@@ -23,7 +23,7 @@ public class FreewayScenario {
 
         // get upstream mainline source
         Set<Link> ml_sources = otm_scenario.network.links.values().stream()
-                .filter(link->link.is_source && link.road_type.equals("feeway"))
+                .filter(link->link.is_source && link.road_type.equals(Link.RoadType.mainline))
                 .collect(toSet());
 
         if(ml_sources.size()!=1)
@@ -38,7 +38,7 @@ public class FreewayScenario {
 
             // get onramp ........................
             Set<Link> onramps = ml_link.start_node.in_links.values().stream()
-                    .filter(link->link.road_type.equals("onramp"))
+                    .filter(link->link.is_source && link.road_type.equals(Link.RoadType.ramp))
                     .collect(toSet());
 
             if(onramps.size()>1)
