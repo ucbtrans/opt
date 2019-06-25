@@ -21,12 +21,9 @@
 	<xs:element name="scn">
 		<xs:complexType>
 			<xs:attribute name="name" type="xs:string" default="unnamed" />
-			<xs:attribute name="folder" type="xs:string" use="required" />
-			<xs:attribute name="class" type="xs:string" use="required" />
+			<xs:attribute name="file" type="xs:string" use="required" />
 		</xs:complexType>
 	</xs:element>
-
-
 
 </xs:schema>
 

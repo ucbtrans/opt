@@ -123,19 +123,19 @@
 
     <dependencies>
 
-        <!-- OTM BASE
+        <!-- OTM BASE -->
         <dependency>
             <groupId>otm</groupId>
             <artifactId>otm-base</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency> -->
+        </dependency>
 
-        <!-- OTM SIM
+        <!-- OTM SIM -->
         <dependency>
             <groupId>otm</groupId>
             <artifactId>otm-sim</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency> -->
+        </dependency>
 
         <!-- JUNIT -->
         <dependency>

@@ -1,4 +1,4 @@
-package opt;
+package opt.tests;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
