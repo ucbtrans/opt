@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0.2">
+
+	<!-- TODO: GG Figure out name spaces so that prjs->projects and scns->scenarios  -->
+	<xs:element name="prj">
+		<xs:complexType>
+			<xs:all>
+				<xs:element ref="scns" minOccurs="0" maxOccurs="1" />
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="scns">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="scn" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="scn">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" default="unnamed" />
+			<xs:attribute name="folder" type="xs:string" use="required" />
+			<xs:attribute name="class" type="xs:string" use="required" />
+		</xs:complexType>
+	</xs:element>
+
+
+
+</xs:schema>
+

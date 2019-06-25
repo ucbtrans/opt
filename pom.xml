@@ -15,12 +15,12 @@
         <url>git@github.com:ucbtrans/opt.git</url>
     </scm>
         
-    <repositories>
-        <repository>
-            <id>myMavenRepoOTM</id>
-            <url>${myMavenRepoOTMReadUrl}</url>
-        </repository>
-    </repositories>
+<!--    <repositories>-->
+<!--        <repository>-->
+<!--            <id>myMavenRepoOTM</id>-->
+<!--            <url>${myMavenRepoOTMReadUrl}</url>-->
+<!--        </repository>-->
+<!--    </repositories>-->
 
     <build>
 
@@ -81,9 +81,6 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
-<!--                    <excludes>-->
-<!--                        <exclude>od/*.java</exclude>-->
-<!--                    </excludes>-->
                 </configuration>
             </plugin>
 
@@ -126,19 +123,19 @@
 
     <dependencies>
 
-        <!-- OTM BASE -->
+        <!-- OTM BASE
         <dependency>
             <groupId>otm</groupId>
             <artifactId>otm-base</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
+        </dependency> -->
 
-        <!-- OTM SIM -->
+        <!-- OTM SIM
         <dependency>
             <groupId>otm</groupId>
             <artifactId>otm-sim</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
+        </dependency> -->
 
         <!-- JUNIT -->
         <dependency>
