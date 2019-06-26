@@ -8,13 +8,17 @@ import static java.util.stream.Collectors.toSet;
 
 public class jScenario {
 
-    public jaxb.Scenario scenario;
     public Map<Long,jNode> nodes = new HashMap<>();
     public Map<Long,jLink> links = new HashMap<>();
     public Map<Long,jaxb.Roadparam> road_params = new HashMap<>();
 
+    /////////////////////////////////////
+    // construction
+    /////////////////////////////////////
+
+    public jScenario(){}
+
     public jScenario(jaxb.Scenario scenario){
-        this.scenario = scenario;
 
         for(jaxb.Roadparam rp: scenario.getNetwork().getRoadparams().getRoadparam())
             road_params.put(rp.getId(),rp);
@@ -33,6 +37,10 @@ public class jScenario {
             link.is_source = nodes.get(link.start_node_id).in_links.isEmpty();
 
     }
+
+    /////////////////////////////////////
+    // getters
+    /////////////////////////////////////
 
     public jLink get_ml_source() throws Exception {
         Set<jLink> source_links = links.values().stream()

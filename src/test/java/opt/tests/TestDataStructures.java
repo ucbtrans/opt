@@ -10,6 +10,8 @@ import org.junit.Test;
 import java.io.File;
 import java.util.Collection;
 
+import static org.junit.Assert.*;
+
 public class TestDataStructures {
 
     //////////////////////////////////////
@@ -115,13 +117,16 @@ public class TestDataStructures {
     }
 
     @Test
-    @Ignore
     public void test_clone_scenario(){
-        Project project = load_test_project();
-        Collection<String> scenario_names = project.get_scenario_names();
-        String new_name = "new_scenario";
         try {
-            project.clone_scenario(scenario_names.iterator().next(),new_name);
+            Project project = load_test_project();
+            project.clone_scenario("scenarioA","new_scenario");
+
+            FreewayScenario scenarioA = project.get_scenario_with_name("scenarioA");
+            FreewayScenario new_scenario = project.get_scenario_with_name("new_scenario");
+
+            System.out.println("asdf");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -171,21 +176,100 @@ public class TestDataStructures {
     }
 
     @Test
-    @Ignore
     public void test_add_ramp() {
-        // TODO GG IMPLEMENT THIS
+
+        Project project = load_test_project();
+        FreewayScenario scenario = project.get_scenario_with_name("scenarioA");
+        Segment segment = scenario.get_segment(1);
+
+        // add offramp
+        segment.set_fr_lanes(1);
+
+        // add onramp
+        segment.set_or_lanes(1);
     }
 
     @Test
-    @Ignore
     public void test_delete_ramp() {
-        // TODO GG IMPLEMENT THIS
+
+        Project project = load_test_project();
+        FreewayScenario scenario = project.get_scenario_with_name("scenarioA");
+
+        // delete an existing offramp
+        assertTrue(scenario.get_segment(2).delete_offramp());
+
+        // try to delete an non-existing offramp
+        assertFalse(scenario.get_segment(1).delete_offramp());
+
+        // delete an existing onramp
+        assertTrue(scenario.get_segment(2).delete_onramp());
+
+        // try to delete an non-existing onramp
+        assertFalse(scenario.get_segment(1).delete_onramp());
     }
 
     @Test
-    @Ignore
     public void test_modify_segment_attributes() {
-        // TODO GG IMPLEMENT THIS
+
+        Project project = load_test_project();
+        FreewayScenario scenario = project.get_scenario_with_name("scenarioA");
+        Segment segment = scenario.get_segment(2);
+
+        // onramp lanes
+        int or_lanes = 12;
+        segment.set_or_lanes(or_lanes);
+        assertEquals(or_lanes,segment.get_or_lanes());
+
+        // onramp capacity
+        float or_capacity = 123.4563f;
+        segment.set_or_capacity_vphpl(or_capacity);
+        assertEquals(or_capacity,segment.get_or_capacity_vphpl(),0.001);
+
+        // onramp max_vehicles
+        float or_max_vehicles = 24983.234f;
+        segment.set_or_max_vehicles(or_max_vehicles);
+        assertEquals(or_max_vehicles,segment.get_or_max_vehicles(),0.001);
+
+        // offramp lanes
+        int fr_lanes = 125;
+        segment.set_fr_lanes(fr_lanes);
+        assertEquals(fr_lanes,segment.get_fr_lanes());
+
+        // offramp capacity
+        float fr_capacity = 123.4563f;
+        segment.set_fr_capacity_vphpl(fr_capacity);
+        assertEquals(fr_capacity,segment.get_fr_capacity_vphpl(),0.001);
+
+        // offramp max_vehicles
+        float fr_max_vehicles = 235567.346f;
+        segment.set_fr_max_vehicles(fr_max_vehicles);
+        assertEquals(fr_max_vehicles,segment.get_fr_max_vehicles(),0.001);
+
+        // mainline lanes
+        int ml_lanes = 2436;
+        segment.set_ml_lanes(ml_lanes);
+        assertEquals(ml_lanes,segment.get_ml_lanes());
+
+        // mainline length
+        float ml_length = 3480.346f;
+        segment.set_ml_length_feet(ml_length);
+        assertEquals(ml_length,segment.get_ml_length_feet(),0.001);
+
+        // mainline capacity
+        float ml_capacity = 3498.2356f;
+        segment.set_ml_capacity_vphpl(ml_capacity);
+        assertEquals(ml_capacity,segment.get_ml_capacity_vphpl(),0.001);
+
+        // mainline jam density
+        float ml_jam_density = 245.234f;
+        segment.set_ml_jam_density_vpmpl(ml_jam_density);
+        assertEquals(ml_jam_density,segment.get_ml_jam_density_vpmpl(),0.001);
+
+        // mainline free flow speed
+        float ml_speed = 348934.435f;
+        segment.set_ml_freespeed_mph(ml_speed);
+        assertEquals(ml_speed,segment.get_ml_freespeed_mph(),0.001);
+
     }
 
     /////////////////////////////////////

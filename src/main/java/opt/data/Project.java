@@ -90,16 +90,13 @@ public class Project {
      */
     public void clone_scenario(String from_name,String to_name) throws Exception {
 
-        throw new Exception("NOT IMPLEMENTED YET.");
+        if(!scenarios.containsKey(from_name))
+            throw new Exception("The project does not have a scenario by this name.");
 
-//        if(!scenarios.containsKey(from_name))
-//            throw new Exception("The project does not have a scenario by this name.");
-//
-//        if(scenarios.containsKey(to_name))
-//            throw new Exception("The project already has a scenario by this name.");
+        if(scenarios.containsKey(to_name))
+            throw new Exception("The project already has a scenario by this name.");
 
-        // TODO : GG Implement deep_copy
-//        scenarios.put( to_name , ScenarioFactory.deep_copy(scenarios.get(from_name)) );
+        scenarios.put( to_name , OPTFactory.deep_copy_scenario(scenarios.get(from_name)) );
     }
 
     /////////////////////////////////////

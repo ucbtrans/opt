@@ -7,6 +7,11 @@ public class jNode {
     public long id;
     public Set<jLink> in_links = new HashSet<>();
     public Set<jLink> out_links = new HashSet<>();
+
+    /////////////////////////////////////
+    // construction
+    /////////////////////////////////////
+
     public jNode(jaxb.Node jnode){
         this.id = jnode.getId();
     }

@@ -11,14 +11,16 @@ public class Segment {
     private final static float default_fr_jam_density_vpkpl = 100f;
     private final static float default_fr_ff_speed_kph = 40f;
 
-    private FreewayScenario fwy_scenario;
-    private jLink ml;
-    private jLink or;
-    private jLink fr;
+    protected FreewayScenario fwy_scenario;
+    protected jLink ml;
+    protected jLink or;
+    protected jLink fr;
 
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
+
+    public Segment(){}
 
     public Segment(FreewayScenario fwy_scenario,jLink or, jLink ml, jLink fr) throws Exception {
 
@@ -35,20 +37,30 @@ public class Segment {
     // deletion
     /////////////////////////////////////
 
-    public void delete_offramp(){
+    /**
+     * Delete the offramp from this segment
+     * @return success value
+     */
+    public boolean delete_offramp(){
         if(fr==null)
-            return;
+            return false;
         fwy_scenario.jscenario.nodes.remove(fr.end_node_id);
         fwy_scenario.jscenario.links.remove(fr.id);
         fr = null;
+        return true;
     }
 
-    public void delete_onramp(){
+    /**
+     * Delete the onramp from this segment
+     * @return success value
+     */
+    public boolean delete_onramp(){
         if(or==null)
-            return;
+            return false;
         fwy_scenario.jscenario.nodes.remove(or.start_node_id);
         fwy_scenario.jscenario.links.remove(or.id);
         or = null;
+        return true;
     }
 
     /////////////////////////////////////

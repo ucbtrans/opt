@@ -16,6 +16,8 @@ public class FreewayScenario {
     // construction
     /////////////////////////////////////
 
+    public FreewayScenario(){}
+
     public FreewayScenario(jaxb.Scenario jaxb_scenario) throws Exception {
         this.jscenario = new jScenario(jaxb_scenario);
 
@@ -75,14 +77,8 @@ public class FreewayScenario {
                 break;
         }
 
-        // max id
-        max_link_id = jscenario.links.keySet().stream()
-                .max(Comparator.comparing(Long::valueOf))
-                .get();
-
-        max_node_id = jscenario.nodes.keySet().stream()
-                .max(Comparator.comparing(Long::valueOf))
-                .get();
+        // max ids
+        reset_max_ids();
 
     }
 
@@ -218,6 +214,20 @@ public class FreewayScenario {
 
 //        if(!ready_to_run)
 //            make_ready_to_run();
+    }
+
+    /////////////////////////////////////
+    // protected
+    /////////////////////////////////////
+
+    protected void reset_max_ids(){
+        max_link_id = jscenario.links.keySet().stream()
+                .max(Comparator.comparing(Long::valueOf))
+                .get();
+
+        max_node_id = jscenario.nodes.keySet().stream()
+                .max(Comparator.comparing(Long::valueOf))
+                .get();
     }
 
     /////////////////////////////////////
