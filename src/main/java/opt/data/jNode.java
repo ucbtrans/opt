@@ -11,13 +11,13 @@ public class jNode {
         this.id = jnode.getId();
     }
 
+    public jNode(long id){
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return String.format("%d",id);
-    }
-
-    public jNode(long id){
-        this.id = id;
     }
 
 }

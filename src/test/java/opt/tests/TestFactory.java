@@ -1,13 +1,10 @@
 package opt.tests;
 
-import opt.data.FreewayScenario;
 import opt.data.OPTFactory;
 import opt.data.Project;
-import opt.data.Segment;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.List;
 
 public class TestFactory {
 

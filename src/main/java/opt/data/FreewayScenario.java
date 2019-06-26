@@ -9,9 +9,8 @@ public class FreewayScenario {
     private Long max_link_id;
     private Long max_node_id;
 
-    private jScenario jscenario;
-
-    private List<Segment> segments = new ArrayList<>();
+    protected jScenario jscenario;
+    protected List<Segment> segments = new ArrayList<>();
 
     /////////////////////////////////////
     // construction
@@ -52,7 +51,7 @@ public class FreewayScenario {
 
 
             // create the segment ................
-            segments.add( new Segment(onramp,ml_link,offramp) );
+            segments.add( new Segment(this,onramp,ml_link,offramp) );
 
             // remove from list ...................
             all_links.remove(ml_link);
@@ -120,7 +119,7 @@ public class FreewayScenario {
                 true, false, dn_index==0, dn_ml.capacity_vphpl, dn_ml.jam_density_vpkpl,
                 dn_ml.ff_speed_kph);
 
-        Segment new_segment = new Segment(null,ml,null);
+        Segment new_segment = new Segment(this,null,ml,null);
         this.segments.add(dn_index,new_segment);
 
         // fix network
@@ -162,11 +161,11 @@ public class FreewayScenario {
     // private
     /////////////////////////////////////
 
-    private long new_link_id(){
+    protected long new_link_id(){
         return ++max_link_id;
     }
 
-    private long new_node_id(){
+    protected long new_node_id(){
         return ++max_node_id;
     }
 

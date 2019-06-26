@@ -14,6 +14,10 @@ public class jLink {
     public float jam_density_vpkpl;
     public float ff_speed_kph;
 
+    /////////////////////////////////////
+    // construction
+    /////////////////////////////////////
+
     public jLink(jaxb.Link link,jaxb.Roadparam rp){
         this.id = link.getId();
         this.start_node_id = link.getStartNodeId();
@@ -45,9 +49,17 @@ public class jLink {
 
     }
 
+    /////////////////////////////////////
+    // getters
+    /////////////////////////////////////
+
     public float get_max_vehicles(){
         return jam_density_vpkpl * full_lanes * length / 1000f;
     }
+
+    /////////////////////////////////////
+    // override
+    /////////////////////////////////////
 
     @Override
     public String toString() {
