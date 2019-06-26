@@ -1,13 +1,10 @@
 package opt.data;
 
 import error.OTMException;
-import runner.ScenarioFactory;
 import xml.JaxbLoader;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Project {
 
@@ -35,8 +32,7 @@ public class Project {
                     throw new Exception("Repeated scenario name in project file.");
 
                 jaxb.Scenario jaxb_scenario = JaxbLoader.load_scenario(scn_file,validate);
-                runner.Scenario scenario =  ScenarioFactory.create_scenario(jaxb_scenario,validate);
-                scenarios.put(scn_name,new FreewayScenario(scenario));
+                scenarios.put(scn_name,new FreewayScenario(jaxb_scenario));
             }
 
         } catch (OTMException e) {
@@ -45,13 +41,18 @@ public class Project {
 
     }
 
-
     /////////////////////////////////////
     // getters / setters
     /////////////////////////////////////
 
     public Collection<String> get_scenario_names(){
         return scenarios.keySet();
+    }
+
+    public Collection<FreewayScenario> get_scenarios(){
+        Set<FreewayScenario> x = new HashSet<>();
+        x.addAll(scenarios.values());
+        return x;
     }
 
     public FreewayScenario get_scenario_with_name(String name){
@@ -70,7 +71,7 @@ public class Project {
     public void create_scenario(String name) throws Exception {
         if( scenarios.containsKey(name))
             throw new Exception("The project already has a scenario by this name.");
-        scenarios.put(name,new FreewayScenario(new runner.Scenario()));
+        scenarios.put(name,new FreewayScenario(new jaxb.Scenario()));
     }
 
     /**
@@ -91,5 +92,24 @@ public class Project {
 
         // TODO : GG Implement deep_copy
 //        scenarios.put( to_name , ScenarioFactory.deep_copy(scenarios.get(from_name)) );
+    }
+
+    /////////////////////////////////////
+    // override
+    /////////////////////////////////////
+
+    @Override
+    public String toString() {
+        String str = "";
+        for(String scenario_name : get_scenario_names()){
+            str = str.concat("Scenario: " + scenario_name + " ------------\n");
+            FreewayScenario scenario = get_scenario_with_name(scenario_name);
+            List<Segment> segments = scenario.get_segments();
+            for(int i=0;i<segments.size();i++){
+                str = str.concat("segment " + i + "..........\n");
+                str = str.concat(segments.get(i).toString()+"\n");
+            }
+        }
+        return str;
     }
 }
