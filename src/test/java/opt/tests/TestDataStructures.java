@@ -150,9 +150,24 @@ public class TestDataStructures {
     }
 
     @Test
-    @Ignore
     public void test_delete_segment() {
-        // TODO GG IMPLEMENT THIS
+        Project project = load_test_project();
+        FreewayScenario scenario = project.get_scenario_with_name("scenarioA");
+
+        try {
+
+            // delete the zeroth segment
+            scenario.delete_segment(0);
+
+            // delete a middle segment
+            scenario.delete_segment(4);
+
+            // delete last segment
+            scenario.delete_segment(scenario.get_num_segments()-1);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

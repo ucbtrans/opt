@@ -117,11 +117,14 @@ public class FreewayScenario {
         jLink dn_ml = dn_segment.get_ml();
 
         jNode start_node = new jNode(new_node_id());
+        jscenario.nodes.put(start_node.id,start_node);
+
         jNode end_node = jscenario.nodes.get(dn_ml.start_node_id);
 
         jLink ml = new jLink(new_link_id(),start_node.id,end_node.id,dn_ml.full_lanes,dn_ml.length,
                 true, false, dn_index==0, dn_ml.capacity_vphpl, dn_ml.jam_density_vpkpl,
                 dn_ml.ff_speed_kph);
+        jscenario.links.put(ml.id,ml);
 
         Segment new_segment = new Segment(this,null,ml,null);
         this.segments.add(dn_index,new_segment);
@@ -153,11 +156,14 @@ public class FreewayScenario {
         jLink up_ml = up_segment.get_ml();
 
         jNode end_node = new jNode(new_node_id());
+        jscenario.nodes.put(end_node.id,end_node);
+
         jNode start_node = jscenario.nodes.get(up_ml.end_node_id);
 
         jLink ml = new jLink(new_link_id(),start_node.id,end_node.id,up_ml.full_lanes,up_ml.length,
                 true, false, false, up_ml.capacity_vphpl, up_ml.jam_density_vpkpl,
                 up_ml.ff_speed_kph);
+        jscenario.links.put(ml.id,ml);
 
         Segment new_segment = new Segment(this,null,ml,null);
         this.segments.add(up_index+1,new_segment);
@@ -169,6 +175,39 @@ public class FreewayScenario {
             dn_segment.set_start_node(end_node.id);
 
         return new_segment;
+    }
+
+    /**
+     * Delete the segment at the given index
+     * @param index
+     */
+    public void delete_segment(int index) throws Exception {
+
+        if(index<0 || index>=segments.size())
+            throw new Exception("Out of bounds index.");
+
+        if(get_num_segments()==1)
+            throw new Exception("Removing the sole segment is not allowed.");
+
+        Segment segment = segments.get(index);
+        segment.delete_offramp();
+        segment.delete_onramp();
+        jscenario.links.remove(segment.get_ml().id);
+
+        // fix adjacent segments
+        if(index==0)
+            // make the 1st segment a source
+            segments.get(1).get_ml().is_source = true;
+        else
+            // attach upstream segment to the end node
+            segments.get(index-1).set_end_node(segment.get_ml().end_node_id);
+
+
+        // remove the start node
+        jscenario.nodes.remove(segment.get_ml().start_node_id);
+
+        // remove the segment
+        segments.remove(index);
     }
 
     /////////////////////////////////////

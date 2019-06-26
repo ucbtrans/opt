@@ -32,6 +32,26 @@ public class Segment {
     }
 
     /////////////////////////////////////
+    // deletion
+    /////////////////////////////////////
+
+    public void delete_offramp(){
+        if(fr==null)
+            return;
+        fwy_scenario.jscenario.nodes.remove(fr.end_node_id);
+        fwy_scenario.jscenario.links.remove(fr.id);
+        fr = null;
+    }
+
+    public void delete_onramp(){
+        if(or==null)
+            return;
+        fwy_scenario.jscenario.nodes.remove(or.start_node_id);
+        fwy_scenario.jscenario.links.remove(or.id);
+        or = null;
+    }
+
+    /////////////////////////////////////
     // onramp getters
     /////////////////////////////////////
 
