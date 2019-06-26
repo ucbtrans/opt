@@ -2,6 +2,7 @@ package opt.data;
 
 public class Segment {
 
+    ///////////////////////////
     private final static float KmPerMile = 1.609344f;
     private final static float FeetPerMeter = 3.28084f;
     private final static float default_or_capacity_vphpl = 1500f;
@@ -10,6 +11,7 @@ public class Segment {
     private final static float default_fr_capacity_vphpl = 1500f;
     private final static float default_fr_jam_density_vpkpl = 100f;
     private final static float default_fr_ff_speed_kph = 40f;
+    ///////////////////////////
 
     protected FreewayScenario fwy_scenario;
     protected jLink ml;

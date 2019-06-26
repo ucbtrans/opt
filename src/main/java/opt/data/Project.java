@@ -1,6 +1,7 @@
 package opt.data;
 
 import error.OTMException;
+import jaxb.Scn;
 import xml.JaxbLoader;
 
 import java.io.File;
@@ -42,27 +43,48 @@ public class Project {
     }
 
     /////////////////////////////////////
-    // save to file
+    // run
     /////////////////////////////////////
 
-    public void save_to_file(String filename){
-        // TODO GG IMPLEMENT THIS
+    public void run_all_scenarios() throws Exception {
+        for(FreewayScenario scenario : scenarios.values())
+            scenario.run_on_new_thread();
+    }
+
+
+    public void run_scenario(String scenario_name) throws Exception {
+        if(!scenarios.containsKey(scenario_name))
+            throw new Exception("Unknown scenario");
+        scenarios.get(scenario_name).run_on_new_thread();
     }
 
     /////////////////////////////////////
     // getters / setters
     /////////////////////////////////////
 
+    /**
+     * Get all names of scenarios in the project
+     * @return collection of string names
+     */
     public Collection<String> get_scenario_names(){
         return scenarios.keySet();
     }
 
+    /**
+     * Get collection of scenarios in the project
+     * @return Collection of FreewayScenario objects
+     */
     public Collection<FreewayScenario> get_scenarios(){
         Set<FreewayScenario> x = new HashSet<>();
         x.addAll(scenarios.values());
         return x;
     }
 
+    /**
+     * Get scenario by name
+     * @param name
+     * @return FreewayScenario object if the name is valid. null otherwise.
+     */
     public FreewayScenario get_scenario_with_name(String name){
         return scenarios.containsKey(name) ? scenarios.get(name) : null;
     }
@@ -97,6 +119,26 @@ public class Project {
             throw new Exception("The project already has a scenario by this name.");
 
         scenarios.put( to_name , OPTFactory.deep_copy_scenario(scenarios.get(from_name)) );
+    }
+
+    /////////////////////////////////////
+    // private
+    /////////////////////////////////////
+
+    protected jaxb.Prj to_jaxb(Map<String,String> scenario_file_names){
+        jaxb.Prj jaxbPrj = new jaxb.Prj();
+        jaxb.Scns jaxbScns = new jaxb.Scns();
+        jaxbPrj.setScns(jaxbScns);
+
+        List<Scn> scnlist = jaxbScns.getScn();
+        for(Map.Entry<String, FreewayScenario> e : scenarios.entrySet()) {
+            jaxb.Scn jScn = new jaxb.Scn();
+            jScn.setName(e.getKey());
+            jScn.setFile(scenario_file_names.get(e.getKey()));
+            scnlist.add(jScn);
+        }
+
+        return jaxbPrj;
     }
 
     /////////////////////////////////////

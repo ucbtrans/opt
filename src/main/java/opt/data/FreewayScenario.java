@@ -86,10 +86,19 @@ public class FreewayScenario {
     // getters
     /////////////////////////////////////
 
+    /**
+     * Number of segments in this scenario
+     * @return integer number of segments.
+     */
     public int get_num_segments(){
         return segments.size();
     }
 
+    /**
+     * Get segment by index.
+     * @param i index in [0...num segments-1]
+     * @return segment object if the index is valid. null otherwise.
+     */
     public Segment get_segment(int i){
         return i<0 || i>=get_num_segments() ? null : segments.get(i);
     }
@@ -210,15 +219,66 @@ public class FreewayScenario {
     // run
     /////////////////////////////////////
 
-    public void run(){
-
-//        if(!ready_to_run)
-//            make_ready_to_run();
+    public void run_on_new_thread() throws Exception {
+        throw new Exception("NOT IMPLEMENTED!");
     }
 
     /////////////////////////////////////
     // protected
     /////////////////////////////////////
+
+    public jaxb.Scenario to_jaxb(){
+        jaxb.Scenario jScn = new jaxb.Scenario();
+        jaxb.Network jNet = new jaxb.Network();
+        jScn.setNetwork(jNet);
+
+        // nodes
+        jaxb.Nodes jNodes = new jaxb.Nodes();
+        jNet.setNodes(jNodes);
+        for(jNode node : jscenario.nodes.values()) {
+            jaxb.Node jaxbNode = new jaxb.Node();
+            jaxbNode.setId(node.id);
+            jNodes.getNode().add(jaxbNode);
+        }
+
+        jaxb.Roadparams jRoadParams = new jaxb.Roadparams();
+        jNet.setRoadparams(jRoadParams);
+        Set<jRoadParam> road_params = jscenario.get_road_params();
+        for(jRoadParam jrp : road_params){
+            jaxb.Roadparam jaxbrp = new jaxb.Roadparam();
+            jaxbrp.setId(jrp.id);
+            jaxbrp.setCapacity(jrp.capacity);
+            jaxbrp.setSpeed(jrp.speed);
+            jaxbrp.setJamDensity(jrp.jam_density);
+            jRoadParams.getRoadparam().add(jaxbrp);
+        }
+
+        // links
+        jaxb.Links jLinks = new jaxb.Links();
+        jNet.setLinks(jLinks);
+        for(jLink link : jscenario.links.values()){
+            jaxb.Link jaxbLink = new jaxb.Link();
+            jaxbLink.setId(link.id);
+            jaxbLink.setLength(link.length);
+            jaxbLink.setFullLanes(link.full_lanes);
+            jaxbLink.setEndNodeId(link.end_node_id);
+            jaxbLink.setStartNodeId(link.start_node_id);
+
+            if(link.is_mainline)
+                jaxbLink.setRoadType("mainline");
+            if(link.is_ramp)
+                jaxbLink.setRoadType("ramp");
+
+            // road params
+            jRoadParam link_rp = new jRoadParam(link.capacity_vphpl,link.ff_speed_kph,link.jam_density_vpkpl);
+            long rp_id = road_params.stream().filter(rp->rp.equals(link_rp)).findFirst().get().id;
+
+            jaxbLink.setRoadparam(rp_id);
+            jLinks.getLink().add(jaxbLink);
+        }
+
+        return jScn;
+    }
 
     protected void reset_max_ids(){
         max_link_id = jscenario.links.keySet().stream()
@@ -229,10 +289,6 @@ public class FreewayScenario {
                 .max(Comparator.comparing(Long::valueOf))
                 .get();
     }
-
-    /////////////////////////////////////
-    // private
-    /////////////////////////////////////
 
     protected long new_link_id(){
         return ++max_link_id;

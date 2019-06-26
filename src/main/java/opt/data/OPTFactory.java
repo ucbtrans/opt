@@ -7,6 +7,7 @@ import org.xml.sax.SAXException;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -14,6 +15,7 @@ import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class OPTFactory {
@@ -44,6 +46,11 @@ public class OPTFactory {
         return new Project();
     }
 
+    /**
+     * Create a deep copy of a given scenario
+     * @param scn_org FreewayScenario object
+     * @return new FreewayScenario object
+     */
     public static FreewayScenario deep_copy_scenario(FreewayScenario scn_org){
         FreewayScenario scn_cpy = new FreewayScenario();
         scn_cpy.jscenario = deep_copy_jscenario(scn_org.jscenario);
@@ -53,6 +60,32 @@ public class OPTFactory {
         scn_cpy.reset_max_ids();
         return scn_cpy;
     }
+
+    /**
+     * Save project to xml files
+     * @param project
+     * @param filePath Full path and name for the output file. (
+     * @throws Exception
+     */
+    public static void save_project(Project project,String filePath) throws Exception {
+
+        // parse the filePath
+        FileInfo file_info = new FileInfo(filePath);
+
+        // save each of the scenarios
+        Map<String,String> scenario_file_names = new HashMap<>();
+        for(String scenario_name : project.get_scenario_names()){
+            FreewayScenario scenario = project.get_scenario_with_name(scenario_name);
+            File scenario_file = file_info.get_scenario_file(scenario_name);
+            scenario_file_names.put(scenario_name,scenario_file.getName());
+            create_marshaller(jaxb.Scenario.class).marshal(scenario.to_jaxb(), scenario_file);
+        }
+
+        // save project file
+        create_marshaller(jaxb.Prj.class).marshal(project.to_jaxb(scenario_file_names), file_info.get_project_file());
+
+    }
+
 
     /////////////////////////////////////
     // private
@@ -66,6 +99,15 @@ public class OPTFactory {
         Schema schema = sf.newSchema(new StreamSource(resourceAsStream));
         unmarshaller.setSchema(schema);
         return unmarshaller;
+    }
+
+    private static Marshaller create_marshaller(Class clazz) throws JAXBException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
+        Marshaller marshaller = jaxbContext.createMarshaller();
+
+        //Required formatting??
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        return marshaller;
     }
 
     private static jScenario deep_copy_jscenario(jScenario jscn_org) {
@@ -105,18 +147,18 @@ public class OPTFactory {
                 node_cpy.in_links.add(jscn_cpy.links.get(link_org.id));
         }
 
-        // set road parameters
-        for(Map.Entry<Long,jaxb.Roadparam> e : jscn_org.road_params.entrySet()) {
-            long rp_id = e.getKey();
-            jaxb.Roadparam rp = e.getValue();
-            jaxb.Roadparam rp_cpy = new Roadparam();
-            rp_cpy.setId(rp_id);
-            rp_cpy.setName(rp.getName());
-            rp_cpy.setCapacity(rp.getCapacity());
-            rp_cpy.setJamDensity(rp.getJamDensity());
-            rp_cpy.setSpeed(rp.getSpeed());
-            jscn_cpy.road_params.put(rp_id, rp_cpy);
-        }
+//        // set road parameters
+//        for(Map.Entry<Long,jaxb.Roadparam> e : jscn_org.road_params.entrySet()) {
+//            long rp_id = e.getKey();
+//            jaxb.Roadparam rp = e.getValue();
+//            jaxb.Roadparam rp_cpy = new Roadparam();
+//            rp_cpy.setId(rp_id);
+//            rp_cpy.setName(rp.getName());
+//            rp_cpy.setCapacity(rp.getCapacity());
+//            rp_cpy.setJamDensity(rp.getJamDensity());
+//            rp_cpy.setSpeed(rp.getSpeed());
+//            jscn_cpy.road_params.put(rp_id, rp_cpy);
+//        }
 
         return jscn_cpy;
     }
@@ -129,4 +171,36 @@ public class OPTFactory {
         seg_cpy.fr = seg_org.fr==null ? null : scenario.jscenario.links.get(seg_org.fr.id);
         return seg_cpy;
     }
+
+    public static class FileInfo {
+        String folder;
+        String file_name;
+        String extension;
+        public FileInfo(String filePath){
+            File f = new File(filePath);
+            if (f.isDirectory())
+                return;
+            folder = f.getParent();
+            String name = f.getName();
+            final int lastPeriodPos = name.lastIndexOf('.');
+            if (lastPeriodPos <= 0) {
+                file_name = name;
+                extension = "xml";
+            }
+            else
+            {
+                file_name = name.substring(0, lastPeriodPos);
+                extension = name.substring(lastPeriodPos+1);
+            }
+        }
+        public File get_project_file(){
+            return new File(folder,file_name + "." + extension);
+        }
+        public File get_scenario_file(String scenario_name){
+            // remove whitespace
+            scenario_name.replaceAll("\\s+","");
+            return new File(folder,file_name + "_" + scenario_name + "." + extension);
+        }
+    }
+
 }

@@ -1,24 +1,24 @@
 package opt.data;
 
 public class jLink {
-    public long id;
-    public long start_node_id;
-    public long end_node_id;
-    public int full_lanes;
-    public float length;
+    protected long id;
+    protected long start_node_id;
+    protected long end_node_id;
+    protected int full_lanes;
+    protected float length;
 
-    public boolean is_source;
-    public boolean is_mainline;
-    public boolean is_ramp;
-    public float capacity_vphpl;
-    public float jam_density_vpkpl;
-    public float ff_speed_kph;
+    protected boolean is_source;
+    protected boolean is_mainline;
+    protected boolean is_ramp;
+    protected float capacity_vphpl;
+    protected float jam_density_vpkpl;
+    protected float ff_speed_kph;
 
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
 
-    public jLink(jaxb.Link link,jaxb.Roadparam rp){
+    protected jLink(jaxb.Link link,jaxb.Roadparam rp){
         this.id = link.getId();
         this.start_node_id = link.getStartNodeId();
         this.end_node_id = link.getEndNodeId();
@@ -31,7 +31,7 @@ public class jLink {
         this.ff_speed_kph = rp.getSpeed();
     }
 
-    public jLink(long id,long start_node_id,long end_node_id,int full_lanes,float length,boolean is_mainline,
+    protected jLink(long id,long start_node_id,long end_node_id,int full_lanes,float length,boolean is_mainline,
                  boolean is_ramp,boolean is_source,float capacity_vphpl,float jam_density_vpkpl,float ff_speed_kph) {
 
         this.id = id;
@@ -47,14 +47,6 @@ public class jLink {
         this.jam_density_vpkpl = jam_density_vpkpl;
         this.ff_speed_kph = ff_speed_kph;
 
-    }
-
-    /////////////////////////////////////
-    // getters
-    /////////////////////////////////////
-
-    public float get_max_vehicles(){
-        return jam_density_vpkpl * full_lanes * length / 1000f;
     }
 
     /////////////////////////////////////

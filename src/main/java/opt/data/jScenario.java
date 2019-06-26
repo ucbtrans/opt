@@ -1,6 +1,7 @@
 package opt.data;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,18 +9,18 @@ import static java.util.stream.Collectors.toSet;
 
 public class jScenario {
 
-    public Map<Long,jNode> nodes = new HashMap<>();
-    public Map<Long,jLink> links = new HashMap<>();
-    public Map<Long,jaxb.Roadparam> road_params = new HashMap<>();
+    protected Map<Long,jNode> nodes = new HashMap<>();
+    protected Map<Long,jLink> links = new HashMap<>();
 
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
 
-    public jScenario(){}
+    protected jScenario(){}
 
-    public jScenario(jaxb.Scenario scenario){
+    protected jScenario(jaxb.Scenario scenario){
 
+        Map<Long,jaxb.Roadparam> road_params = new HashMap<>();
         for(jaxb.Roadparam rp: scenario.getNetwork().getRoadparams().getRoadparam())
             road_params.put(rp.getId(),rp);
 
@@ -42,13 +43,25 @@ public class jScenario {
     // getters
     /////////////////////////////////////
 
-    public jLink get_ml_source() throws Exception {
+    protected jLink get_ml_source() throws Exception {
         Set<jLink> source_links = links.values().stream()
                 .filter(link -> link.is_mainline && link.is_source)
                 .collect(toSet());
         if ( source_links.size()!=1 )
             throw new Exception("The network should have exactly one mainline source link.");
         return source_links.iterator().next();
+    }
+
+    protected Set<jRoadParam> get_road_params(){
+        Set<jRoadParam> road_params = new HashSet<>();
+        for(jLink link : links.values())
+            road_params.add(new jRoadParam(link.capacity_vphpl,link.ff_speed_kph,link.jam_density_vpkpl));
+
+        // set ids
+        long id = 0;
+        for(jRoadParam roadParam : road_params)
+            roadParam.id = id++;
+        return road_params;
     }
 
 }

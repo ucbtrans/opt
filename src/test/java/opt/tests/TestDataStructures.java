@@ -8,7 +8,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.Collection;
 
 import static org.junit.Assert.*;
 
@@ -29,14 +28,23 @@ public class TestDataStructures {
             System.out.print(project.toString());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            fail(e.getMessage());
         }
     }
 
     @Test
     public void test_save_project_to_file() {
         Project project = load_test_project();
-        project.save_to_file(get_test_fullpath("project_saved.xml"));
+        try {
+            OPTFactory.save_project(project,get_test_fullpath("project_saved"));
+
+            Project project_saved = OPTFactory.load_project(get_test_fullpath("project_saved.xml"),false);
+
+            System.out.println(project_saved);
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 
     /////////////////////////////////
@@ -121,14 +129,8 @@ public class TestDataStructures {
         try {
             Project project = load_test_project();
             project.clone_scenario("scenarioA","new_scenario");
-
-            FreewayScenario scenarioA = project.get_scenario_with_name("scenarioA");
-            FreewayScenario new_scenario = project.get_scenario_with_name("new_scenario");
-
-            System.out.println("asdf");
-
         } catch (Exception e) {
-            e.printStackTrace();
+            fail(e.getMessage());
         }
     }
 
@@ -149,7 +151,7 @@ public class TestDataStructures {
             scenario.insert_segment_downstream_from_index(scenario.get_num_segments()-1);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            fail(e.getMessage());
         }
 
     }
@@ -171,7 +173,7 @@ public class TestDataStructures {
             scenario.delete_segment(scenario.get_num_segments()-1);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            fail(e.getMessage());
         }
     }
 
@@ -184,9 +186,11 @@ public class TestDataStructures {
 
         // add offramp
         segment.set_fr_lanes(1);
+        assertTrue(segment.has_offramp());
 
         // add onramp
         segment.set_or_lanes(1);
+        assertTrue(segment.has_onramp());
     }
 
     @Test
@@ -270,6 +274,30 @@ public class TestDataStructures {
         segment.set_ml_freespeed_mph(ml_speed);
         assertEquals(ml_speed,segment.get_ml_freespeed_mph(),0.001);
 
+    }
+
+    /////////////////////////////////////
+    // run simulation
+    /////////////////////////////////////
+
+    @Test
+    public void test_run_all_scenarios(){
+        Project project = load_test_project();
+        try {
+            project.run_all_scenarios();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void test_run_scenario(){
+        Project project = load_test_project();
+        try {
+            project.run_scenario("scenarioA");
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 
     /////////////////////////////////////

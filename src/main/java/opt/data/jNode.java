@@ -4,21 +4,25 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class jNode {
-    public long id;
-    public Set<jLink> in_links = new HashSet<>();
-    public Set<jLink> out_links = new HashSet<>();
+    protected long id;
+    protected Set<jLink> in_links = new HashSet<>();
+    protected Set<jLink> out_links = new HashSet<>();
 
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
 
-    public jNode(jaxb.Node jnode){
+    protected jNode(jaxb.Node jnode){
         this.id = jnode.getId();
     }
 
-    public jNode(long id){
+    protected jNode(long id){
         this.id = id;
     }
+
+    /////////////////////////////////////
+    // override
+    /////////////////////////////////////
 
     @Override
     public String toString() {
