@@ -90,8 +90,12 @@ public class FreewayScenario {
     // getters
     /////////////////////////////////////
 
-    public List<Segment> get_segments(){
-        return segments;
+    public int get_num_segments(){
+        return segments.size();
+    }
+
+    public Segment get_segment(int i){
+        return i<0 || i>=get_num_segments() ? null : segments.get(i);
     }
 
     /////////////////////////////////////
@@ -122,13 +126,14 @@ public class FreewayScenario {
         Segment new_segment = new Segment(this,null,ml,null);
         this.segments.add(dn_index,new_segment);
 
-        // fix network
-        if(up_segment!=null){
-            // TODO GG THIS FIX HAS TO BE ON THE PURE GRAPH, PRIOR TO CREATING LANE GROUPS.
-            // upsegment's end node = start_node
+        // fix adjacent segments ..............
 
-            // fix road connections
-        }
+        // dn_segment is no longer a source
+        dn_segment.get_ml().is_source = false;
+
+        // up_segment's end node = start_node
+        if(up_segment!=null)
+            up_segment.set_end_node(start_node.id);
 
         return new_segment;
     }
@@ -142,9 +147,28 @@ public class FreewayScenario {
 
         assert(up_index>=0 && up_index<segments.size());
 
-        // TODO COMPLETE THIS
+        Segment up_segment = segments.get(up_index);
+        Segment dn_segment = up_index<segments.size()-1 ? segments.get(up_index+1) : null;
 
-        return null;
+        jLink up_ml = up_segment.get_ml();
+
+        jNode end_node = new jNode(new_node_id());
+        jNode start_node = jscenario.nodes.get(up_ml.end_node_id);
+
+        jLink ml = new jLink(new_link_id(),start_node.id,end_node.id,up_ml.full_lanes,up_ml.length,
+                true, false, false, up_ml.capacity_vphpl, up_ml.jam_density_vpkpl,
+                up_ml.ff_speed_kph);
+
+        Segment new_segment = new Segment(this,null,ml,null);
+        this.segments.add(up_index+1,new_segment);
+
+        // fix adjacent segments ..............
+
+        // dn_segment's start node = end_node
+        if(dn_segment!=null)
+            dn_segment.set_start_node(end_node.id);
+
+        return new_segment;
     }
 
     /////////////////////////////////////

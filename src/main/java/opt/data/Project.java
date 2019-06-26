@@ -42,6 +42,14 @@ public class Project {
     }
 
     /////////////////////////////////////
+    // save to file
+    /////////////////////////////////////
+
+    public void save_to_file(String filename){
+        // TODO GG IMPLEMENT THIS
+    }
+
+    /////////////////////////////////////
     // getters / setters
     /////////////////////////////////////
 
@@ -104,10 +112,9 @@ public class Project {
         for(String scenario_name : get_scenario_names()){
             str = str.concat("Scenario: " + scenario_name + " ------------\n");
             FreewayScenario scenario = get_scenario_with_name(scenario_name);
-            List<Segment> segments = scenario.get_segments();
-            for(int i=0;i<segments.size();i++){
+            for(int i=0;i<scenario.segments.size();i++){
                 str = str.concat("segment " + i + "..........\n");
-                str = str.concat(segments.get(i).toString()+"\n");
+                str = str.concat(scenario.segments.get(i).toString()+"\n");
             }
         }
         return str;

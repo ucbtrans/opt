@@ -211,6 +211,18 @@ public class Segment {
     // protected
     /////////////////////////////////////
 
+    protected void set_start_node(long new_start_node){
+        ml.start_node_id = new_start_node;
+        if(fr!=null)
+            fr.start_node_id = new_start_node;
+    }
+
+    protected void set_end_node(long new_end_node){
+        ml.end_node_id = new_end_node;
+        if(or!=null)
+            or.end_node_id = new_end_node;
+    }
+
     protected jLink get_ml(){
         return ml;
     }
@@ -221,10 +233,10 @@ public class Segment {
 
     @Override
     public String toString() {
-        String str = String.format("ml\t%s\nor:\t%s\nfr:\t%s",
+        String str = String.format("fr\t%s\nml:\t%s\nor:\t%s",
+                fr==null?"null":fr.toString(),
                 ml.toString(),
-                or==null?"null":or.toString(),
-                fr==null?"null":fr.toString());
+                or==null?"null":or.toString());
         return str;
     }
 
