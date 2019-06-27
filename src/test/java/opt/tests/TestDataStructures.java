@@ -281,6 +281,7 @@ public class TestDataStructures {
     /////////////////////////////////////
 
     @Test
+    @Ignore
     public void test_run_all_scenarios(){
         Project project = load_test_project();
         try {
@@ -291,6 +292,7 @@ public class TestDataStructures {
     }
 
     @Test
+    @Ignore
     public void test_run_scenario(){
         Project project = load_test_project();
         try {
