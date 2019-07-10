@@ -15,12 +15,12 @@
         <url>git@github.com:ucbtrans/opt.git</url>
     </scm>
         
-<!--    <repositories>-->
-<!--        <repository>-->
-<!--            <id>myMavenRepoOTM</id>-->
-<!--            <url>${myMavenRepoOTMReadUrl}</url>-->
-<!--        </repository>-->
-<!--    </repositories>-->
+    <repositories>
+        <repository>
+            <id>myMavenRepoOTM</id>
+            <url>${myMavenRepoOTMReadUrl}</url>
+        </repository>
+    </repositories>
 
     <build>
 
