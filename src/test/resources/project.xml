@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<prj>
-	<scns>
-		<scn name="scenarioA" file="scenarioA.xml"/>
-		<scn name="scenarioB" file="scenarioB.xml"/>
-	</scns>
-</prj>

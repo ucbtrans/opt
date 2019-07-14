@@ -1,8 +1,8 @@
 package opt.data;
 
 import error.OTMException;
-import jaxb.Scenario;
 import jaxb.Scn;
+import utils.OTMUtils;
 import xml.JaxbLoader;
 
 import java.io.File;
@@ -33,8 +33,16 @@ public class Project {
                 if(scenarios.containsKey(scn_name))
                     throw new Exception("Repeated scenario name in project file.");
 
+                // load the scenario
                 jaxb.Scenario jaxb_scenario = JaxbLoader.load_scenario(scn_file,validate);
-                scenarios.put(scn_name,new FreewayScenario(jaxb_scenario));
+
+
+                // read segment names
+                String sgmt_names_str = jaxb_scn.getSgmtNames();
+                String [] sgmt_names = sgmt_names_str==null || sgmt_names_str.isEmpty() ?
+                    null : sgmt_names_str.split("\\|");
+
+                scenarios.put(scn_name,new FreewayScenario(jaxb_scenario,sgmt_names));
             }
 
         } catch (OTMException e) {
@@ -117,7 +125,7 @@ public class Project {
     public void create_scenario(String name) throws Exception {
         if( scenarios.containsKey(name))
             throw new Exception("The project already has a scenario by this name.");
-        scenarios.put(name,new FreewayScenario(new jaxb.Scenario()));
+        scenarios.put(name,new FreewayScenario(new jaxb.Scenario(),null));
     }
 
     /**
@@ -148,9 +156,12 @@ public class Project {
 
         List<Scn> scnlist = jaxbScns.getScn();
         for(Map.Entry<String, FreewayScenario> e : scenarios.entrySet()) {
+            String scenario_name = e.getKey();
+            FreewayScenario fwy_scenario = e.getValue();
             jaxb.Scn jScn = new jaxb.Scn();
-            jScn.setName(e.getKey());
-            jScn.setFile(scenario_file_names.get(e.getKey()));
+            jScn.setName(scenario_name);
+            jScn.setFile(scenario_file_names.get(scenario_name));
+            jScn.setSgmtNames(OTMUtils.format_delim(fwy_scenario.get_segment_names().toArray(),"|"));
             scnlist.add(jScn);
         }
 

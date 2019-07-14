@@ -1,5 +1,5 @@
 .idea/
 target/
-src/test/resources/project_saved.xml
+src/test/resources/project_saved.opt
 src/test/resources/project_saved_scenarioA.xml
 src/test/resources/project_saved_scenarioB.xml

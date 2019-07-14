@@ -21,7 +21,12 @@
 	<xs:element name="scn">
 		<xs:complexType>
 			<xs:attribute name="name" type="xs:string" default="unnamed" />
+
+			<!-- Full file name for the scenario. THIS WILL BE REMOVED IN FUTURE VERSIONS -->
 			<xs:attribute name="file" type="xs:string" use="required" />
+
+			<!-- Comma-separated list of names of the segments, in order from upstream to downstream -->
+			<xs:attribute name="sgmt_names" type="xs:string" />
 		</xs:complexType>
 	</xs:element>
 

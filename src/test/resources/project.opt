@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <prj>
 	<scns>
-		<scn name="scenarioA" file="scenarioA.xml"/>
-		<scn name="scenarioB" file="scenarioB.xml"/>
+		<scn name="scenarioA" file="scenarioA.xml" sgmt_names=""/>
+		<scn name="scenarioB" file="scenarioB.xml" sgmt_names=""/>
 	</scns>
 </prj>

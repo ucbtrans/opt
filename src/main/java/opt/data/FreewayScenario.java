@@ -1,6 +1,7 @@
 package opt.data;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -18,7 +19,7 @@ public class FreewayScenario {
 
     public FreewayScenario(){}
 
-    public FreewayScenario(jaxb.Scenario jaxb_scenario) throws Exception {
+    public FreewayScenario(jaxb.Scenario jaxb_scenario, String [] segment_names) throws Exception {
         this.jscenario = new jScenario(jaxb_scenario);
 
         // get upstream mainline source
@@ -51,7 +52,6 @@ public class FreewayScenario {
 
             jLink onramp = onramps.isEmpty() ? null : onramps.iterator().next();
 
-
             // create the segment ................
             segments.add( new Segment(this,onramp,ml_link,offramp) );
 
@@ -77,6 +77,13 @@ public class FreewayScenario {
                 break;
         }
 
+        // assign names
+        if(segment_names!=null && segment_names.length!=segments.size())
+            throw new Exception("The defined segment names do not cover all segments");
+
+        for(int i=0;i<segments.size();i++)
+            segments.get(i).set_name(segment_names==null ? String.format("segment %d",i) : segment_names[i]);
+
         // max ids
         reset_max_ids();
 
@@ -101,6 +108,10 @@ public class FreewayScenario {
      */
     public Segment get_segment(int i){
         return i<0 || i>=get_num_segments() ? null : segments.get(i);
+    }
+
+    public List<String> get_segment_names(){
+        return segments.stream().map(segment->segment.name).collect(Collectors.toList());
     }
 
     /////////////////////////////////////

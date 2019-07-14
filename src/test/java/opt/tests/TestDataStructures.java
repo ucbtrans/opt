@@ -21,7 +21,7 @@ public class TestDataStructures {
 
     @Test
     public void test_load_project_from_file(){
-        String project_file_name = get_test_fullpath("project.xml");
+        String project_file_name = get_test_fullpath("project.opt");
         boolean validate = true;
         try {
             Project project = OPTFactory.load_project(project_file_name,validate);
@@ -38,9 +38,9 @@ public class TestDataStructures {
     public void test_save_project_to_file() {
         Project project = load_test_project();
         try {
-            OPTFactory.save_project(project,get_test_fullpath("project_saved"));
+            OPTFactory.save_project(project,get_test_fullpath("project_saved.opt"));
 
-            Project project_saved = OPTFactory.load_project(get_test_fullpath("project_saved.xml"),false);
+            Project project_saved = OPTFactory.load_project(get_test_fullpath("project_saved.opt"),false);
 
             System.out.println(project_saved);
 
@@ -293,6 +293,23 @@ public class TestDataStructures {
 
     }
 
+    @Test
+    public void test_set_segment_name(){
+
+        Project project = load_test_project();
+        FreewayScenario scenario = project.get_scenario_with_name("scenarioA");
+        Segment segment = scenario.get_segment(2);
+
+        try {
+            System.out.println(segment.get_name());
+            segment.set_name("valid name");
+            System.out.println(segment.get_name());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     /////////////////////////////////////
     // run simulation
     /////////////////////////////////////
@@ -329,7 +346,7 @@ public class TestDataStructures {
 
     private Project load_test_project(){
         Project project = null;
-        String project_file_name = get_test_fullpath("project.xml");
+        String project_file_name = get_test_fullpath("project.opt");
         try {
             project = OPTFactory.load_project(project_file_name,true);
         } catch (Exception e) {

@@ -1,5 +1,7 @@
 package opt.data;
 
+import com.sun.rmi.rmid.ExecPermission;
+
 public class Segment {
 
     ///////////////////////////
@@ -14,6 +16,8 @@ public class Segment {
     ///////////////////////////
 
     protected FreewayScenario fwy_scenario;
+
+    protected String name;
     protected jLink ml;
     protected jLink or;
     protected jLink fr;
@@ -30,6 +34,7 @@ public class Segment {
             throw new Exception("A segment is not allowed to have a null mainline.");
 
         this.fwy_scenario = fwy_scenario;
+        this.name = "undefined";
         this.or = or;
         this.ml = ml;
         this.fr = fr;
@@ -63,6 +68,29 @@ public class Segment {
         fwy_scenario.jscenario.links.remove(or.id);
         or = null;
         return true;
+    }
+
+
+    /////////////////////////////////////
+    // name
+    /////////////////////////////////////
+
+    /**
+     * Get the name of this segment
+     * @return String name
+     */
+    public String get_name(){
+        return name;
+    }
+
+    /**
+     * Set the name of this segment.
+     * @param new_name
+     */
+    public void set_name(String new_name) throws Exception {
+        if (new_name.contains("|"))
+            throw new Exception("Invalid name");
+        this.name = new_name;
     }
 
     /////////////////////////////////////
@@ -267,7 +295,8 @@ public class Segment {
 
     @Override
     public String toString() {
-        String str = String.format("fr\t%s\nml:\t%s\nor:\t%s",
+        String str = String.format("name\t%s\nfr\t%s\nml:\t%s\nor:\t%s",
+                name,
                 fr==null?"null":fr.toString(),
                 ml.toString(),
                 or==null?"null":or.toString());

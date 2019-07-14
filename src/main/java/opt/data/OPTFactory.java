@@ -175,7 +175,8 @@ public class OPTFactory {
     public static class FileInfo {
         String folder;
         String file_name;
-        String extension;
+        static String project_extension = "opt";
+        static String scenario_extension = "xml";
         public FileInfo(String filePath){
             File f = new File(filePath);
             if (f.isDirectory())
@@ -183,23 +184,18 @@ public class OPTFactory {
             folder = f.getParent();
             String name = f.getName();
             final int lastPeriodPos = name.lastIndexOf('.');
-            if (lastPeriodPos <= 0) {
+            if (lastPeriodPos <= 0)
                 file_name = name;
-                extension = "xml";
-            }
             else
-            {
                 file_name = name.substring(0, lastPeriodPos);
-                extension = name.substring(lastPeriodPos+1);
-            }
         }
         public File get_project_file(){
-            return new File(folder,file_name + "." + extension);
+            return new File(folder,file_name + "." + project_extension);
         }
         public File get_scenario_file(String scenario_name){
             // remove whitespace
             scenario_name.replaceAll("\\s+","");
-            return new File(folder,file_name + "_" + scenario_name + "." + extension);
+            return new File(folder,file_name + "_" + scenario_name + "." + scenario_extension);
         }
     }
 
