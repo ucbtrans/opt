@@ -1,6 +1,7 @@
 package opt.data;
 
 import error.OTMException;
+import jaxb.Scenario;
 import jaxb.Scn;
 import xml.JaxbLoader;
 
@@ -88,6 +89,21 @@ public class Project {
     public FreewayScenario get_scenario_with_name(String name){
         return scenarios.containsKey(name) ? scenarios.get(name) : null;
     }
+
+
+    /**
+     * Change the name of a scenario
+     * @param oldname Current name of the scenario
+     * @param newname New name of the scenario
+     * @throws Exception
+     */
+    public void set_scenario_name(String oldname, String newname) throws Exception {
+        if (!scenarios.containsKey(oldname))
+            throw new Exception("Sceanrio name not found.");
+        scenarios.put(newname, scenarios.remove(oldname));
+    }
+
+
 
     /////////////////////////////////////
     // create scenarios

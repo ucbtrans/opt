@@ -8,6 +8,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -101,6 +103,21 @@ public class TestDataStructures {
         }
 
     }
+
+    @Test
+    public void test_set_scenario_name(){
+        try {
+            Project project = load_test_project();
+            Collection<String> names = project.get_scenario_names();
+            System.out.print(names);
+            String oldname = names.iterator().next();
+            project.set_scenario_name(oldname,"newname");
+            System.out.print(project.get_scenario_names());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
 
     /////////////////////////////////
     // Creating or modifying objects
