@@ -1,15 +1,11 @@
 package opt.tests;
 
-import opt.data.FreewayScenario;
-import opt.data.OPTFactory;
-import opt.data.Project;
-import opt.data.Segment;
+import opt.data.*;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -118,6 +114,17 @@ public class TestDataStructures {
         }
     }
 
+    @Test
+    public void test_commodities(){
+        Project project = load_test_project();
+        FreewayScenario scenario = project.get_scenario_with_name("scenarioA");
+
+        long comm_id = scenario.get_commodities().keySet().iterator().next();
+        System.out.println(scenario.get_commodity_by_id(comm_id));
+
+        jCommodity new_comm = scenario.create_commodity("new commodity");
+        System.out.println(new_comm);
+    }
 
     /////////////////////////////////
     // Creating or modifying objects

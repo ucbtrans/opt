@@ -1,6 +1,9 @@
 package opt.data;
 
-import com.sun.rmi.rmid.ExecPermission;
+import profiles.Profile1D;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Segment {
 
@@ -21,6 +24,9 @@ public class Segment {
     protected jLink ml;
     protected jLink or;
     protected jLink fr;
+
+    protected Map<Long,Profile1D> or_demands = new HashMap<>();
+    protected Map<Long,jSplit> fr_splits = new HashMap<>();
 
     /////////////////////////////////////
     // construction
@@ -54,6 +60,7 @@ public class Segment {
         fwy_scenario.jscenario.nodes.remove(fr.end_node_id);
         fwy_scenario.jscenario.links.remove(fr.id);
         fr = null;
+        fr_splits = new HashMap<>();
         return true;
     }
 
@@ -67,9 +74,9 @@ public class Segment {
         fwy_scenario.jscenario.nodes.remove(or.start_node_id);
         fwy_scenario.jscenario.links.remove(or.id);
         or = null;
+        or_demands = new HashMap<>();
         return true;
     }
-
 
     /////////////////////////////////////
     // name
@@ -113,6 +120,17 @@ public class Segment {
         return has_onramp() ? or.jam_density_vpkpl * or.full_lanes * or.length / 1000f : 0d;
     }
 
+    /**
+     * Get the demand for this onramp, for a particular commodity, or the total.
+     * @param commodity_id Pass a commodity id, or null to obtain the total
+     * @return An OTM Profile1D object if demand is defined for this commodity. null otherwise.
+     */
+    public Profile1D get_onramp_demand_vph(Long commodity_id){
+        if (or_demands.containsKey(commodity_id))
+            return or_demands.get(commodity_id);
+        else return null;
+    }
+
     /////////////////////////////////////
     // onramp setters
     /////////////////////////////////////
@@ -154,7 +172,15 @@ public class Segment {
         if(or==null)
             add_onramp();
         or.jam_density_vpkpl = x / (or.length/1000f) / or.full_lanes;
+    }
 
+    /**
+     * Set the onramp demand in vehicles per hour.
+     * @param demand_vph Demand in veh/hr as a Profile1D object
+     * @param commodity_id ID for the commodity
+     */
+    public void set_onramp_demand_vph(Profile1D demand_vph, long commodity_id){
+        this.or_demands.put(commodity_id,demand_vph);
     }
 
     /////////////////////////////////////

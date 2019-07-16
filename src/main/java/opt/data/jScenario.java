@@ -1,9 +1,6 @@
 package opt.data;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -11,7 +8,9 @@ public class jScenario {
 
     protected Map<Long,jNode> nodes = new HashMap<>();
     protected Map<Long,jLink> links = new HashMap<>();
+    protected Map<Long,jCommodity> commodities = new HashMap<>();
 
+    // commodity/link -> demand profile
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
@@ -20,6 +19,7 @@ public class jScenario {
 
     protected jScenario(jaxb.Scenario scenario){
 
+        // network
         Map<Long,jaxb.Roadparam> road_params = new HashMap<>();
         for(jaxb.Roadparam rp: scenario.getNetwork().getRoadparams().getRoadparam())
             road_params.put(rp.getId(),rp);
@@ -36,6 +36,10 @@ public class jScenario {
 
         for(jLink link : links.values())
             link.is_source = nodes.get(link.start_node_id).in_links.isEmpty();
+
+        // commodities
+        for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
+            this.commodities.put(comm.getId(),new jCommodity(comm.getId(),comm.getName()));
 
     }
 
