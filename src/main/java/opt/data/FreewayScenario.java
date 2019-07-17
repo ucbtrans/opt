@@ -20,7 +20,9 @@ public class FreewayScenario {
     private Long max_node_id;
 
     protected jScenario jscenario;
-    protected List<Segment> segments = new ArrayList<>();
+//    protected List<Segment> segments = new ArrayList<>();
+
+    protected Map<Long,Segment> segments = new HashMap<>();
 
     /////////////////////////////////////
     // construction
