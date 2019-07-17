@@ -1,9 +1,10 @@
 package opt.data;
 
 import profiles.Profile1D;
+import utils.OTMUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Segment {
 
@@ -21,9 +22,10 @@ public class Segment {
     protected FreewayScenario fwy_scenario;
 
     protected String name;
-    protected Link ml;
-    protected Link or;
-    protected Link fr;
+    protected final long id;
+    protected Link ml = null;
+    protected Link or = null;
+    protected Link fr = null;
 
     protected Map<Long,Profile1D> or_demands = new HashMap<>();
     protected Map<Long, Split> fr_splits = new HashMap<>();
@@ -32,18 +34,67 @@ public class Segment {
     // construction
     /////////////////////////////////////
 
-    public Segment(){}
+    public Segment(long id){
+        this.id = id;
+    }
 
-    public Segment(FreewayScenario fwy_scenario, Link or, Link ml, Link fr) throws Exception {
+    public Segment(FreewayScenario fwy_scenario,long id, jaxb.Sgmt sgmt) throws Exception {
 
-        if(ml==null)
-            throw new Exception("A segment is not allowed to have a null mainline.");
-
+        this.id = id;
         this.fwy_scenario = fwy_scenario;
-        this.name = "undefined";
-        this.or = or;
-        this.ml = ml;
-        this.fr = fr;
+        this.name = sgmt.getName();
+
+        List<Long> link_ids = OTMUtils.csv2longlist(sgmt.getLinks());
+        List<Link> links = link_ids.stream()
+                .map(link_id->fwy_scenario.scenario.links.get(link_id))
+                .collect(Collectors.toList());
+
+        // find mainline link
+        Set<Link> ml_links = links.stream()
+                .filter(link->link.is_mainline)
+                .collect(Collectors.toSet());
+
+        // check exactly one mailine link
+        if( ml_links.size()!=1 )
+            throw new Exception("All segments must contain exactly one mainline link");
+
+        ml = ml_links.iterator().next();
+        links.remove(ml);
+
+        // check that what is remaining are at most two and all ramps
+        if (links.size()>2)
+            throw new Exception("Segment has too many links");
+        if (!links.stream().allMatch(link->link.is_ramp))
+            throw new Exception("Links in a segment must be either mainline or ramp");
+
+        // find onramps
+        Set<Link> ors = links.stream()
+                .filter(link-> link.end_node_id==ml.start_node_id || link.end_node_id==ml.end_node_id)
+                .collect(Collectors.toSet());
+
+        // at most one onramp
+        if (!ors.isEmpty()){
+            if(ors.size()>1)
+                throw new Exception("At most one onramp per segment");
+            or = ors.iterator().next();
+            links.remove(or);
+        }
+
+        // find offramps
+        Set<Link> frs = links.stream()
+                .filter(link-> link.start_node_id==ml.start_node_id || link.start_node_id==ml.end_node_id)
+                .collect(Collectors.toSet());
+
+        // at most one offramp
+        if (!frs.isEmpty()){
+            if(frs.size()>1)
+                throw new Exception("At most one offramp per segment");
+            fr = frs.iterator().next();
+            links.remove(fr);
+        }
+
+        // there should be nothing left over
+        assert(links.isEmpty());
     }
 
     /////////////////////////////////////
@@ -57,8 +108,8 @@ public class Segment {
     public boolean delete_offramp(){
         if(fr==null)
             return false;
-        fwy_scenario.jscenario.nodes.remove(fr.end_node_id);
-        fwy_scenario.jscenario.links.remove(fr.id);
+        fwy_scenario.scenario.nodes.remove(fr.end_node_id);
+        fwy_scenario.scenario.links.remove(fr.id);
         fr = null;
         fr_splits = new HashMap<>();
         return true;
@@ -71,8 +122,8 @@ public class Segment {
     public boolean delete_onramp(){
         if(or==null)
             return false;
-        fwy_scenario.jscenario.nodes.remove(or.start_node_id);
-        fwy_scenario.jscenario.links.remove(or.id);
+        fwy_scenario.scenario.nodes.remove(or.start_node_id);
+        fwy_scenario.scenario.links.remove(or.id);
         or = null;
         or_demands = new HashMap<>();
         return true;
@@ -152,8 +203,8 @@ public class Segment {
         float ff_speed_kph = default_or_ff_speed_kph;
         or = new Link(id,start_node_id,end_node_id,full_lanes,length,is_mainline,is_ramp,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph);
         start_node.out_links.add(or);
-        fwy_scenario.jscenario.nodes.put(start_node.id,start_node);
-        fwy_scenario.jscenario.links.put(or.id,or);
+        fwy_scenario.scenario.nodes.put(start_node.id,start_node);
+        fwy_scenario.scenario.links.put(or.id,or);
     }
 
     public void set_or_lanes(int x){
@@ -225,8 +276,8 @@ public class Segment {
 
         fr = new Link(id,start_node_id,end_node_id,full_lanes,length,is_mainline,is_ramp,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph);
         end_node.in_links.add(fr);
-        fwy_scenario.jscenario.nodes.put(end_node.id,end_node);
-        fwy_scenario.jscenario.links.put(fr.id,fr);
+        fwy_scenario.scenario.nodes.put(end_node.id,end_node);
+        fwy_scenario.scenario.links.put(fr.id,fr);
     }
 
     public void set_fr_lanes(int x){

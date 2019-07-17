@@ -166,10 +166,8 @@ public class AppMainController {
             object2tree.put(scenario, scenario_node);
             
             scenario_node.getChildren().add(new TreeItem<String>("Road Segments"));
-            int num_segments = scenario.get_num_segments();
-            for (int i = 0; i < num_segments; i++) {
-                Segment seg = scenario.get_segment(i);
-                TreeItem<String> segment_node = new TreeItem<String>(seg.toString());
+            for (Segment segment : scenario.get_segments()) {
+                TreeItem<String> segment_node = new TreeItem<String>(segment.toString());
                 scenario_node.getChildren().add(segment_node);
             }
             

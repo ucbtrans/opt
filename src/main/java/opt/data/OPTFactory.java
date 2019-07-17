@@ -13,7 +13,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,10 +51,10 @@ public class OPTFactory {
      */
     public static FreewayScenario deep_copy_scenario(FreewayScenario scn_org){
         FreewayScenario scn_cpy = new FreewayScenario();
-        scn_cpy.jscenario = deep_copy_jscenario(scn_org.jscenario);
-        scn_cpy.segments = new ArrayList<>();
-        for(Segment sgm_org : scn_org.segments)
-            scn_cpy.segments.add(deep_copy_segment(sgm_org,scn_cpy));
+        scn_cpy.scenario = deep_copy_jscenario(scn_org.scenario);
+        scn_cpy.segments = new HashMap<>();
+        for(Map.Entry<Long,Segment> e : scn_org.segments.entrySet())
+            scn_cpy.segments.put(e.getKey(),deep_copy_segment(e.getValue(),scn_cpy));
         scn_cpy.reset_max_ids();
         return scn_cpy;
     }
@@ -163,11 +162,11 @@ public class OPTFactory {
     }
 
     private static Segment deep_copy_segment(Segment seg_org,FreewayScenario scenario){
-        Segment seg_cpy = new Segment();
+        Segment seg_cpy = new Segment(seg_org.id);
         seg_cpy.fwy_scenario = scenario;
-        seg_cpy.ml = scenario.jscenario.links.get(seg_org.ml.id);
-        seg_cpy.or = seg_org.or==null ? null : scenario.jscenario.links.get(seg_org.or.id);
-        seg_cpy.fr = seg_org.fr==null ? null : scenario.jscenario.links.get(seg_org.fr.id);
+        seg_cpy.ml = scenario.scenario.links.get(seg_org.ml.id);
+        seg_cpy.or = seg_org.or==null ? null : scenario.scenario.links.get(seg_org.or.id);
+        seg_cpy.fr = seg_org.fr==null ? null : scenario.scenario.links.get(seg_org.fr.id);
         return seg_cpy;
     }
 

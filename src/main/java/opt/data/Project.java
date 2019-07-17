@@ -1,7 +1,6 @@
 package opt.data;
 
 import error.OTMException;
-import utils.OTMUtils;
 import xml.JaxbLoader;
 
 import java.io.File;
@@ -34,7 +33,7 @@ public class Project {
 
                 // load the scenario
                 jaxb.Scenario jaxb_scenario = JaxbLoader.load_scenario(scn_file,validate);
-                scenarios.put(scn_name,new FreewayScenario(jaxb_scenario));
+                scenarios.put(scn_name,new FreewayScenario(scn_name,jaxb_scn.getSgmts(),jaxb_scenario));
             }
 
         } catch (OTMException e) {
@@ -100,7 +99,9 @@ public class Project {
     public void set_scenario_name(String oldname, String newname) throws Exception {
         if (!scenarios.containsKey(oldname))
             throw new Exception("Sceanrio name not found.");
-        scenarios.put(newname, scenarios.remove(oldname));
+        FreewayScenario scenario = scenarios.remove(oldname);
+        scenario.name = newname;
+        scenarios.put(newname, scenario);
     }
 
 
@@ -117,7 +118,7 @@ public class Project {
     public void create_scenario(String name) throws Exception {
         if( scenarios.containsKey(name))
             throw new Exception("The project already has a scenario by this name.");
-        scenarios.put(name,new FreewayScenario(new jaxb.Scenario()));
+        scenarios.put(name,new FreewayScenario(name,null,new jaxb.Scenario()));
     }
 
     /**
@@ -166,12 +167,11 @@ public class Project {
     @Override
     public String toString() {
         String str = "";
-        for(String scenario_name : get_scenario_names()){
-            str = str.concat("Scenario: " + scenario_name + " ------------\n");
-            FreewayScenario scenario = get_scenario_with_name(scenario_name);
-            for(int i=0;i<scenario.segments.size();i++){
-                str = str.concat("segment " + i + "..........\n");
-                str = str.concat(scenario.segments.get(i).toString()+"\n");
+        for(FreewayScenario scenario : scenarios.values()){
+            str = str.concat("Scenario: " + scenario.name + " ------------\n");
+            for(Segment segment : scenario.segments.values()){
+                str = str.concat("segment " + segment.id + "..........\n");
+                str = str.concat(segment.toString()+"\n");
             }
         }
         return str;

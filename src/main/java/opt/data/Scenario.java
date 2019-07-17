@@ -20,25 +20,36 @@ public class Scenario {
 
         // network
         Map<Long,jaxb.Roadparam> road_params = new HashMap<>();
-        for(jaxb.Roadparam rp: scenario.getNetwork().getRoadparams().getRoadparam())
-            road_params.put(rp.getId(),rp);
+        if (scenario.getNetwork()!=null){
 
-        for(jaxb.Node jnode : scenario.getNetwork().getNodes().getNode())
-            nodes.put(jnode.getId(),new Node(jnode));
+            jaxb.Network network = scenario.getNetwork();
 
-        for(jaxb.Link jlink : scenario.getNetwork().getLinks().getLink()) {
-            Link link = new Link(jlink,road_params.get(jlink.getRoadparam()));
-            links.put(jlink.getId(),link);
-            nodes.get(jlink.getEndNodeId()).in_links.add(link);
-            nodes.get(jlink.getStartNodeId()).out_links.add(link);
+            if (network.getRoadparams()!=null)
+                for(jaxb.Roadparam rp: network.getRoadparams().getRoadparam())
+                    road_params.put(rp.getId(),rp);
+
+            if (network.getNodes()!=null)
+                for(jaxb.Node jnode : network.getNodes().getNode())
+                    nodes.put(jnode.getId(),new Node(jnode));
+
+            if (network.getLinks()!=null)
+                for(jaxb.Link jlink : network.getLinks().getLink()) {
+                    Link link = new Link(jlink,road_params.get(jlink.getRoadparam()));
+                    links.put(jlink.getId(),link);
+                    nodes.get(jlink.getEndNodeId()).in_links.add(link);
+                    nodes.get(jlink.getStartNodeId()).out_links.add(link);
+                }
+
         }
+
 
         for(Link link : links.values())
             link.is_source = nodes.get(link.start_node_id).in_links.isEmpty();
 
         // commodities
-        for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
-            this.commodities.put(comm.getId(),new Commodity(comm.getId(),comm.getName()));
+        if(scenario.getCommodities()!=null)
+            for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
+                this.commodities.put(comm.getId(),new Commodity(comm.getId(),comm.getName()));
 
     }
 
