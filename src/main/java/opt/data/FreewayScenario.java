@@ -96,31 +96,33 @@ public class FreewayScenario {
         // assign demands
         for(jaxb.Demand dem : jaxb_scenario.getDemands().getDemand()){
 
-            long comm_id = dem.getCommodityId();
+            System.out.println("WARNING: DEMANDS NOT IMPLEMENTED");
 
-            if( !get_commodities().containsKey(comm_id))
-                throw new Exception("Bad commodity id in demand profile");
-
-            if(dem.getLinkId()==null)
-                throw new Exception("Link not specified in demand profile for commodity " + comm_id);
-
-            Link or = network.links.get(jd.getLinkId());
-            if(link==null)
-                throw new OTMException("Bad link id (" + jd.getLinkId() + ") in demand for commodity " + comm.getId());
-
-
-            this.link = link;
-            this.path = null;
-            this.commodity = commodity;
-
-            // create a source and add it to the origin
-            Link origin = get_origin();
-            source = origin.model.create_source(origin,this,commodity,null);
-            origin.sources.add(source);
-
-            // assume the content to be given in veh/hr
-            profile = new Profile1D(start_time,dt,values);
-            profile.multiply(1.0/3600.0);
+//            long comm_id = dem.getCommodityId();
+//
+//            if( !get_commodities().containsKey(comm_id))
+//                throw new Exception("Bad commodity id in demand profile");
+//
+//            if(dem.getLinkId()==null)
+//                throw new Exception("Link not specified in demand profile for commodity " + comm_id);
+//
+//            Link or = network.links.get(jd.getLinkId());
+//            if(link==null)
+//                throw new OTMException("Bad link id (" + jd.getLinkId() + ") in demand for commodity " + comm.getId());
+//
+//
+//            this.link = link;
+//            this.path = null;
+//            this.commodity = commodity;
+//
+//            // create a source and add it to the origin
+//            Link origin = get_origin();
+//            source = origin.model.create_source(origin,this,commodity,null);
+//            origin.sources.add(source);
+//
+//            // assume the content to be given in veh/hr
+//            profile = new Profile1D(start_time,dt,values);
+//            profile.multiply(1.0/3600.0);
         }
 
         // max ids
