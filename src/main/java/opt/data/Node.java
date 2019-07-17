@@ -5,8 +5,8 @@ import java.util.Set;
 
 public class Node {
     protected long id;
-    protected Set<Link> in_links = new HashSet<>();
-    protected Set<Link> out_links = new HashSet<>();
+    protected Set<AbstractLink> in_links = new HashSet<>();
+    protected Set<AbstractLink> out_links = new HashSet<>();
 
     /////////////////////////////////////
     // construction

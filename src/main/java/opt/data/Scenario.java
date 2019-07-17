@@ -2,12 +2,10 @@ package opt.data;
 
 import java.util.*;
 
-import static java.util.stream.Collectors.toSet;
-
 public class Scenario {
 
     protected Map<Long, Node> nodes = new HashMap<>();
-    protected Map<Long, Link> links = new HashMap<>();
+    protected Map<Long, AbstractLink> links = new HashMap<>();
     protected Map<Long, Commodity> commodities = new HashMap<>();
 
     /////////////////////////////////////
@@ -16,7 +14,7 @@ public class Scenario {
 
     protected Scenario(){}
 
-    protected Scenario(jaxb.Scenario scenario){
+    protected Scenario(jaxb.Scenario scenario) throws Exception {
 
         // network
         Map<Long,jaxb.Roadparam> road_params = new HashMap<>();
@@ -34,16 +32,25 @@ public class Scenario {
 
             if (network.getLinks()!=null)
                 for(jaxb.Link jlink : network.getLinks().getLink()) {
-                    Link link = new Link(jlink,road_params.get(jlink.getRoadparam()));
+                    AbstractLink link;
+                    switch(jlink.getRoadType()){
+                        case "ramp":
+                            link = new LinkRamp(jlink,road_params.get(jlink.getRoadparam()));
+                            break;
+                        case "mainline":
+                            link = new LinkMainline(jlink,road_params.get(jlink.getRoadparam()));
+                            break;
+                        default:
+                            throw new Exception("Bad road type");
+                    }
                     links.put(jlink.getId(),link);
                     nodes.get(jlink.getEndNodeId()).in_links.add(link);
                     nodes.get(jlink.getStartNodeId()).out_links.add(link);
                 }
-
         }
 
 
-        for(Link link : links.values())
+        for(AbstractLink link : links.values())
             link.is_source = nodes.get(link.start_node_id).in_links.isEmpty();
 
         // commodities
@@ -57,18 +64,9 @@ public class Scenario {
     // getters
     /////////////////////////////////////
 
-    protected Link get_ml_source() throws Exception {
-        Set<Link> source_links = links.values().stream()
-                .filter(link -> link.is_mainline && link.is_source)
-                .collect(toSet());
-        if ( source_links.size()!=1 )
-            throw new Exception("The network should have exactly one mainline source link.");
-        return source_links.iterator().next();
-    }
-
     protected Set<RoadParam> get_road_params(){
         Set<RoadParam> road_params = new HashSet<>();
-        for(Link link : links.values())
+        for(AbstractLink link : links.values())
             road_params.add(new RoadParam(link.capacity_vphpl,link.ff_speed_kph,link.jam_density_vpkpl));
 
         // set ids

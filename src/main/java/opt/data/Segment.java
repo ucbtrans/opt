@@ -23,9 +23,9 @@ public class Segment {
 
     protected String name;
     protected final long id;
-    protected Link ml = null;
-    protected Link or = null;
-    protected Link fr = null;
+    protected AbstractLink ml = null;
+    protected AbstractLink or = null;
+    protected AbstractLink fr = null;
 
     protected Map<Long,Profile1D> or_demands = new HashMap<>();
     protected Map<Long, Split> fr_splits = new HashMap<>();
@@ -45,13 +45,13 @@ public class Segment {
         this.name = sgmt.getName();
 
         List<Long> link_ids = OTMUtils.csv2longlist(sgmt.getLinks());
-        List<Link> links = link_ids.stream()
+        List<AbstractLink> links = link_ids.stream()
                 .map(link_id->fwy_scenario.scenario.links.get(link_id))
                 .collect(Collectors.toList());
 
         // find mainline link
-        Set<Link> ml_links = links.stream()
-                .filter(link->link.is_mainline)
+        Set<AbstractLink> ml_links = links.stream()
+                .filter(link->link instanceof LinkMainline)
                 .collect(Collectors.toSet());
 
         // check exactly one mailine link
@@ -64,11 +64,11 @@ public class Segment {
         // check that what is remaining are at most two and all ramps
         if (links.size()>2)
             throw new Exception("Segment has too many links");
-        if (!links.stream().allMatch(link->link.is_ramp))
+        if (!links.stream().allMatch(link->link instanceof LinkRamp))
             throw new Exception("Links in a segment must be either mainline or ramp");
 
         // find onramps
-        Set<Link> ors = links.stream()
+        Set<AbstractLink> ors = links.stream()
                 .filter(link-> link.end_node_id==ml.start_node_id || link.end_node_id==ml.end_node_id)
                 .collect(Collectors.toSet());
 
@@ -81,7 +81,7 @@ public class Segment {
         }
 
         // find offramps
-        Set<Link> frs = links.stream()
+        Set<AbstractLink> frs = links.stream()
                 .filter(link-> link.start_node_id==ml.start_node_id || link.start_node_id==ml.end_node_id)
                 .collect(Collectors.toSet());
 
@@ -195,13 +195,11 @@ public class Segment {
         long end_node_id = ml.end_node_id;
         int full_lanes = 1;
         float length = 100f;
-        boolean is_mainline = false;
-        boolean is_ramp = true;
         boolean is_source = true;
         float capacity_vphpl = default_or_capacity_vphpl;
         float jam_density_vpkpl = default_or_jam_density_vpkpl;
         float ff_speed_kph = default_or_ff_speed_kph;
-        or = new Link(id,start_node_id,end_node_id,full_lanes,length,is_mainline,is_ramp,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph);
+        or = new LinkRamp(id,start_node_id,end_node_id,full_lanes,length,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph);
         start_node.out_links.add(or);
         fwy_scenario.scenario.nodes.put(start_node.id,start_node);
         fwy_scenario.scenario.links.put(or.id,or);
@@ -267,14 +265,12 @@ public class Segment {
         long end_node_id = end_node.id;
         int full_lanes = 1;
         float length = 100f;
-        boolean is_mainline = false;
-        boolean is_ramp = true;
         boolean is_source = false;
         float capacity_vphpl = default_fr_capacity_vphpl;
         float jam_density_vpkpl = default_fr_jam_density_vpkpl;
         float ff_speed_kph = default_fr_ff_speed_kph;
 
-        fr = new Link(id,start_node_id,end_node_id,full_lanes,length,is_mainline,is_ramp,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph);
+        fr = new LinkRamp(id,start_node_id,end_node_id,full_lanes,length,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph);
         end_node.in_links.add(fr);
         fwy_scenario.scenario.nodes.put(end_node.id,end_node);
         fwy_scenario.scenario.links.put(fr.id,fr);
@@ -362,7 +358,7 @@ public class Segment {
             or.end_node_id = new_end_node;
     }
 
-    protected Link get_ml(){
+    protected AbstractLink get_ml(){
         return ml;
     }
 

@@ -13,6 +13,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,7 +86,6 @@ public class OPTFactory {
 
     }
 
-
     /////////////////////////////////////
     // private
     /////////////////////////////////////
@@ -116,32 +117,15 @@ public class OPTFactory {
             jscn_cpy.nodes.put(e.getKey(), new Node(e.getKey()));
 
         // create new links
-        for (Map.Entry<Long, Link> e : jscn_org.links.entrySet()) {
-            long link_id = e.getKey();
-            Link link_org = e.getValue();
-
-            Link new_link = new Link(
-                    link_id,
-                    link_org.start_node_id,
-                    link_org.end_node_id,
-                    link_org.full_lanes,
-                    link_org.length,
-                    link_org.is_mainline,
-                    link_org.is_ramp,
-                    link_org.is_source,
-                    link_org.capacity_vphpl,
-                    link_org.jam_density_vpkpl,
-                    link_org.ff_speed_kph);
-
-            jscn_cpy.links.put(link_id,new_link);
-        }
+        for (Map.Entry<Long, AbstractLink> e : jscn_org.links.entrySet())
+            jscn_cpy.links.put(e.getKey(),deep_copy_link(e.getValue()));
 
         // set node inlinks and outlinks
         for (Node node_cpy : jscn_cpy.nodes.values()){
             Node node_org = jscn_org.nodes.get(node_cpy.id);
-            for(Link link_org : node_org.out_links)
+            for(AbstractLink link_org : node_org.out_links)
                 node_cpy.out_links.add(jscn_cpy.links.get(link_org.id));
-            for(Link link_org : node_org.in_links)
+            for(AbstractLink link_org : node_org.in_links)
                 node_cpy.in_links.add(jscn_cpy.links.get(link_org.id));
         }
 
@@ -159,6 +143,34 @@ public class OPTFactory {
 //        }
 
         return jscn_cpy;
+    }
+
+    private static AbstractLink deep_copy_link(AbstractLink link_org){
+
+        AbstractLink new_link = null;
+        try {
+            Constructor<AbstractLink> constr = (Constructor<AbstractLink>)link_org.getClass().getConstructor(Long.class, Long.class, Long.class, Integer.class, Float.class, Boolean.class, Float.class, Float.class, Float.class);
+            new_link = constr.newInstance(
+                    link_org.id,
+                    link_org.start_node_id,
+                    link_org.end_node_id,
+                    link_org.full_lanes,
+                    link_org.length,
+                    link_org.is_source,
+                    link_org.capacity_vphpl,
+                    link_org.jam_density_vpkpl,
+                    link_org.ff_speed_kph);
+        } catch (InstantiationException ex) {
+            ex.printStackTrace();
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+        } catch (InvocationTargetException ex) {
+            ex.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
+        }
+        return new_link;
+
     }
 
     private static Segment deep_copy_segment(Segment seg_org,FreewayScenario scenario){

@@ -3,8 +3,6 @@ package opt.data;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toSet;
-
 public class FreewayScenario {
 
     private Long max_link_id;
@@ -55,9 +53,9 @@ public class FreewayScenario {
 //    //                throw new Exception("Bad commodity id in demand profile");
 //    //
 //    //            if(dem.getLinkId()==null)
-//    //                throw new Exception("Link not specified in demand profile for commodity " + comm_id);
+//    //                throw new Exception("AbstractLink not specified in demand profile for commodity " + comm_id);
 //    //
-//    //            Link or = network.links.get(jd.getLinkId());
+//    //            AbstractLink or = network.links.get(jd.getLinkId());
 //    //            if(link==null)
 //    //                throw new OTMException("Bad link id (" + jd.getLinkId() + ") in demand for commodity " + comm.getId());
 //    //
@@ -67,7 +65,7 @@ public class FreewayScenario {
 //    //            this.commodity = commodity;
 //    //
 //    //            // create a source and add it to the origin
-//    //            Link origin = get_origin();
+//    //            AbstractLink origin = get_origin();
 //    //            source = origin.model.create_source(origin,this,commodity,null);
 //    //            origin.sources.add(source);
 //    //
@@ -173,14 +171,14 @@ public class FreewayScenario {
 //        Segment dn_segment = segments.get(dn_index);
 //        Segment up_segment = dn_index>0 ? segments.get(dn_index-1) : null;
 //
-//        Link dn_ml = dn_segment.get_ml();
+//        AbstractLink dn_ml = dn_segment.get_ml();
 //
 //        Node start_node = new Node(new_node_id());
 //        scenario.nodes.put(start_node.id,start_node);
 //
 //        Node end_node = scenario.nodes.get(dn_ml.start_node_id);
 //
-//        Link ml = new Link(new_link_id(),start_node.id,end_node.id,dn_ml.full_lanes,dn_ml.length,
+//        AbstractLink ml = new AbstractLink(new_link_id(),start_node.id,end_node.id,dn_ml.full_lanes,dn_ml.length,
 //                true, false, dn_index==0, dn_ml.capacity_vphpl, dn_ml.jam_density_vpkpl,
 //                dn_ml.ff_speed_kph);
 //        scenario.links.put(ml.id,ml);
@@ -213,14 +211,14 @@ public class FreewayScenario {
 //        Segment up_segment = segments.get(up_index);
 //        Segment dn_segment = up_index<segments.size()-1 ? segments.get(up_index+1) : null;
 //
-//        Link up_ml = up_segment.get_ml();
+//        AbstractLink up_ml = up_segment.get_ml();
 //
 //        Node end_node = new Node(new_node_id());
 //        scenario.nodes.put(end_node.id,end_node);
 //
 //        Node start_node = scenario.nodes.get(up_ml.end_node_id);
 //
-//        Link ml = new Link(new_link_id(),start_node.id,end_node.id,up_ml.full_lanes,up_ml.length,
+//        AbstractLink ml = new AbstractLink(new_link_id(),start_node.id,end_node.id,up_ml.full_lanes,up_ml.length,
 //                true, false, false, up_ml.capacity_vphpl, up_ml.jam_density_vpkpl,
 //                up_ml.ff_speed_kph);
 //        scenario.links.put(ml.id,ml);
@@ -325,7 +323,7 @@ public class FreewayScenario {
         // links
         jaxb.Links jLinks = new jaxb.Links();
         jNet.setLinks(jLinks);
-        for(Link link : scenario.links.values()){
+        for(AbstractLink link : scenario.links.values()){
             jaxb.Link jaxbLink = new jaxb.Link();
             jaxbLink.setId(link.id);
             jaxbLink.setLength(link.length);
@@ -333,9 +331,9 @@ public class FreewayScenario {
             jaxbLink.setEndNodeId(link.end_node_id);
             jaxbLink.setStartNodeId(link.start_node_id);
 
-            if(link.is_mainline)
+            if(link instanceof LinkMainline)
                 jaxbLink.setRoadType("mainline");
-            if(link.is_ramp)
+            if(link instanceof LinkRamp)
                 jaxbLink.setRoadType("ramp");
 
             // road params

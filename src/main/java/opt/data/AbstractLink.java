@@ -1,6 +1,6 @@
 package opt.data;
 
-public class Link {
+public abstract class AbstractLink {
     protected long id;
     protected long start_node_id;
     protected long end_node_id;
@@ -8,8 +8,6 @@ public class Link {
     protected float length;
 
     protected boolean is_source;
-    protected boolean is_mainline;
-    protected boolean is_ramp;
     protected float capacity_vphpl;
     protected float jam_density_vpkpl;
     protected float ff_speed_kph;
@@ -18,21 +16,18 @@ public class Link {
     // construction
     /////////////////////////////////////
 
-    protected Link(jaxb.Link link, jaxb.Roadparam rp){
+    public AbstractLink(jaxb.Link link, jaxb.Roadparam rp){
         this.id = link.getId();
         this.start_node_id = link.getStartNodeId();
         this.end_node_id = link.getEndNodeId();
         this.full_lanes = link.getFullLanes();
         this.length = link.getLength();
-        this.is_mainline = link.getRoadType().equals("mainline");
-        this.is_ramp = link.getRoadType().equals("ramp");
         this.capacity_vphpl = rp.getCapacity();
         this.jam_density_vpkpl = rp.getJamDensity();
         this.ff_speed_kph = rp.getSpeed();
     }
 
-    protected Link(long id, long start_node_id, long end_node_id, int full_lanes, float length, boolean is_mainline,
-                   boolean is_ramp, boolean is_source, float capacity_vphpl, float jam_density_vpkpl, float ff_speed_kph) {
+    public AbstractLink(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Boolean is_source, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
 
         this.id = id;
         this.start_node_id = start_node_id;
@@ -40,8 +35,6 @@ public class Link {
         this.full_lanes = full_lanes;
         this.length = length;
 
-        this.is_mainline = is_mainline;
-        this.is_ramp = is_ramp;
         this.is_source = is_source;
         this.capacity_vphpl = capacity_vphpl;
         this.jam_density_vpkpl = jam_density_vpkpl;
@@ -62,12 +55,10 @@ public class Link {
                         "\tfull_lanes\t%d\n" +
                         "\tlength\t%f\n" +
                         "\tis_source\t%s\n" +
-                        "\tis_mainline\t%s\n" +
-                        "\tis_ramp\t%s\n" +
                         "\tcapacity_vphpl\t%f\n" +
                         "\tjam_density_vpkpl\t%f\n" +
                         "\tff_speed_kph\t%f",
-                id,start_node_id,end_node_id,full_lanes,length,is_source, is_mainline,is_ramp,capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
+                id,start_node_id,end_node_id,full_lanes,length,is_source,capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
         return str;
     }
 }
