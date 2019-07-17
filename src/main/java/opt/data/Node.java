@@ -3,20 +3,20 @@ package opt.data;
 import java.util.HashSet;
 import java.util.Set;
 
-public class jNode {
+public class Node {
     protected long id;
-    protected Set<jLink> in_links = new HashSet<>();
-    protected Set<jLink> out_links = new HashSet<>();
+    protected Set<Link> in_links = new HashSet<>();
+    protected Set<Link> out_links = new HashSet<>();
 
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
 
-    protected jNode(jaxb.Node jnode){
+    protected Node(jaxb.Node jnode){
         this.id = jnode.getId();
     }
 
-    protected jNode(long id){
+    protected Node(long id){
         this.id = id;
     }
 

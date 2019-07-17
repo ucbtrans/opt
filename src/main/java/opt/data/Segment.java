@@ -21,12 +21,12 @@ public class Segment {
     protected FreewayScenario fwy_scenario;
 
     protected String name;
-    protected jLink ml;
-    protected jLink or;
-    protected jLink fr;
+    protected Link ml;
+    protected Link or;
+    protected Link fr;
 
     protected Map<Long,Profile1D> or_demands = new HashMap<>();
-    protected Map<Long,jSplit> fr_splits = new HashMap<>();
+    protected Map<Long, Split> fr_splits = new HashMap<>();
 
     /////////////////////////////////////
     // construction
@@ -34,7 +34,7 @@ public class Segment {
 
     public Segment(){}
 
-    public Segment(FreewayScenario fwy_scenario,jLink or, jLink ml, jLink fr) throws Exception {
+    public Segment(FreewayScenario fwy_scenario, Link or, Link ml, Link fr) throws Exception {
 
         if(ml==null)
             throw new Exception("A segment is not allowed to have a null mainline.");
@@ -139,7 +139,7 @@ public class Segment {
         if(or!=null)
             return;
         long id = fwy_scenario.new_link_id();
-        jNode start_node = new jNode(fwy_scenario.new_node_id());
+        Node start_node = new Node(fwy_scenario.new_node_id());
         long start_node_id = start_node.id;
         long end_node_id = ml.end_node_id;
         int full_lanes = 1;
@@ -150,7 +150,7 @@ public class Segment {
         float capacity_vphpl = default_or_capacity_vphpl;
         float jam_density_vpkpl = default_or_jam_density_vpkpl;
         float ff_speed_kph = default_or_ff_speed_kph;
-        or = new jLink(id,start_node_id,end_node_id,full_lanes,length,is_mainline,is_ramp,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph);
+        or = new Link(id,start_node_id,end_node_id,full_lanes,length,is_mainline,is_ramp,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph);
         start_node.out_links.add(or);
         fwy_scenario.jscenario.nodes.put(start_node.id,start_node);
         fwy_scenario.jscenario.links.put(or.id,or);
@@ -212,7 +212,7 @@ public class Segment {
             return;
         long id = fwy_scenario.new_link_id();
         long start_node_id = ml.start_node_id;
-        jNode end_node = new jNode(fwy_scenario.new_node_id());
+        Node end_node = new Node(fwy_scenario.new_node_id());
         long end_node_id = end_node.id;
         int full_lanes = 1;
         float length = 100f;
@@ -223,7 +223,7 @@ public class Segment {
         float jam_density_vpkpl = default_fr_jam_density_vpkpl;
         float ff_speed_kph = default_fr_ff_speed_kph;
 
-        fr = new jLink(id,start_node_id,end_node_id,full_lanes,length,is_mainline,is_ramp,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph);
+        fr = new Link(id,start_node_id,end_node_id,full_lanes,length,is_mainline,is_ramp,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph);
         end_node.in_links.add(fr);
         fwy_scenario.jscenario.nodes.put(end_node.id,end_node);
         fwy_scenario.jscenario.links.put(fr.id,fr);
@@ -311,7 +311,7 @@ public class Segment {
             or.end_node_id = new_end_node;
     }
 
-    protected jLink get_ml(){
+    protected Link get_ml(){
         return ml;
     }
 

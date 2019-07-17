@@ -1,7 +1,6 @@
 package opt.data;
 
 import error.OTMException;
-import jaxb.Scn;
 import utils.OTMUtils;
 import xml.JaxbLoader;
 
@@ -35,14 +34,7 @@ public class Project {
 
                 // load the scenario
                 jaxb.Scenario jaxb_scenario = JaxbLoader.load_scenario(scn_file,validate);
-
-
-                // read segment names
-                String sgmt_names_str = jaxb_scn.getSgmtNames();
-                String [] sgmt_names = sgmt_names_str==null || sgmt_names_str.isEmpty() ?
-                    null : sgmt_names_str.split("\\|");
-
-                scenarios.put(scn_name,new FreewayScenario(jaxb_scenario,sgmt_names));
+                scenarios.put(scn_name,new FreewayScenario(jaxb_scenario));
             }
 
         } catch (OTMException e) {
@@ -125,7 +117,7 @@ public class Project {
     public void create_scenario(String name) throws Exception {
         if( scenarios.containsKey(name))
             throw new Exception("The project already has a scenario by this name.");
-        scenarios.put(name,new FreewayScenario(new jaxb.Scenario(),null));
+        scenarios.put(name,new FreewayScenario(new jaxb.Scenario()));
     }
 
     /**
@@ -154,14 +146,13 @@ public class Project {
         jaxb.Scns jaxbScns = new jaxb.Scns();
         jaxbPrj.setScns(jaxbScns);
 
-        List<Scn> scnlist = jaxbScns.getScn();
+        List<jaxb.Scn> scnlist = jaxbScns.getScn();
         for(Map.Entry<String, FreewayScenario> e : scenarios.entrySet()) {
             String scenario_name = e.getKey();
             FreewayScenario fwy_scenario = e.getValue();
             jaxb.Scn jScn = new jaxb.Scn();
             jScn.setName(scenario_name);
             jScn.setFile(scenario_file_names.get(scenario_name));
-            jScn.setSgmtNames(OTMUtils.format_delim(fwy_scenario.get_segment_names().toArray(),"|"));
             scnlist.add(jScn);
         }
 

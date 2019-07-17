@@ -36,6 +36,7 @@
 			<xs:sequence>
 				<xs:element ref="sgmt" minOccurs="0" maxOccurs="unbounded" />
 			</xs:sequence>
+			<xs:attribute name="offrampfirst" type="xs:boolean" default="true" />
 		</xs:complexType>
 	</xs:element>
 

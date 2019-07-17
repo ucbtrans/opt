@@ -1,14 +1,5 @@
 package opt.data;
 
-import commodity.Commodity;
-import commodity.Path;
-import commodity.Subnetwork;
-import common.Link;
-import common.Network;
-import error.OTMException;
-import profiles.Profile1D;
-import utils.OTMUtils;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,10 +10,10 @@ public class FreewayScenario {
     private Long max_link_id;
     private Long max_node_id;
 
-    protected jScenario jscenario;
-//    protected List<Segment> segments = new ArrayList<>();
+    protected Scenario jscenario;
+    protected List<Segment> segments = new ArrayList<>();
 
-    protected Map<Long,Segment> segments = new HashMap<>();
+//    protected Map<Long,Segment> segments = new HashMap<>();
 
     /////////////////////////////////////
     // construction
@@ -30,38 +21,39 @@ public class FreewayScenario {
 
     public FreewayScenario(){}
 
-    public FreewayScenario(jaxb.Scenario jaxb_scenario, String [] segment_names) throws Exception {
-        this.jscenario = new jScenario(jaxb_scenario);
+    public FreewayScenario(jaxb.Scenario jaxb_scenario) throws Exception {
+
+        this.jscenario = new Scenario(jaxb_scenario);
 
         // get upstream mainline source
-        jLink ml_link = jscenario.get_ml_source();
+        Link ml_link = jscenario.get_ml_source();
 
-        Set<jLink> all_links = new HashSet<>(jscenario.links.values());
+        Set<Link> all_links = new HashSet<>(jscenario.links.values());
 
         while (true){
 
-            jNode start_node = jscenario.nodes.get(ml_link.start_node_id);
-            jNode end_node = jscenario.nodes.get(ml_link.end_node_id);
+            Node start_node = jscenario.nodes.get(ml_link.start_node_id);
+            Node end_node = jscenario.nodes.get(ml_link.end_node_id);
 
             // get offramp ........................
-            Set<jLink> offramps = start_node.out_links.stream()
+            Set<Link> offramps = start_node.out_links.stream()
                     .filter(link->link.is_ramp)
                     .collect(toSet());
 
             if(offramps.size()>1)
                 throw new Exception("Multiple offramps on a single node.");
 
-            jLink offramp = offramps.isEmpty() ? null : offramps.iterator().next() ;
+            Link offramp = offramps.isEmpty() ? null : offramps.iterator().next() ;
 
             // get onramp ........................
-            Set<jLink> onramps = end_node.in_links.stream()
+            Set<Link> onramps = end_node.in_links.stream()
                     .filter(link->link.is_source && link.is_ramp)
                     .collect(toSet());
 
             if(onramps.size()>1)
                 throw new Exception("Multiple onramps on a single node.");
 
-            jLink onramp = onramps.isEmpty() ? null : onramps.iterator().next();
+            Link onramp = onramps.isEmpty() ? null : onramps.iterator().next();
 
             // create the segment ................
             segments.add( new Segment(this,onramp,ml_link,offramp) );
@@ -74,7 +66,7 @@ public class FreewayScenario {
                 all_links.remove(offramp);
 
             // next link .........................
-            Set<jLink> dn_links = end_node.out_links.stream()
+            Set<Link> dn_links = end_node.out_links.stream()
                     .filter(link->link.is_mainline)
                     .collect(toSet());
 
@@ -89,11 +81,11 @@ public class FreewayScenario {
         }
 
         // assign names
-        if(segment_names!=null && segment_names.length!=segments.size())
-            throw new Exception("The defined segment names do not cover all segments");
-
-        for(int i=0;i<segments.size();i++)
-            segments.get(i).set_name(segment_names==null ? String.format("segment %d",i) : segment_names[i]);
+//        if(segment_names!=null && segment_names.length!=segments.size())
+//            throw new Exception("The defined segment names do not cover all segments");
+//
+//        for(int i=0;i<segments.size();i++)
+//            segments.get(i).set_name(segment_names==null ? String.format("segment %d",i) : segment_names[i]);
 
         // assign demands
         if (jaxb_scenario.getDemands()!=null)
@@ -169,18 +161,18 @@ public class FreewayScenario {
 
     /**
      * Retrieve a map of id -> commodity
-     * @return Map<Long,jCommodity>
+     * @return Map<Long,Commodity>
      */
-    public Map<Long,jCommodity> get_commodities(){
+    public Map<Long, Commodity> get_commodities(){
         return jscenario.commodities;
     }
 
     /**
      * Get the commodity for a given id
      * @param id
-     * @return jCommodity
+     * @return Commodity
      */
-    public jCommodity get_commodity_by_id(long id){
+    public Commodity get_commodity_by_id(long id){
         return jscenario.commodities.containsKey(id) ? jscenario.commodities.get(id) : null;
     }
 
@@ -189,14 +181,14 @@ public class FreewayScenario {
      * @param name
      * @return
      */
-    public jCommodity create_commodity(String name){
+    public Commodity create_commodity(String name){
         long max_id;
         if(jscenario.commodities.isEmpty())
             max_id = 0;
         else
             max_id = jscenario.commodities.keySet().stream().mapToLong(x->x).max().getAsLong() + 1;
 
-        jCommodity new_comm = new jCommodity(max_id,name);
+        Commodity new_comm = new Commodity(max_id,name);
         jscenario.commodities.put(max_id,new_comm);
         return new_comm;
     }
@@ -217,14 +209,14 @@ public class FreewayScenario {
         Segment dn_segment = segments.get(dn_index);
         Segment up_segment = dn_index>0 ? segments.get(dn_index-1) : null;
 
-        jLink dn_ml = dn_segment.get_ml();
+        Link dn_ml = dn_segment.get_ml();
 
-        jNode start_node = new jNode(new_node_id());
+        Node start_node = new Node(new_node_id());
         jscenario.nodes.put(start_node.id,start_node);
 
-        jNode end_node = jscenario.nodes.get(dn_ml.start_node_id);
+        Node end_node = jscenario.nodes.get(dn_ml.start_node_id);
 
-        jLink ml = new jLink(new_link_id(),start_node.id,end_node.id,dn_ml.full_lanes,dn_ml.length,
+        Link ml = new Link(new_link_id(),start_node.id,end_node.id,dn_ml.full_lanes,dn_ml.length,
                 true, false, dn_index==0, dn_ml.capacity_vphpl, dn_ml.jam_density_vpkpl,
                 dn_ml.ff_speed_kph);
         jscenario.links.put(ml.id,ml);
@@ -256,14 +248,14 @@ public class FreewayScenario {
         Segment up_segment = segments.get(up_index);
         Segment dn_segment = up_index<segments.size()-1 ? segments.get(up_index+1) : null;
 
-        jLink up_ml = up_segment.get_ml();
+        Link up_ml = up_segment.get_ml();
 
-        jNode end_node = new jNode(new_node_id());
+        Node end_node = new Node(new_node_id());
         jscenario.nodes.put(end_node.id,end_node);
 
-        jNode start_node = jscenario.nodes.get(up_ml.end_node_id);
+        Node start_node = jscenario.nodes.get(up_ml.end_node_id);
 
-        jLink ml = new jLink(new_link_id(),start_node.id,end_node.id,up_ml.full_lanes,up_ml.length,
+        Link ml = new Link(new_link_id(),start_node.id,end_node.id,up_ml.full_lanes,up_ml.length,
                 true, false, false, up_ml.capacity_vphpl, up_ml.jam_density_vpkpl,
                 up_ml.ff_speed_kph);
         jscenario.links.put(ml.id,ml);
@@ -332,7 +324,7 @@ public class FreewayScenario {
         jaxb.Commodities jComms = new jaxb.Commodities();
         jScn.setCommodities(jComms);
 
-        for(Map.Entry<Long,jCommodity> e : this.get_commodities().entrySet()){
+        for(Map.Entry<Long, Commodity> e : this.get_commodities().entrySet()){
             jaxb.Commodity jcomm = new jaxb.Commodity();
             jComms.getCommodity().add(jcomm);
             jcomm.setId(e.getKey());
@@ -347,7 +339,7 @@ public class FreewayScenario {
         // nodes
         jaxb.Nodes jNodes = new jaxb.Nodes();
         jNet.setNodes(jNodes);
-        for(jNode node : jscenario.nodes.values()) {
+        for(Node node : jscenario.nodes.values()) {
             jaxb.Node jaxbNode = new jaxb.Node();
             jaxbNode.setId(node.id);
             jNodes.getNode().add(jaxbNode);
@@ -355,8 +347,8 @@ public class FreewayScenario {
 
         jaxb.Roadparams jRoadParams = new jaxb.Roadparams();
         jNet.setRoadparams(jRoadParams);
-        Set<jRoadParam> road_params = jscenario.get_road_params();
-        for(jRoadParam jrp : road_params){
+        Set<RoadParam> road_params = jscenario.get_road_params();
+        for(RoadParam jrp : road_params){
             jaxb.Roadparam jaxbrp = new jaxb.Roadparam();
             jaxbrp.setId(jrp.id);
             jaxbrp.setCapacity(jrp.capacity);
@@ -368,7 +360,7 @@ public class FreewayScenario {
         // links
         jaxb.Links jLinks = new jaxb.Links();
         jNet.setLinks(jLinks);
-        for(jLink link : jscenario.links.values()){
+        for(Link link : jscenario.links.values()){
             jaxb.Link jaxbLink = new jaxb.Link();
             jaxbLink.setId(link.id);
             jaxbLink.setLength(link.length);
@@ -382,7 +374,7 @@ public class FreewayScenario {
                 jaxbLink.setRoadType("ramp");
 
             // road params
-            jRoadParam link_rp = new jRoadParam(link.capacity_vphpl,link.ff_speed_kph,link.jam_density_vpkpl);
+            RoadParam link_rp = new RoadParam(link.capacity_vphpl,link.ff_speed_kph,link.jam_density_vpkpl);
             long rp_id = road_params.stream().filter(rp->rp.equals(link_rp)).findFirst().get().id;
 
             jaxbLink.setRoadparam(rp_id);

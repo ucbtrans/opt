@@ -1,6 +1,6 @@
 package opt.data;
 
-public class jLink {
+public class Link {
     protected long id;
     protected long start_node_id;
     protected long end_node_id;
@@ -18,7 +18,7 @@ public class jLink {
     // construction
     /////////////////////////////////////
 
-    protected jLink(jaxb.Link link,jaxb.Roadparam rp){
+    protected Link(jaxb.Link link, jaxb.Roadparam rp){
         this.id = link.getId();
         this.start_node_id = link.getStartNodeId();
         this.end_node_id = link.getEndNodeId();
@@ -31,8 +31,8 @@ public class jLink {
         this.ff_speed_kph = rp.getSpeed();
     }
 
-    protected jLink(long id,long start_node_id,long end_node_id,int full_lanes,float length,boolean is_mainline,
-                 boolean is_ramp,boolean is_source,float capacity_vphpl,float jam_density_vpkpl,float ff_speed_kph) {
+    protected Link(long id, long start_node_id, long end_node_id, int full_lanes, float length, boolean is_mainline,
+                   boolean is_ramp, boolean is_source, float capacity_vphpl, float jam_density_vpkpl, float ff_speed_kph) {
 
         this.id = id;
         this.start_node_id = start_node_id;

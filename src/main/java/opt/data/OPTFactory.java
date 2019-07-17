@@ -1,7 +1,6 @@
 package opt.data;
 
 import jaxb.Prj;
-import jaxb.Roadparam;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -110,19 +109,19 @@ public class OPTFactory {
         return marshaller;
     }
 
-    private static jScenario deep_copy_jscenario(jScenario jscn_org) {
-        jScenario jscn_cpy = new jScenario();
+    private static Scenario deep_copy_jscenario(Scenario jscn_org) {
+        Scenario jscn_cpy = new Scenario();
 
         // create new nodes
-        for (Map.Entry<Long, jNode> e : jscn_org.nodes.entrySet())
-            jscn_cpy.nodes.put(e.getKey(), new jNode(e.getKey()));
+        for (Map.Entry<Long, Node> e : jscn_org.nodes.entrySet())
+            jscn_cpy.nodes.put(e.getKey(), new Node(e.getKey()));
 
         // create new links
-        for (Map.Entry<Long, jLink> e : jscn_org.links.entrySet()) {
+        for (Map.Entry<Long, Link> e : jscn_org.links.entrySet()) {
             long link_id = e.getKey();
-            jLink link_org = e.getValue();
+            Link link_org = e.getValue();
 
-            jLink new_link = new jLink(
+            Link new_link = new Link(
                     link_id,
                     link_org.start_node_id,
                     link_org.end_node_id,
@@ -139,11 +138,11 @@ public class OPTFactory {
         }
 
         // set node inlinks and outlinks
-        for (jNode node_cpy : jscn_cpy.nodes.values()){
-            jNode node_org = jscn_org.nodes.get(node_cpy.id);
-            for(jLink link_org : node_org.out_links)
+        for (Node node_cpy : jscn_cpy.nodes.values()){
+            Node node_org = jscn_org.nodes.get(node_cpy.id);
+            for(Link link_org : node_org.out_links)
                 node_cpy.out_links.add(jscn_cpy.links.get(link_org.id));
-            for(jLink link_org : node_org.in_links)
+            for(Link link_org : node_org.in_links)
                 node_cpy.in_links.add(jscn_cpy.links.get(link_org.id));
         }
 

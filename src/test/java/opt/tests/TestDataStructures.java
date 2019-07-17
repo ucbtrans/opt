@@ -17,7 +17,7 @@ public class TestDataStructures {
 
     @Test
     public void test_load_project_from_file(){
-        String project_file_name = get_test_fullpath("project.opt");
+        String project_file_name = get_test_fullpath("project_new.opt");
         boolean validate = true;
         try {
             Project project = OPTFactory.load_project(project_file_name,validate);
@@ -122,7 +122,7 @@ public class TestDataStructures {
         long comm_id = scenario.get_commodities().keySet().iterator().next();
         System.out.println(scenario.get_commodity_by_id(comm_id));
 
-        jCommodity new_comm = scenario.create_commodity("new commodity");
+        Commodity new_comm = scenario.create_commodity("new commodity");
         System.out.println(new_comm);
     }
 
