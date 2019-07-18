@@ -19,20 +19,33 @@ public class TestSegment extends AbstractTest {
         sX = new TestData();
     }
 
+    // MISSING //
+//    test_get_upstrm_segments
+//    test_get_upstrm_links
+//    test_get_dnstrm_segments
+//    test_get_dnstrm_links
+//    test_insert_upstrm_hov_segment
+//    test_insert_upstrm_mainline_segment
+//    test_insert_upstrm_onramp_segment
+//    test_insert_dnstrm_hov_segment
+//    test_insert_dnstrm_mainline_segment
+//    test_insert_dnstrm_onramp_segment
+//    test_set_get_or_demand_vph
+
     /////////////////////////////////////
     // name and length
     /////////////////////////////////////
 
-    @Ignore
     @Test
     public void test_set_get_name(){
-
         try {
-
+            TestData X = new TestData();
+            assertEquals("segment A0",X.segment0.get_name());
+            X.segment0.set_name("newname");
+            assertEquals("newname",X.segment0.get_name());
         } catch (Exception e) {
             fail(e.getMessage());
         }
-
     }
 
     @Test
@@ -120,12 +133,12 @@ public class TestSegment extends AbstractTest {
         assertTrue(sX.segment2.has_offramp());
     }
 
-    @Ignore
     @Test
     public void test_set_get_fr_name(){
-
         try {
-
+            TestData X = new TestData();
+            assertNull(X.segment0.get_fr_name());
+            assertEquals("A7",X.segment2.get_fr_name());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -167,7 +180,6 @@ public class TestSegment extends AbstractTest {
         }
     }
 
-    @Ignore
     @Test
     public void test_delete_offramp(){
         TestData X = new TestData();
@@ -178,27 +190,30 @@ public class TestSegment extends AbstractTest {
         assertFalse(X.segment2.delete_offramp());
     }
 
-    @Ignore
     @Test
     public void test_add_offramp(){
+        TestData X = new TestData();
+        assertFalse(X.segment0.has_offramp());
+        X.segment0.add_offramp();
+        assertTrue(X.segment0.has_offramp());
     }
 
     /////////////////////////////////////
     // onramp
     /////////////////////////////////////
 
-    @Ignore
     @Test
     public void test_has_onramp(){
         assertFalse(sX.segment0.has_onramp());
         assertTrue(sX.segment2.has_onramp());
     }
 
-    @Ignore
     @Test
     public void test_set_get_or_name(){
         try {
-
+            TestData X = new TestData();
+            assertNull(X.segment0.get_or_name());
+            assertEquals("A8",X.segment2.get_or_name());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -251,9 +266,12 @@ public class TestSegment extends AbstractTest {
         assertFalse(X.segment4.delete_onramp());
     }
 
-    @Ignore
     @Test
     public void test_add_onramp(){
+        TestData X = new TestData();
+        assertFalse(X.segment0.has_onramp());
+        X.segment0.add_onramp();
+        assertTrue(X.segment0.has_onramp());
     }
 
     @Ignore
@@ -275,11 +293,15 @@ public class TestSegment extends AbstractTest {
     public void test_set_get_hov_lanes(){
     }
 
-    @Ignore
     @Test
     public void test_set_get_ml_name(){
         try {
-
+            try {
+                TestData X = new TestData();
+                assertEquals("A2",X.segment2.get_ml_name());
+            } catch (Exception e) {
+                fail(e.getMessage());
+            }
         } catch (Exception e) {
             fail(e.getMessage());
         }

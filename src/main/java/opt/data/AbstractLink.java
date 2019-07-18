@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public abstract class AbstractLink {
     protected long id;
-    protected String name = "NOT IMPLEMENTED";
+    protected String name;
     protected long start_node_id;
     protected long end_node_id;
     protected int full_lanes;
@@ -65,6 +65,7 @@ public abstract class AbstractLink {
                     jam_density_vpkpl,
                     ff_speed_kph,
                     mysegment);
+            new_link.name = name;
         } catch (InstantiationException ex) {
             ex.printStackTrace();
         } catch (IllegalAccessException ex) {

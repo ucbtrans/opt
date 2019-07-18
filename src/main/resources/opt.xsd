@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0.2">
 
-	<!-- TODO: GG Figure out name spaces so that prjs->projects and scns->scenarios  -->
 	<xs:element name="prj">
 		<xs:complexType>
 			<xs:all>
@@ -21,6 +20,7 @@
 	<xs:element name="scn">
 		<xs:complexType>
 			<xs:all>
+				<xs:element ref="lnks" minOccurs="0" maxOccurs="1" />
 				<xs:element ref="sgmts" minOccurs="0" maxOccurs="1" />
 			</xs:all>
 			<xs:attribute name="name" type="xs:string" default="unnamed" />
@@ -31,12 +31,26 @@
 		</xs:complexType>
 	</xs:element>
 
+	<xs:element name="lnks">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="lnk" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
 	<xs:element name="sgmts">
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="sgmt" minOccurs="0" maxOccurs="unbounded" />
 			</xs:sequence>
-			<xs:attribute name="offrampfirst" type="xs:boolean" default="true" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="lnk">
+		<xs:complexType>
+			<xs:attribute name="id" type="xs:long" use="required" />
+			<xs:attribute name="name" type="xs:string" />
 		</xs:complexType>
 	</xs:element>
 

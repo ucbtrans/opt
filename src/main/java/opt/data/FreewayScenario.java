@@ -24,19 +24,31 @@ public class FreewayScenario {
 
     public FreewayScenario(){}
 
-    public FreewayScenario(String name,jaxb.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
+    public FreewayScenario(String name,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
 
         this.name = name;
 
         // create Scenario object
         this.scenario = new Scenario(jaxb_scenario);
 
+        // attach link names
+        if (jaxb_lnks!=null){
+            for(jaxb.Lnk lnk : jaxb_lnks.getLnk()){
+                if (scenario.links.containsKey(lnk.getId())){
+                    AbstractLink link = scenario.links.get(lnk.getId());
+                    if( link.name!=null )
+                        throw new Exception("Link named twice");
+                    link.name = lnk.getName();
+                }
+            }
+        }
+
         // create FreewaySegment network
         long max_sgmt_id = 0;
         if(jaxb_segments!=null) {
-            for (jaxb.Sgmt jaxb_sgmt : jaxb_segments.getSgmt()) {
+            for (jaxb.Sgmt sgmt : jaxb_segments.getSgmt()) {
                 long sgmt_id = max_sgmt_id++;
-                Segment segment = new Segment(this,sgmt_id, jaxb_sgmt);
+                Segment segment = new Segment(this,sgmt_id, sgmt);
                 segments.put(sgmt_id,segment);
 
                 // assign segments to links
@@ -353,73 +365,35 @@ public class FreewayScenario {
     // protected
     /////////////////////////////////////
 
-    public jaxb.Scenario to_jaxb(){
-        jaxb.Scenario jScn = new jaxb.Scenario();
+    protected jaxb.Scn to_jaxb(){
+        jaxb.Scn scn = new jaxb.Scn();
+        scn.setName(name);
 
-        // commodities
-        jaxb.Commodities jComms = new jaxb.Commodities();
-        jScn.setCommodities(jComms);
+        jaxb.Sgmts sgmts = new jaxb.Sgmts();
+        scn.setSgmts(sgmts);
+        for(Segment segment : segments.values())
+            sgmts.getSgmt().add(segment.to_jaxb());
 
-        for(Map.Entry<String, Commodity> e : this.get_commodities().entrySet()){
-            jaxb.Commodity jcomm = new jaxb.Commodity();
-            jComms.getCommodity().add(jcomm);
-            Commodity comm = e.getValue();
-            jcomm.setId(comm.id);
-            jcomm.setName(comm.name);
-            jcomm.setPathfull(false);
+        jaxb.Lnks lnks = new jaxb.Lnks();
+        scn.setLnks(lnks);
+        for(AbstractLink link : get_links()){
+            jaxb.Lnk lnk = new jaxb.Lnk();
+            lnk.setId(link.id);
+            lnk.setName(link.name);
+            lnks.getLnk().add(lnk);
         }
-
-        // network
-        jaxb.Network jNet = new jaxb.Network();
-        jScn.setNetwork(jNet);
-
-        // nodes
-        jaxb.Nodes jNodes = new jaxb.Nodes();
-        jNet.setNodes(jNodes);
-        for(Node node : scenario.nodes.values()) {
-            jaxb.Node jaxbNode = new jaxb.Node();
-            jaxbNode.setId(node.id);
-            jNodes.getNode().add(jaxbNode);
-        }
-
-        jaxb.Roadparams jRoadParams = new jaxb.Roadparams();
-        jNet.setRoadparams(jRoadParams);
-        Set<RoadParam> road_params = scenario.get_road_params();
-        for(RoadParam jrp : road_params){
-            jaxb.Roadparam jaxbrp = new jaxb.Roadparam();
-            jaxbrp.setId(jrp.id);
-            jaxbrp.setCapacity(jrp.capacity);
-            jaxbrp.setSpeed(jrp.speed);
-            jaxbrp.setJamDensity(jrp.jam_density);
-            jRoadParams.getRoadparam().add(jaxbrp);
-        }
-
-        // links
-        jaxb.Links jLinks = new jaxb.Links();
-        jNet.setLinks(jLinks);
-        for(AbstractLink link : scenario.links.values()){
-            jaxb.Link jaxbLink = new jaxb.Link();
-            jaxbLink.setId(link.id);
-            jaxbLink.setLength(link.length_meters);
-            jaxbLink.setFullLanes(link.full_lanes);
-            jaxbLink.setEndNodeId(link.end_node_id);
-            jaxbLink.setStartNodeId(link.start_node_id);
-
-            if(link instanceof LinkMainline)
-                jaxbLink.setRoadType("mainline");
-            if(link instanceof LinkRamp)
-                jaxbLink.setRoadType("ramp");
-
-            // road params
-            RoadParam link_rp = new RoadParam(link.capacity_vphpl,link.ff_speed_kph,link.jam_density_vpkpl);
-            long rp_id = road_params.stream().filter(rp->rp.equals(link_rp)).findFirst().get().id;
-
-            jaxbLink.setRoadparam(rp_id);
-            jLinks.getLink().add(jaxbLink);
-        }
-
-        return jScn;
+        return scn;
     }
+
+
+
+
+
+
+
+
+
+
 
     protected AbstractLink get_link(Long id){
         return scenario.links.get(id);

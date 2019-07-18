@@ -117,6 +117,75 @@ public class Scenario {
         return road_params;
     }
 
+    public jaxb.Scenario to_jaxb(){
+        jaxb.Scenario jScn = new jaxb.Scenario();
+
+        // commodities
+        jaxb.Commodities jComms = new jaxb.Commodities();
+        jScn.setCommodities(jComms);
+
+        for(Map.Entry<String, Commodity> e : commodities.entrySet()){
+            jaxb.Commodity jcomm = new jaxb.Commodity();
+            jComms.getCommodity().add(jcomm);
+            Commodity comm = e.getValue();
+            jcomm.setId(comm.id);
+            jcomm.setName(comm.name);
+            jcomm.setPathfull(false);
+        }
+
+        // network
+        jaxb.Network jNet = new jaxb.Network();
+        jScn.setNetwork(jNet);
+
+        // nodes
+        jaxb.Nodes jNodes = new jaxb.Nodes();
+        jNet.setNodes(jNodes);
+        for(Node node : nodes.values()) {
+            jaxb.Node jaxbNode = new jaxb.Node();
+            jaxbNode.setId(node.id);
+            jNodes.getNode().add(jaxbNode);
+        }
+
+        jaxb.Roadparams jRoadParams = new jaxb.Roadparams();
+        jNet.setRoadparams(jRoadParams);
+        Set<RoadParam> road_params = get_road_params();
+        for(RoadParam jrp : road_params){
+            jaxb.Roadparam jaxbrp = new jaxb.Roadparam();
+            jaxbrp.setId(jrp.id);
+            jaxbrp.setCapacity(jrp.capacity);
+            jaxbrp.setSpeed(jrp.speed);
+            jaxbrp.setJamDensity(jrp.jam_density);
+            jRoadParams.getRoadparam().add(jaxbrp);
+        }
+
+        // links
+        jaxb.Links jLinks = new jaxb.Links();
+        jNet.setLinks(jLinks);
+        for(AbstractLink link : links.values()){
+            jaxb.Link jaxbLink = new jaxb.Link();
+            jaxbLink.setId(link.id);
+            jaxbLink.setLength(link.length_meters);
+            jaxbLink.setFullLanes(link.full_lanes);
+            jaxbLink.setEndNodeId(link.end_node_id);
+            jaxbLink.setStartNodeId(link.start_node_id);
+
+            if(link instanceof LinkMainline)
+                jaxbLink.setRoadType("mainline");
+            if(link instanceof LinkRamp)
+                jaxbLink.setRoadType("ramp");
+
+            // road params
+            RoadParam link_rp = new RoadParam(link.capacity_vphpl,link.ff_speed_kph,link.jam_density_vpkpl);
+            long rp_id = road_params.stream().filter(rp->rp.equals(link_rp)).findFirst().get().id;
+
+            jaxbLink.setRoadparam(rp_id);
+            jLinks.getLink().add(jaxbLink);
+        }
+
+        return jScn;
+    }
+
+
     /////////////////////////////////////
     // Override
     /////////////////////////////////////

@@ -33,7 +33,7 @@ public class Project {
 
                 // load the scenario
                 jaxb.Scenario jaxb_scenario = JaxbLoader.load_scenario(scn_file,validate);
-                scenarios.put(scn_name,new FreewayScenario(scn_name,jaxb_scn.getSgmts(),jaxb_scenario));
+                scenarios.put(scn_name,new FreewayScenario(scn_name,jaxb_scn.getLnks(),jaxb_scn.getSgmts(),jaxb_scenario));
             }
 
         } catch (OTMException e) {
@@ -115,7 +115,7 @@ public class Project {
     public void create_scenario(String name) throws Exception {
         if( scenarios.containsKey(name))
             throw new Exception("The project already has a scenario by this name.");
-        scenarios.put(name,new FreewayScenario(name,null,new jaxb.Scenario()));
+        scenarios.put(name,new FreewayScenario(name,null,null,new jaxb.Scenario()));
     }
 
     /**
@@ -145,11 +145,9 @@ public class Project {
         jaxbPrj.setScns(jaxbScns);
 
         List<jaxb.Scn> scnlist = jaxbScns.getScn();
-        for(Map.Entry<String, FreewayScenario> e : scenarios.entrySet()) {
-            String scenario_name = e.getKey();
-            jaxb.Scn jScn = new jaxb.Scn();
-            jScn.setName(scenario_name);
-            jScn.setFile(scenario_file_names.get(scenario_name));
+        for(FreewayScenario fwy_scenario: scenarios.values()) {
+            jaxb.Scn jScn = fwy_scenario.to_jaxb();
+            jScn.setFile(scenario_file_names.get(jScn.getName()));
             scnlist.add(jScn);
         }
         return jaxbPrj;

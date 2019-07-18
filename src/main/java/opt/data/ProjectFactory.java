@@ -44,7 +44,6 @@ public class ProjectFactory {
         return new Project();
     }
 
-
     /**
      * Save project to xml files
      * @param project
@@ -59,10 +58,10 @@ public class ProjectFactory {
         // save each of the scenarios
         Map<String,String> scenario_file_names = new HashMap<>();
         for(String scenario_name : project.get_scenario_names()){
-            FreewayScenario scenario = project.get_scenario_with_name(scenario_name);
+            FreewayScenario fwy_scenario = project.get_scenario_with_name(scenario_name);
             File scenario_file = file_info.get_scenario_file(scenario_name);
             scenario_file_names.put(scenario_name,scenario_file.getName());
-            create_marshaller(jaxb.Scenario.class).marshal(scenario.to_jaxb(), scenario_file);
+            create_marshaller(jaxb.Scenario.class).marshal(fwy_scenario.scenario.to_jaxb(), scenario_file);
         }
 
         // save project file

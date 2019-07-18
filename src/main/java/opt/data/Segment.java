@@ -266,7 +266,7 @@ public class Segment {
     }
 
     public String get_fr_name(){
-        return "NOT IMPLEMENTED";
+        return has_offramp() ? fr().name : null;
     }
 
     public int get_fr_lanes(){
@@ -362,7 +362,7 @@ public class Segment {
     }
 
     public String get_or_name(){
-        return "NOT IMPLEMENTED";
+        return has_onramp() ? or().name : null;
     }
 
     public int get_or_lanes(){
@@ -473,7 +473,7 @@ public class Segment {
     /////////////////////////////////////
 
     public String get_ml_name(){
-        return "NOT IMPLEMENTED";
+        return ml().name;
     }
 
     public int get_mixed_lanes(){
@@ -562,6 +562,13 @@ public class Segment {
     /////////////////////////////////////
     // override
     /////////////////////////////////////
+
+    public jaxb.Sgmt to_jaxb(){
+        jaxb.Sgmt sgmt = new jaxb.Sgmt();
+        sgmt.setName(name);
+        sgmt.setLinks(OTMUtils.comma_format(get_links().stream().map(link->link.get_id()).collect(Collectors.toSet())));
+        return sgmt;
+    }
 
     @Override
     public String toString() {

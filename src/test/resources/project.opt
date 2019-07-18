@@ -2,7 +2,21 @@
 <prj>
 	<scns>
 		<scn name="scenarioA" file="scenarioA.xml">
-			<sgmts offrampfirst="true">
+			<lnks>
+				<lnk id="0" name="A0"/>
+				<lnk id="1" name="A1"/>
+				<lnk id="2" name="A2"/>
+				<lnk id="3" name="A3"/>
+				<lnk id="4" name="A4"/>
+				<lnk id="5" name="A5"/>
+				<lnk id="6" name="A6"/>
+				<lnk id="7" name="A7"/>
+				<lnk id="8" name="A8"/>
+				<lnk id="9" name="A9"/>
+				<lnk id="10" name="A10"/>
+				<lnk id="11" name="A11"/>
+			</lnks>
+			<sgmts>
 				<sgmt name="segment A0" links="0"/>
 				<sgmt name="segment A1" links="1"/>
 				<sgmt name="segment A2" links="7,2,8"/>
@@ -13,7 +27,21 @@
 			</sgmts>
 		</scn>
 		<scn name="scenarioB" file="scenarioB.xml">
-			<sgmts offrampfirst="true">
+			<lnks>
+				<lnk id="0" name="B0"/>
+				<lnk id="1" name="B1"/>
+				<lnk id="2" name="B2"/>
+				<lnk id="3" name="B3"/>
+				<lnk id="4" name="B4"/>
+				<lnk id="5" name="B5"/>
+				<lnk id="6" name="B6"/>
+				<lnk id="7" name="B7"/>
+				<lnk id="8" name="B8"/>
+				<lnk id="9" name="B9"/>
+				<lnk id="10" name="B10"/>
+				<lnk id="11" name="B11"/>
+			</lnks>
+			<sgmts>
 				<sgmt name="segment B0" links="0"/>
 				<sgmt name="segment B1" links="1"/>
 				<sgmt name="segment B2" links="7,2,8"/>
