@@ -3,6 +3,8 @@ package opt.data;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toSet;
+
 public class FreewayScenario {
 
     private Long max_link_id;
@@ -14,8 +16,6 @@ public class FreewayScenario {
     protected Scenario scenario;
 
     // interface to the ui
-//    protected List<Segment> segments = new ArrayList<>();
-
     protected Map<Long,Segment> segments = new HashMap<>();
 
     /////////////////////////////////////
@@ -36,8 +36,61 @@ public class FreewayScenario {
         if(jaxb_segments!=null) {
             for (jaxb.Sgmt jaxb_sgmt : jaxb_segments.getSgmt()) {
                 long sgmt_id = max_sgmt_id++;
-                segments.put(sgmt_id,new Segment(this,sgmt_id, jaxb_sgmt));
+                Segment segment = new Segment(this,sgmt_id, jaxb_sgmt);
+                segments.put(sgmt_id,segment);
+
+                // assign segments to links
+                if (segment.ml.mysegment!=null)
+                    throw new Exception("Link " + segment.ml.id + " assigned to multiple segments");
+                segment.ml.mysegment = segment;
+
+                if (segment.or!=null){
+                    if (segment.or.mysegment!=null)
+                        throw new Exception("Link " + segment.or.id + " assigned to multiple segments");
+                    segment.or.mysegment = segment;
+                }
+
+                if (segment.fr!=null){
+                    if (segment.fr.mysegment!=null)
+                        throw new Exception("Link " + segment.fr.id + " assigned to multiple segments");
+                    segment.fr.mysegment = segment;
+                }
+
             }
+        }
+
+        // segment adjacency mappings ..................................
+        for(Segment segment : segments.values()){
+
+            // upstream segments
+            Node start_node = scenario.nodes.get(segment.ml.start_node_id);
+            Set<Segment> upstream_segments = start_node.in_links.stream()
+                    .filter(link->!(link instanceof LinkRamp))
+                    .map(link -> link.mysegment)
+                    .filter(seg->seg!=segment)
+                    .collect(toSet());
+
+            if (upstream_segments.size()>1)
+                throw new Exception("Level 3 networks has not been implemented");
+
+            if (upstream_segments.size()==1)
+                segment.upstrm_segment = upstream_segments.iterator().next();
+
+            // downstream segments
+            Node end_node = scenario.nodes.get(segment.ml.end_node_id);
+            Set<Segment> downstream_segments = end_node.out_links.stream()
+                    .filter(link->!(link instanceof LinkRamp))
+                    .map(link -> link.mysegment)
+                    .filter(seg->seg!=segment)
+                    .collect(toSet());
+
+            if (downstream_segments.size()>1)
+                throw new Exception("Level 3 networks has not been implemented");
+
+            if (downstream_segments.size()==1)
+                segment.dnstrm_segment = downstream_segments.iterator().next();
+
+            System.out.println("WARNING: Network class II mappings have not been implemented.");
         }
 
 
@@ -83,37 +136,34 @@ public class FreewayScenario {
     // getters
     /////////////////////////////////////
 
-    /**
-     * Get the name of the scenario
-     * @return String
-     */
-    public String get_name(){
-        return name;
-    }
+//    /**
+//     * Get the name of the scenario
+//     * @return String
+//     */
+//    public String get_name(){
+//        return name;
+//    }
 
     /**
      * get all segments in this scenario
      * @return Collection of segments
      */
-    public Collection<Segment> get_segments(){
-        return segments.values();
+    public Set<Segment> get_segments(){
+        return new HashSet<>(segments.values());
     }
 
 //    /**
-//     * Get segment by index.
-//     * @param i index in [0...num segments-1]
-//     * @return segment object if the index is valid. null otherwise.
+//     * Get an order list of the names of segments
+//     * @return
 //     */
-//    public Segment get_segment(int i){
-//        return i<0 || i>=get_num_segments() ? null : segments.get(i);
+//    public List<String> get_segment_names(){
+//        return segments.values().stream().map(segment->segment.name).collect(Collectors.toList());
 //    }
 
-    /**
-     * Get an order list of the names of segments
-     * @return
-     */
-    public List<String> get_segment_names(){
-        return segments.values().stream().map(segment->segment.name).collect(Collectors.toList());
+    public Set<AbstractLink> get_links(){
+        return segments.values().stream()
+                .flatMap(sgmt->sgmt.get_links().stream())
+                .collect(Collectors.toSet());
     }
 
     /////////////////////////////////////
@@ -178,7 +228,7 @@ public class FreewayScenario {
 //
 //        Node end_node = scenario.nodes.get(dn_ml.start_node_id);
 //
-//        AbstractLink ml = new AbstractLink(new_link_id(),start_node.id,end_node.id,dn_ml.full_lanes,dn_ml.length,
+//        AbstractLink ml = new AbstractLink(new_link_id(),start_node.id,end_node.id,dn_ml.full_lanes,dn_ml.length_meters,
 //                true, false, dn_index==0, dn_ml.capacity_vphpl, dn_ml.jam_density_vpkpl,
 //                dn_ml.ff_speed_kph);
 //        scenario.links.put(ml.id,ml);
@@ -218,7 +268,7 @@ public class FreewayScenario {
 //
 //        Node start_node = scenario.nodes.get(up_ml.end_node_id);
 //
-//        AbstractLink ml = new AbstractLink(new_link_id(),start_node.id,end_node.id,up_ml.full_lanes,up_ml.length,
+//        AbstractLink ml = new AbstractLink(new_link_id(),start_node.id,end_node.id,up_ml.full_lanes,up_ml.length_meters,
 //                true, false, false, up_ml.capacity_vphpl, up_ml.jam_density_vpkpl,
 //                up_ml.ff_speed_kph);
 //        scenario.links.put(ml.id,ml);
@@ -326,7 +376,7 @@ public class FreewayScenario {
         for(AbstractLink link : scenario.links.values()){
             jaxb.Link jaxbLink = new jaxb.Link();
             jaxbLink.setId(link.id);
-            jaxbLink.setLength(link.length);
+            jaxbLink.setLength(link.length_meters);
             jaxbLink.setFullLanes(link.full_lanes);
             jaxbLink.setEndNodeId(link.end_node_id);
             jaxbLink.setStartNodeId(link.start_node_id);

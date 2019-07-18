@@ -155,7 +155,7 @@ public class OPTFactory {
                     link_org.start_node_id,
                     link_org.end_node_id,
                     link_org.full_lanes,
-                    link_org.length,
+                    link_org.length_meters,
                     link_org.is_source,
                     link_org.capacity_vphpl,
                     link_org.jam_density_vpkpl,
@@ -176,9 +176,9 @@ public class OPTFactory {
     private static Segment deep_copy_segment(Segment seg_org,FreewayScenario scenario){
         Segment seg_cpy = new Segment(seg_org.id);
         seg_cpy.fwy_scenario = scenario;
-        seg_cpy.ml = scenario.scenario.links.get(seg_org.ml.id);
-        seg_cpy.or = seg_org.or==null ? null : scenario.scenario.links.get(seg_org.or.id);
-        seg_cpy.fr = seg_org.fr==null ? null : scenario.scenario.links.get(seg_org.fr.id);
+        seg_cpy.ml = (LinkMainline) scenario.scenario.links.get(seg_org.ml.id);
+        seg_cpy.or = seg_org.or==null ? null : (LinkRamp) scenario.scenario.links.get(seg_org.or.id);
+        seg_cpy.fr = seg_org.fr==null ? null : (LinkRamp) scenario.scenario.links.get(seg_org.fr.id);
         return seg_cpy;
     }
 

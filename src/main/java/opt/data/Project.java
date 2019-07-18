@@ -104,8 +104,6 @@ public class Project {
         scenarios.put(newname, scenario);
     }
 
-
-
     /////////////////////////////////////
     // create scenarios
     /////////////////////////////////////
