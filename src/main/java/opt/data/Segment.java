@@ -10,7 +10,6 @@ public class Segment {
 
     ///////////////////////////
     private final static float KmPerMile = 1.609344f;
-    private final static float FeetPerMeter = 3.28084f;
     private final static float default_or_capacity_vphpl = 1500f;
     private final static float default_or_jam_density_vpkpl = 100f;
     private final static float default_or_ff_speed_kph = 40f;
@@ -23,15 +22,15 @@ public class Segment {
 
     protected String name;
     protected final long id;
-    protected LinkMainline ml = null;
-    protected LinkRamp or = null;
-    protected LinkRamp fr = null;
+    protected Long ml_id = null;
+    protected Long or_id = null;
+    protected Long fr_id = null;
 
     // maps to adjacent segments
-    protected Segment dnstrm_segment;
-    protected Segment upstrm_segment;
-    protected Segment fr_connector_segment = null;     // NOT IMPLEMENTED
-    protected Segment or_connector_segment = null;     // NOT IMPLEMENTED
+    protected Long dnstrm_segment_id;
+    protected Long upstrm_segment_id;
+    protected Long fr_connector_segment_id = null;     // NOT IMPLEMENTED
+    protected Long or_connector_segment_id = null;     // NOT IMPLEMENTED
 
     protected Map<Long,Profile1D> or_demands = new HashMap<>();
     protected Map<Long, Split> fr_splits = new HashMap<>();
@@ -64,7 +63,8 @@ public class Segment {
         if( ml_links.size()!=1 )
             throw new Exception("All segments must contain exactly one mainline link");
 
-        ml = (LinkMainline) ml_links.iterator().next();
+        AbstractLink ml = (LinkMainline) ml_links.iterator().next();
+        ml_id = ml.id;
         links.remove(ml);
 
         // check that what is remaining are at most two and all ramps
@@ -83,7 +83,8 @@ public class Segment {
         if (!ors.isEmpty()){
             if(ors.size()>1)
                 throw new Exception("At most one onramp per segment");
-            or = (LinkRamp) ors.iterator().next();
+            AbstractLink or = (LinkRamp) ors.iterator().next();
+            or_id = or.id;
             links.remove(or);
         }
 
@@ -97,7 +98,8 @@ public class Segment {
         if (!frs.isEmpty()){
             if(frs.size()>1)
                 throw new Exception("At most one offramp per segment");
-            fr = (LinkRamp) frs.iterator().next();
+            AbstractLink fr = (LinkRamp) frs.iterator().next();
+            fr_id = fr.id;
             links.remove(fr);
         }
 
@@ -107,10 +109,22 @@ public class Segment {
 
     public Segment deep_copy(FreewayScenario scenario){
         Segment seg_cpy = new Segment(id);
+        seg_cpy.name = name;
         seg_cpy.fwy_scenario = scenario;
-        seg_cpy.ml = (LinkMainline) scenario.scenario.links.get(ml.id);
-        seg_cpy.or = or==null ? null : (LinkRamp) scenario.scenario.links.get(or.id);
-        seg_cpy.fr = fr==null ? null : (LinkRamp) scenario.scenario.links.get(fr.id);
+        seg_cpy.ml_id = ml_id;
+        seg_cpy.or_id = or_id;
+        seg_cpy.fr_id = fr_id;
+        seg_cpy.dnstrm_segment_id = dnstrm_segment_id;
+        seg_cpy.upstrm_segment_id = upstrm_segment_id;
+        seg_cpy.fr_connector_segment_id = fr_connector_segment_id;
+        seg_cpy.or_connector_segment_id = or_connector_segment_id;
+
+        for(Map.Entry<Long,Profile1D> e : or_demands.entrySet())
+            seg_cpy.or_demands.put(e.getKey(),e.getValue().clone());
+
+        for(Map.Entry<Long,Split> e : fr_splits.entrySet())
+            seg_cpy.fr_splits.put(e.getKey(),e.getValue().deep_copy());
+
         return seg_cpy;
     }
 
@@ -141,7 +155,7 @@ public class Segment {
      * @return float
      */
     public float get_length_meters(){
-        return ml.length_meters;
+        return ml().length_meters;
     }
 
     /**
@@ -151,7 +165,7 @@ public class Segment {
     public void set_length_meters(float newlength) throws Exception {
         if (newlength<=0.0001)
             throw new Exception("Attempted to set a non-positive segment length");
-        ml.length_meters = newlength;
+        ml().length_meters = newlength;
     }
 
     /////////////////////////////////////
@@ -160,11 +174,11 @@ public class Segment {
 
     public Set<AbstractLink> get_links(){
         Set<AbstractLink> x = new HashSet<>();
-        x.add(ml);
-        if(or!=null)
-            x.add(or);
-        if(fr!=null)
-            x.add(fr);
+        x.add(ml());
+        if(or_id!=null)
+            x.add(or());
+        if(fr_id!=null)
+            x.add(fr());
         return x;
     }
 
@@ -174,7 +188,7 @@ public class Segment {
      */
     public Set<Segment> get_upstrm_segments(){
         Set<Segment> x = new HashSet<>();
-        x.add(upstrm_segment);
+        x.add(fwy_scenario.segments.get(upstrm_segment_id));
         return x;
     }
 
@@ -183,6 +197,7 @@ public class Segment {
      * @return Set<Link>
      */
     public Set<AbstractLink> get_upstrm_links(){
+        AbstractLink ml = ml();
         return get_upstrm_segments().stream()
                 .flatMap(sgmt->sgmt.get_links().stream())
                 .filter(link->link.end_node_id==ml.end_node_id || link.end_node_id==ml.start_node_id)
@@ -195,7 +210,7 @@ public class Segment {
      */
     public Set<Segment> get_dnstrm_segments() {
         Set<Segment> x = new HashSet<>();
-        x.add(dnstrm_segment);
+        x.add(fwy_scenario.segments.get(dnstrm_segment_id));
         return x;
     }
 
@@ -204,6 +219,7 @@ public class Segment {
      * @return Set<Link>
      */
     public Set<AbstractLink> get_dnstrm_links(){
+        AbstractLink ml = ml();
         return get_dnstrm_segments().stream()
                 .flatMap(sgmt->sgmt.get_links().stream())
                 .filter(link->link.start_node_id==ml.end_node_id || link.start_node_id==ml.start_node_id)
@@ -246,7 +262,7 @@ public class Segment {
     /////////////////////////////////////
 
     public boolean has_offramp(){
-        return fr!=null;
+        return fr_id!=null;
     }
 
     public String get_fr_name(){
@@ -254,43 +270,48 @@ public class Segment {
     }
 
     public int get_fr_lanes(){
-        return has_offramp() ? fr.full_lanes : 0;
+        return has_offramp() ? fr().full_lanes : 0;
     }
 
     public float get_fr_capacity_vphpl(){
-        return has_offramp() ? fr.capacity_vphpl : Float.NaN;
+        return has_offramp() ? fr().capacity_vphpl : Float.NaN;
     }
 
     public double get_fr_max_vehicles(){
-        return has_offramp() ? fr.jam_density_vpkpl * fr.full_lanes * fr.length_meters / 1000f : 0d;
+        if(has_offramp()){
+            AbstractLink fr = fr();
+            return fr.jam_density_vpkpl * fr.full_lanes * fr.length_meters / 1000f;
+        }
+        else return 0d;
     }
 
     public void set_fr_name(String newname) {
-        if(fr!=null)
-            fr.name = newname;
+        if(has_offramp())
+            fr().name = newname;
     }
 
     public void set_fr_lanes(int x) throws Exception {
         if (x<=0)
             throw new Exception("Invalid number of lanes");
-        if(fr==null)
+        if(!has_offramp())
             add_offramp();
-        fr.full_lanes = x;
+        fr().full_lanes = x;
     }
 
     public void set_fr_capacity_vphpl(float x) throws Exception {
         if (x<=0)
             throw new Exception("Invalid capacity");
-        if(fr==null)
+        if(!has_offramp())
             add_offramp();
-        fr.capacity_vphpl = x;
+        fr().capacity_vphpl = x;
     }
 
     public void set_fr_max_vehicles(float x) throws Exception {
         if (x<=0)
             throw new Exception("Invalid max vehicles");
-        if(fr==null)
+        if(!has_offramp())
             add_offramp();
+        AbstractLink fr = fr();
         fr.jam_density_vpkpl = x / (fr.length_meters /1000f) / fr.full_lanes;
     }
 
@@ -299,19 +320,21 @@ public class Segment {
      * @return success value
      */
     public boolean delete_offramp(){
-        if(fr==null)
+        if(!has_offramp())
             return false;
+        AbstractLink fr = fr();
         fwy_scenario.scenario.nodes.remove(fr.end_node_id);
         fwy_scenario.scenario.links.remove(fr.id);
-        fr = null;
+        fr_id = null;
         fr_splits = new HashMap<>();
         return true;
     }
 
     public void add_offramp(){
-        if(fr!=null)
+        if(has_offramp())
             return;
         long id = fwy_scenario.new_link_id();
+        AbstractLink ml = ml();
         long start_node_id = ml.start_node_id;
         Node end_node = new Node(fwy_scenario.new_node_id());
         long end_node_id = end_node.id;
@@ -322,7 +345,8 @@ public class Segment {
         float jam_density_vpkpl = default_fr_jam_density_vpkpl;
         float ff_speed_kph = default_fr_ff_speed_kph;
 
-        fr = new LinkRamp(id,start_node_id,end_node_id,full_lanes,length,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
+        LinkRamp fr = new LinkRamp(id,start_node_id,end_node_id,full_lanes,length,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
+        fr_id = fr.id;
         fr.mysegment = this;
         end_node.in_links.add(fr);
         fwy_scenario.scenario.nodes.put(end_node.id,end_node);
@@ -334,7 +358,7 @@ public class Segment {
     /////////////////////////////////////
 
     public boolean has_onramp(){
-        return or!=null;
+        return or_id!=null;
     }
 
     public String get_or_name(){
@@ -342,37 +366,42 @@ public class Segment {
     }
 
     public int get_or_lanes(){
-        return has_onramp() ? or.full_lanes : 0;
+        return has_onramp() ? or().full_lanes : 0;
     }
 
     public float get_or_capacity_vphpl(){
-        return has_onramp() ? or.capacity_vphpl: Float.NaN;
+        return has_onramp() ? or().capacity_vphpl: Float.NaN;
     }
 
     public double get_or_max_vehicles(){
-        return has_onramp() ? or.jam_density_vpkpl * or.full_lanes * or.length_meters / 1000f : 0d;
+        if (has_onramp()){
+            AbstractLink or = or();
+            return or.jam_density_vpkpl * or.full_lanes * or.length_meters / 1000f;
+        }
+        else return 0d;
     }
 
     public void set_or_name(String newname) {
-        if(or!=null)
-            or.name = newname;
+        if(has_onramp())
+            or().name = newname;
     }
 
     public void set_or_lanes(int x){
-        if(or==null)
+        if(!has_onramp())
             add_onramp();
-        or.full_lanes = x;
+        or().full_lanes = x;
     }
 
     public void set_or_capacity_vphpl(float x){
-        if(or==null)
+        if(!has_onramp())
             add_onramp();
-        or.capacity_vphpl = x;
+        or().capacity_vphpl = x;
     }
 
     public void set_or_max_vehicles(float x){
-        if(or==null)
+        if(!has_onramp())
             add_onramp();
+        AbstractLink or = or();
         or.jam_density_vpkpl = x / (or.length_meters /1000f) / or.full_lanes;
     }
 
@@ -382,29 +411,31 @@ public class Segment {
      * @return success value
      */
     public boolean delete_onramp(){
-        if(or==null)
+        if(!has_onramp())
             return false;
+        AbstractLink or = or();
         fwy_scenario.scenario.nodes.remove(or.start_node_id);
         fwy_scenario.scenario.links.remove(or.id);
-        or = null;
+        or_id = null;
         or_demands = new HashMap<>();
         return true;
     }
 
     public void add_onramp(){
-        if(or!=null)
+        if(has_onramp())
             return;
         long id = fwy_scenario.new_link_id();
         Node start_node = new Node(fwy_scenario.new_node_id());
         long start_node_id = start_node.id;
-        long end_node_id = ml.end_node_id;
+        long end_node_id = ml().end_node_id;
         int full_lanes = 1;
         float length = 100f;
         boolean is_source = true;
         float capacity_vphpl = default_or_capacity_vphpl;
         float jam_density_vpkpl = default_or_jam_density_vpkpl;
         float ff_speed_kph = default_or_ff_speed_kph;
-        or = new LinkRamp(id,start_node_id,end_node_id,full_lanes,length,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
+        AbstractLink or = new LinkRamp(id,start_node_id,end_node_id,full_lanes,length,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
+        or_id = or.id;
         or.mysegment = this;
         start_node.out_links.add(or);
         fwy_scenario.scenario.nodes.put(start_node.id,start_node);
@@ -446,7 +477,7 @@ public class Segment {
     }
 
     public int get_mixed_lanes(){
-        return ml.full_lanes;
+        return ml().full_lanes;
     }
 
     public int get_hov_lanes(){
@@ -455,25 +486,25 @@ public class Segment {
     }
 
     public float get_capacity_vphpl(){
-        return ml.capacity_vphpl;
+        return ml().capacity_vphpl;
     }
 
     public double get_jam_density_vpmpl(){
-        return ml.jam_density_vpkpl * KmPerMile;
+        return ml().jam_density_vpkpl * KmPerMile;
     }
 
     public double get_freespeed_mph(){
-        return ml.ff_speed_kph / KmPerMile;
+        return ml().ff_speed_kph / KmPerMile;
     }
 
     public void set_ml_name(String newname) {
-        ml.name = newname;
+        ml().name = newname;
     }
 
     public void set_mixed_lanes(int x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive number of lanes");
-        ml.full_lanes = x;
+        ml().full_lanes = x;
     }
 
     public void set_hov_lanes(int x) throws Exception {
@@ -485,39 +516,47 @@ public class Segment {
     public void set_capacity_vphpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive capacity");
-        ml.capacity_vphpl = x;
+        ml().capacity_vphpl = x;
     }
 
     public void set_jam_density_vpmpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive jam density");
-        ml.jam_density_vpkpl = x/KmPerMile;
+        ml().jam_density_vpkpl = x/KmPerMile;
     }
 
     public void set_freespeed_mph(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive free speed");
-        ml.ff_speed_kph = x * KmPerMile;
+        ml().ff_speed_kph = x * KmPerMile;
     }
 
     /////////////////////////////////////
     // protected
     /////////////////////////////////////
 
+    protected AbstractLink ml(){
+        return fwy_scenario.get_link(ml_id);
+    }
+
+    protected AbstractLink or(){
+        return has_onramp() ? fwy_scenario.get_link(or_id) : null;
+    }
+
+    protected AbstractLink fr(){
+        return has_offramp() ? fwy_scenario.get_link(fr_id) : null;
+    }
+
     protected void set_start_node(long new_start_node){
-        ml.start_node_id = new_start_node;
-        if(fr!=null)
-            fr.start_node_id = new_start_node;
+        ml().start_node_id = new_start_node;
+        if(has_offramp())
+            fr().start_node_id = new_start_node;
     }
 
     protected void set_end_node(long new_end_node){
-        ml.end_node_id = new_end_node;
-        if(or!=null)
-            or.end_node_id = new_end_node;
-    }
-
-    protected AbstractLink get_ml(){
-        return ml;
+        ml().end_node_id = new_end_node;
+        if(has_onramp())
+            or().end_node_id = new_end_node;
     }
 
     /////////////////////////////////////
@@ -526,12 +565,29 @@ public class Segment {
 
     @Override
     public String toString() {
-        String str = String.format("name\t%s\nfr\t%s\nml:\t%s\nor:\t%s",
-                name,
-                fr==null?"null":fr.toString(),
-                ml.toString(),
-                or==null?"null":or.toString());
-        return str;
+        return String.format("name\t%s\nfr\t%s\nml:\t%s\nor:\t%s", name, fr_id, ml_id, or_id);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Segment segment = (Segment) o;
+        return id == segment.id &&
+                name.equals(segment.name) &&
+                ml_id.equals(segment.ml_id) &&
+                Objects.equals(or_id, segment.or_id) &&
+                Objects.equals(fr_id, segment.fr_id) &&
+                Objects.equals(dnstrm_segment_id, segment.dnstrm_segment_id) &&
+                Objects.equals(upstrm_segment_id, segment.upstrm_segment_id) &&
+                Objects.equals(fr_connector_segment_id, segment.fr_connector_segment_id) &&
+                Objects.equals(or_connector_segment_id, segment.or_connector_segment_id) &&
+                or_demands.equals(segment.or_demands) &&
+                fr_splits.equals(segment.fr_splits);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, id, ml_id, or_id, fr_id, dnstrm_segment_id, upstrm_segment_id, fr_connector_segment_id, or_connector_segment_id, or_demands, fr_splits);
+    }
 }

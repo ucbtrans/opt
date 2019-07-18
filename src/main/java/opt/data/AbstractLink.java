@@ -2,6 +2,7 @@ package opt.data;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 public abstract class AbstractLink {
     protected long id;
@@ -52,7 +53,7 @@ public abstract class AbstractLink {
     public AbstractLink deep_copy(){
         AbstractLink new_link = null;
         try {
-            Constructor<AbstractLink> constr = (Constructor<AbstractLink>)getClass().getConstructor(Long.class, Long.class, Long.class, Integer.class, Float.class, Boolean.class, Float.class, Float.class, Float.class);
+            Constructor<AbstractLink> constr = (Constructor<AbstractLink>)getClass().getConstructor(Long.class, Long.class, Long.class, Integer.class, Float.class, Boolean.class, Float.class, Float.class, Float.class, Segment.class);
             new_link = constr.newInstance(
                     id,
                     start_node_id,
@@ -62,7 +63,8 @@ public abstract class AbstractLink {
                     is_source,
                     capacity_vphpl,
                     jam_density_vpkpl,
-                    ff_speed_kph);
+                    ff_speed_kph,
+                    mysegment);
         } catch (InstantiationException ex) {
             ex.printStackTrace();
         } catch (IllegalAccessException ex) {
@@ -101,5 +103,27 @@ public abstract class AbstractLink {
                         "\tff_speed_kph\t%f",
                 id,start_node_id,end_node_id,full_lanes, length_meters,is_source,capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
         return str;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AbstractLink that = (AbstractLink) o;
+        return id == that.id &&
+                start_node_id == that.start_node_id &&
+                end_node_id == that.end_node_id &&
+                full_lanes == that.full_lanes &&
+                Float.compare(that.length_meters, length_meters) == 0 &&
+                is_source == that.is_source &&
+                Float.compare(that.capacity_vphpl, capacity_vphpl) == 0 &&
+                Float.compare(that.jam_density_vpkpl, jam_density_vpkpl) == 0 &&
+                Float.compare(that.ff_speed_kph, ff_speed_kph) == 0 &&
+                name.equals(that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, start_node_id, end_node_id, full_lanes, length_meters, is_source, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 }

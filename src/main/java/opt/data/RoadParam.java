@@ -18,15 +18,15 @@ public class RoadParam {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RoadParam that = (RoadParam) o;
-        return Float.compare(that.capacity, capacity) == 0 &&
-                Float.compare(that.speed, speed) == 0 &&
-                Float.compare(that.jam_density, jam_density) == 0;
+        RoadParam roadParam = (RoadParam) o;
+        return id == roadParam.id &&
+                Float.compare(roadParam.capacity, capacity) == 0 &&
+                Float.compare(roadParam.speed, speed) == 0 &&
+                Float.compare(roadParam.jam_density, jam_density) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(capacity, speed, jam_density);
+        return Objects.hash(id, capacity, speed, jam_density);
     }
-
 }

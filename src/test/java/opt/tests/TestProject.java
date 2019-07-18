@@ -115,5 +115,5 @@ public class TestProject extends AbstractTest {
             fail(e.getMessage());
         }
     }
-    
+
 }

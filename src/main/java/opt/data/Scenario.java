@@ -6,7 +6,7 @@ public class Scenario {
 
     protected Map<Long, Node> nodes = new HashMap<>();
     protected Map<Long, AbstractLink> links = new HashMap<>();
-    protected Map<Long, Commodity> commodities = new HashMap<>();
+    protected Map<String, Commodity> commodities = new HashMap<>();
 
     /////////////////////////////////////
     // construction
@@ -56,7 +56,7 @@ public class Scenario {
         // commodities
         if(scenario.getCommodities()!=null)
             for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
-                this.commodities.put(comm.getId(),new Commodity(comm.getId(),comm.getName()));
+                this.commodities.put(comm.getName(),new Commodity(comm.getId(),comm.getName()));
 
     }
 
@@ -79,6 +79,11 @@ public class Scenario {
             for(AbstractLink link_org : node_org.in_links)
                 node_cpy.in_links.add(jscn_cpy.links.get(link_org.id));
         }
+
+        // commodities
+        for (Map.Entry<String,Commodity> e : commodities.entrySet())
+            jscn_cpy.commodities.put(e.getKey(),e.getValue().deep_copy());
+
 
 //        // set road parameters
 //        for(Map.Entry<Long,jaxb.Roadparam> e : jscn_org.road_params.entrySet()) {
@@ -113,7 +118,22 @@ public class Scenario {
     }
 
     /////////////////////////////////////
-    // private statics
+    // Override
     /////////////////////////////////////
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Scenario scenario = (Scenario) o;
+        return nodes.equals(scenario.nodes) &&
+                links.equals(scenario.links) &&
+                commodities.equals(scenario.commodities);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nodes, links, commodities);
+    }
 }

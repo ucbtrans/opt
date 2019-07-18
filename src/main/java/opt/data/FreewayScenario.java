@@ -40,20 +40,20 @@ public class FreewayScenario {
                 segments.put(sgmt_id,segment);
 
                 // assign segments to links
-                if (segment.ml.mysegment!=null)
-                    throw new Exception("Link " + segment.ml.id + " assigned to multiple segments");
-                segment.ml.mysegment = segment;
+                if (segment.ml().mysegment!=null)
+                    throw new Exception("Link " + segment.ml_id + " assigned to multiple segments");
+                segment.ml().mysegment = segment;
 
-                if (segment.or!=null){
-                    if (segment.or.mysegment!=null)
-                        throw new Exception("Link " + segment.or.id + " assigned to multiple segments");
-                    segment.or.mysegment = segment;
+                if (segment.has_onramp()){
+                    if (segment.or().mysegment!=null)
+                        throw new Exception("Link " + segment.or_id + " assigned to multiple segments");
+                    segment.or().mysegment = segment;
                 }
 
-                if (segment.fr!=null){
-                    if (segment.fr.mysegment!=null)
-                        throw new Exception("Link " + segment.fr.id + " assigned to multiple segments");
-                    segment.fr.mysegment = segment;
+                if (segment.has_offramp()){
+                    if (segment.fr().mysegment!=null)
+                        throw new Exception("Link " + segment.fr_id + " assigned to multiple segments");
+                    segment.fr().mysegment = segment;
                 }
 
             }
@@ -63,32 +63,32 @@ public class FreewayScenario {
         for(Segment segment : segments.values()){
 
             // upstream segments
-            Node start_node = scenario.nodes.get(segment.ml.start_node_id);
-            Set<Segment> upstream_segments = start_node.in_links.stream()
+            Node start_node = scenario.nodes.get(segment.ml().start_node_id);
+            Set<Long> upstream_segments = start_node.in_links.stream()
                     .filter(link->!(link instanceof LinkRamp))
-                    .map(link -> link.mysegment)
-                    .filter(seg->seg!=segment)
+                    .map(link -> link.mysegment.id)
+                    .filter(seg->seg!=segment.id)
                     .collect(toSet());
 
             if (upstream_segments.size()>1)
                 throw new Exception("Level 3 networks has not been implemented");
 
             if (upstream_segments.size()==1)
-                segment.upstrm_segment = upstream_segments.iterator().next();
+                segment.upstrm_segment_id = upstream_segments.iterator().next();
 
             // downstream segments
-            Node end_node = scenario.nodes.get(segment.ml.end_node_id);
-            Set<Segment> downstream_segments = end_node.out_links.stream()
+            Node end_node = scenario.nodes.get(segment.ml().end_node_id);
+            Set<Long> downstream_segments = end_node.out_links.stream()
                     .filter(link->!(link instanceof LinkRamp))
-                    .map(link -> link.mysegment)
-                    .filter(seg->seg!=segment)
+                    .map(link -> link.mysegment.id)
+                    .filter(seg->seg!=segment.id)
                     .collect(toSet());
 
             if (downstream_segments.size()>1)
                 throw new Exception("Level 3 networks has not been implemented");
 
             if (downstream_segments.size()==1)
-                segment.dnstrm_segment = downstream_segments.iterator().next();
+                segment.dnstrm_segment_id = downstream_segments.iterator().next();
 
             System.out.println("WARNING: Network class II mappings have not been implemented.");
         }
@@ -138,6 +138,7 @@ public class FreewayScenario {
      */
     public FreewayScenario deep_copy(){
         FreewayScenario scn_cpy = new FreewayScenario();
+        scn_cpy.name = name;
         scn_cpy.scenario = scenario.deep_copy();
         scn_cpy.segments = new HashMap<>();
         for(Map.Entry<Long,Segment> e : segments.entrySet())
@@ -186,19 +187,19 @@ public class FreewayScenario {
 
     /**
      * Retrieve a map of id -> commodity
-     * @return Map<Long,Commodity>
+     * @return Map<String,Commodity>
      */
-    public Map<Long, Commodity> get_commodities(){
+    public Map<String, Commodity> get_commodities(){
         return scenario.commodities;
     }
 
     /**
      * Get the commodity for a given id
-     * @param id
+     * @param name
      * @return Commodity
      */
-    public Commodity get_commodity_by_id(long id){
-        return scenario.commodities.containsKey(id) ? scenario.commodities.get(id) : null;
+    public Commodity get_commodity_by_name(String name){
+        return scenario.commodities.containsKey(name) ? scenario.commodities.get(name) : null;
     }
 
     /**
@@ -211,10 +212,10 @@ public class FreewayScenario {
         if(scenario.commodities.isEmpty())
             max_id = 0;
         else
-            max_id = scenario.commodities.keySet().stream().mapToLong(x->x).max().getAsLong() + 1;
+            max_id = scenario.commodities.values().stream().mapToLong(x->x.id).max().getAsLong() + 1;
 
         Commodity new_comm = new Commodity(max_id,name);
-        scenario.commodities.put(max_id,new_comm);
+        scenario.commodities.put(name,new_comm);
         return new_comm;
     }
 
@@ -314,19 +315,19 @@ public class FreewayScenario {
         Segment segment = segments.get(index);
         segment.delete_offramp();
         segment.delete_onramp();
-        scenario.links.remove(segment.get_ml().id);
+        scenario.links.remove(segment.ml_id);
 
         // fix adjacent segments
         if(index==0)
             // make the 1st segment a source
-            segments.get(1).get_ml().is_source = true;
+            segments.get(1).ml().is_source = true;
         else
             // attach upstream segment to the end node
-            segments.get(index-1).set_end_node(segment.get_ml().end_node_id);
+            segments.get(index-1).set_end_node(segment.ml().end_node_id);
 
 
         // remove the start node
-        scenario.nodes.remove(segment.get_ml().start_node_id);
+        scenario.nodes.remove(segment.ml().start_node_id);
 
         // remove the segment
         segments.remove(index);
@@ -351,11 +352,12 @@ public class FreewayScenario {
         jaxb.Commodities jComms = new jaxb.Commodities();
         jScn.setCommodities(jComms);
 
-        for(Map.Entry<Long, Commodity> e : this.get_commodities().entrySet()){
+        for(Map.Entry<String, Commodity> e : this.get_commodities().entrySet()){
             jaxb.Commodity jcomm = new jaxb.Commodity();
             jComms.getCommodity().add(jcomm);
-            jcomm.setId(e.getKey());
-            jcomm.setName(e.getValue().name);
+            Commodity comm = e.getValue();
+            jcomm.setId(comm.id);
+            jcomm.setName(comm.name);
             jcomm.setPathfull(false);
         }
 
@@ -411,6 +413,10 @@ public class FreewayScenario {
         return jScn;
     }
 
+    protected AbstractLink get_link(Long id){
+        return scenario.links.get(id);
+    }
+
     protected void reset_max_ids(){
 
         Optional<Long> opt_max_link_id = scenario.links.keySet().stream()
@@ -432,6 +438,23 @@ public class FreewayScenario {
         return ++max_node_id;
     }
 
+    /////////////////////////////////////
+    // override
+    /////////////////////////////////////
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FreewayScenario that = (FreewayScenario) o;
+        return name.equals(that.name) &&
+                scenario.equals(that.scenario) &&
+                segments.equals(that.segments);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, scenario, segments);
+    }
 }
