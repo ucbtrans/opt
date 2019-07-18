@@ -167,13 +167,21 @@ public class FreewayScenario {
         return new HashSet<>(segments.values());
     }
 
-//    /**
-//     * Get an order list of the names of segments
-//     * @return
-//     */
-//    public List<String> get_segment_names(){
-//        return segments.values().stream().map(segment->segment.name).collect(Collectors.toList());
-//    }
+    /**
+     * Get an order list of the names of segments
+     * @return
+     */
+    public List<String> get_segment_names(){
+        return segments.values().stream().map(segment->segment.name).collect(Collectors.toList());
+    }
+
+    /**
+     * Get a segment with its id
+     * @return
+     */
+    public Segment get_segment_with_id(Long id){
+        return segments.containsKey(id) ? segments.get(id) : null;
+    }
 
     public Set<AbstractLink> get_links(){
         return segments.values().stream()

@@ -1,11 +1,23 @@
 package opt.tests;
 
+import opt.data.AbstractLink;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.*;
 
 public class TestSegment extends AbstractTest {
+
+    private static TestData sX;
+
+    static{
+        sX = new TestData();
+    }
 
     /////////////////////////////////////
     // name and length
@@ -39,9 +51,13 @@ public class TestSegment extends AbstractTest {
     // network
     /////////////////////////////////////
 
-    @Ignore
     @Test
     public void test_get_links(){
+        Set<AbstractLink> links0 = sX.segment0.get_links();
+        assertEquals(links0.stream().map(x->x.get_id()).collect(toSet()),new HashSet(Arrays.asList(0l)));
+
+        Set<AbstractLink> links2 = sX.segment2.get_links();
+        assertEquals(links2.stream().map(x->x.get_id()).collect(toSet()),new HashSet(Arrays.asList(2l,8l,7l)));
     }
 
     @Ignore
@@ -98,9 +114,10 @@ public class TestSegment extends AbstractTest {
     // offramp
     /////////////////////////////////////
 
-    @Ignore
     @Test
     public void test_has_offramp(){
+        assertFalse(sX.segment0.has_offramp());
+        assertTrue(sX.segment2.has_offramp());
     }
 
     @Ignore
@@ -150,14 +167,15 @@ public class TestSegment extends AbstractTest {
         }
     }
 
+    @Ignore
     @Test
     public void test_delete_offramp(){
         TestData X = new TestData();
         // delete an existing offramp
-        assertTrue(X.segment2.delete_offramp());
+        assertTrue(X.segment0.delete_offramp());
 
         // try to delete an non-existing offramp
-        assertFalse(X.segment1.delete_offramp());
+        assertFalse(X.segment2.delete_offramp());
     }
 
     @Ignore
@@ -172,6 +190,8 @@ public class TestSegment extends AbstractTest {
     @Ignore
     @Test
     public void test_has_onramp(){
+        assertFalse(sX.segment0.has_onramp());
+        assertTrue(sX.segment2.has_onramp());
     }
 
     @Ignore
@@ -228,7 +248,7 @@ public class TestSegment extends AbstractTest {
         assertTrue(X.segment2.delete_onramp());
 
         // try to delete an non-existing onramp
-        assertFalse(X.segment1.delete_onramp());
+        assertFalse(X.segment4.delete_onramp());
     }
 
     @Ignore

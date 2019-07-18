@@ -81,6 +81,10 @@ public abstract class AbstractLink {
     // getters
     /////////////////////////////////////
 
+    public Long get_id(){
+        return id;
+    }
+
     public Segment get_segment(){
         return mysegment;
     }

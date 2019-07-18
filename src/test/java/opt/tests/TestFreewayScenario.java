@@ -30,6 +30,14 @@ public class TestFreewayScenario extends AbstractTest {
     }
 
     @Test
+    public void test_get_segment_with_id(){
+        TestData X = new TestData();
+        FreewayScenario scenario = X.project.get_scenario_with_name("scenarioA");
+        Segment segment = scenario.get_segment_with_id(0l);
+        assertNotNull(segment);
+    }
+
+    @Test
     public void test_get_links(){
         TestData X = new TestData();
         FreewayScenario scenario = X.project.get_scenario_with_name("scenarioA");

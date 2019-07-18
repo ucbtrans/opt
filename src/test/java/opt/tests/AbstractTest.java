@@ -6,7 +6,6 @@ import opt.data.Project;
 import opt.data.Segment;
 
 import java.io.File;
-import java.util.Iterator;
 
 import static org.junit.Assert.fail;
 
@@ -16,19 +15,17 @@ public abstract class AbstractTest {
         return (new File("src/test/resources/" + testname)).getAbsolutePath();
     }
 
-    public class TestData {
+    public static class TestData {
         Project project;
         FreewayScenario scenario;
-        Segment segment0, segment1, segment2;
+        Segment segment0, segment2, segment4;
         public TestData(){
             try {
                 project = ProjectFactory.load_project(get_test_fullpath("project.opt"),true);
                 scenario = project.get_scenario_with_name("scenarioA");
-                Iterator<Segment> it = scenario.get_segments().iterator();
-
-                segment0 = it.next();
-                segment1 = it.next();
-                segment2 = it.next();
+                segment0 = scenario.get_segment_with_id(0l);
+                segment2 = scenario.get_segment_with_id(2l);
+                segment4 = scenario.get_segment_with_id(4l);
             } catch (Exception e) {
                 fail(e.getMessage());
             }
