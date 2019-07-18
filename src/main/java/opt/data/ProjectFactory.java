@@ -70,6 +70,10 @@ public class ProjectFactory {
 
     }
 
+    /////////////////////////////////////
+    // class
+    /////////////////////////////////////
+
     public static class FileInfo {
         String folder;
         String file_name;

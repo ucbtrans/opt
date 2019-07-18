@@ -87,7 +87,6 @@ public abstract class AbstractLink {
     // override
     /////////////////////////////////////
 
-
     @Override
     public String toString() {
         String str = String.format(

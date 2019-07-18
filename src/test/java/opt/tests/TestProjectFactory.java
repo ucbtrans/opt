@@ -2,12 +2,11 @@ package opt.tests;
 
 import opt.data.ProjectFactory;
 import opt.data.Project;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
 
-public class TestFactory extends AbstractTest {
+public class TestProjectFactory extends AbstractTest {
 
     @Test
     public void test_load_project_from_file(){
@@ -30,11 +29,6 @@ public class TestFactory extends AbstractTest {
         System.out.println(project);
     }
 
-    @Ignore
-    @Test
-    public void test_deep_copy_scenario(){
-
-    }
 
     @Test
     public void test_save_project_to_file() {
