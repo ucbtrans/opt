@@ -2,7 +2,6 @@ package opt.tests;
 
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
-import opt.data.Project;
 import org.junit.Ignore;
 import org.junit.Test;
 

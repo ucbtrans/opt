@@ -1,7 +1,7 @@
 package opt.tests;
 
 import opt.data.FreewayScenario;
-import opt.data.OPTFactory;
+import opt.data.ProjectFactory;
 import opt.data.Project;
 import opt.data.Segment;
 
@@ -22,7 +22,7 @@ public abstract class AbstractTest {
         Segment segment0, segment1, segment2;
         public TestData(){
             try {
-                project = OPTFactory.load_project(get_test_fullpath("project.opt"),true);
+                project = ProjectFactory.load_project(get_test_fullpath("project.opt"),true);
                 scenario = project.get_scenario_with_name("scenarioA");
                 Iterator<Segment> it = scenario.get_segments().iterator();
 

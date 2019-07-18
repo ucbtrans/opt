@@ -132,6 +132,20 @@ public class FreewayScenario {
 
     }
 
+    /**
+     * Create a deep copy of a given scenario
+     * @return new FreewayScenario object
+     */
+    public FreewayScenario deep_copy(){
+        FreewayScenario scn_cpy = new FreewayScenario();
+        scn_cpy.scenario = scenario.deep_copy();
+        scn_cpy.segments = new HashMap<>();
+        for(Map.Entry<Long,Segment> e : segments.entrySet())
+            scn_cpy.segments.put(e.getKey(),e.getValue().deep_copy(scn_cpy));
+        scn_cpy.reset_max_ids();
+        return scn_cpy;
+    }
+
     /////////////////////////////////////
     // getters
     /////////////////////////////////////

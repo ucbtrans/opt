@@ -6,14 +6,11 @@
 package opt;
 
 
-import error.OTMException;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
@@ -26,7 +23,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import opt.data.FreewayScenario;
-import opt.data.OPTFactory;
+import opt.data.ProjectFactory;
 import opt.data.Project;
 import opt.data.Segment;
 
@@ -101,7 +98,7 @@ public class AppMainController {
         try {
             projectFilePath = file.getAbsolutePath();
             projectFileDir = file.getParentFile();
-            project = OPTFactory.load_project(projectFilePath, validate);
+            project = ProjectFactory.load_project(projectFilePath, validate);
             menuFileSave.setDisable(false);
             menuFileSaveAs.setDisable(false);
             populateProjectTree(project);
@@ -116,7 +113,7 @@ public class AppMainController {
         if (projectFilePath == null)
             return;
         try {
-            OPTFactory.save_project(project, projectFilePath);
+            ProjectFactory.save_project(project, projectFilePath);
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
         }
@@ -137,7 +134,7 @@ public class AppMainController {
         try {
             projectFilePath = file.getAbsolutePath();
             projectFileDir = file.getParentFile();
-            OPTFactory.save_project(project, projectFilePath);
+            ProjectFactory.save_project(project, projectFilePath);
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
         }

@@ -105,6 +105,15 @@ public class Segment {
         assert(links.isEmpty());
     }
 
+    public Segment deep_copy(FreewayScenario scenario){
+        Segment seg_cpy = new Segment(id);
+        seg_cpy.fwy_scenario = scenario;
+        seg_cpy.ml = (LinkMainline) scenario.scenario.links.get(ml.id);
+        seg_cpy.or = or==null ? null : (LinkRamp) scenario.scenario.links.get(or.id);
+        seg_cpy.fr = fr==null ? null : (LinkRamp) scenario.scenario.links.get(fr.id);
+        return seg_cpy;
+    }
+
     /////////////////////////////////////
     // name and length
     /////////////////////////////////////

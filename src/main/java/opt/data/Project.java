@@ -51,7 +51,6 @@ public class Project {
             scenario.run_on_new_thread();
     }
 
-
     public void run_scenario(String scenario_name) throws Exception {
         if(!scenarios.containsKey(scenario_name))
             throw new Exception("Unknown scenario");
@@ -133,7 +132,7 @@ public class Project {
         if(scenarios.containsKey(to_name))
             throw new Exception("The project already has a scenario by this name.");
 
-        scenarios.put( to_name , OPTFactory.deep_copy_scenario(scenarios.get(from_name)) );
+        scenarios.put( to_name , scenarios.get(from_name).deep_copy() );
     }
 
     /////////////////////////////////////
@@ -148,13 +147,11 @@ public class Project {
         List<jaxb.Scn> scnlist = jaxbScns.getScn();
         for(Map.Entry<String, FreewayScenario> e : scenarios.entrySet()) {
             String scenario_name = e.getKey();
-            FreewayScenario fwy_scenario = e.getValue();
             jaxb.Scn jScn = new jaxb.Scn();
             jScn.setName(scenario_name);
             jScn.setFile(scenario_file_names.get(scenario_name));
             scnlist.add(jScn);
         }
-
         return jaxbPrj;
     }
 

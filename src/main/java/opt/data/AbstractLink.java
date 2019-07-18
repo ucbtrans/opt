@@ -1,5 +1,8 @@
 package opt.data;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 public abstract class AbstractLink {
     protected long id;
     protected String name = "NOT IMPLEMENTED";
@@ -46,6 +49,32 @@ public abstract class AbstractLink {
 
     }
 
+    public AbstractLink deep_copy(){
+        AbstractLink new_link = null;
+        try {
+            Constructor<AbstractLink> constr = (Constructor<AbstractLink>)getClass().getConstructor(Long.class, Long.class, Long.class, Integer.class, Float.class, Boolean.class, Float.class, Float.class, Float.class);
+            new_link = constr.newInstance(
+                    id,
+                    start_node_id,
+                    end_node_id,
+                    full_lanes,
+                    length_meters,
+                    is_source,
+                    capacity_vphpl,
+                    jam_density_vpkpl,
+                    ff_speed_kph);
+        } catch (InstantiationException ex) {
+            ex.printStackTrace();
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+        } catch (InvocationTargetException ex) {
+            ex.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
+        }
+        return new_link;
+
+    }
     /////////////////////////////////////
     // getters
     /////////////////////////////////////

@@ -1,6 +1,5 @@
 package opt.tests;
 
-import opt.data.*;
 import org.junit.Ignore;
 import org.junit.Test;
 

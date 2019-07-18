@@ -60,6 +60,42 @@ public class Scenario {
 
     }
 
+    public Scenario deep_copy() {
+        Scenario jscn_cpy = new Scenario();
+
+        // create new nodes
+        for (Map.Entry<Long, Node> e : nodes.entrySet())
+            jscn_cpy.nodes.put(e.getKey(), new Node(e.getKey()));
+
+        // create new links
+        for (Map.Entry<Long, AbstractLink> e : links.entrySet())
+            jscn_cpy.links.put(e.getKey(),e.getValue().deep_copy());
+
+        // set node inlinks and outlinks
+        for (Node node_cpy : jscn_cpy.nodes.values()){
+            Node node_org = nodes.get(node_cpy.id);
+            for(AbstractLink link_org : node_org.out_links)
+                node_cpy.out_links.add(jscn_cpy.links.get(link_org.id));
+            for(AbstractLink link_org : node_org.in_links)
+                node_cpy.in_links.add(jscn_cpy.links.get(link_org.id));
+        }
+
+//        // set road parameters
+//        for(Map.Entry<Long,jaxb.Roadparam> e : jscn_org.road_params.entrySet()) {
+//            long rp_id = e.getKey();
+//            jaxb.Roadparam rp = e.getValue();
+//            jaxb.Roadparam rp_cpy = new Roadparam();
+//            rp_cpy.setId(rp_id);
+//            rp_cpy.setName(rp.getName());
+//            rp_cpy.setCapacity(rp.getCapacity());
+//            rp_cpy.setJamDensity(rp.getJamDensity());
+//            rp_cpy.setSpeed(rp.getSpeed());
+//            jscn_cpy.road_params.put(rp_id, rp_cpy);
+//        }
+
+        return jscn_cpy;
+    }
+
     /////////////////////////////////////
     // getters
     /////////////////////////////////////
@@ -75,5 +111,9 @@ public class Scenario {
             roadParam.id = id++;
         return road_params;
     }
+
+    /////////////////////////////////////
+    // private statics
+    /////////////////////////////////////
 
 }
