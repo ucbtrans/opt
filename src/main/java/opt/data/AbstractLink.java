@@ -12,7 +12,6 @@ public abstract class AbstractLink {
     protected int full_lanes;
     protected float length_meters;
 
-    protected boolean is_source;
     protected float capacity_vphpl;
     protected float jam_density_vpkpl;
     protected float ff_speed_kph;
@@ -34,7 +33,7 @@ public abstract class AbstractLink {
         this.ff_speed_kph = rp.getSpeed();
     }
 
-    public AbstractLink(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Boolean is_source, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph,Segment mysegment) {
+    public AbstractLink(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph,Segment mysegment) {
 
         this.id = id;
         this.start_node_id = start_node_id;
@@ -42,7 +41,6 @@ public abstract class AbstractLink {
         this.full_lanes = full_lanes;
         this.length_meters = length;
 
-        this.is_source = is_source;
         this.capacity_vphpl = capacity_vphpl;
         this.jam_density_vpkpl = jam_density_vpkpl;
         this.ff_speed_kph = ff_speed_kph;
@@ -53,14 +51,13 @@ public abstract class AbstractLink {
     public AbstractLink deep_copy(){
         AbstractLink new_link = null;
         try {
-            Constructor<AbstractLink> constr = (Constructor<AbstractLink>)getClass().getConstructor(Long.class, Long.class, Long.class, Integer.class, Float.class, Boolean.class, Float.class, Float.class, Float.class, Segment.class);
+            Constructor<AbstractLink> constr = (Constructor<AbstractLink>)getClass().getConstructor(Long.class, Long.class, Long.class, Integer.class, Float.class, Float.class, Float.class, Float.class, Segment.class);
             new_link = constr.newInstance(
                     id,
                     start_node_id,
                     end_node_id,
                     full_lanes,
                     length_meters,
-                    is_source,
                     capacity_vphpl,
                     jam_density_vpkpl,
                     ff_speed_kph,
@@ -90,6 +87,15 @@ public abstract class AbstractLink {
         return mysegment;
     }
 
+    public boolean is_source(){
+        return mysegment.fwy_scenario.scenario.nodes.get(start_node_id).in_links.isEmpty();
+    }
+
+    public boolean is_sink(){
+        return mysegment.fwy_scenario.scenario.nodes.get(end_node_id).out_links.isEmpty();
+    }
+
+
     /////////////////////////////////////
     // override
     /////////////////////////////////////
@@ -102,11 +108,10 @@ public abstract class AbstractLink {
                         "\tend_node_id\t%d\n" +
                         "\tfull_lanes\t%d\n" +
                         "\tlength_meters\t%f\n" +
-                        "\tis_source\t%s\n" +
                         "\tcapacity_vphpl\t%f\n" +
                         "\tjam_density_vpkpl\t%f\n" +
                         "\tff_speed_kph\t%f",
-                id,start_node_id,end_node_id,full_lanes, length_meters,is_source,capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
+                id,start_node_id,end_node_id,full_lanes, length_meters,capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
         return str;
     }
 
@@ -120,7 +125,6 @@ public abstract class AbstractLink {
                 end_node_id == that.end_node_id &&
                 full_lanes == that.full_lanes &&
                 Float.compare(that.length_meters, length_meters) == 0 &&
-                is_source == that.is_source &&
                 Float.compare(that.capacity_vphpl, capacity_vphpl) == 0 &&
                 Float.compare(that.jam_density_vpkpl, jam_density_vpkpl) == 0 &&
                 Float.compare(that.ff_speed_kph, ff_speed_kph) == 0 &&
@@ -129,6 +133,6 @@ public abstract class AbstractLink {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, start_node_id, end_node_id, full_lanes, length_meters, is_source, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+        return Objects.hash(id, name, start_node_id, end_node_id, full_lanes, length_meters, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 }

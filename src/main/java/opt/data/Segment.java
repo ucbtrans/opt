@@ -288,13 +288,9 @@ public class Segment {
                 existing_node.id,
                 get_mixed_lanes(),
                 get_length_meters(),
-                ml().is_source,
                 get_capacity_vphpl(),
                 get_jam_density_vpkpl(),
                 get_freespeed_kph(),null);
-
-        // this ml can no longer be a source
-        ml().is_source = false;
 
         // connect new link to start and end nodes
         existing_node.in_links.add(new_link.id);
@@ -336,7 +332,6 @@ public class Segment {
                 existing_node.id,
                 get_mixed_lanes(),
                 get_length_meters(),
-                has_onramp() ? or().is_source : true,
                 get_capacity_vphpl(),
                 get_jam_density_vpkpl(),
                 get_freespeed_kph(),null);
@@ -381,7 +376,6 @@ public class Segment {
                 new_node.id,
                 get_mixed_lanes(),
                 get_length_meters(),
-                false,
                 get_capacity_vphpl(),
                 get_jam_density_vpkpl(),
                 get_freespeed_kph(),null);
@@ -425,7 +419,6 @@ public class Segment {
                 new_node.id,
                 get_mixed_lanes(),
                 get_length_meters(),
-                has_onramp() ? or().is_source : true,
                 get_capacity_vphpl(),
                 get_jam_density_vpkpl(),
                 get_freespeed_kph(),null);
@@ -534,12 +527,11 @@ public class Segment {
         long end_node_id = end_node.id;
         int full_lanes = 1;
         float length = 100f;
-        boolean is_source = false;
         float capacity_vphpl = default_fr_capacity_vphpl;
         float jam_density_vpkpl = default_fr_jam_density_vpkpl;
         float ff_speed_kph = default_fr_ff_speed_kph;
 
-        LinkRamp fr = new LinkRamp(id,start_node_id,end_node_id,full_lanes,length,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
+        LinkRamp fr = new LinkRamp(id,start_node_id,end_node_id,full_lanes,length,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
         fr_id = fr.id;
         fr.mysegment = this;
         end_node.in_links.add(fr_id);
@@ -628,11 +620,10 @@ public class Segment {
         long end_node_id = ml().end_node_id;
         int full_lanes = 1;
         float length = 100f;
-        boolean is_source = true;
         float capacity_vphpl = default_or_capacity_vphpl;
         float jam_density_vpkpl = default_or_jam_density_vpkpl;
         float ff_speed_kph = default_or_ff_speed_kph;
-        AbstractLink or = new LinkRamp(id,start_node_id,end_node_id,full_lanes,length,is_source,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
+        AbstractLink or = new LinkRamp(id,start_node_id,end_node_id,full_lanes,length,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
         or_id = or.id;
         or.mysegment = this;
         start_node.out_links.add(or_id);

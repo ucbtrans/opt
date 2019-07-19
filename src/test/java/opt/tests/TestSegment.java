@@ -20,15 +20,6 @@ public class TestSegment extends AbstractTest {
         sX = new TestData();
     }
 
-    // MISSING //
-//    test_insert_upstrm_hov_segment
-//    test_insert_upstrm_mainline_segment
-//    test_insert_upstrm_onramp_segment
-//    test_insert_dnstrm_hov_segment
-//    test_insert_dnstrm_mainline_segment
-//    test_insert_dnstrm_onramp_segment
-//    test_set_get_or_demand_vph
-
     /////////////////////////////////////
     // name and length
     /////////////////////////////////////
@@ -410,21 +401,6 @@ public class TestSegment extends AbstractTest {
             fail(e.getMessage());
         }
     }
-
-
-    @Test
-    public void test_set_segment_name(){
-        TestData X = new TestData();
-        Segment segment2 = X.scenario.get_segment_by_name("sA2");
-        try {
-            System.out.println(segment2.get_name());
-            segment2.set_name("valid name");
-            System.out.println(segment2.get_name());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
 
 
 }

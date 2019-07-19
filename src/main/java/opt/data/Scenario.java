@@ -52,10 +52,6 @@ public class Scenario {
                 }
         }
 
-
-        for(AbstractLink link : links.values())
-            link.is_source = nodes.get(link.start_node_id).in_links.isEmpty();
-
         // commodities
         if(scenario.getCommodities()!=null)
             for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
