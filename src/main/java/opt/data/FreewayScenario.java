@@ -1,5 +1,8 @@
 package opt.data;
 
+import profiles.Profile1D;
+import utils.OTMUtils;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -141,39 +144,33 @@ public class FreewayScenario {
 
         }
 
+        // assign demands
+        if (jaxb_scenario.getDemands()!=null)
+            for(jaxb.Demand dem : jaxb_scenario.getDemands().getDemand()){
 
-//        // assign demands
-//        if (jaxb_scenario.getDemands()!=null)
-//            for(jaxb.Demand dem : jaxb_scenario.getDemands().getDemand()){
-//
-//                System.out.println("WARNING: DEMANDS NOT IMPLEMENTED");
-//
-//    //            long comm_id = dem.getCommodityId();
-//    //
-//    //            if( !get_commodities().containsKey(comm_id))
-//    //                throw new Exception("Bad commodity id in demand profile");
-//    //
-//    //            if(dem.getLinkId()==null)
-//    //                throw new Exception("AbstractLink not specified in demand profile for commodity " + comm_id);
-//    //
-//    //            AbstractLink or = network.links.get(jd.getLinkId());
-//    //            if(link==null)
-//    //                throw new OTMException("Bad link id (" + jd.getLinkId() + ") in demand for commodity " + comm.getId());
-//    //
-//    //
-//    //            this.link = link;
-//    //            this.path = null;
-//    //            this.commodity = commodity;
-//    //
-//    //            // create a source and add it to the origin
-//    //            AbstractLink origin = get_origin();
-//    //            source = origin.model.create_source(origin,this,commodity,null);
-//    //            origin.sources.add(source);
-//    //
-//    //            // assume the content to be given in veh/hr
-//    //            profile = new Profile1D(start_time,dt,values);
-//    //            profile.multiply(1.0/3600.0);
-//            }
+                long comm_id = dem.getCommodityId();
+
+                if( !get_commodities().containsKey(comm_id))
+                    throw new Exception("Bad commodity id in demand profile");
+
+                if(dem.getLinkId()==null)
+                    throw new Exception("Link not specified in demand profile for commodity " + comm_id);
+
+                if(!scenario.links.containsKey(dem.getLinkId()))
+                    throw new Exception("Bad link id in demand profile.");
+
+                AbstractLink or = scenario.links.get(dem.getLinkId());
+
+                if(!or.is_source())
+                    throw new Exception("Demand assigned to invalid link.");
+
+                Profile1D profile = new Profile1D(
+                        dem.getStartTime(),
+                        dem.getDt(),
+                        OTMUtils.csv2list(dem.getContent()));
+
+                or.get_segment().set_or_demand_vph(profile,comm_id);
+            }
 
         // max ids
         reset_max_ids();
@@ -315,7 +312,7 @@ public class FreewayScenario {
      * Retrieve a map of id -> commodity
      * @return Map<String,Commodity>
      */
-    public Map<String, Commodity> get_commodities(){
+    public Map<Long, Commodity> get_commodities(){
         return scenario.commodities;
     }
 
@@ -341,7 +338,7 @@ public class FreewayScenario {
             max_id = scenario.commodities.values().stream().mapToLong(x->x.id).max().getAsLong() + 1;
 
         Commodity new_comm = new Commodity(max_id,name);
-        scenario.commodities.put(name,new_comm);
+        scenario.commodities.put(new_comm.id,new_comm);
         return new_comm;
     }
 

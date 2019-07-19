@@ -1,5 +1,6 @@
 package opt.data;
 
+import error.OTMErrorLog;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
@@ -632,17 +633,12 @@ public class Segment {
     }
 
     /**
-     * Get the demand for this onramp, for a particular commodity, or the total.
-     * @param comm_id Pass a commodity id, or null to obtain the total
-     * @return An OTM Profile1D object if demand is defined for this commodity. null otherwise.
+     * Get the demand for this onramp, for a particular commodity.
+     * @param comm_id Pass a commodity id
+     * @return Profile1D object if demand is defined for this commodity. null otherwise.
      */
     public Profile1D get_or_demand_vph(Long comm_id){
-
-        // TODO: return total if comm_id == null
-
-        if (or_demands.containsKey(comm_id))
-            return or_demands.get(comm_id);
-        else return null;
+        return or_demands.containsKey(comm_id) ? or_demands.get(comm_id) : null;
     }
 
     /**
@@ -651,9 +647,10 @@ public class Segment {
      * @param comm_id ID for the commodity
      */
     public void set_or_demand_vph(Profile1D demand_vph, long comm_id)throws Exception {
-
-        // TODO: check values, throw exception
-
+        OTMErrorLog errorLog = new OTMErrorLog();
+        demand_vph.validate(errorLog);
+        if (errorLog.haserror())
+            throw new Exception(errorLog.format_errors());
         this.or_demands.put(comm_id,demand_vph);
     }
 

@@ -6,7 +6,7 @@ public class Scenario {
 
     protected Map<Long, Node> nodes = new HashMap<>();
     protected Map<Long, AbstractLink> links = new HashMap<>();
-    protected Map<String, Commodity> commodities = new HashMap<>();
+    protected Map<Long, Commodity> commodities = new HashMap<>();
 
     /////////////////////////////////////
     // construction
@@ -55,7 +55,7 @@ public class Scenario {
         // commodities
         if(scenario.getCommodities()!=null)
             for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
-                this.commodities.put(comm.getName(),new Commodity(comm.getId(),comm.getName()));
+                this.commodities.put(comm.getId(),new Commodity(comm.getId(),comm.getName()));
 
     }
 
@@ -78,7 +78,7 @@ public class Scenario {
         }
 
         // commodities
-        for (Map.Entry<String,Commodity> e : commodities.entrySet())
+        for (Map.Entry<Long,Commodity> e : commodities.entrySet())
             jscn_cpy.commodities.put(e.getKey(),e.getValue().deep_copy());
 
 
@@ -121,7 +121,7 @@ public class Scenario {
         jaxb.Commodities jComms = new jaxb.Commodities();
         jScn.setCommodities(jComms);
 
-        for(Map.Entry<String, Commodity> e : commodities.entrySet()){
+        for(Map.Entry<Long, Commodity> e : commodities.entrySet()){
             jaxb.Commodity jcomm = new jaxb.Commodity();
             jComms.getCommodity().add(jcomm);
             Commodity comm = e.getValue();
