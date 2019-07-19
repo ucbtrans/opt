@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<prj>
+	<scns>
+		<scn name="scenarioC" file="two_fwy.xml">
+			<lnks>
+				<lnk id="0" name="lA0"/>
+				<lnk id="1" name="lA1"/>
+				<lnk id="2" name="lA2"/>
+				<lnk id="3" name="lA3"/>
+				<lnk id="4" name="lA4"/>
+				<lnk id="5" name="lA5"/>
+				<lnk id="6" name="lA6"/>
+				<lnk id="7" name="lA7"/>
+				<lnk id="8" name="lA8"/>
+				<lnk id="9" name="lA9"/>
+				<lnk id="10" name="lA10"/>
+				<lnk id="11" name="lA11"/>
+				<lnk id="12" name="lA12"/>
+				<lnk id="13" name="lA13"/>
+				<lnk id="14" name="lA14"/>
+				<lnk id="15" name="lA15"/>
+			</lnks>
+			<sgmts>
+				<sgmt name="sA0" links="0"/>
+				<sgmt name="sA1" links="1"/>
+				<sgmt name="sA2" links="7,2,8"/>
+				<sgmt name="sA3" links="3"/>
+				<sgmt name="sA4" links="9,4"/>
+				<sgmt name="sA5" links="10,5,11"/>
+				<sgmt name="sA6" links="6"/>
+				<sgmt name="sA7" links="12"/>
+				<sgmt name="sA8" links="13,14"/>
+				<sgmt name="sA9" links="15"/>
+			</sgmts>
+		</scn>
+	</scns>
+</prj>
+

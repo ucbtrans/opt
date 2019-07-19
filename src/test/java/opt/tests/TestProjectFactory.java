@@ -12,7 +12,7 @@ public class TestProjectFactory extends AbstractTest {
 
     @Test
     public void test_load_project_from_file(){
-        String project_file_name = get_test_fullpath("project.opt");
+        String project_file_name = get_test_fullpath(project_name);
         boolean validate = true;
         try {
             Project project = ProjectFactory.load_project(project_file_name,validate);

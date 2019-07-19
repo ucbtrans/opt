@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 public class Node {
     protected long id;
 
-    protected Set<AbstractLink> in_links = new HashSet<>();
-    protected Set<AbstractLink> out_links = new HashSet<>();
+    protected Set<Long> in_links = new HashSet<>();
+    protected Set<Long> out_links = new HashSet<>();
 
     /////////////////////////////////////
     // construction
@@ -49,11 +49,11 @@ public class Node {
     /////////////////////////////////////
 
     public Set<Long> get_in_link_ids(){
-        return in_links.stream().map(link->link.id).collect(Collectors.toSet());
+        return in_links;
     }
 
     public Set<Long> get_out_link_ids(){
-        return out_links.stream().map(link->link.id).collect(Collectors.toSet());
+        return out_links;
     }
 
 }

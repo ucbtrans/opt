@@ -8,6 +8,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -20,45 +21,70 @@ public class TestFreewayScenario extends AbstractTest {
         assertTrue(new_scn.equals(X.scenario));
     }
 
-    @Test
-    public void test_get_segments(){
-        TestData X = new TestData();
-        FreewayScenario scenario = X.project.get_scenario_with_name("scenarioA");
-        Collection<Segment> segments = scenario.get_segments();
-        assertNotNull(segments);
-        assertEquals(7,segments.size());
-    }
+    /////////////////////////////////////
+    // scenario getters
+    /////////////////////////////////////
 
     @Test
-    public void test_get_segment_with_id(){
+    public void test_get_name(){
         TestData X = new TestData();
-        FreewayScenario scenario = X.project.get_scenario_with_name("scenarioA");
-        Segment segment = scenario.get_segment_with_id(0l);
-        assertNotNull(segment);
+        assertEquals("scenarioC",X.scenario.get_name());
     }
 
     @Test
     public void test_get_links(){
         TestData X = new TestData();
-        FreewayScenario scenario = X.project.get_scenario_with_name("scenarioA");
-        Collection<AbstractLink> links = scenario.get_links();
+        Collection<AbstractLink> links = X.scenario.get_links();
         assertNotNull(links);
-        assertEquals(12,links.size());
+        assertEquals(16,links.size());
     }
+
+    /////////////////////////////////////
+    // segment getters
+    /////////////////////////////////////
+
+    @Test
+    public void test_get_segments(){
+        TestData X = new TestData();
+        Collection<Segment> segments = X.scenario.get_segments();
+        assertNotNull(segments);
+        assertEquals(10,segments.size());
+    }
+
+    @Test
+    public void test_get_segment_names(){
+        TestData X = new TestData();
+        assertEquals(10,X.scenario.get_segment_names().size());
+    }
+
+    @Test
+    public void test_get_segment_by_name(){
+        TestData X = new TestData();
+        assertEquals("sA0",X.scenario.get_segment_by_name("sA0").get_name());
+    }
+
+    @Test
+    public void test_get_segment_with_id(){
+        TestData X = new TestData();
+        Segment segment = X.scenario.get_segment_with_id(0l);
+        assertNotNull(segment);
+    }
+
+    /////////////////////////////////////
+    // commodity getters and setters
+    /////////////////////////////////////
 
     @Test
     public void test_get_commodities(){
         TestData X = new TestData();
-        FreewayScenario scenario = X.project.get_scenario_with_name("scenarioA");
-        assertEquals(1,scenario.get_commodities().size());
+        assertEquals(1,X.scenario.get_commodities().size());
     }
 
     @Test
     public void test_get_commodity_by_name(){
         try {
             TestData X = new TestData();
-            FreewayScenario scenario = X.project.get_scenario_with_name("scenarioA");
-            assertNotNull(scenario.get_commodity_by_name("c1"));
+            assertNotNull(X.scenario.get_commodity_by_name("c1"));
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -68,14 +94,26 @@ public class TestFreewayScenario extends AbstractTest {
     public void test_create_commodity(){
         try {
             TestData X = new TestData();
-            FreewayScenario scenario = X.project.get_scenario_with_name("scenarioA");
-            Commodity new_comm = scenario.create_commodity("new commodity");
+            Commodity new_comm = X.scenario.create_commodity("new commodity");
             assertNotNull(new_comm);
-            assertEquals(new_comm,scenario.get_commodity_by_name("new commodity"));
+            assertEquals(new_comm,X.scenario.get_commodity_by_name("new commodity"));
         } catch (Exception e) {
             fail(e.getMessage());
         }
 
+    }
+
+
+
+    @Test
+    public void test_delete_segment() {
+        try {
+            TestData X = new TestData();
+            Segment segment2 = X.scenario.get_segment_by_name("sA3");
+            X.scenario.delete_segment(segment2);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 
     @Ignore

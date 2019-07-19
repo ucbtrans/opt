@@ -9,6 +9,7 @@ public class FreewayScenario {
 
     private Long max_link_id;
     private Long max_node_id;
+    private Long max_seg_id;
 
     protected String name;
 
@@ -43,7 +44,7 @@ public class FreewayScenario {
             }
         }
 
-        // create FreewaySegment network
+        // create segments
         long max_sgmt_id = 0;
         if(jaxb_segments!=null) {
             for (jaxb.Sgmt sgmt : jaxb_segments.getSgmt()) {
@@ -74,35 +75,70 @@ public class FreewayScenario {
         // segment adjacency mappings ..................................
         for(Segment segment : segments.values()){
 
-            // upstream segments
+            // upstream mainline segment ..............
             Node start_node = scenario.nodes.get(segment.ml().start_node_id);
-            Set<Long> upstream_segments = start_node.in_links.stream()
+            Set<Long> segments_ml_up = start_node.in_links.stream()
+                    .map(id->scenario.links.get(id))
                     .filter(link->!(link instanceof LinkRamp))
                     .map(link -> link.mysegment.id)
                     .filter(seg->seg!=segment.id)
                     .collect(toSet());
 
-            if (upstream_segments.size()>1)
+            if (segments_ml_up.size()>1)
                 throw new Exception("Level 3 networks has not been implemented");
 
-            if (upstream_segments.size()==1)
-                segment.upstrm_segment_id = upstream_segments.iterator().next();
+            if (segments_ml_up.size()==1)
+                segment.segment_ml_up_id = segments_ml_up.iterator().next();
 
-            // downstream segments
+            // downstream mainline segment ..............
             Node end_node = scenario.nodes.get(segment.ml().end_node_id);
-            Set<Long> downstream_segments = end_node.out_links.stream()
+            Set<Long> segments_ml_dn = end_node.out_links.stream()
+                    .map(id->scenario.links.get(id))
                     .filter(link->!(link instanceof LinkRamp))
                     .map(link -> link.mysegment.id)
                     .filter(seg->seg!=segment.id)
                     .collect(toSet());
 
-            if (downstream_segments.size()>1)
+            if (segments_ml_dn.size()>1)
                 throw new Exception("Level 3 networks has not been implemented");
 
-            if (downstream_segments.size()==1)
-                segment.dnstrm_segment_id = downstream_segments.iterator().next();
+            if (segments_ml_dn.size()==1)
+                segment.segment_ml_dn_id = segments_ml_dn.iterator().next();
 
-            System.out.println("WARNING: Network class II mappings have not been implemented.");
+            // downstream offramp connector segment ...........
+            if(segment.has_offramp()){
+                end_node = scenario.nodes.get(segment.fr().end_node_id);
+                Set<Long> segments_fr_dn = end_node.out_links.stream()
+                        .map(id->scenario.links.get(id))
+                        .filter(link->link instanceof LinkConnector)
+                        .map(link -> link.mysegment.id)
+                        .filter(seg->seg!=segment.id)
+                        .collect(toSet());
+
+                if (segments_fr_dn.size()>1)
+                    throw new Exception("Level 3 networks has not been implemented");
+
+                if (segments_fr_dn.size()==1)
+                    segment.segment_fr_dn_id = segments_fr_dn.iterator().next();
+            }
+
+            // upstream onramp connector segment ...........
+            if(segment.has_onramp()){
+                start_node = scenario.nodes.get(segment.or().start_node_id);
+                Set<Long> segments_or_up = start_node.in_links.stream()
+                        .map(id->scenario.links.get(id))
+                        .filter(link->link instanceof LinkConnector)
+                        .map(link -> link.mysegment.id)
+                        .filter(seg->seg!=segment.id)
+                        .collect(toSet());
+
+                if (segments_or_up.size()>1)
+                    throw new Exception("Level 3 networks has not been implemented");
+
+                if (segments_or_up.size()==1)
+                    segment.segment_or_up_id = segments_or_up.iterator().next();
+            }
+
         }
 
 
@@ -160,16 +196,26 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
-    // getters
+    // scenario getters
     /////////////////////////////////////
 
-//    /**
-//     * Get the name of the scenario
-//     * @return String
-//     */
-//    public String get_name(){
-//        return name;
-//    }
+    /**
+     * Get the name of the scenario
+     * @return String
+     */
+    public String get_name(){
+        return name;
+    }
+
+    public Set<AbstractLink> get_links(){
+        return segments.values().stream()
+                .flatMap(sgmt->sgmt.get_links().stream())
+                .collect(Collectors.toSet());
+    }
+
+    /////////////////////////////////////
+    // segment getters and delete
+    /////////////////////////////////////
 
     /**
      * get all segments in this scenario
@@ -183,8 +229,15 @@ public class FreewayScenario {
      * Get an order list of the names of segments
      * @return
      */
-    public List<String> get_segment_names(){
-        return segments.values().stream().map(segment->segment.name).collect(Collectors.toList());
+    public Set<String> get_segment_names(){
+        return segments.values().stream().map(segment->segment.name).collect(Collectors.toSet());
+    }
+
+    public Segment get_segment_by_name(String name){
+        Set<Segment> xsegments = segments.values().stream()
+                .filter(seg->seg.name.equals(name))
+                .collect(toSet());
+        return xsegments.size()==0 ? null : xsegments.iterator().next();
     }
 
     /**
@@ -195,10 +248,63 @@ public class FreewayScenario {
         return segments.containsKey(id) ? segments.get(id) : null;
     }
 
-    public Set<AbstractLink> get_links(){
-        return segments.values().stream()
-                .flatMap(sgmt->sgmt.get_links().stream())
-                .collect(Collectors.toSet());
+    /**
+     * Delete a segment
+     * @param segment
+     */
+    public void delete_segment(Segment segment) throws Exception {
+
+        if(segments.size()==1)
+            throw new Exception("Removing the sole segment is not allowed.");
+
+        if(segment.segment_or_up_id!=null || segment.segment_fr_dn_id!=null)
+            throw new Exception("Removing a segment with a ramp connector is not allowed.");
+
+        Node start_node = scenario.nodes.get(segment.ml().start_node_id);
+        Node end_node   = scenario.nodes.get(segment.ml().end_node_id);
+
+        // connect upstream mainline segment to end node
+        if(segment.segment_ml_up_id!=null){
+
+            Segment segup = segments.get(segment.segment_ml_up_id);
+            segup.segment_ml_dn_id = segment.segment_ml_dn_id;
+
+            // ml link
+            segup.ml().end_node_id = end_node.id;
+            start_node.in_links.remove(segup.ml().id);
+            end_node.in_links.add(segup.ml().id);
+
+            if(segup.has_onramp() && segup.or().end_node_id==start_node.id) {
+                segup.or().end_node_id = end_node.id;
+                start_node.in_links.remove(segup.or().id);
+                end_node.in_links.add(segup.or().id);
+            }
+
+            if(segup.has_offramp() && segup.fr().start_node_id==start_node.id){
+                segup.fr().start_node_id = end_node.id;
+                start_node.out_links.remove(segup.fr().id);
+                end_node.out_links.add(segup.fr().id);
+            }
+
+        }
+
+        // fix downstream mainline segment
+        if(segment.segment_ml_dn_id!=null){
+            Segment segdn = segments.get(segment.segment_ml_dn_id);
+            segdn.segment_ml_up_id = segment.segment_ml_up_id;
+        }
+
+        // delete the start node
+        scenario.nodes.remove(segment.ml().start_node_id);
+
+        // delete segment links
+        segment.delete_offramp();
+        segment.delete_onramp();
+        scenario.links.remove(segment.ml_id);
+        end_node.in_links.remove(segment.ml_id);
+
+        // remove the segment
+        segments.remove(segment.id);
     }
 
     /////////////////////////////////////
@@ -240,120 +346,6 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
-    // modify
-    /////////////////////////////////////
-
-    /**
-     * Create a new segment upstream of a given index
-     * Caution: This method alters the indices of all segments downstream of the new segment.
-     * @param dn_index integer in [0,num segments-1]
-     */
-    public Segment insert_segment_upstream_from_index(int dn_index) throws Exception {
-        throw new Exception("NOT IMPLEMENTED!");
-
-//        assert(dn_index>=0 && dn_index<segments.size());
-//
-//        Segment dn_segment = segments.get(dn_index);
-//        Segment up_segment = dn_index>0 ? segments.get(dn_index-1) : null;
-//
-//        AbstractLink dn_ml = dn_segment.get_ml();
-//
-//        Node start_node = new Node(new_node_id());
-//        scenario.nodes.put(start_node.id,start_node);
-//
-//        Node end_node = scenario.nodes.get(dn_ml.start_node_id);
-//
-//        AbstractLink ml = new AbstractLink(new_link_id(),start_node.id,end_node.id,dn_ml.full_lanes,dn_ml.length_meters,
-//                true, false, dn_index==0, dn_ml.capacity_vphpl, dn_ml.jam_density_vpkpl,
-//                dn_ml.ff_speed_kph);
-//        scenario.links.put(ml.id,ml);
-//
-//        Segment new_segment = new Segment(this,null,ml,null);
-//        this.segments.add(dn_index,new_segment);
-//
-//        // fix adjacent segments ..............
-//
-//        // dn_segment is no longer a source
-//        dn_segment.get_ml().is_source = false;
-//
-//        // up_segment's end node = start_node
-//        if(up_segment!=null)
-//            up_segment.set_end_node(start_node.id);
-//
-//        return new_segment;
-    }
-
-    /**
-     * Create a new segment downstream of a given index.
-     * Caution: This method alters the indices of all segments downstream of the new segment.
-     * @param up_index integer in [0,num segments-1]
-     */
-    public Segment insert_segment_downstream_from_index(int up_index) throws Exception {
-        throw new Exception("NOT IMPLEMENTED!");
-
-//        assert(up_index>=0 && up_index<segments.size());
-//
-//        Segment up_segment = segments.get(up_index);
-//        Segment dn_segment = up_index<segments.size()-1 ? segments.get(up_index+1) : null;
-//
-//        AbstractLink up_ml = up_segment.get_ml();
-//
-//        Node end_node = new Node(new_node_id());
-//        scenario.nodes.put(end_node.id,end_node);
-//
-//        Node start_node = scenario.nodes.get(up_ml.end_node_id);
-//
-//        AbstractLink ml = new AbstractLink(new_link_id(),start_node.id,end_node.id,up_ml.full_lanes,up_ml.length_meters,
-//                true, false, false, up_ml.capacity_vphpl, up_ml.jam_density_vpkpl,
-//                up_ml.ff_speed_kph);
-//        scenario.links.put(ml.id,ml);
-//
-//        Segment new_segment = new Segment(this,null,ml,null);
-//        this.segments.add(up_index+1,new_segment);
-//
-//        // fix adjacent segments ..............
-//
-//        // dn_segment's start node = end_node
-//        if(dn_segment!=null)
-//            dn_segment.set_start_node(end_node.id);
-//
-//        return new_segment;
-    }
-
-    /**
-     * Delete the segment at the given index
-     * @param index
-     */
-    public void delete_segment(int index) throws Exception {
-
-        if(index<0 || index>=segments.size())
-            throw new Exception("Out of bounds index.");
-
-        if(segments.size()==1)
-            throw new Exception("Removing the sole segment is not allowed.");
-
-        Segment segment = segments.get(index);
-        segment.delete_offramp();
-        segment.delete_onramp();
-        scenario.links.remove(segment.ml_id);
-
-        // fix adjacent segments
-        if(index==0)
-            // make the 1st segment a source
-            segments.get(1).ml().is_source = true;
-        else
-            // attach upstream segment to the end node
-            segments.get(index-1).set_end_node(segment.ml().end_node_id);
-
-
-        // remove the start node
-        scenario.nodes.remove(segment.ml().start_node_id);
-
-        // remove the segment
-        segments.remove(index);
-    }
-
-    /////////////////////////////////////
     // run
     /////////////////////////////////////
 
@@ -385,31 +377,27 @@ public class FreewayScenario {
         return scn;
     }
 
-
-
-
-
-
-
-
-
-
-
     protected AbstractLink get_link(Long id){
         return scenario.links.get(id);
     }
 
     protected void reset_max_ids(){
 
+        // link
         Optional<Long> opt_max_link_id = scenario.links.keySet().stream()
                 .max(Comparator.comparing(Long::valueOf));
-
         max_link_id = opt_max_link_id.isPresent() ? opt_max_link_id.get() : 0l;
 
+        // node
         Optional<Long> opt_max_node_id = scenario.nodes.keySet().stream()
                 .max(Comparator.comparing(Long::valueOf));
-
         max_node_id = opt_max_node_id.isPresent() ? opt_max_node_id.get() : 0l;
+
+        // segment
+        Optional<Long> opt_max_seg_id = segments.keySet().stream()
+                .max(Comparator.comparing(Long::valueOf));
+        max_seg_id = opt_max_seg_id.isPresent() ? opt_max_seg_id.get() : 0l;
+
     }
 
     protected long new_link_id(){
@@ -420,10 +408,13 @@ public class FreewayScenario {
         return ++max_node_id;
     }
 
+    protected long new_seg_id(){
+        return ++max_seg_id;
+    }
+
     /////////////////////////////////////
     // override
     /////////////////////////////////////
-
 
     @Override
     public boolean equals(Object o) {

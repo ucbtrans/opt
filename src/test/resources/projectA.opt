@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<prj>
+	<scns>
+		<scn name="scenarioA" file="one_fwy.xml">
+			<lnks>
+				<lnk id="0" name="lA0"/>
+				<lnk id="1" name="lA1"/>
+				<lnk id="2" name="lA2"/>
+				<lnk id="3" name="lA3"/>
+				<lnk id="4" name="lA4"/>
+				<lnk id="5" name="lA5"/>
+				<lnk id="6" name="lA6"/>
+				<lnk id="7" name="lA7"/>
+				<lnk id="8" name="lA8"/>
+				<lnk id="9" name="lA9"/>
+				<lnk id="10" name="lA10"/>
+				<lnk id="11" name="lA11"/>
+			</lnks>
+			<sgmts>
+				<sgmt name="sA0" links="0"/>
+				<sgmt name="sA1" links="1"/>
+				<sgmt name="sA2" links="7,2,8"/>
+				<sgmt name="sA3" links="3"/>
+				<sgmt name="sA4" links="9,4"/>
+				<sgmt name="sA5" links="10,5,11"/>
+				<sgmt name="sA6" links="6"/>
+			</sgmts>
+		</scn>
+		<scn name="scenarioB" file="one_fwy.xml">
+			<lnks>
+				<lnk id="0" name="lB0"/>
+				<lnk id="1" name="lB1"/>
+				<lnk id="2" name="lB2"/>
+				<lnk id="3" name="lB3"/>
+				<lnk id="4" name="lB4"/>
+				<lnk id="5" name="lB5"/>
+				<lnk id="6" name="lB6"/>
+				<lnk id="7" name="lB7"/>
+				<lnk id="8" name="lB8"/>
+				<lnk id="9" name="lB9"/>
+				<lnk id="10" name="lB10"/>
+				<lnk id="11" name="lB11"/>
+			</lnks>
+			<sgmts>
+				<sgmt name="sB0" links="0"/>
+				<sgmt name="sB1" links="1,7"/>
+				<sgmt name="sB2" links="2"/>
+				<sgmt name="sB3" links="3,8,9"/>
+				<sgmt name="sB4" links="4,10"/>
+				<sgmt name="sB5" links="5"/>
+				<sgmt name="sB6" links="6,11"/>
+			</sgmts>
+		</scn>
+	</scns>
+</prj>
+

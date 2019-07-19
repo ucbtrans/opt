@@ -40,12 +40,15 @@ public class Scenario {
                         case "mainline":
                             link = new LinkMainline(jlink,road_params.get(jlink.getRoadparam()));
                             break;
+                        case "connector":
+                            link = new LinkConnector(jlink,road_params.get(jlink.getRoadparam()));
+                            break;
                         default:
                             throw new Exception("Bad road type");
                     }
                     links.put(jlink.getId(),link);
-                    nodes.get(jlink.getEndNodeId()).in_links.add(link);
-                    nodes.get(jlink.getStartNodeId()).out_links.add(link);
+                    nodes.get(jlink.getEndNodeId()).in_links.add(link.id);
+                    nodes.get(jlink.getStartNodeId()).out_links.add(link.id);
                 }
         }
 
@@ -74,10 +77,8 @@ public class Scenario {
         // set node inlinks and outlinks
         for (Node node_cpy : jscn_cpy.nodes.values()){
             Node node_org = nodes.get(node_cpy.id);
-            for(AbstractLink link_org : node_org.out_links)
-                node_cpy.out_links.add(jscn_cpy.links.get(link_org.id));
-            for(AbstractLink link_org : node_org.in_links)
-                node_cpy.in_links.add(jscn_cpy.links.get(link_org.id));
+            node_cpy.out_links.addAll(node_org.out_links);
+            node_cpy.in_links.addAll(node_org.in_links);
         }
 
         // commodities
@@ -173,6 +174,8 @@ public class Scenario {
                 jaxbLink.setRoadType("mainline");
             if(link instanceof LinkRamp)
                 jaxbLink.setRoadType("ramp");
+            if(link instanceof LinkConnector)
+                jaxbLink.setRoadType("connector");
 
             // road params
             RoadParam link_rp = new RoadParam(link.capacity_vphpl,link.ff_speed_kph,link.jam_density_vpkpl);

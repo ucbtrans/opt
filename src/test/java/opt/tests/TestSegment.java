@@ -1,6 +1,7 @@
 package opt.tests;
 
 import opt.data.AbstractLink;
+import opt.data.Segment;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -20,10 +21,6 @@ public class TestSegment extends AbstractTest {
     }
 
     // MISSING //
-//    test_get_upstrm_segments
-//    test_get_upstrm_links
-//    test_get_dnstrm_segments
-//    test_get_dnstrm_links
 //    test_insert_upstrm_hov_segment
 //    test_insert_upstrm_mainline_segment
 //    test_insert_upstrm_onramp_segment
@@ -40,9 +37,10 @@ public class TestSegment extends AbstractTest {
     public void test_set_get_name(){
         try {
             TestData X = new TestData();
-            assertEquals("segment A0",X.segment0.get_name());
-            X.segment0.set_name("newname");
-            assertEquals("newname",X.segment0.get_name());
+            Segment segment = X.scenario.get_segment_by_name("sA0");
+            assertEquals("sA0",segment.get_name());
+            segment.set_name("newname");
+            assertEquals("newname",segment.get_name());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -53,8 +51,9 @@ public class TestSegment extends AbstractTest {
         TestData X = new TestData();
         try {
             float ml_length = 3480.346f;
-            X.segment2.set_length_meters(ml_length);
-            assertEquals(ml_length,X.segment2.get_length_meters(),0.001);
+            Segment segment = X.scenario.get_segment_by_name("sA2");
+            segment.set_length_meters(ml_length);
+            assertEquals(ml_length,segment.get_length_meters(),0.001);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -66,31 +65,45 @@ public class TestSegment extends AbstractTest {
 
     @Test
     public void test_get_links(){
-        Set<AbstractLink> links0 = sX.segment0.get_links();
+        Segment segment0 = sX.scenario.get_segment_by_name("sA0");
+        Set<AbstractLink> links0 = segment0.get_links();
         assertEquals(links0.stream().map(x->x.get_id()).collect(toSet()),new HashSet(Arrays.asList(0l)));
 
-        Set<AbstractLink> links2 = sX.segment2.get_links();
+        Segment segment2 = sX.scenario.get_segment_by_name("sA2");
+        Set<AbstractLink> links2 = segment2.get_links();
         assertEquals(links2.stream().map(x->x.get_id()).collect(toSet()),new HashSet(Arrays.asList(2l,8l,7l)));
     }
 
-    @Ignore
     @Test
     public void test_get_upstrm_segments(){
+        Segment segment = sX.scenario.get_segment_by_name("sA9");
+        Set<Segment> x = segment.get_upstrm_segments();
+        assertEquals(1,x.size());
+        assertEquals("sA8",x.iterator().next().get_name());
     }
 
-    @Ignore
     @Test
     public void test_get_upstrm_links(){
+        Segment segment = sX.scenario.get_segment_by_name("sA9");
+        Set<AbstractLink> x = segment.get_upstrm_links();
+        assertEquals(2,x.size());
+        assertEquals(new HashSet<>(Arrays.asList(14l,13l)),x.stream().map(link->link.get_id()).collect(toSet()));
     }
 
-    @Ignore
     @Test
     public void test_get_dnstrm_segments(){
+        Segment segment = sX.scenario.get_segment_by_name("sA2");
+        Set<Segment> x = segment.get_dnstrm_segments();
+        assertEquals(2,x.size());
+        assertEquals(new HashSet<>(Arrays.asList("sA7","sA3")),x.stream().map(s->s.get_name()).collect(toSet()));
     }
 
-    @Ignore
     @Test
     public void test_get_dnstrm_links(){
+        Segment segment = sX.scenario.get_segment_by_name("sA2");
+        Set<AbstractLink> x = segment.get_dnstrm_links();
+        assertEquals(2,x.size());
+        assertEquals(new HashSet<>(Arrays.asList(12l,3l)),x.stream().map(link->link.get_id()).collect(toSet()));
     }
 
     @Ignore
@@ -98,14 +111,18 @@ public class TestSegment extends AbstractTest {
     public void test_insert_upstrm_hov_segment(){
     }
 
-    @Ignore
     @Test
     public void test_insert_upstrm_mainline_segment(){
+        TestData X = new TestData();
+        Segment segment = X.scenario.get_segment_by_name("sA3").insert_upstrm_mainline_segment();
+        assertNotNull(segment);
     }
 
-    @Ignore
     @Test
     public void test_insert_upstrm_onramp_segment(){
+        TestData X = new TestData();
+        Segment segment = X.scenario.get_segment_by_name("sA5").insert_upstrm_onramp_segment();
+        assertNotNull(segment);
     }
 
     @Ignore
@@ -113,14 +130,18 @@ public class TestSegment extends AbstractTest {
     public void test_insert_dnstrm_hov_segment(){
     }
 
-    @Ignore
     @Test
     public void test_insert_dnstrm_mainline_segment(){
+        TestData X = new TestData();
+        Segment segment = X.scenario.get_segment_by_name("sA4").insert_dnstrm_mainline_segment();
+        assertNotNull(segment);
     }
 
-    @Ignore
     @Test
-    public void test_insert_dnstrm_onramp_segment(){
+    public void test_insert_dnstrm_offramp_segment(){
+        TestData X = new TestData();
+        Segment segment = X.scenario.get_segment_by_name("sA5").insert_dnstrm_offramp_segment();
+        assertNotNull(segment);
     }
 
     /////////////////////////////////////
@@ -129,16 +150,16 @@ public class TestSegment extends AbstractTest {
 
     @Test
     public void test_has_offramp(){
-        assertFalse(sX.segment0.has_offramp());
-        assertTrue(sX.segment2.has_offramp());
+        assertFalse(sX.scenario.get_segment_by_name("sA0").has_offramp());
+        assertTrue(sX.scenario.get_segment_by_name("sA2").has_offramp());
     }
 
     @Test
     public void test_set_get_fr_name(){
         try {
             TestData X = new TestData();
-            assertNull(X.segment0.get_fr_name());
-            assertEquals("A7",X.segment2.get_fr_name());
+            assertNull(X.scenario.get_segment_by_name("sA0").get_fr_name());
+            assertEquals("lA7",X.scenario.get_segment_by_name("sA2").get_fr_name());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -147,10 +168,11 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_fr_lanes(){
         TestData X = new TestData();
+        Segment segment2 = X.scenario.get_segment_by_name("sA2");
         try {
             int fr_lanes = 125;
-            X.segment2.set_fr_lanes(fr_lanes);
-            assertEquals(fr_lanes,X.segment2.get_fr_lanes());
+            segment2.set_fr_lanes(fr_lanes);
+            assertEquals(fr_lanes,segment2.get_fr_lanes());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -159,10 +181,11 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_fr_capacity_vphpl(){
         TestData X = new TestData();
+        Segment segment2 = X.scenario.get_segment_by_name("sA2");
         try {
             float fr_capacity = 123.4563f;
-            X.segment2.set_fr_capacity_vphpl(fr_capacity);
-            assertEquals(fr_capacity,X.segment2.get_fr_capacity_vphpl(),0.001);
+            segment2.set_fr_capacity_vphpl(fr_capacity);
+            assertEquals(fr_capacity,segment2.get_fr_capacity_vphpl(),0.001);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -171,10 +194,11 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_fr_max_vehicles(){
         TestData X = new TestData();
+        Segment segment2 = X.scenario.get_segment_by_name("sA2");
         try {
             float fr_max_vehicles = 235567.346f;
-            X.segment2.set_fr_max_vehicles(fr_max_vehicles);
-            assertEquals(fr_max_vehicles,X.segment2.get_fr_max_vehicles(),0.001);
+            segment2.set_fr_max_vehicles(fr_max_vehicles);
+            assertEquals(fr_max_vehicles,segment2.get_fr_max_vehicles(),0.001);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -183,19 +207,21 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_delete_offramp(){
         TestData X = new TestData();
+
         // delete an existing offramp
-        assertTrue(X.segment0.delete_offramp());
+        assertFalse(X.scenario.get_segment_by_name("sA0").delete_offramp());
 
         // try to delete an non-existing offramp
-        assertFalse(X.segment2.delete_offramp());
+        assertTrue(X.scenario.get_segment_by_name("sA4").delete_offramp());
     }
 
     @Test
     public void test_add_offramp(){
         TestData X = new TestData();
-        assertFalse(X.segment0.has_offramp());
-        X.segment0.add_offramp();
-        assertTrue(X.segment0.has_offramp());
+        Segment segment0 = X.scenario.get_segment_by_name("sA0");
+        assertFalse(segment0.has_offramp());
+        segment0.add_offramp();
+        assertTrue(segment0.has_offramp());
     }
 
     /////////////////////////////////////
@@ -204,16 +230,16 @@ public class TestSegment extends AbstractTest {
 
     @Test
     public void test_has_onramp(){
-        assertFalse(sX.segment0.has_onramp());
-        assertTrue(sX.segment2.has_onramp());
+        assertFalse(sX.scenario.get_segment_by_name("sA0").has_onramp());
+        assertTrue(sX.scenario.get_segment_by_name("sA2").has_onramp());
     }
 
     @Test
     public void test_set_get_or_name(){
         try {
             TestData X = new TestData();
-            assertNull(X.segment0.get_or_name());
-            assertEquals("A8",X.segment2.get_or_name());
+            assertNull(X.scenario.get_segment_by_name("sA0").get_or_name());
+            assertEquals("lA8",X.scenario.get_segment_by_name("sA2").get_or_name());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -222,10 +248,11 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_or_lanes(){
         TestData X = new TestData();
+        Segment segment2 = X.scenario.get_segment_by_name("sA2");
         try {
             int or_lanes = 12;
-            X.segment2.set_or_lanes(or_lanes);
-            assertEquals(or_lanes,X.segment2.get_or_lanes());
+            segment2.set_or_lanes(or_lanes);
+            assertEquals(or_lanes,segment2.get_or_lanes());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -234,10 +261,11 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_or_capacity_vphpl(){
         TestData X = new TestData();
+        Segment segment2 = X.scenario.get_segment_by_name("sA2");
         try {
             float or_capacity = 123.4563f;
-            X.segment2.set_or_capacity_vphpl(or_capacity);
-            assertEquals(or_capacity,X.segment2.get_or_capacity_vphpl(),0.001);
+            segment2.set_or_capacity_vphpl(or_capacity);
+            assertEquals(or_capacity,segment2.get_or_capacity_vphpl(),0.001);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -246,10 +274,11 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_or_max_vehicles(){
         TestData X = new TestData();
+        Segment segment2 = X.scenario.get_segment_by_name("sA2");
         try {
             float or_max_vehicles = 24983.234f;
-            X.segment2.set_or_max_vehicles(or_max_vehicles);
-            assertEquals(or_max_vehicles,X.segment2.get_or_max_vehicles(),0.001);
+            segment2.set_or_max_vehicles(or_max_vehicles);
+            assertEquals(or_max_vehicles,segment2.get_or_max_vehicles(),0.001);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -260,18 +289,21 @@ public class TestSegment extends AbstractTest {
         TestData X = new TestData();
 
         // delete an existing onramp
-        assertTrue(X.segment2.delete_onramp());
+        Segment segment2 = X.scenario.get_segment_by_name("sA2");
+        assertTrue(segment2.delete_onramp());
 
         // try to delete an non-existing onramp
-        assertFalse(X.segment4.delete_onramp());
+        Segment segment4 = X.scenario.get_segment_by_name("sA4");
+        assertFalse(segment4.delete_onramp());
     }
 
     @Test
     public void test_add_onramp(){
         TestData X = new TestData();
-        assertFalse(X.segment0.has_onramp());
-        X.segment0.add_onramp();
-        assertTrue(X.segment0.has_onramp());
+        Segment segment = X.scenario.get_segment_by_name("sA0");
+        assertFalse(segment.has_onramp());
+        segment.add_onramp();
+        assertTrue(segment.has_onramp());
     }
 
     @Ignore
@@ -298,7 +330,8 @@ public class TestSegment extends AbstractTest {
         try {
             try {
                 TestData X = new TestData();
-                assertEquals("A2",X.segment2.get_ml_name());
+                Segment segment2 = X.scenario.get_segment_by_name("sA2");
+                assertEquals("lA2",segment2.get_ml_name());
             } catch (Exception e) {
                 fail(e.getMessage());
             }
@@ -310,10 +343,11 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_mixed_lanes(){
         TestData X = new TestData();
+        Segment segment2 = X.scenario.get_segment_by_name("sA2");
         try {
             int ml_lanes = 2436;
-            X.segment2.set_mixed_lanes(ml_lanes);
-            assertEquals(ml_lanes,X.segment2.get_mixed_lanes());
+            segment2.set_mixed_lanes(ml_lanes);
+            assertEquals(ml_lanes,segment2.get_mixed_lanes());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -322,10 +356,11 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_capacity_vphpl(){
         TestData X = new TestData();
+        Segment segment2 = X.scenario.get_segment_by_name("sA2");
         try {
             float ml_capacity = 3498.2356f;
-            X.segment2.set_capacity_vphpl(ml_capacity);
-            assertEquals(ml_capacity,X.segment2.get_capacity_vphpl(),0.001);
+            segment2.set_capacity_vphpl(ml_capacity);
+            assertEquals(ml_capacity,segment2.get_capacity_vphpl(),0.001);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -334,10 +369,11 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_jam_density_vpmpl(){
         TestData X = new TestData();
+        Segment segment2 = X.scenario.get_segment_by_name("sA2");
         try {
             float ml_jam_density = 245.234f;
-            X.segment2.set_jam_density_vpmpl(ml_jam_density);
-            assertEquals(ml_jam_density,X.segment2.get_jam_density_vpmpl(),0.001);
+            segment2.set_jam_density_vpkpl(ml_jam_density);
+            assertEquals(ml_jam_density,segment2.get_jam_density_vpkpl(),0.001);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -346,10 +382,11 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_freespeed_mph(){
         TestData X = new TestData();
+        Segment segment2 = X.scenario.get_segment_by_name("sA2");
         try {
             float ml_speed = 348934.435f;
-            X.segment2.set_freespeed_mph(ml_speed);
-            assertEquals(ml_speed,X.segment2.get_freespeed_mph(),0.001);
+            segment2.set_freespeed_kph(ml_speed);
+            assertEquals(ml_speed,segment2.get_freespeed_kph(),0.001);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -360,28 +397,6 @@ public class TestSegment extends AbstractTest {
 
 
 
-
-    @Ignore
-    @Test
-    public void test_delete_segment() {
-//
-//        try {
-//
-//        Project project = load_test_project();
-//        FreewayScenario scenario = project.get_scenario_with_name("scenarioA");
-//            // delete the zeroth segment
-//            scenario.delete_segment(0);
-//
-//            // delete a middle segment
-//            scenario.delete_segment(4);
-//
-//            // delete last segment
-//            scenario.delete_segment(scenario.get_num_segments()-1);
-//
-//        } catch (Exception e) {
-//            fail(e.getMessage());
-//        }
-    }
 
 
     @Test
@@ -400,10 +415,11 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_segment_name(){
         TestData X = new TestData();
+        Segment segment2 = X.scenario.get_segment_by_name("sA2");
         try {
-            System.out.println(X.segment2.get_name());
-            X.segment2.set_name("valid name");
-            System.out.println(X.segment2.get_name());
+            System.out.println(segment2.get_name());
+            segment2.set_name("valid name");
+            System.out.println(segment2.get_name());
         } catch (Exception e) {
             fail(e.getMessage());
         }

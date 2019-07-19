@@ -22,6 +22,10 @@
 			<node id="10"/>
 			<node id="11"/>
 			<node id="12"/>
+			<node id="13"/>
+			<node id="14"/>
+			<node id="15"/>
+			<node id="16"/>
 		</nodes>
 		<links>
 			<link id="0" length="100"  start_node_id="0"  end_node_id="1" roadparam="0" full_lanes="4" road_type="mainline"/>
@@ -36,12 +40,16 @@
 			<link id="9" length="100"  start_node_id="4"  end_node_id="10" roadparam="1" full_lanes="2" road_type="ramp"/>
 			<link id="10" length="100" start_node_id="5"  end_node_id="11" roadparam="1" full_lanes="2" road_type="ramp"/>
 			<link id="11" length="100" start_node_id="12" end_node_id="6" roadparam="1" full_lanes="2" road_type="ramp"/>
+			<link id="12" length="200" start_node_id="8" end_node_id="13" roadparam="1" full_lanes="1" road_type="connector"/>
+			<link id="13" length="100" start_node_id="13" end_node_id="15" roadparam="1" full_lanes="2" road_type="ramp"/>
+			<link id="14" length="500" start_node_id="14" end_node_id="15" roadparam="1" full_lanes="4" road_type="mainline"/>
+			<link id="15" length="500" start_node_id="15" end_node_id="16" roadparam="1" full_lanes="4" road_type="mainline"/>
 		</links>
 		<roadparams>
 			<roadparam id="0" capacity="2000" speed="100" jam_density="100"/>
 			<roadparam id="1" capacity="1000" speed="40" jam_density="100"/>
 		</roadparams>
-		<roadconnections>
+<!-- 		<roadconnections>
 			<roadconnection id="0" in_link="1"  out_link="7" in_link_lanes="4#4" />
 			<roadconnection id="1" in_link="1"  out_link="2" />
 			<roadconnection id="2" in_link="2"  out_link="3" />
@@ -52,7 +60,7 @@
 			<roadconnection id="7" in_link="4"  out_link="10" in_link_lanes="3#4" />
 			<roadconnection id="8" in_link="5"  out_link="6" />
 			<roadconnection id="9" in_link="11" out_link="6" out_link_lanes="2#3" />
-		</roadconnections>
+		</roadconnections> -->
 	</network>
 
 	<commodities>

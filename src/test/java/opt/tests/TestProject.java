@@ -30,7 +30,7 @@ public class TestProject extends AbstractTest {
     public void test_run_scenario(){
         try {
             TestData X = new TestData();
-            X.project.run_scenario("scenarioA");
+            X.project.run_scenario("scenarioC");
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -45,9 +45,9 @@ public class TestProject extends AbstractTest {
         try {
             TestData X = new TestData();
             Collection<String> x = X.project.get_scenario_names();
-            assertEquals(2,x.size());
-            assertTrue(x.contains("scenarioA"));
-            assertTrue(x.contains("scenarioB"));
+            assertEquals(1,x.size());
+            assertTrue(x.contains("scenarioC"));
+            assertFalse(x.contains("scenarioB"));
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -58,7 +58,7 @@ public class TestProject extends AbstractTest {
         try {
             TestData X = new TestData();
             Collection<FreewayScenario> x = X.project.get_scenarios();
-            assertEquals(2,x.size());
+            assertEquals(1,x.size());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -80,10 +80,10 @@ public class TestProject extends AbstractTest {
     public void test_set_scenario_name(){
         try {
             TestData X = new TestData();
-            X.project.set_scenario_name("scenarioA","newname");
+            X.project.set_scenario_name("scenarioC","newname");
             Collection<String> names = X.project.get_scenario_names();
             assertTrue(names.contains("newname"));
-            assertFalse(names.contains("scenarioA"));
+            assertFalse(names.contains("scenarioC"));
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -109,7 +109,7 @@ public class TestProject extends AbstractTest {
     public void test_clone_scenario(){
         try {
             TestData X = new TestData();
-            X.project.clone_scenario("scenarioA","new_scenario");
+            X.project.clone_scenario("scenarioC","new_scenario");
             assertNotNull(X.project.get_scenario_with_name("new_scenario"));
         } catch (Exception e) {
             fail(e.getMessage());
