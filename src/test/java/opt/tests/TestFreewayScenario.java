@@ -28,7 +28,7 @@ public class TestFreewayScenario extends AbstractTest {
     @Test
     public void test_get_name(){
         TestData X = new TestData();
-        assertEquals("scenarioC",X.scenario.get_name());
+        assertEquals("scenarioA",X.scenario.get_name());
     }
 
     @Test
@@ -36,7 +36,7 @@ public class TestFreewayScenario extends AbstractTest {
         TestData X = new TestData();
         Collection<AbstractLink> links = X.scenario.get_links();
         assertNotNull(links);
-        assertEquals(16,links.size());
+        assertEquals(18,links.size());
     }
 
     /////////////////////////////////////
@@ -48,19 +48,19 @@ public class TestFreewayScenario extends AbstractTest {
         TestData X = new TestData();
         Collection<Segment> segments = X.scenario.get_segments();
         assertNotNull(segments);
-        assertEquals(10,segments.size());
+        assertEquals(11,segments.size());
     }
 
     @Test
     public void test_get_segment_names(){
         TestData X = new TestData();
-        assertEquals(10,X.scenario.get_segment_names().size());
+        assertEquals(11,X.scenario.get_segment_names().size());
     }
 
     @Test
     public void test_get_segment_by_name(){
         TestData X = new TestData();
-        assertEquals("sA0",X.scenario.get_segment_by_name("sA0").get_name());
+        assertEquals("sA1",X.scenario.get_segment_by_name("sA1").get_name());
     }
 
     @Test

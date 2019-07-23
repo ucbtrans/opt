@@ -61,7 +61,9 @@ public class ProjectFactory {
             FreewayScenario fwy_scenario = project.get_scenario_with_name(scenario_name);
             File scenario_file = file_info.get_scenario_file(scenario_name);
             scenario_file_names.put(scenario_name,scenario_file.getName());
-            create_marshaller(jaxb.Scenario.class).marshal(fwy_scenario.scenario.to_jaxb(), scenario_file);
+            create_marshaller(jaxb.Scenario.class).marshal(
+                    fwy_scenario.scenario.to_jaxb(fwy_scenario.segments.values()),
+                    scenario_file);
         }
 
         // save project file

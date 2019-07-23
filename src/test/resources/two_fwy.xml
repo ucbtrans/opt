@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <scenario>
-
+	<commodities>
+		<commodity id="0" name="c1" pathfull="false"/>
+	</commodities>
 	<models>
 		<model type="ctm" name="myctm" is_default="true">
 			<model_params sim_dt="2" max_cell_length="100"/>
 		</model>
 	</models>
-
 	<network>
 		<nodes>
 			<node id="0"/>
@@ -26,9 +27,11 @@
 			<node id="14"/>
 			<node id="15"/>
 			<node id="16"/>
+			<node id="17"/>
+			<node id="18"/>
+			<node id="19"/>
 		</nodes>
 		<links>
-			<link id="0" length="100"  start_node_id="0"  end_node_id="1" roadparam="0" full_lanes="4" road_type="mainline"/>
 			<link id="1" length="1500" start_node_id="1"  end_node_id="2" roadparam="0" full_lanes="4" road_type="mainline"/>
 			<link id="2" length="500"  start_node_id="2"  end_node_id="3" roadparam="0" full_lanes="4" road_type="mainline"/>
 			<link id="3" length="800"  start_node_id="3"  end_node_id="4" roadparam="0" full_lanes="5" road_type="mainline"/>
@@ -44,6 +47,9 @@
 			<link id="13" length="100" start_node_id="13" end_node_id="15" roadparam="1" full_lanes="2" road_type="ramp"/>
 			<link id="14" length="500" start_node_id="14" end_node_id="15" roadparam="1" full_lanes="4" road_type="mainline"/>
 			<link id="15" length="500" start_node_id="15" end_node_id="16" roadparam="1" full_lanes="4" road_type="mainline"/>
+			<link id="16" length="500" start_node_id="16" end_node_id="17" roadparam="1" full_lanes="4" road_type="mainline"/>
+			<link id="17" length="500" start_node_id="17" end_node_id="18" roadparam="1" full_lanes="4" road_type="mainline"/>
+			<link id="18" length="500" start_node_id="17" end_node_id="19" roadparam="1" full_lanes="2" road_type="ramp"/>
 		</links>
 		<roadparams>
 			<roadparam id="0" capacity="2000" speed="100" jam_density="100"/>
@@ -63,31 +69,29 @@
 		</roadconnections> -->
 	</network>
 
-	<commodities>
-		<commodity id="0" name="c1" pathfull="false"/>
-	</commodities>
-
 	<demands>
-		<demand link_id="0" commodity_id="0" dt="1000">1500,0</demand>
+		<demand link_id="1" commodity_id="0" dt="1000">1500,0</demand>
 		<demand link_id="8" commodity_id="0" dt="1000">1500,0</demand>
 		<demand link_id="11" commodity_id="0" dt="1000">1500,0</demand>
 	</demands>
 
 	<splits>
 		<split_node commodity_id="0" node_id="2" link_in="1">
-			<split link_out="2">0.9</split>
 			<split link_out="7">0.1</split>
 		</split_node>
 
 		<split_node commodity_id="0" node_id="4" link_in="3">
-			<split link_out="4">0.9</split>
 			<split link_out="9">0.1</split>
 		</split_node>
 
 		<split_node commodity_id="0" node_id="5" link_in="4">
-			<split link_out="5">0.9</split>
 			<split link_out="10">0.1</split>
 		</split_node>
+
+		<split_node commodity_id="0" node_id="17" link_in="16">
+			<split link_out="18">0.1</split>
+		</split_node>
+
 
 	</splits>
 

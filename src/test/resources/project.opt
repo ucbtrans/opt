@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <prj>
 	<scns>
-		<scn name="scenarioC" file="two_fwy.xml">
+		<scn name="scenarioA" file="two_fwy.xml">
 			<lnks>
-				<lnk id="0" name="lA0"/>
 				<lnk id="1" name="lA1"/>
 				<lnk id="2" name="lA2"/>
 				<lnk id="3" name="lA3"/>
@@ -19,18 +18,22 @@
 				<lnk id="13" name="lA13"/>
 				<lnk id="14" name="lA14"/>
 				<lnk id="15" name="lA15"/>
+				<lnk id="16" name="lA16"/>
+				<lnk id="17" name="lA17"/>
+				<lnk id="18" name="lA18"/>
 			</lnks>
 			<sgmts>
-				<sgmt name="sA0" links="0"/>
-				<sgmt name="sA1" links="1"/>
-				<sgmt name="sA2" links="7,2,8"/>
-				<sgmt name="sA3" links="3"/>
-				<sgmt name="sA4" links="9,4"/>
-				<sgmt name="sA5" links="10,5,11"/>
-				<sgmt name="sA6" links="6"/>
+				<sgmt name="sA1" links="1,7"/>
+				<sgmt name="sA2" links="2"/>
+				<sgmt name="sA3" links="3,8,9"/>
+				<sgmt name="sA4" links="4,10"/>
+				<sgmt name="sA5" links="5"/>
+				<sgmt name="sA6" links="6,11"/>
 				<sgmt name="sA7" links="12"/>
-				<sgmt name="sA8" links="13,14"/>
-				<sgmt name="sA9" links="15"/>
+				<sgmt name="sA8" links="13,15"/>
+				<sgmt name="sA9" links="16,18"/>
+				<sgmt name="sa" links="14"/>
+				<sgmt name="sb" links="17"/>
 			</sgmts>
 		</scn>
 	</scns>

@@ -32,17 +32,20 @@ public class Segment {
     protected Long segment_fr_dn_id;
     protected Long segment_or_up_id;
 
-    protected Map<Long,Profile1D> or_demands = new HashMap<>();
-    protected Map<Long, Split> fr_splits = new HashMap<>();
+    protected Map<Long,Profile1D> ml_demands = new HashMap<>();     // commodity -> Profile1D
+    protected Map<Long,Profile1D> or_demands = new HashMap<>();     // commodity -> Profile1D
+    protected Map<Long,Profile1D> fr_splits = new HashMap<>();      // commodity -> Profile1D
 
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
 
+    // used in deep copy
     public Segment(long id){
         this.id = id;
     }
 
+    // used by FreewayScenario jaxb constructor
     public Segment(FreewayScenario fwy_scenario,long id, jaxb.Sgmt sgmt) throws Exception {
 
         this.id = id;
@@ -107,6 +110,7 @@ public class Segment {
         assert(links.isEmpty());
     }
 
+    // used by Segment.create_new_segment
     public Segment(FreewayScenario fwy_scenario,long id,String name,Long ml_id){
         this.fwy_scenario = fwy_scenario;
         this.id = id;
@@ -126,11 +130,14 @@ public class Segment {
         seg_cpy.segment_fr_dn_id = segment_fr_dn_id;
         seg_cpy.segment_or_up_id = segment_or_up_id;
 
-        for(Map.Entry<Long,Profile1D> e : or_demands.entrySet())
-            seg_cpy.or_demands.put(e.getKey(),e.getValue().clone());
+        for(Map.Entry<Long,Profile1D> e : ml_demands.entrySet())
+            seg_cpy.ml_demands.put(e.getKey(),e.getValue().clone());
 
-        for(Map.Entry<Long,Split> e : fr_splits.entrySet())
-            seg_cpy.fr_splits.put(e.getKey(),e.getValue().deep_copy());
+        for(Map.Entry<Long,Profile1D> e : or_demands.entrySet())
+            seg_cpy.or_demands.put(e.getKey(), e.getValue().clone());
+
+        for(Map.Entry<Long,Profile1D> e : fr_splits.entrySet())
+            seg_cpy.fr_splits.put(e.getKey(),e.getValue().clone());
 
         return seg_cpy;
     }
@@ -511,8 +518,10 @@ public class Segment {
         AbstractLink fr = fr();
         fwy_scenario.scenario.nodes.remove(fr.end_node_id);
         fwy_scenario.scenario.links.remove(fr.id);
-        Node start_node = fwy_scenario.scenario.nodes.get(fr.start_node_id);
-        start_node.out_links.remove(fr.id);
+        if(fwy_scenario.scenario.nodes.containsKey(fr.start_node_id)){
+            Node start_node = fwy_scenario.scenario.nodes.get(fr.start_node_id);
+            start_node.out_links.remove(fr.id);
+        }
         fr_id = null;
         fr_splits = new HashMap<>();
         return true;
@@ -602,8 +611,10 @@ public class Segment {
         AbstractLink or = or();
         fwy_scenario.scenario.nodes.remove(or.start_node_id);
         fwy_scenario.scenario.links.remove(or.id);
-        Node end_node = fwy_scenario.scenario.nodes.get(or.end_node_id);
-        end_node.in_links.remove(or.id);
+        if(fwy_scenario.scenario.nodes.containsKey(or.end_node_id)) {
+            Node end_node = fwy_scenario.scenario.nodes.get(or.end_node_id);
+            end_node.in_links.remove(or.id);
+        }
         or_id = null;
         or_demands = new HashMap<>();
         return true;
@@ -630,28 +641,6 @@ public class Segment {
         start_node.out_links.add(or_id);
         fwy_scenario.scenario.nodes.put(start_node.id,start_node);
         fwy_scenario.scenario.links.put(or.id,or);
-    }
-
-    /**
-     * Get the demand for this onramp, for a particular commodity.
-     * @param comm_id Pass a commodity id
-     * @return Profile1D object if demand is defined for this commodity. null otherwise.
-     */
-    public Profile1D get_or_demand_vph(Long comm_id){
-        return or_demands.containsKey(comm_id) ? or_demands.get(comm_id) : null;
-    }
-
-    /**
-     * Set the onramp demand in vehicles per hour.
-     * @param demand_vph Demand in veh/hr as a Profile1D object
-     * @param comm_id ID for the commodity
-     */
-    public void set_or_demand_vph(Profile1D demand_vph, long comm_id)throws Exception {
-        OTMErrorLog errorLog = new OTMErrorLog();
-        demand_vph.validate(errorLog);
-        if (errorLog.haserror())
-            throw new Exception(errorLog.format_errors());
-        this.or_demands.put(comm_id,demand_vph);
     }
 
     /////////////////////////////////////
@@ -718,7 +707,83 @@ public class Segment {
     }
 
     /////////////////////////////////////
-    // protected and provate
+    // demands
+    /////////////////////////////////////
+
+    /**
+     * Get the mainline demand for this segment, for a particular commodity.
+     * @param comm_id ID for the commodity
+     * @return Profile1D object if demand is defined for this commodity. null otherwise.
+     */
+    public Profile1D get_ml_demand_vph(long comm_id){
+        return ml_demands.containsKey(comm_id) ? ml_demands.get(comm_id) : null;
+    }
+
+    /**
+     * Set the mainline demand in vehicles per hour.
+     * @param comm_id ID for the commodity
+     * @param demand_vph Demand in veh/hr as a Profile1D object
+     */
+    public void set_ml_demand_vph(long comm_id,Profile1D demand_vph)throws Exception {
+        OTMErrorLog errorLog = new OTMErrorLog();
+        demand_vph.validate(errorLog);
+        if (errorLog.haserror())
+            throw new Exception(errorLog.format_errors());
+        this.ml_demands.put(comm_id,demand_vph);
+    }
+
+    /**
+     * Get the onramp demand for this segment, for a particular commodity.
+     * @param comm_id ID for the commodity
+     * @return Profile1D object if demand is defined for this commodity. null otherwise.
+     */
+    public Profile1D get_or_demand_vph(long comm_id){
+        return or_demands.containsKey(comm_id) ? or_demands.get(comm_id) : null;
+    }
+
+    /**
+     * Set the onramp demand in vehicles per hour.
+     * @param comm_id ID for the commodity
+     * @param demand_vph Demand in veh/hr as a Profile1D object
+     */
+    public void set_or_demand_vph(long comm_id,Profile1D demand_vph)throws Exception {
+        OTMErrorLog errorLog = new OTMErrorLog();
+        demand_vph.validate(errorLog);
+        if (errorLog.haserror())
+            throw new Exception(errorLog.format_errors());
+        this.or_demands.put(comm_id,demand_vph);
+    }
+
+    /////////////////////////////////////
+    // splits
+    /////////////////////////////////////
+
+    /**
+     * Get the offramp split ratio for this segment, for a particular commodity.
+     * @param comm_id ID for the commodity
+     * @return Profile1D object if split is defined for this commodity. null otherwise.
+     */
+    public Profile1D get_fr_split(long comm_id){
+        return fr_splits.containsKey(comm_id) ? fr_splits.get(comm_id) : null;
+    }
+
+    /**
+     * Set the offramp split ratio for this segment, for a particular commodity.
+     * @param comm_id ID for the commodity
+     * @param splits DSplit ratio as a Profile1D object
+     */
+    public void set_fr_split(long comm_id,Profile1D splits)throws Exception {
+        OTMErrorLog errorLog = new OTMErrorLog();
+        splits.validate(errorLog);
+        if (Collections.max(splits.values) > 1.0D)
+            errorLog.addError("Collections.max(values)>1");
+        if (errorLog.haserror())
+            throw new Exception(errorLog.format_errors());
+        this.fr_splits.put(comm_id,splits);
+    }
+
+    /////////////////////////////////////
+    // protected and private
     /////////////////////////////////////
 
     protected AbstractLink ml(){
@@ -791,7 +856,6 @@ public class Segment {
         }
     }
 
-
     private Segment create_new_segment(AbstractLink newml){
         Long new_seg_id = fwy_scenario.new_seg_id();
         String new_seg_name = String.format("segment %d",new_seg_id);
@@ -831,12 +895,13 @@ public class Segment {
                 Objects.equals(segment_ml_up_id, segment.segment_ml_up_id) &&
                 Objects.equals(segment_fr_dn_id, segment.segment_fr_dn_id) &&
                 Objects.equals(segment_or_up_id, segment.segment_or_up_id) &&
+                ml_demands.equals(segment.ml_demands) &&
                 or_demands.equals(segment.or_demands) &&
                 fr_splits.equals(segment.fr_splits);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, id, ml_id, or_id, fr_id, segment_ml_dn_id, segment_ml_up_id, segment_fr_dn_id, segment_or_up_id, or_demands, fr_splits);
+        return Objects.hash(name, id, ml_id, or_id, fr_id, segment_ml_dn_id, segment_ml_up_id, segment_fr_dn_id, segment_or_up_id, ml_demands, or_demands, fr_splits);
     }
 }

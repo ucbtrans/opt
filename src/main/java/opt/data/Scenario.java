@@ -1,5 +1,8 @@
 package opt.data;
 
+import profiles.Profile1D;
+import utils.OTMUtils;
+
 import java.util.*;
 
 public class Scenario {
@@ -114,7 +117,7 @@ public class Scenario {
         return road_params;
     }
 
-    public jaxb.Scenario to_jaxb(){
+    public jaxb.Scenario to_jaxb(Collection<Segment> segments){
         jaxb.Scenario jScn = new jaxb.Scenario();
 
         // commodities
@@ -179,6 +182,64 @@ public class Scenario {
 
             jaxbLink.setRoadparam(rp_id);
             jLinks.getLink().add(jaxbLink);
+        }
+
+        // demands and splits
+        jaxb.Demands jdemands = new jaxb.Demands();
+        jScn.setDemands(jdemands);
+        jaxb.Splits jsplits = new jaxb.Splits();
+        jScn.setSplits(jsplits);
+
+        for(Segment segment : segments){
+
+            if(!segment.fr_splits.isEmpty()) {
+
+                for (Map.Entry<Long, Profile1D> e : segment.fr_splits.entrySet()) {
+                    jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
+                    jsplits.getSplitNode().add(jsplitnode);
+                    jaxb.Split jsplit = new jaxb.Split();
+                    jsplitnode.getSplit().add(jsplit);
+
+                    jsplitnode.setCommodityId(e.getKey());
+                    Profile1D profile = e.getValue();
+
+                    if(profile.dt!=null)
+                        jsplitnode.setDt(profile.dt);
+                    jsplitnode.setStartTime(profile.start_time);
+                    jsplitnode.setLinkIn(segment.ml_id);
+                    jsplitnode.setNodeId(segment.ml().end_node_id);
+                    jsplit.setLinkOut(segment.fr_id);
+                    jsplit.setContent(OTMUtils.comma_format(profile.values));
+                }
+            }
+
+            if(!segment.or_demands.isEmpty()) {
+                for (Map.Entry<Long, Profile1D> e : segment.or_demands.entrySet()) {
+                    jaxb.Demand jdemand = new jaxb.Demand();
+                    jdemands.getDemand().add(jdemand);
+                    jdemand.setCommodityId(e.getKey());
+                    Profile1D profile = e.getValue();
+                    jdemand.setDt(profile.dt);
+                    jdemand.setStartTime(profile.start_time);
+                    jdemand.setLinkId(segment.or_id);
+                    jdemand.setContent(OTMUtils.comma_format(profile.get_values()));
+                }
+            }
+
+            if(!segment.ml_demands.isEmpty()) {
+                for (Map.Entry<Long, Profile1D> e : segment.ml_demands.entrySet()) {
+                    jaxb.Demand jdemand = new jaxb.Demand();
+                    jdemands.getDemand().add(jdemand);
+                    jdemand.setCommodityId(e.getKey());
+                    Profile1D profile = e.getValue();
+                    if(profile.dt!=null)
+                        jdemand.setDt(profile.dt);
+                    jdemand.setStartTime(profile.start_time);
+                    jdemand.setLinkId(segment.ml_id);
+                    jdemand.setContent(OTMUtils.comma_format(profile.get_values()));
+                }
+            }
+
         }
 
         return jScn;
