@@ -46,7 +46,7 @@ public class Segment {
     }
 
     // used by FreewayScenario jaxb constructor
-    public Segment(FreewayScenario fwy_scenario,long id, jaxb.Sgmt sgmt) throws Exception {
+    public Segment(FreewayScenario fwy_scenario,long id, jaxbopt.Sgmt sgmt) throws Exception {
 
         this.id = id;
         this.fwy_scenario = fwy_scenario;
@@ -869,8 +869,8 @@ public class Segment {
     // override
     /////////////////////////////////////
 
-    public jaxb.Sgmt to_jaxb(){
-        jaxb.Sgmt sgmt = new jaxb.Sgmt();
+    public jaxbopt.Sgmt to_jaxb(){
+        jaxbopt.Sgmt sgmt = new jaxbopt.Sgmt();
         sgmt.setName(name);
         sgmt.setLinks(OTMUtils.comma_format(get_links().stream().map(link->link.get_id()).collect(Collectors.toSet())));
         return sgmt;

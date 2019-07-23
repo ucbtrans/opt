@@ -1,14 +1,28 @@
 package opt.tests;
 
+import error.OTMException;
 import opt.data.ProjectFactory;
 import opt.data.Project;
 import org.junit.Test;
+import xml.JaxbLoader;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class TestProjectFactory extends AbstractTest {
+
+    @Test
+    public void test_load_scenario_from_file(){
+
+        try {
+//            String scn_file = get_test_fullpath("two_fwy.xml");
+            String scn_file = "C:\\Users\\gomes\\code\\otm\\otm-base\\src\\main\\resources\\test_configs\\line.xml";
+            assertNotNull(JaxbLoader.load_scenario(scn_file,true));
+        } catch (OTMException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void test_load_project_from_file(){
