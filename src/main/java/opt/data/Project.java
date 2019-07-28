@@ -16,14 +16,14 @@ public class Project {
 
     public Project(){}
 
-    public Project(jaxb.Prj project,String folder,boolean validate) throws Exception {
+    public Project(jaxbopt.Prj project,String folder,boolean validate) throws Exception {
 
         if(project.getScns()==null)
             return;
 
         try {
 
-            for(jaxb.Scn jaxb_scn : project.getScns().getScn()){
+            for(jaxbopt.Scn jaxb_scn : project.getScns().getScn()){
 
                 String scn_file = (new File(folder,jaxb_scn.getFile())).getAbsolutePath();
                 String scn_name = jaxb_scn.getName();
@@ -139,14 +139,14 @@ public class Project {
     // private
     /////////////////////////////////////
 
-    protected jaxb.Prj to_jaxb(Map<String,String> scenario_file_names){
-        jaxb.Prj jaxbPrj = new jaxb.Prj();
-        jaxb.Scns jaxbScns = new jaxb.Scns();
+    protected jaxbopt.Prj to_jaxb(Map<String,String> scenario_file_names){
+        jaxbopt.Prj jaxbPrj = new jaxbopt.Prj();
+        jaxbopt.Scns jaxbScns = new jaxbopt.Scns();
         jaxbPrj.setScns(jaxbScns);
 
-        List<jaxb.Scn> scnlist = jaxbScns.getScn();
+        List<jaxbopt.Scn> scnlist = jaxbScns.getScn();
         for(FreewayScenario fwy_scenario: scenarios.values()) {
-            jaxb.Scn jScn = fwy_scenario.to_jaxb();
+            jaxbopt.Scn jScn = fwy_scenario.to_jaxb();
             jScn.setFile(scenario_file_names.get(jScn.getName()));
             scnlist.add(jScn);
         }

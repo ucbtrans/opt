@@ -28,7 +28,7 @@ public class FreewayScenario {
 
     public FreewayScenario(){}
 
-    public FreewayScenario(String name,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
+    public FreewayScenario(String name,jaxbopt.Lnks jaxb_lnks,jaxbopt.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
 
         this.name = name;
 
@@ -37,7 +37,7 @@ public class FreewayScenario {
 
         // attach link names
         if (jaxb_lnks!=null){
-            for(jaxb.Lnk lnk : jaxb_lnks.getLnk()){
+            for(jaxbopt.Lnk lnk : jaxb_lnks.getLnk()){
                 if (scenario.links.containsKey(lnk.getId())){
                     AbstractLink link = scenario.links.get(lnk.getId());
                     if( link.name!=null )
@@ -50,7 +50,7 @@ public class FreewayScenario {
         // create segments
         long max_sgmt_id = 0;
         if(jaxb_segments!=null) {
-            for (jaxb.Sgmt sgmt : jaxb_segments.getSgmt()) {
+            for (jaxbopt.Sgmt sgmt : jaxb_segments.getSgmt()) {
                 long sgmt_id = max_sgmt_id++;
                 Segment segment = new Segment(this,sgmt_id, sgmt);
                 segments.put(sgmt_id,segment);
@@ -421,19 +421,19 @@ public class FreewayScenario {
     // protected
     /////////////////////////////////////
 
-    protected jaxb.Scn to_jaxb(){
-        jaxb.Scn scn = new jaxb.Scn();
+    protected jaxbopt.Scn to_jaxb(){
+        jaxbopt.Scn scn = new jaxbopt.Scn();
         scn.setName(name);
 
-        jaxb.Sgmts sgmts = new jaxb.Sgmts();
+        jaxbopt.Sgmts sgmts = new jaxbopt.Sgmts();
         scn.setSgmts(sgmts);
         for(Segment segment : segments.values())
             sgmts.getSgmt().add(segment.to_jaxb());
 
-        jaxb.Lnks lnks = new jaxb.Lnks();
+        jaxbopt.Lnks lnks = new jaxbopt.Lnks();
         scn.setLnks(lnks);
         for(AbstractLink link : get_links()){
-            jaxb.Lnk lnk = new jaxb.Lnk();
+            jaxbopt.Lnk lnk = new jaxbopt.Lnk();
             lnk.setId(link.id);
             lnk.setName(link.name);
             lnks.getLnk().add(lnk);

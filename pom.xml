@@ -63,7 +63,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <generatePackage>jaxb</generatePackage>
+                            <generatePackage>jaxbopt</generatePackage>
                             <bindingDirectory>src/main/resources</bindingDirectory>
                             <bindingIncludes>
                                 <bindingInclude>jaxb-bindings.xjb</bindingInclude>
