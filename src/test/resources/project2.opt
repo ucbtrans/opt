@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<otm:scenario xmlns:otm="opentrafficmodels">
+	<commodities>
+		<commodity id="0" name="c1" pathfull="false"/>
+	</commodities>
+	<models>
+		<model type="ctm" name="myctm" is_default="true">
+			<model_params sim_dt="2" max_cell_length="100"/>
+		</model>
+	</models>
+	<network>
+		<nodes>
+			<node id="0"/>
+			<node id="1"/>
+			<node id="2"/>
+			<node id="3"/>
+			<node id="4"/>
+			<node id="5"/>
+			<node id="6"/>
+			<node id="7"/>
+			<node id="8"/>
+			<node id="9"/>
+			<node id="10"/>
+			<node id="11"/>
+			<node id="12"/>
+			<node id="13"/>
+			<node id="14"/>
+			<node id="15"/>
+			<node id="16"/>
+			<node id="17"/>
+			<node id="18"/>
+			<node id="19"/>
+		</nodes>
+		<links>
+			<link id="1" length="1500" start_node_id="1"  end_node_id="2" roadparam="0" full_lanes="4" road_type="mainline"/>
+			<link id="2" length="500"  start_node_id="2"  end_node_id="3" roadparam="0" full_lanes="4" road_type="mainline"/>
+			<link id="3" length="800"  start_node_id="3"  end_node_id="4" roadparam="0" full_lanes="5" road_type="mainline"/>
+			<link id="4" length="1000" start_node_id="4"  end_node_id="5" roadparam="0" full_lanes="4" road_type="mainline"/>
+			<link id="5" length="500"  start_node_id="5"  end_node_id="6" roadparam="0" full_lanes="3" road_type="mainline"/>
+			<link id="6" length="800"  start_node_id="6"  end_node_id="7" roadparam="0" full_lanes="3" road_type="mainline"/>
+			<link id="7" length="100"  start_node_id="2"  end_node_id="8" roadparam="1" full_lanes="1" road_type="ramp"/>
+			<link id="8" length="100"  start_node_id="9"  end_node_id="3" roadparam="1" full_lanes="2" road_type="ramp"/>
+			<link id="9" length="100"  start_node_id="4"  end_node_id="10" roadparam="1" full_lanes="2" road_type="ramp"/>
+			<link id="10" length="100" start_node_id="5"  end_node_id="11" roadparam="1" full_lanes="2" road_type="ramp"/>
+			<link id="11" length="100" start_node_id="12" end_node_id="6" roadparam="1" full_lanes="2" road_type="ramp"/>
+			<link id="12" length="200" start_node_id="8" end_node_id="13" roadparam="1" full_lanes="1" road_type="connector"/>
+			<link id="13" length="100" start_node_id="13" end_node_id="15" roadparam="1" full_lanes="2" road_type="ramp"/>
+			<link id="14" length="500" start_node_id="14" end_node_id="15" roadparam="1" full_lanes="4" road_type="mainline"/>
+			<link id="15" length="500" start_node_id="15" end_node_id="16" roadparam="1" full_lanes="4" road_type="mainline"/>
+			<link id="16" length="500" start_node_id="16" end_node_id="17" roadparam="1" full_lanes="4" road_type="mainline"/>
+			<link id="17" length="500" start_node_id="17" end_node_id="18" roadparam="1" full_lanes="4" road_type="mainline"/>
+			<link id="18" length="500" start_node_id="17" end_node_id="19" roadparam="1" full_lanes="2" road_type="ramp"/>
+		</links>
+		<roadparams>
+			<roadparam id="0" capacity="2000" speed="100" jam_density="100"/>
+			<roadparam id="1" capacity="1000" speed="40" jam_density="100"/>
+		</roadparams>
+<!-- 		<roadconnections>
+			<roadconnection id="0" in_link="1"  out_link="7" in_link_lanes="4#4" />
+			<roadconnection id="1" in_link="1"  out_link="2" />
+			<roadconnection id="2" in_link="2"  out_link="3" />
+			<roadconnection id="3" in_link="8"  out_link="3" out_link_lanes="4#5" />
+			<roadconnection id="4" in_link="3"  out_link="4" />
+			<roadconnection id="5" in_link="3"  out_link="9" in_link_lanes="4#5" />
+			<roadconnection id="6" in_link="4"  out_link="5" />
+			<roadconnection id="7" in_link="4"  out_link="10" in_link_lanes="3#4" />
+			<roadconnection id="8" in_link="5"  out_link="6" />
+			<roadconnection id="9" in_link="11" out_link="6" out_link_lanes="2#3" />
+		</roadconnections> -->
+	</network>
+
+	<demands>
+		<demand link_id="1" commodity_id="0" dt="1000">1500,0</demand>
+		<demand link_id="8" commodity_id="0" dt="1000">1500,0</demand>
+		<demand link_id="11" commodity_id="0" dt="1000">1500,0</demand>
+	</demands>
+
+	<splits>
+		<split_node commodity_id="0" node_id="2" link_in="1">
+			<split link_out="7">0.1</split>
+		</split_node>
+
+		<split_node commodity_id="0" node_id="4" link_in="3">
+			<split link_out="9">0.1</split>
+		</split_node>
+
+		<split_node commodity_id="0" node_id="5" link_in="4">
+			<split link_out="10">0.1</split>
+		</split_node>
+
+		<split_node commodity_id="0" node_id="17" link_in="16">
+			<split link_out="18">0.1</split>
+		</split_node>
+
+
+	</splits>
+
+</scenario>
+
+
+
+
+<prj xmlns="https://github.com/ucbtrans/opt">
+	<scns>
+		<scn name="scenarioA" file="two_fwy.xml">
+			<lnks>
+				<lnk id="1" name="lA1"/>
+				<lnk id="2" name="lA2"/>
+				<lnk id="3" name="lA3"/>
+				<lnk id="4" name="lA4"/>
+				<lnk id="5" name="lA5"/>
+				<lnk id="6" name="lA6"/>
+				<lnk id="7" name="lA7"/>
+				<lnk id="8" name="lA8"/>
+				<lnk id="9" name="lA9"/>
+				<lnk id="10" name="lA10"/>
+				<lnk id="11" name="lA11"/>
+				<lnk id="12" name="lA12"/>
+				<lnk id="13" name="lA13"/>
+				<lnk id="14" name="lA14"/>
+				<lnk id="15" name="lA15"/>
+				<lnk id="16" name="lA16"/>
+				<lnk id="17" name="lA17"/>
+				<lnk id="18" name="lA18"/>
+			</lnks>
+			<sgmts>
+				<sgmt name="sA1" links="1,7"/>
+				<sgmt name="sA2" links="2"/>
+				<sgmt name="sA3" links="3,8,9"/>
+				<sgmt name="sA4" links="4,10"/>
+				<sgmt name="sA5" links="5"/>
+				<sgmt name="sA6" links="6,11"/>
+				<sgmt name="sA7" links="12"/>
+				<sgmt name="sA8" links="13,15"/>
+				<sgmt name="sA9" links="16,18"/>
+				<sgmt name="sa" links="14"/>
+				<sgmt name="sb" links="17"/>
+			</sgmts>
+		</scn>
+	</scns>
+</prj>
+
