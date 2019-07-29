@@ -19,13 +19,13 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox id="topPane" fx:id="topPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.AppMainController">
+<VBox id="topPane" fx:id="topPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.AppMainController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
         <Menu mnemonicParsing="false" text="File">
           <items>
-            <MenuItem id="menuFileNewProject" fx:id="menuFileNewProject" mnemonicParsing="false" text="New Project">
+            <MenuItem id="menuFileNewProject" fx:id="menuFileNewProject" mnemonicParsing="false" onAction="#onClickMenuFileNew" text="New Project">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
@@ -74,11 +74,11 @@
                   <TreeView id="projectTree" fx:id="projectTree" prefHeight="511.0" prefWidth="248.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
-            <TabPane tabClosingPolicy="UNAVAILABLE">
+            <TabPane id="actionPane" fx:id="actionPane" tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                <Tab fx:id="actionTabPane" text="Configuration" />
-                <Tab text="Simulation" />
-                  <Tab text="Reports" />
+                <Tab id="configTabPane" fx:id="configTabPane" text="Configuration" />
+                <Tab id="simTabPane" fx:id="simTabPane" disable="true" text="Simulation" />
+                  <Tab id="reportTabPane" fx:id="reportTabPane" disable="true" text="Reports" />
               </tabs>
             </TabPane>
             <AnchorPane prefHeight="200.0" prefWidth="200.0" />

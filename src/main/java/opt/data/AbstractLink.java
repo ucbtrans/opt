@@ -82,6 +82,10 @@ public abstract class AbstractLink {
     public Long get_id(){
         return id;
     }
+    
+    public String get_name(){
+        return name;
+    }
 
     public Segment get_segment(){
         return mysegment;
