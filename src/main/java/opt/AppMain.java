@@ -24,10 +24,14 @@ import javafx.scene.image.Image;
  */
 public class AppMain extends Application {
     
+    protected AppMainController main_controller;
+    
     @Override
     public void start(Stage primaryStage) throws IOException {
         
-        VBox root = (VBox)FXMLLoader.load(getClass().getResource("/opt_main.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/opt_main.fxml"));
+        VBox root = (VBox)loader.load();
+        main_controller = loader.getController();
         Scene scene = new Scene(root, 1200, 800);
         //setUserAgentStylesheet(STYLESHEET_CASPIAN);
         setUserAgentStylesheet(STYLESHEET_MODENA);
@@ -36,6 +40,11 @@ public class AppMain extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+    
+    public void stop() throws IOException {
+        main_controller.toSaveProjectOrNot();
+    }
+    
 
     /**
      * @param args the command line arguments
