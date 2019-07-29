@@ -8,7 +8,7 @@ import java.util.*;
 public class Scenario {
 
     protected Map<Long, Node> nodes = new HashMap<>();
-    protected Map<Long, AbstractLink> links = new HashMap<>();
+    protected Map<Long, Link> links = new HashMap<>();
     protected Map<Long, Commodity> commodities = new HashMap<>();
 
     /////////////////////////////////////
@@ -35,16 +35,16 @@ public class Scenario {
 
             if (network.getLinks()!=null)
                 for(jaxb.Link jlink : network.getLinks().getLink()) {
-                    AbstractLink link;
+                    Link link;
                     switch(jlink.getRoadType()){
                         case "ramp":
-                            link = new LinkRamp(jlink,road_params.get(jlink.getRoadparam()));
+                            link = new Link(jlink,Link.Type.ramp,road_params.get(jlink.getRoadparam()));
                             break;
                         case "mainline":
-                            link = new LinkFreeway(jlink,road_params.get(jlink.getRoadparam()));
+                            link = new Link(jlink,Link.Type.freeway,road_params.get(jlink.getRoadparam()));
                             break;
                         case "connector":
-                            link = new LinkConnector(jlink,road_params.get(jlink.getRoadparam()));
+                            link = new Link(jlink,Link.Type.connector,road_params.get(jlink.getRoadparam()));
                             break;
                         default:
                             throw new Exception("Bad road type");
@@ -70,7 +70,7 @@ public class Scenario {
             jscn_cpy.nodes.put(e.getKey(), new Node(e.getKey()));
 
         // create new links
-        for (Map.Entry<Long, AbstractLink> e : links.entrySet())
+        for (Map.Entry<Long, Link> e : links.entrySet())
             jscn_cpy.links.put(e.getKey(),e.getValue().deep_copy());
 
         // set node inlinks and outlinks
@@ -107,7 +107,7 @@ public class Scenario {
 
     protected Set<RoadParam> get_road_params(){
         Set<RoadParam> road_params = new HashSet<>();
-        for(AbstractLink link : links.values())
+        for(Link link : links.values())
             road_params.add(new RoadParam(link.capacity_vphpl,link.ff_speed_kph,link.jam_density_vpkpl));
 
         // set ids
@@ -161,7 +161,7 @@ public class Scenario {
         // links
         jaxb.Links jLinks = new jaxb.Links();
         jNet.setLinks(jLinks);
-        for(AbstractLink link : links.values()){
+        for(Link link : links.values()){
             jaxb.Link jaxbLink = new jaxb.Link();
             jaxbLink.setId(link.id);
             jaxbLink.setLength(link.length_meters);
@@ -169,11 +169,11 @@ public class Scenario {
             jaxbLink.setEndNodeId(link.end_node_id);
             jaxbLink.setStartNodeId(link.start_node_id);
 
-            if(link instanceof LinkFreeway)
+            if(link.type==Link.Type.freeway)
                 jaxbLink.setRoadType("mainline");
-            if(link instanceof LinkRamp)
+            if(link.type==Link.Type.ramp)
                 jaxbLink.setRoadType("ramp");
-            if(link instanceof LinkConnector)
+            if(link.type==Link.Type.connector)
                 jaxbLink.setRoadType("connector");
 
             // road params

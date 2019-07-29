@@ -32,13 +32,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.prefs.Preferences;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.stage.Stage;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
@@ -46,17 +43,15 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import opt.config.LinkEditorController;
-import opt.data.AbstractLink;
+import opt.data.Link;
 import opt.data.FreewayScenario;
 import opt.data.ProjectFactory;
 import opt.data.Project;
-import opt.data.Segment;
 
 
 /**
@@ -254,7 +249,7 @@ public class AppMainController {
             
             TreeItem<String> links_node = new TreeItem<String>(roadLinksTreeItem);
             scenario_node.getChildren().add(links_node);
-            for (AbstractLink link : scenario.get_links()) {
+            for (Link link : scenario.get_links()) {
                 TreeItem<String> link_node = new TreeItem<String>(link.get_name());
                 links_node.getChildren().add(link_node);
             }

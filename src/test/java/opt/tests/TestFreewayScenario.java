@@ -1,6 +1,6 @@
 package opt.tests;
 
-import opt.data.AbstractLink;
+import opt.data.Link;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
 import opt.data.Segment;
@@ -8,7 +8,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collection;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -34,7 +33,7 @@ public class TestFreewayScenario extends AbstractTest {
     @Test
     public void test_get_links(){
         TestData X = new TestData();
-        Collection<AbstractLink> links = X.scenario.get_links();
+        Collection<Link> links = X.scenario.get_links();
         assertNotNull(links);
         assertEquals(18,links.size());
     }

@@ -4,12 +4,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
-public abstract class AbstractLink {
+public class Link {
 
-    public enum Type {freeway,onramp,offramp,connector}
+    public enum Type {freeway,ramp,connector}
 
     protected long id;
     protected String name;
+    protected Type type;
     protected long start_node_id;
     protected long end_node_id;
     protected int full_lanes;
@@ -25,8 +26,9 @@ public abstract class AbstractLink {
     // construction
     /////////////////////////////////////
 
-    public AbstractLink(jaxb.Link link, jaxb.Roadparam rp){
+    public Link(jaxb.Link link, Type type, jaxb.Roadparam rp){
         this.id = link.getId();
+        this.type = type;
         this.start_node_id = link.getStartNodeId();
         this.end_node_id = link.getEndNodeId();
         this.full_lanes = link.getFullLanes();
@@ -36,9 +38,9 @@ public abstract class AbstractLink {
         this.ff_speed_kph = rp.getSpeed();
     }
 
-    public AbstractLink(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph,Segment mysegment) {
-
+    public Link(Long id, Type type, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
         this.id = id;
+        this.type = type;
         this.start_node_id = start_node_id;
         this.end_node_id = end_node_id;
         this.full_lanes = full_lanes;
@@ -51,12 +53,13 @@ public abstract class AbstractLink {
 
     }
 
-    public AbstractLink deep_copy(){
-        AbstractLink new_link = null;
+    public Link deep_copy(){
+        Link new_link = null;
         try {
-            Constructor<AbstractLink> constr = (Constructor<AbstractLink>)getClass().getConstructor(Long.class, Long.class, Long.class, Integer.class, Float.class, Float.class, Float.class, Float.class, Segment.class);
+            Constructor<Link> constr = (Constructor<Link>)getClass().getConstructor(Long.class,Link.Type.class, Long.class, Long.class, Integer.class, Float.class, Float.class, Float.class, Float.class, Segment.class);
             new_link = constr.newInstance(
                     id,
+                    type,
                     start_node_id,
                     end_node_id,
                     full_lanes,
@@ -126,8 +129,9 @@ public abstract class AbstractLink {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AbstractLink that = (AbstractLink) o;
+        Link that = (Link) o;
         return id == that.id &&
+                type== that.type &&
                 start_node_id == that.start_node_id &&
                 end_node_id == that.end_node_id &&
                 full_lanes == that.full_lanes &&
@@ -140,6 +144,6 @@ public abstract class AbstractLink {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, start_node_id, end_node_id, full_lanes, length_meters, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+        return Objects.hash(id, type, name, start_node_id, end_node_id, full_lanes, length_meters, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 }

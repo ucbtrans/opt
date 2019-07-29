@@ -39,7 +39,7 @@ public class FreewayScenario {
         if (jaxb_lnks!=null){
             for(jaxbopt.Lnk lnk : jaxb_lnks.getLnk()){
                 if (scenario.links.containsKey(lnk.getId())){
-                    AbstractLink link = scenario.links.get(lnk.getId());
+                    Link link = scenario.links.get(lnk.getId());
                     if( link.name!=null )
                         throw new Exception("Link named twice");
                     link.name = lnk.getName();
@@ -80,24 +80,24 @@ public class FreewayScenario {
 
             // upstream mainline segment ..............
             Node start_node = scenario.nodes.get(segment.fwy().start_node_id);
-            Set<Long> segments_ml_up = start_node.in_links.stream()
+            Set<Long> segments_fwy_up = start_node.in_links.stream()
                     .map(id->scenario.links.get(id))
-                    .filter(link->!(link instanceof LinkRamp))
+                    .filter(link->link.type!=Link.Type.ramp)
                     .map(link -> link.mysegment.id)
                     .filter(seg->seg!=segment.id)
                     .collect(toSet());
 
-            if (segments_ml_up.size()>1)
+            if (segments_fwy_up.size()>1)
                 throw new Exception("Level 3 networks has not been implemented");
 
-            if (segments_ml_up.size()==1)
-                segment.segment_fwy_up_id = segments_ml_up.iterator().next();
+            if (segments_fwy_up.size()==1)
+                segment.segment_fwy_up_id = segments_fwy_up.iterator().next();
 
             // downstream mainline segment ..............
             Node end_node = scenario.nodes.get(segment.fwy().end_node_id);
             Set<Long> segments_ml_dn = end_node.out_links.stream()
                     .map(id->scenario.links.get(id))
-                    .filter(link->!(link instanceof LinkRamp))
+                    .filter(link->link.type!=Link.Type.ramp)
                     .map(link -> link.mysegment.id)
                     .filter(seg->seg!=segment.id)
                     .collect(toSet());
@@ -113,7 +113,7 @@ public class FreewayScenario {
                 end_node = scenario.nodes.get(segment.fr().end_node_id);
                 Set<Long> segments_fr_dn = end_node.out_links.stream()
                         .map(id->scenario.links.get(id))
-                        .filter(link->link instanceof LinkConnector)
+                        .filter(link->link.type==Link.Type.connector)
                         .map(link -> link.mysegment.id)
                         .filter(seg->seg!=segment.id)
                         .collect(toSet());
@@ -130,7 +130,7 @@ public class FreewayScenario {
                 start_node = scenario.nodes.get(segment.or().start_node_id);
                 Set<Long> segments_or_up = start_node.in_links.stream()
                         .map(id->scenario.links.get(id))
-                        .filter(link->link instanceof LinkConnector)
+                        .filter(link->link.type==Link.Type.connector)
                         .map(link -> link.mysegment.id)
                         .filter(seg->seg!=segment.id)
                         .collect(toSet());
@@ -159,7 +159,7 @@ public class FreewayScenario {
                 if(!scenario.links.containsKey(dem.getLinkId()))
                     throw new Exception("Bad link id in demand profile.");
 
-                AbstractLink link = scenario.links.get(dem.getLinkId());
+                Link link = scenario.links.get(dem.getLinkId());
 
                 if(!link.is_source())
                     throw new Exception("Demand assigned to invalid link.");
@@ -197,12 +197,12 @@ public class FreewayScenario {
 
                 // from the splits of jsplitnode, extract the outlinks.
                 // Identify the offramp, and ignore the rest.
-                Set<AbstractLink> jofframps = new HashSet<>();
+                Set<Link> jofframps = new HashSet<>();
                 for(jaxb.Split split : jsplitnode.getSplit()){
                     if(!scenario.links.containsKey(split.getLinkOut()))
                         throw new Exception("Bad outlink in splits");
-                    AbstractLink outlink = scenario.links.get(split.getLinkOut());
-                    if ( !(outlink instanceof LinkFreeway) )
+                    Link outlink = scenario.links.get(split.getLinkOut());
+                    if ( outlink.type!=Link.Type.freeway )
                         jofframps.add(outlink);
                 }
 
@@ -210,7 +210,7 @@ public class FreewayScenario {
                 if(jofframps.size()!=1)
                     throw new Exception("Stranprojecge error: Please report code 2303409.");
 
-                LinkRamp offramp = (LinkRamp) jofframps.iterator().next();
+                Link offramp = jofframps.iterator().next();
                 Segment segment = offramp.mysegment;
 
                 // the link in should be the mainline
@@ -268,7 +268,7 @@ public class FreewayScenario {
         return name;
     }
 
-    public Set<AbstractLink> get_links(){
+    public Set<Link> get_links(){
         return segments.values().stream()
                 .flatMap(sgmt->sgmt.get_links().stream())
                 .collect(Collectors.toSet());
@@ -432,7 +432,7 @@ public class FreewayScenario {
 
         jaxbopt.Lnks lnks = new jaxbopt.Lnks();
         scn.setLnks(lnks);
-        for(AbstractLink link : get_links()){
+        for(Link link : get_links()){
             jaxbopt.Lnk lnk = new jaxbopt.Lnk();
             lnk.setId(link.id);
             lnk.setName(link.name);
@@ -441,7 +441,7 @@ public class FreewayScenario {
         return scn;
     }
 
-    protected AbstractLink get_link(Long id){
+    protected Link get_link(Long id){
         return scenario.links.get(id);
     }
 

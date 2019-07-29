@@ -53,32 +53,32 @@ public class Segment {
         this.name = sgmt.getName();
 
         List<Long> link_ids = OTMUtils.csv2longlist(sgmt.getLinks());
-        List<AbstractLink> links = link_ids.stream()
+        List<Link> links = link_ids.stream()
                 .map(link_id->fwy_scenario.scenario.links.get(link_id))
                 .collect(Collectors.toList());
 
         // find mainline link
-        Set<AbstractLink> fwy_links = links.stream()
-                .filter(link->link instanceof LinkFreeway || link instanceof LinkConnector)
+        Set<Link> fwy_links = links.stream()
+                .filter(link->link.type==Link.Type.freeway || link.type== Link.Type.connector)
                 .collect(Collectors.toSet());
 
         // check exactly one mailine link
         if( fwy_links.size()!=1 )
             throw new Exception("All segments must contain exactly one mainline link");
 
-        AbstractLink fwy = fwy_links.iterator().next();
+        Link fwy = fwy_links.iterator().next();
         fwy_id = fwy.id;
         links.remove(fwy);
 
         // check that what is remaining are at most two and all ramps
         if (links.size()>2)
             throw new Exception("Segment has too many links");
-        if (!links.stream().allMatch(link->link instanceof LinkRamp))
+        if (!links.stream().allMatch(link->link.type==Link.Type.ramp))
             throw new Exception("Links in a segment must be either freeway or ramp");
 
         // find onramps
-        Set<AbstractLink> ors = links.stream()
-                .filter(link-> link instanceof LinkRamp)
+        Set<Link> ors = links.stream()
+                .filter(link-> link.type==Link.Type.ramp)
                 .filter(link-> link.end_node_id==fwy.start_node_id || link.end_node_id==fwy.end_node_id)
                 .collect(Collectors.toSet());
 
@@ -86,14 +86,14 @@ public class Segment {
         if (!ors.isEmpty()){
             if(ors.size()>1)
                 throw new Exception("At most one onramp per segment");
-            AbstractLink or = ors.iterator().next();
+            Link or = ors.iterator().next();
             or_id = or.id;
             links.remove(or);
         }
 
         // find offramps
-        Set<AbstractLink> frs = links.stream()
-                .filter(link-> link instanceof LinkRamp)
+        Set<Link> frs = links.stream()
+                .filter(link-> link.type==Link.Type.ramp)
                 .filter(link-> link.start_node_id==fwy.start_node_id || link.start_node_id==fwy.end_node_id)
                 .collect(Collectors.toSet());
 
@@ -101,7 +101,7 @@ public class Segment {
         if (!frs.isEmpty()){
             if(frs.size()>1)
                 throw new Exception("At most one offramp per segment");
-            AbstractLink fr = frs.iterator().next();
+            Link fr = frs.iterator().next();
             fr_id = fr.id;
             links.remove(fr);
         }
@@ -186,8 +186,8 @@ public class Segment {
     // network
     /////////////////////////////////////
 
-    public Set<AbstractLink> get_links(){
-        Set<AbstractLink> x = new HashSet<>();
+    public Set<Link> get_links(){
+        Set<Link> x = new HashSet<>();
         x.add(fwy());
         if(or_id!=null)
             x.add(or());
@@ -229,11 +229,11 @@ public class Segment {
      * Get the links that are immediately upstream from this one
      * @return Set<Link>
      */
-    public Set<AbstractLink> get_upstrm_links(){
-        AbstractLink fwy = fwy();
-        Set<AbstractLink> x = new HashSet<>();
+    public Set<Link> get_upstrm_links(){
+        Link fwy = fwy();
+        Set<Link> x = new HashSet<>();
         for (Segment seg : get_upstrm_segments()){
-            for (AbstractLink link : seg.get_links()){
+            for (Link link : seg.get_links()){
                 if (link.end_node_id==fwy.start_node_id )
                     x.add(link);
                 if( has_onramp() && link.end_node_id==or().start_node_id)
@@ -260,11 +260,11 @@ public class Segment {
      * Get the links that are immediately downstream from this one
      * @return Set<Link>
      */
-    public Set<AbstractLink> get_dnstrm_links(){
-        AbstractLink fwy = fwy();
-        Set<AbstractLink> x = new HashSet<>();
+    public Set<Link> get_dnstrm_links(){
+        Link fwy = fwy();
+        Set<Link> x = new HashSet<>();
         for (Segment seg : get_dnstrm_segments()){
-            for (AbstractLink link : seg.get_links()){
+            for (Link link : seg.get_links()){
                 if (link.start_node_id==fwy.end_node_id )
                     x.add(link);
                 if( has_offramp() && link.start_node_id==fr().end_node_id)
@@ -289,8 +289,9 @@ public class Segment {
         connect_segment_to_downstream_node(get_upstrm_fwy_segment(),new_node);
 
         // create new freeway link
-        LinkFreeway new_link = new LinkFreeway(
+        Link new_link = new Link(
                 fwy_scenario.new_link_id(),
+                Link.Type.freeway,
                 new_node.id,
                 existing_node.id,
                 get_mixed_lanes(),
@@ -323,7 +324,7 @@ public class Segment {
         if (!has_onramp())
             return null;
 
-        LinkRamp or = or();
+        Link or = or();
 
         // existing node and new node
         Node existing_node = fwy_scenario.scenario.nodes.get(or.end_node_id);
@@ -333,8 +334,9 @@ public class Segment {
         connect_segment_to_downstream_node(get_upstrm_or_segment(),new_node);
 
         // create new freeway link
-        LinkConnector new_link = new LinkConnector(
+        Link new_link = new Link(
                 fwy_scenario.new_link_id(),
+                Link.Type.connector,
                 new_node.id,
                 existing_node.id,
                 get_mixed_lanes(),
@@ -377,8 +379,9 @@ public class Segment {
         connect_segment_to_upstream_node(get_dnstrm_fwy_segment(),new_node);
 
         // create new freeway link
-        LinkFreeway new_link = new LinkFreeway(
+        Link new_link = new Link(
                 fwy_scenario.new_link_id(),
+                Link.Type.freeway,
                 existing_node.id,
                 new_node.id,
                 get_mixed_lanes(),
@@ -410,7 +413,7 @@ public class Segment {
         if (!has_offramp())
             return null;
 
-        LinkRamp fr = fr();
+        Link fr = fr();
 
         // existing node and new node
         Node existing_node = fwy_scenario.scenario.nodes.get(fr.start_node_id);
@@ -420,8 +423,9 @@ public class Segment {
         connect_segment_to_upstream_node(get_dnstrm_fr_segment(),new_node);
 
         // create new freeway link
-        LinkConnector new_link = new LinkConnector(
+        Link new_link = new Link(
                 fwy_scenario.new_link_id(),
+                Link.Type.connector,
                 existing_node.id,
                 new_node.id,
                 get_mixed_lanes(),
@@ -471,7 +475,7 @@ public class Segment {
 
     public double get_fr_max_vehicles(){
         if(has_offramp()){
-            AbstractLink fr = fr();
+            Link fr = fr();
             return fr.jam_density_vpkpl * fr.full_lanes * fr.length_meters / 1000f;
         }
         else return 0d;
@@ -503,7 +507,7 @@ public class Segment {
             throw new Exception("Invalid max vehicles");
         if(!has_offramp())
             add_offramp();
-        AbstractLink fr = fr();
+        Link fr = fr();
         fr.jam_density_vpkpl = x / (fr.length_meters /1000f) / fr.full_lanes;
     }
 
@@ -514,7 +518,7 @@ public class Segment {
     public boolean delete_offramp(){
         if(!has_offramp() || segment_fr_dn_id!=null)
             return false;
-        AbstractLink fr = fr();
+        Link fr = fr();
         fwy_scenario.scenario.nodes.remove(fr.end_node_id);
         fwy_scenario.scenario.links.remove(fr.id);
         if(fwy_scenario.scenario.nodes.containsKey(fr.start_node_id)){
@@ -530,7 +534,7 @@ public class Segment {
         if(has_offramp())
             return;
         long id = fwy_scenario.new_link_id();
-        AbstractLink fwy = fwy();
+        Link fwy = fwy();
         long start_node_id = fwy.start_node_id;
         Node end_node = new Node(fwy_scenario.new_node_id());
         long end_node_id = end_node.id;
@@ -540,7 +544,7 @@ public class Segment {
         float jam_density_vpkpl = default_fr_jam_density_vpkpl;
         float ff_speed_kph = default_fr_ff_speed_kph;
 
-        LinkRamp fr = new LinkRamp(id,start_node_id,end_node_id,full_lanes,length,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
+        Link fr = new Link(id,Link.Type.ramp,start_node_id,end_node_id,full_lanes,length,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
         fr_id = fr.id;
         fr.mysegment = this;
         end_node.in_links.add(fr_id);
@@ -570,7 +574,7 @@ public class Segment {
 
     public double get_or_max_vehicles(){
         if (has_onramp()){
-            AbstractLink or = or();
+            Link or = or();
             return or.jam_density_vpkpl * or.full_lanes * or.length_meters / 1000f;
         }
         else return 0d;
@@ -596,7 +600,7 @@ public class Segment {
     public void set_or_max_vehicles(float x){
         if(!has_onramp())
             add_onramp();
-        AbstractLink or = or();
+        Link or = or();
         or.jam_density_vpkpl = x / (or.length_meters /1000f) / or.full_lanes;
     }
 
@@ -607,7 +611,7 @@ public class Segment {
     public boolean delete_onramp(){
         if(!has_onramp() || segment_or_up_id!=null)
             return false;
-        AbstractLink or = or();
+        Link or = or();
         fwy_scenario.scenario.nodes.remove(or.start_node_id);
         fwy_scenario.scenario.links.remove(or.id);
         if(fwy_scenario.scenario.nodes.containsKey(or.end_node_id)) {
@@ -634,7 +638,7 @@ public class Segment {
         float capacity_vphpl = default_or_capacity_vphpl;
         float jam_density_vpkpl = default_or_jam_density_vpkpl;
         float ff_speed_kph = default_or_ff_speed_kph;
-        AbstractLink or = new LinkRamp(id,start_node_id,end_node_id,full_lanes,length,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
+        Link or = new Link(id,Link.Type.ramp,start_node_id,end_node_id,full_lanes,length,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
         or_id = or.id;
         or.mysegment = this;
         start_node.out_links.add(or_id);
@@ -785,16 +789,16 @@ public class Segment {
     // protected and private
     /////////////////////////////////////
 
-    protected AbstractLink fwy(){
+    protected Link fwy(){
         return fwy_scenario.get_link(fwy_id);
     }
 
-    protected LinkRamp or(){
-        return has_onramp() ? (LinkRamp) fwy_scenario.get_link(or_id) : null;
+    protected Link or(){
+        return has_onramp() ? fwy_scenario.get_link(or_id) : null;
     }
 
-    protected LinkRamp fr(){
-        return has_offramp() ? (LinkRamp) fwy_scenario.get_link(fr_id) : null;
+    protected Link fr(){
+        return has_offramp() ? fwy_scenario.get_link(fr_id) : null;
     }
 
     protected void set_start_node(long new_start_node){
@@ -855,7 +859,7 @@ public class Segment {
         }
     }
 
-    private Segment create_new_segment(AbstractLink newfwy){
+    private Segment create_new_segment(Link newfwy){
         Long new_seg_id = fwy_scenario.new_seg_id();
         String new_seg_name = String.format("segment %d",new_seg_id);
         Segment newseg = new Segment(fwy_scenario,new_seg_id,new_seg_name,newfwy.id);

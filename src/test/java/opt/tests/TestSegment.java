@@ -1,6 +1,6 @@
 package opt.tests;
 
-import opt.data.AbstractLink;
+import opt.data.Link;
 import opt.data.Segment;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -57,11 +57,11 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_get_links(){
         Segment segment0 = sX.scenario.get_segment_by_name("sA1");
-        Set<AbstractLink> links1 = segment0.get_links();
+        Set<Link> links1 = segment0.get_links();
         assertEquals(links1.stream().map(x->x.get_id()).collect(toSet()),new HashSet(Arrays.asList(1l,7l)));
 
         Segment segment2 = sX.scenario.get_segment_by_name("sA2");
-        Set<AbstractLink> links2 = segment2.get_links();
+        Set<Link> links2 = segment2.get_links();
         assertEquals(links2.stream().map(x->x.get_id()).collect(toSet()),new HashSet(Arrays.asList(2l)));
     }
 
@@ -76,7 +76,7 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_get_upstrm_links(){
         Segment segment = sX.scenario.get_segment_by_name("sA8");
-        Set<AbstractLink> x = segment.get_upstrm_links();
+        Set<Link> x = segment.get_upstrm_links();
         assertEquals(2,x.size());
         assertEquals(new HashSet<>(Arrays.asList(14l,12l)),x.stream().map(link->link.get_id()).collect(toSet()));
     }
@@ -92,7 +92,7 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_get_dnstrm_links(){
         Segment segment = sX.scenario.get_segment_by_name("sA1");
-        Set<AbstractLink> x = segment.get_dnstrm_links();
+        Set<Link> x = segment.get_dnstrm_links();
         assertEquals(2,x.size());
         assertEquals(new HashSet<>(Arrays.asList(2l,12l)),x.stream().map(link->link.get_id()).collect(toSet()));
     }
