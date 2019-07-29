@@ -16,8 +16,7 @@ public class TestProjectFactory extends AbstractTest {
     public void test_load_scenario_from_file(){
 
         try {
-//            String scn_file = get_test_fullpath("two_fwy.xml");
-            String scn_file = "C:\\Users\\gomes\\code\\otm\\otm-base\\src\\main\\resources\\test_configs\\line.xml";
+            String scn_file = get_test_fullpath("two_fwy.xml");
             assertNotNull(JaxbLoader.load_scenario(scn_file,true));
         } catch (OTMException e) {
             e.printStackTrace();

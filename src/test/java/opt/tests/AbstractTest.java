@@ -10,7 +10,7 @@ import static org.junit.Assert.fail;
 
 public abstract class AbstractTest {
 
-    static protected String project_name = "project2.opt";
+    static protected String project_name = "project.opt";
 
     static protected String get_test_fullpath(String testname){
         return (new File("src/test/resources/" + testname)).getAbsolutePath();

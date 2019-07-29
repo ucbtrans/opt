@@ -5,6 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
 public abstract class AbstractLink {
+
+    public enum Type {freeway,onramp,offramp,connector}
+
     protected long id;
     protected String name;
     protected long start_node_id;

@@ -41,7 +41,7 @@ public class Scenario {
                             link = new LinkRamp(jlink,road_params.get(jlink.getRoadparam()));
                             break;
                         case "mainline":
-                            link = new LinkMainline(jlink,road_params.get(jlink.getRoadparam()));
+                            link = new LinkFreeway(jlink,road_params.get(jlink.getRoadparam()));
                             break;
                         case "connector":
                             link = new LinkConnector(jlink,road_params.get(jlink.getRoadparam()));
@@ -169,7 +169,7 @@ public class Scenario {
             jaxbLink.setEndNodeId(link.end_node_id);
             jaxbLink.setStartNodeId(link.start_node_id);
 
-            if(link instanceof LinkMainline)
+            if(link instanceof LinkFreeway)
                 jaxbLink.setRoadType("mainline");
             if(link instanceof LinkRamp)
                 jaxbLink.setRoadType("ramp");
@@ -206,8 +206,8 @@ public class Scenario {
                     if(profile.dt!=null)
                         jsplitnode.setDt(profile.dt);
                     jsplitnode.setStartTime(profile.start_time);
-                    jsplitnode.setLinkIn(segment.ml_id);
-                    jsplitnode.setNodeId(segment.ml().end_node_id);
+                    jsplitnode.setLinkIn(segment.fwy_id);
+                    jsplitnode.setNodeId(segment.fwy().end_node_id);
                     jsplit.setLinkOut(segment.fr_id);
                     jsplit.setContent(OTMUtils.comma_format(profile.values));
                 }
@@ -226,8 +226,8 @@ public class Scenario {
                 }
             }
 
-            if(!segment.ml_demands.isEmpty()) {
-                for (Map.Entry<Long, Profile1D> e : segment.ml_demands.entrySet()) {
+            if(!segment.fwy_demands.isEmpty()) {
+                for (Map.Entry<Long, Profile1D> e : segment.fwy_demands.entrySet()) {
                     jaxb.Demand jdemand = new jaxb.Demand();
                     jdemands.getDemand().add(jdemand);
                     jdemand.setCommodityId(e.getKey());
@@ -235,7 +235,7 @@ public class Scenario {
                     if(profile.dt!=null)
                         jdemand.setDt(profile.dt);
                     jdemand.setStartTime(profile.start_time);
-                    jdemand.setLinkId(segment.ml_id);
+                    jdemand.setLinkId(segment.fwy_id);
                     jdemand.setContent(OTMUtils.comma_format(profile.get_values()));
                 }
             }

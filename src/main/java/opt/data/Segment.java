@@ -22,17 +22,17 @@ public class Segment {
 
     protected String name;
     protected final long id;
-    protected Long ml_id = null;
+    protected Long fwy_id = null;
     protected Long or_id = null;
     protected Long fr_id = null;
 
     // maps to adjacent segments
-    protected Long segment_ml_dn_id;
-    protected Long segment_ml_up_id;
+    protected Long segment_fwy_dn_id;
+    protected Long segment_fwy_up_id;
     protected Long segment_fr_dn_id;
     protected Long segment_or_up_id;
 
-    protected Map<Long,Profile1D> ml_demands = new HashMap<>();     // commodity -> Profile1D
+    protected Map<Long,Profile1D> fwy_demands = new HashMap<>();     // commodity -> Profile1D
     protected Map<Long,Profile1D> or_demands = new HashMap<>();     // commodity -> Profile1D
     protected Map<Long,Profile1D> fr_splits = new HashMap<>();      // commodity -> Profile1D
 
@@ -58,28 +58,28 @@ public class Segment {
                 .collect(Collectors.toList());
 
         // find mainline link
-        Set<AbstractLink> ml_links = links.stream()
-                .filter(link->link instanceof LinkMainline || link instanceof LinkConnector)
+        Set<AbstractLink> fwy_links = links.stream()
+                .filter(link->link instanceof LinkFreeway || link instanceof LinkConnector)
                 .collect(Collectors.toSet());
 
         // check exactly one mailine link
-        if( ml_links.size()!=1 )
+        if( fwy_links.size()!=1 )
             throw new Exception("All segments must contain exactly one mainline link");
 
-        AbstractLink ml = ml_links.iterator().next();
-        ml_id = ml.id;
-        links.remove(ml);
+        AbstractLink fwy = fwy_links.iterator().next();
+        fwy_id = fwy.id;
+        links.remove(fwy);
 
         // check that what is remaining are at most two and all ramps
         if (links.size()>2)
             throw new Exception("Segment has too many links");
         if (!links.stream().allMatch(link->link instanceof LinkRamp))
-            throw new Exception("Links in a segment must be either mainline or ramp");
+            throw new Exception("Links in a segment must be either freeway or ramp");
 
         // find onramps
         Set<AbstractLink> ors = links.stream()
                 .filter(link-> link instanceof LinkRamp)
-                .filter(link-> link.end_node_id==ml.start_node_id || link.end_node_id==ml.end_node_id)
+                .filter(link-> link.end_node_id==fwy.start_node_id || link.end_node_id==fwy.end_node_id)
                 .collect(Collectors.toSet());
 
         // at most one onramp
@@ -94,7 +94,7 @@ public class Segment {
         // find offramps
         Set<AbstractLink> frs = links.stream()
                 .filter(link-> link instanceof LinkRamp)
-                .filter(link-> link.start_node_id==ml.start_node_id || link.start_node_id==ml.end_node_id)
+                .filter(link-> link.start_node_id==fwy.start_node_id || link.start_node_id==fwy.end_node_id)
                 .collect(Collectors.toSet());
 
         // at most one offramp
@@ -111,27 +111,27 @@ public class Segment {
     }
 
     // used by Segment.create_new_segment
-    public Segment(FreewayScenario fwy_scenario,long id,String name,Long ml_id){
+    public Segment(FreewayScenario fwy_scenario,long id,String name,Long fwy_id){
         this.fwy_scenario = fwy_scenario;
         this.id = id;
         this.name = name;
-        this.ml_id = ml_id;
+        this.fwy_id = fwy_id;
     }
 
     public Segment deep_copy(FreewayScenario scenario){
         Segment seg_cpy = new Segment(id);
         seg_cpy.name = name;
         seg_cpy.fwy_scenario = scenario;
-        seg_cpy.ml_id = ml_id;
+        seg_cpy.fwy_id = fwy_id;
         seg_cpy.or_id = or_id;
         seg_cpy.fr_id = fr_id;
-        seg_cpy.segment_ml_dn_id = segment_ml_dn_id;
-        seg_cpy.segment_ml_up_id = segment_ml_up_id;
+        seg_cpy.segment_fwy_dn_id = segment_fwy_dn_id;
+        seg_cpy.segment_fwy_up_id = segment_fwy_up_id;
         seg_cpy.segment_fr_dn_id = segment_fr_dn_id;
         seg_cpy.segment_or_up_id = segment_or_up_id;
 
-        for(Map.Entry<Long,Profile1D> e : ml_demands.entrySet())
-            seg_cpy.ml_demands.put(e.getKey(),e.getValue().clone());
+        for(Map.Entry<Long,Profile1D> e : fwy_demands.entrySet())
+            seg_cpy.fwy_demands.put(e.getKey(),e.getValue().clone());
 
         for(Map.Entry<Long,Profile1D> e : or_demands.entrySet())
             seg_cpy.or_demands.put(e.getKey(), e.getValue().clone());
@@ -169,7 +169,7 @@ public class Segment {
      * @return float
      */
     public float get_length_meters(){
-        return ml().length_meters;
+        return fwy().length_meters;
     }
 
     /**
@@ -179,7 +179,7 @@ public class Segment {
     public void set_length_meters(float newlength) throws Exception {
         if (newlength<=0.0001)
             throw new Exception("Attempted to set a non-positive segment length");
-        ml().length_meters = newlength;
+        fwy().length_meters = newlength;
     }
 
     /////////////////////////////////////
@@ -188,7 +188,7 @@ public class Segment {
 
     public Set<AbstractLink> get_links(){
         Set<AbstractLink> x = new HashSet<>();
-        x.add(ml());
+        x.add(fwy());
         if(or_id!=null)
             x.add(or());
         if(fr_id!=null)
@@ -196,16 +196,16 @@ public class Segment {
         return x;
     }
 
-    public Segment get_upstrm_ml_segment(){
-        return segment_ml_up_id==null ? null : fwy_scenario.segments.get(segment_ml_up_id);
+    public Segment get_upstrm_fwy_segment(){
+        return segment_fwy_up_id ==null ? null : fwy_scenario.segments.get(segment_fwy_up_id);
     }
 
     public Segment get_upstrm_or_segment(){
         return segment_or_up_id==null ? null : fwy_scenario.segments.get(segment_or_up_id);
     }
 
-    public Segment get_dnstrm_ml_segment(){
-        return segment_ml_dn_id==null ? null : fwy_scenario.segments.get(segment_ml_dn_id);
+    public Segment get_dnstrm_fwy_segment(){
+        return segment_fwy_dn_id ==null ? null : fwy_scenario.segments.get(segment_fwy_dn_id);
     }
 
     public Segment get_dnstrm_fr_segment(){
@@ -218,8 +218,8 @@ public class Segment {
      */
     public Set<Segment> get_upstrm_segments(){
         Set<Segment> x = new HashSet<>();
-        if (segment_ml_up_id!=null)
-            x.add(fwy_scenario.segments.get(segment_ml_up_id));
+        if (segment_fwy_up_id !=null)
+            x.add(fwy_scenario.segments.get(segment_fwy_up_id));
         if (segment_or_up_id!=null)
             x.add(fwy_scenario.segments.get(segment_or_up_id));
         return x;
@@ -230,18 +230,17 @@ public class Segment {
      * @return Set<Link>
      */
     public Set<AbstractLink> get_upstrm_links(){
-        AbstractLink ml = ml();
+        AbstractLink fwy = fwy();
         Set<AbstractLink> x = new HashSet<>();
         for (Segment seg : get_upstrm_segments()){
             for (AbstractLink link : seg.get_links()){
-                if (link.end_node_id==ml.start_node_id )
+                if (link.end_node_id==fwy.start_node_id )
                     x.add(link);
                 if( has_onramp() && link.end_node_id==or().start_node_id)
                     x.add(link);
             }
         }
         return x;
-
     }
 
     /**
@@ -250,8 +249,8 @@ public class Segment {
      */
     public Set<Segment> get_dnstrm_segments() {
         Set<Segment> x = new HashSet<>();
-        if(segment_ml_dn_id!=null)
-            x.add(fwy_scenario.segments.get(segment_ml_dn_id));
+        if(segment_fwy_dn_id !=null)
+            x.add(fwy_scenario.segments.get(segment_fwy_dn_id));
         if(segment_fr_dn_id!=null)
             x.add(fwy_scenario.segments.get(segment_fr_dn_id));
         return x;
@@ -262,11 +261,11 @@ public class Segment {
      * @return Set<Link>
      */
     public Set<AbstractLink> get_dnstrm_links(){
-        AbstractLink ml = ml();
+        AbstractLink fwy = fwy();
         Set<AbstractLink> x = new HashSet<>();
         for (Segment seg : get_dnstrm_segments()){
             for (AbstractLink link : seg.get_links()){
-                if (link.start_node_id==ml.end_node_id )
+                if (link.start_node_id==fwy.end_node_id )
                     x.add(link);
                 if( has_offramp() && link.start_node_id==fr().end_node_id)
                     x.add(link);
@@ -283,14 +282,14 @@ public class Segment {
     public Segment insert_upstrm_mainline_segment(){
 
         // create new upstream node
-        Node existing_node = fwy_scenario.scenario.nodes.get(ml().start_node_id);
+        Node existing_node = fwy_scenario.scenario.nodes.get(fwy().start_node_id);
         Node new_node = new Node(fwy_scenario.new_node_id());
 
         // connect upstream links to new node
-        connect_segment_to_downstream_node(get_upstrm_ml_segment(),new_node);
+        connect_segment_to_downstream_node(get_upstrm_fwy_segment(),new_node);
 
-        // create new mainline link
-        LinkMainline new_link = new LinkMainline(
+        // create new freeway link
+        LinkFreeway new_link = new LinkFreeway(
                 fwy_scenario.new_link_id(),
                 new_node.id,
                 existing_node.id,
@@ -309,9 +308,9 @@ public class Segment {
 
         // create new segment
         Segment newseg = create_new_segment(new_link);
-        newseg.segment_ml_dn_id = this.id;
-        newseg.segment_ml_up_id = this.segment_ml_up_id;
-        this.segment_ml_up_id = newseg.id;
+        newseg.segment_fwy_dn_id = this.id;
+        newseg.segment_fwy_up_id = this.segment_fwy_up_id;
+        this.segment_fwy_up_id = newseg.id;
 
         // add to fwy scenario
         fwy_scenario.segments.put(newseg.id,newseg);
@@ -333,7 +332,7 @@ public class Segment {
         // connect upstream links to new node
         connect_segment_to_downstream_node(get_upstrm_or_segment(),new_node);
 
-        // create new mainline link
+        // create new freeway link
         LinkConnector new_link = new LinkConnector(
                 fwy_scenario.new_link_id(),
                 new_node.id,
@@ -353,8 +352,8 @@ public class Segment {
 
         // create new segment
         Segment newseg = create_new_segment(new_link);
-        newseg.segment_ml_dn_id = this.id;
-        newseg.segment_ml_up_id = this.segment_or_up_id;
+        newseg.segment_fwy_dn_id = this.id;
+        newseg.segment_fwy_up_id = this.segment_or_up_id;
         this.segment_or_up_id = newseg.id;
 
         // add to fwy scenario
@@ -371,14 +370,14 @@ public class Segment {
     public Segment insert_dnstrm_mainline_segment(){
 
         // existing node and new node
-        Node existing_node = fwy_scenario.scenario.nodes.get(ml().end_node_id);
+        Node existing_node = fwy_scenario.scenario.nodes.get(fwy().end_node_id);
         Node new_node = new Node(fwy_scenario.new_node_id());
 
         // connect downstream links to new node
-        connect_segment_to_upstream_node(get_dnstrm_ml_segment(),new_node);
+        connect_segment_to_upstream_node(get_dnstrm_fwy_segment(),new_node);
 
-        // create new mainline link
-        LinkMainline new_link = new LinkMainline(
+        // create new freeway link
+        LinkFreeway new_link = new LinkFreeway(
                 fwy_scenario.new_link_id(),
                 existing_node.id,
                 new_node.id,
@@ -397,8 +396,8 @@ public class Segment {
 
         // create new segment
         Segment newseg = create_new_segment(new_link);
-        newseg.segment_ml_dn_id = this.segment_ml_dn_id;
-        this.segment_ml_dn_id = newseg.id;
+        newseg.segment_fwy_dn_id = this.segment_fwy_dn_id;
+        this.segment_fwy_dn_id = newseg.id;
 
         // add to fwy scenario
         fwy_scenario.segments.put(newseg.id,newseg);
@@ -420,7 +419,7 @@ public class Segment {
         // connect upstream links to new node
         connect_segment_to_upstream_node(get_dnstrm_fr_segment(),new_node);
 
-        // create new mainline link
+        // create new freeway link
         LinkConnector new_link = new LinkConnector(
                 fwy_scenario.new_link_id(),
                 existing_node.id,
@@ -440,8 +439,8 @@ public class Segment {
 
         // create new segment
         Segment newseg = create_new_segment(new_link);
-        newseg.segment_ml_up_id = this.id;
-        newseg.segment_ml_dn_id = this.segment_fr_dn_id;
+        newseg.segment_fwy_up_id = this.id;
+        newseg.segment_fwy_dn_id = this.segment_fr_dn_id;
         this.segment_fr_dn_id = newseg.id;
 
         // add to fwy scenario
@@ -531,8 +530,8 @@ public class Segment {
         if(has_offramp())
             return;
         long id = fwy_scenario.new_link_id();
-        AbstractLink ml = ml();
-        long start_node_id = ml.start_node_id;
+        AbstractLink fwy = fwy();
+        long start_node_id = fwy.start_node_id;
         Node end_node = new Node(fwy_scenario.new_node_id());
         long end_node_id = end_node.id;
         int full_lanes = 1;
@@ -629,7 +628,7 @@ public class Segment {
         long id = fwy_scenario.new_link_id();
         Node start_node = new Node(fwy_scenario.new_node_id());
         long start_node_id = start_node.id;
-        long end_node_id = ml().end_node_id;
+        long end_node_id = fwy().end_node_id;
         int full_lanes = 1;
         float length = 100f;
         float capacity_vphpl = default_or_capacity_vphpl;
@@ -644,15 +643,15 @@ public class Segment {
     }
 
     /////////////////////////////////////
-    // mainline
+    // freeway
     /////////////////////////////////////
 
-    public String get_ml_name(){
-        return ml().name;
+    public String get_fwy_name(){
+        return fwy().name;
     }
 
     public int get_mixed_lanes(){
-        return ml().full_lanes;
+        return fwy().full_lanes;
     }
 
     public int get_hov_lanes(){
@@ -661,25 +660,25 @@ public class Segment {
     }
 
     public float get_capacity_vphpl(){
-        return ml().capacity_vphpl;
+        return fwy().capacity_vphpl;
     }
 
     public float get_jam_density_vpkpl(){
-        return ml().jam_density_vpkpl;
+        return fwy().jam_density_vpkpl;
     }
 
     public float get_freespeed_kph(){
-        return ml().ff_speed_kph;
+        return fwy().ff_speed_kph;
     }
 
-    public void set_ml_name(String newname) {
-        ml().name = newname;
+    public void set_fwy_name(String newname) {
+        fwy().name = newname;
     }
 
     public void set_mixed_lanes(int x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive number of lanes");
-        ml().full_lanes = x;
+        fwy().full_lanes = x;
     }
 
     public void set_hov_lanes(int x) throws Exception {
@@ -691,19 +690,19 @@ public class Segment {
     public void set_capacity_vphpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive capacity");
-        ml().capacity_vphpl = x;
+        fwy().capacity_vphpl = x;
     }
 
     public void set_jam_density_vpkpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive jam density");
-        ml().jam_density_vpkpl = x;
+        fwy().jam_density_vpkpl = x;
     }
 
     public void set_freespeed_kph(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive free speed");
-        ml().ff_speed_kph = x;
+        fwy().ff_speed_kph = x;
     }
 
     /////////////////////////////////////
@@ -715,8 +714,8 @@ public class Segment {
      * @param comm_id ID for the commodity
      * @return Profile1D object if demand is defined for this commodity. null otherwise.
      */
-    public Profile1D get_ml_demand_vph(long comm_id){
-        return ml_demands.containsKey(comm_id) ? ml_demands.get(comm_id) : null;
+    public Profile1D get_fwy_demand_vph(long comm_id){
+        return fwy_demands.containsKey(comm_id) ? fwy_demands.get(comm_id) : null;
     }
 
     /**
@@ -724,12 +723,12 @@ public class Segment {
      * @param comm_id ID for the commodity
      * @param demand_vph Demand in veh/hr as a Profile1D object
      */
-    public void set_ml_demand_vph(long comm_id,Profile1D demand_vph)throws Exception {
+    public void set_fwy_demand_vph(long comm_id, Profile1D demand_vph)throws Exception {
         OTMErrorLog errorLog = new OTMErrorLog();
         demand_vph.validate(errorLog);
         if (errorLog.haserror())
             throw new Exception(errorLog.format_errors());
-        this.ml_demands.put(comm_id,demand_vph);
+        this.fwy_demands.put(comm_id,demand_vph);
     }
 
     /**
@@ -786,8 +785,8 @@ public class Segment {
     // protected and private
     /////////////////////////////////////
 
-    protected AbstractLink ml(){
-        return fwy_scenario.get_link(ml_id);
+    protected AbstractLink fwy(){
+        return fwy_scenario.get_link(fwy_id);
     }
 
     protected LinkRamp or(){
@@ -799,13 +798,13 @@ public class Segment {
     }
 
     protected void set_start_node(long new_start_node){
-        ml().start_node_id = new_start_node;
+        fwy().start_node_id = new_start_node;
         if(has_offramp())
             fr().start_node_id = new_start_node;
     }
 
     protected void set_end_node(long new_end_node){
-        ml().end_node_id = new_end_node;
+        fwy().end_node_id = new_end_node;
         if(has_onramp())
             or().end_node_id = new_end_node;
     }
@@ -815,10 +814,10 @@ public class Segment {
         if(segment==null)
             return;
 
-        Node old_dwn_node = segment.fwy_scenario.scenario.nodes.get(segment.ml().end_node_id);
-        segment.ml().end_node_id = new_dwn_node.id;
-        old_dwn_node.in_links.remove(segment.ml_id);
-        new_dwn_node.in_links.add(segment.ml_id);
+        Node old_dwn_node = segment.fwy_scenario.scenario.nodes.get(segment.fwy().end_node_id);
+        segment.fwy().end_node_id = new_dwn_node.id;
+        old_dwn_node.in_links.remove(segment.fwy_id);
+        new_dwn_node.in_links.add(segment.fwy_id);
 
         if(segment.has_onramp() && segment.or().end_node_id==old_dwn_node.id) {
             segment.or().end_node_id = new_dwn_node.id;
@@ -838,10 +837,10 @@ public class Segment {
         if(segment==null)
             return;
 
-        Node old_up_node = segment.fwy_scenario.scenario.nodes.get(segment.ml().start_node_id);
-        segment.ml().start_node_id = new_up_node.id;
-        old_up_node.out_links.remove(segment.ml_id);
-        new_up_node.out_links.add(segment.ml_id);
+        Node old_up_node = segment.fwy_scenario.scenario.nodes.get(segment.fwy().start_node_id);
+        segment.fwy().start_node_id = new_up_node.id;
+        old_up_node.out_links.remove(segment.fwy_id);
+        new_up_node.out_links.add(segment.fwy_id);
 
         if(segment.has_onramp() && segment.or().end_node_id==old_up_node.id) {
             segment.or().end_node_id = new_up_node.id;
@@ -856,12 +855,12 @@ public class Segment {
         }
     }
 
-    private Segment create_new_segment(AbstractLink newml){
+    private Segment create_new_segment(AbstractLink newfwy){
         Long new_seg_id = fwy_scenario.new_seg_id();
         String new_seg_name = String.format("segment %d",new_seg_id);
-        Segment newseg = new Segment(fwy_scenario,new_seg_id,new_seg_name,newml.id);
-        newml.mysegment = newseg;
-        newseg.segment_ml_dn_id = this.id;
+        Segment newseg = new Segment(fwy_scenario,new_seg_id,new_seg_name,newfwy.id);
+        newfwy.mysegment = newseg;
+        newseg.segment_fwy_dn_id = this.id;
         return newseg;
     }
 
@@ -878,7 +877,7 @@ public class Segment {
 
     @Override
     public String toString() {
-        return String.format("name\t%s\nfr\t%s\nml:\t%s\nor:\t%s", name, fr_id, ml_id, or_id);
+        return String.format("name\t%s\nfr\t%s\nfwy:\t%s\nor:\t%s", name, fr_id, fwy_id, or_id);
     }
 
     @Override
@@ -888,20 +887,20 @@ public class Segment {
         Segment segment = (Segment) o;
         return id == segment.id &&
                 name.equals(segment.name) &&
-                ml_id.equals(segment.ml_id) &&
+                fwy_id.equals(segment.fwy_id) &&
                 Objects.equals(or_id, segment.or_id) &&
                 Objects.equals(fr_id, segment.fr_id) &&
-                Objects.equals(segment_ml_dn_id, segment.segment_ml_dn_id) &&
-                Objects.equals(segment_ml_up_id, segment.segment_ml_up_id) &&
+                Objects.equals(segment_fwy_dn_id, segment.segment_fwy_dn_id) &&
+                Objects.equals(segment_fwy_up_id, segment.segment_fwy_up_id) &&
                 Objects.equals(segment_fr_dn_id, segment.segment_fr_dn_id) &&
                 Objects.equals(segment_or_up_id, segment.segment_or_up_id) &&
-                ml_demands.equals(segment.ml_demands) &&
+                fwy_demands.equals(segment.fwy_demands) &&
                 or_demands.equals(segment.or_demands) &&
                 fr_splits.equals(segment.fr_splits);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, id, ml_id, or_id, fr_id, segment_ml_dn_id, segment_ml_up_id, segment_fr_dn_id, segment_or_up_id, ml_demands, or_demands, fr_splits);
+        return Objects.hash(name, id, fwy_id, or_id, fr_id, segment_fwy_dn_id, segment_fwy_up_id, segment_fr_dn_id, segment_or_up_id, fwy_demands, or_demands, fr_splits);
     }
 }

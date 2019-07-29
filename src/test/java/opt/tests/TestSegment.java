@@ -322,7 +322,7 @@ public class TestSegment extends AbstractTest {
             try {
                 TestData X = new TestData();
                 Segment segment2 = X.scenario.get_segment_by_name("sA2");
-                assertEquals("lA2",segment2.get_ml_name());
+                assertEquals("lA2",segment2.get_fwy_name());
             } catch (Exception e) {
                 fail(e.getMessage());
             }

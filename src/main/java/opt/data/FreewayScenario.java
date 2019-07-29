@@ -56,9 +56,9 @@ public class FreewayScenario {
                 segments.put(sgmt_id,segment);
 
                 // assign segments to links
-                if (segment.ml().mysegment!=null)
-                    throw new Exception("Link " + segment.ml_id + " assigned to multiple segments");
-                segment.ml().mysegment = segment;
+                if (segment.fwy().mysegment!=null)
+                    throw new Exception("Link " + segment.fwy_id + " assigned to multiple segments");
+                segment.fwy().mysegment = segment;
 
                 if (segment.has_onramp()){
                     if (segment.or().mysegment!=null)
@@ -79,7 +79,7 @@ public class FreewayScenario {
         for(Segment segment : segments.values()){
 
             // upstream mainline segment ..............
-            Node start_node = scenario.nodes.get(segment.ml().start_node_id);
+            Node start_node = scenario.nodes.get(segment.fwy().start_node_id);
             Set<Long> segments_ml_up = start_node.in_links.stream()
                     .map(id->scenario.links.get(id))
                     .filter(link->!(link instanceof LinkRamp))
@@ -91,10 +91,10 @@ public class FreewayScenario {
                 throw new Exception("Level 3 networks has not been implemented");
 
             if (segments_ml_up.size()==1)
-                segment.segment_ml_up_id = segments_ml_up.iterator().next();
+                segment.segment_fwy_up_id = segments_ml_up.iterator().next();
 
             // downstream mainline segment ..............
-            Node end_node = scenario.nodes.get(segment.ml().end_node_id);
+            Node end_node = scenario.nodes.get(segment.fwy().end_node_id);
             Set<Long> segments_ml_dn = end_node.out_links.stream()
                     .map(id->scenario.links.get(id))
                     .filter(link->!(link instanceof LinkRamp))
@@ -106,7 +106,7 @@ public class FreewayScenario {
                 throw new Exception("Level 3 networks has not been implemented");
 
             if (segments_ml_dn.size()==1)
-                segment.segment_ml_dn_id = segments_ml_dn.iterator().next();
+                segment.segment_fwy_dn_id = segments_ml_dn.iterator().next();
 
             // downstream offramp connector segment ...........
             if(segment.has_offramp()){
@@ -170,8 +170,8 @@ public class FreewayScenario {
                         OTMUtils.csv2list(dem.getContent()));
 
                 Segment segment = link.get_segment();
-                if (segment.ml_id==link.id)
-                    link.get_segment().set_ml_demand_vph(comm_id,profile);
+                if (segment.fwy_id ==link.id)
+                    link.get_segment().set_fwy_demand_vph(comm_id,profile);
                 else if (segment.or_id==link.id)
                     link.get_segment().set_or_demand_vph(comm_id,profile);
                 else
@@ -202,7 +202,7 @@ public class FreewayScenario {
                     if(!scenario.links.containsKey(split.getLinkOut()))
                         throw new Exception("Bad outlink in splits");
                     AbstractLink outlink = scenario.links.get(split.getLinkOut());
-                    if ( !(outlink instanceof LinkMainline) )
+                    if ( !(outlink instanceof LinkFreeway) )
                         jofframps.add(outlink);
                 }
 
@@ -215,11 +215,11 @@ public class FreewayScenario {
 
                 // the link in should be the mainline
                 // (because all segments are "onramp first, offramp last")
-                if (link_in_id!=segment.ml_id)
+                if (link_in_id!=segment.fwy_id)
                     throw new Exception("Bad link in id in split ratio");
 
                 // and the node should be the end node of the segment
-                if(segment.ml().end_node_id!=node_id)
+                if(segment.fwy().end_node_id!=node_id)
                     throw new Exception("Bad node in id in split ratio");
 
                 // get values and create profile
@@ -321,19 +321,19 @@ public class FreewayScenario {
         if(segment.segment_or_up_id!=null || segment.segment_fr_dn_id!=null)
             throw new Exception("Removing a segment with a ramp connector is not allowed.");
 
-        Node start_node = scenario.nodes.get(segment.ml().start_node_id);
-        Node end_node   = scenario.nodes.get(segment.ml().end_node_id);
+        Node start_node = scenario.nodes.get(segment.fwy().start_node_id);
+        Node end_node   = scenario.nodes.get(segment.fwy().end_node_id);
 
         // connect upstream mainline segment to end node
-        if(segment.segment_ml_up_id!=null){
+        if(segment.segment_fwy_up_id !=null){
 
-            Segment segup = segments.get(segment.segment_ml_up_id);
-            segup.segment_ml_dn_id = segment.segment_ml_dn_id;
+            Segment segup = segments.get(segment.segment_fwy_up_id);
+            segup.segment_fwy_dn_id = segment.segment_fwy_dn_id;
 
-            // ml link
-            segup.ml().end_node_id = end_node.id;
-            start_node.in_links.remove(segup.ml().id);
-            end_node.in_links.add(segup.ml().id);
+            // fwy link
+            segup.fwy().end_node_id = end_node.id;
+            start_node.in_links.remove(segup.fwy().id);
+            end_node.in_links.add(segup.fwy().id);
 
             if(segup.has_onramp() && segup.or().end_node_id==start_node.id) {
                 segup.or().end_node_id = end_node.id;
@@ -350,19 +350,19 @@ public class FreewayScenario {
         }
 
         // fix downstream mainline segment
-        if(segment.segment_ml_dn_id!=null){
-            Segment segdn = segments.get(segment.segment_ml_dn_id);
-            segdn.segment_ml_up_id = segment.segment_ml_up_id;
+        if(segment.segment_fwy_dn_id !=null){
+            Segment segdn = segments.get(segment.segment_fwy_dn_id);
+            segdn.segment_fwy_up_id = segment.segment_fwy_up_id;
         }
 
         // delete the start node
-        scenario.nodes.remove(segment.ml().start_node_id);
+        scenario.nodes.remove(segment.fwy().start_node_id);
 
         // delete segment links
         segment.delete_offramp();
         segment.delete_onramp();
-        scenario.links.remove(segment.ml_id);
-        end_node.in_links.remove(segment.ml_id);
+        scenario.links.remove(segment.fwy_id);
+        end_node.in_links.remove(segment.fwy_id);
 
         // remove the segment
         segments.remove(segment.id);
