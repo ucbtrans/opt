@@ -32,24 +32,24 @@
 			<node id="19"/>
 		</nodes>
 		<links>
-			<link id="1" length="1500" start_node_id="1"  end_node_id="2" roadparam="0" full_lanes="4" road_type="mainline"/>
-			<link id="2" length="500"  start_node_id="2"  end_node_id="3" roadparam="0" full_lanes="4" road_type="mainline"/>
-			<link id="3" length="800"  start_node_id="3"  end_node_id="4" roadparam="0" full_lanes="5" road_type="mainline"/>
-			<link id="4" length="1000" start_node_id="4"  end_node_id="5" roadparam="0" full_lanes="4" road_type="mainline"/>
-			<link id="5" length="500"  start_node_id="5"  end_node_id="6" roadparam="0" full_lanes="3" road_type="mainline"/>
-			<link id="6" length="800"  start_node_id="6"  end_node_id="7" roadparam="0" full_lanes="3" road_type="mainline"/>
-			<link id="7" length="100"  start_node_id="2"  end_node_id="8" roadparam="1" full_lanes="1" road_type="ramp"/>
-			<link id="8" length="100"  start_node_id="9"  end_node_id="3" roadparam="1" full_lanes="2" road_type="ramp"/>
-			<link id="9" length="100"  start_node_id="4"  end_node_id="10" roadparam="1" full_lanes="2" road_type="ramp"/>
-			<link id="10" length="100" start_node_id="5"  end_node_id="11" roadparam="1" full_lanes="2" road_type="ramp"/>
-			<link id="11" length="100" start_node_id="12" end_node_id="6" roadparam="1" full_lanes="2" road_type="ramp"/>
+			<link id="1" length="1500" start_node_id="1"  end_node_id="2" roadparam="0" full_lanes="4" road_type="freeway"/>
+			<link id="2" length="500"  start_node_id="2"  end_node_id="3" roadparam="0" full_lanes="4" road_type="freeway"/>
+			<link id="3" length="800"  start_node_id="3"  end_node_id="4" roadparam="0" full_lanes="5" road_type="freeway"/>
+			<link id="4" length="1000" start_node_id="4"  end_node_id="5" roadparam="0" full_lanes="4" road_type="freeway"/>
+			<link id="5" length="500"  start_node_id="5"  end_node_id="6" roadparam="0" full_lanes="3" road_type="freeway"/>
+			<link id="6" length="800"  start_node_id="6"  end_node_id="7" roadparam="0" full_lanes="3" road_type="freeway"/>
+			<link id="7" length="100"  start_node_id="2"  end_node_id="8" roadparam="1" full_lanes="1" road_type="offramp"/>
+			<link id="8" length="100"  start_node_id="9"  end_node_id="3" roadparam="1" full_lanes="2" road_type="onramp"/>
+			<link id="9" length="100"  start_node_id="4"  end_node_id="10" roadparam="1" full_lanes="2" road_type="offramp"/>
+			<link id="10" length="100" start_node_id="5"  end_node_id="11" roadparam="1" full_lanes="2" road_type="offramp"/>
+			<link id="11" length="100" start_node_id="12" end_node_id="6" roadparam="1" full_lanes="2" road_type="onramp"/>
 			<link id="12" length="200" start_node_id="8" end_node_id="13" roadparam="1" full_lanes="1" road_type="connector"/>
-			<link id="13" length="100" start_node_id="13" end_node_id="15" roadparam="1" full_lanes="2" road_type="ramp"/>
-			<link id="14" length="500" start_node_id="14" end_node_id="15" roadparam="1" full_lanes="4" road_type="mainline"/>
-			<link id="15" length="500" start_node_id="15" end_node_id="16" roadparam="1" full_lanes="4" road_type="mainline"/>
-			<link id="16" length="500" start_node_id="16" end_node_id="17" roadparam="1" full_lanes="4" road_type="mainline"/>
-			<link id="17" length="500" start_node_id="17" end_node_id="18" roadparam="1" full_lanes="4" road_type="mainline"/>
-			<link id="18" length="500" start_node_id="17" end_node_id="19" roadparam="1" full_lanes="2" road_type="ramp"/>
+			<link id="13" length="100" start_node_id="13" end_node_id="15" roadparam="1" full_lanes="2" road_type="onramp"/>
+			<link id="14" length="500" start_node_id="14" end_node_id="15" roadparam="1" full_lanes="4" road_type="freeway"/>
+			<link id="15" length="500" start_node_id="15" end_node_id="16" roadparam="1" full_lanes="4" road_type="freeway"/>
+			<link id="16" length="500" start_node_id="16" end_node_id="17" roadparam="1" full_lanes="4" road_type="freeway"/>
+			<link id="17" length="500" start_node_id="17" end_node_id="18" roadparam="1" full_lanes="4" road_type="freeway"/>
+			<link id="18" length="500" start_node_id="17" end_node_id="19" roadparam="1" full_lanes="2" road_type="offramp"/>
 		</links>
 		<roadparams>
 			<roadparam id="0" capacity="2000" speed="100" jam_density="100"/>

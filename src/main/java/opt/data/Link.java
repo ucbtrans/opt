@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class Link {
 
-    public enum Type {freeway,ramp,connector}
+    public enum Type {freeway,offramp,onramp,connector}
 
     protected long id;
     protected String name;
@@ -81,6 +81,7 @@ public class Link {
         return new_link;
 
     }
+
     /////////////////////////////////////
     // getters
     /////////////////////////////////////
@@ -105,6 +106,13 @@ public class Link {
         return mysegment.fwy_scenario.scenario.nodes.get(end_node_id).out_links.isEmpty();
     }
 
+    public Link.Type get_type(){
+        return this.type;
+    }
+
+    public boolean is_ramp(){
+        return this.type== Type.onramp || type==Type.offramp;
+    }
 
     /////////////////////////////////////
     // override

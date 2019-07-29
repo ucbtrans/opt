@@ -78,11 +78,11 @@ public class FreewayScenario {
         // segment adjacency mappings ..................................
         for(Segment segment : segments.values()){
 
-            // upstream mainline segment ..............
+            // upstream freeway segment ..............
             Node start_node = scenario.nodes.get(segment.fwy().start_node_id);
             Set<Long> segments_fwy_up = start_node.in_links.stream()
                     .map(id->scenario.links.get(id))
-                    .filter(link->link.type!=Link.Type.ramp)
+                    .filter(link->!link.is_ramp())
                     .map(link -> link.mysegment.id)
                     .filter(seg->seg!=segment.id)
                     .collect(toSet());
@@ -93,11 +93,11 @@ public class FreewayScenario {
             if (segments_fwy_up.size()==1)
                 segment.segment_fwy_up_id = segments_fwy_up.iterator().next();
 
-            // downstream mainline segment ..............
+            // downstream freeway segment ..............
             Node end_node = scenario.nodes.get(segment.fwy().end_node_id);
             Set<Long> segments_ml_dn = end_node.out_links.stream()
                     .map(id->scenario.links.get(id))
-                    .filter(link->link.type!=Link.Type.ramp)
+                    .filter(link->!link.is_ramp())
                     .map(link -> link.mysegment.id)
                     .filter(seg->seg!=segment.id)
                     .collect(toSet());
@@ -213,7 +213,7 @@ public class FreewayScenario {
                 Link offramp = jofframps.iterator().next();
                 Segment segment = offramp.mysegment;
 
-                // the link in should be the mainline
+                // the link in should be the freeway
                 // (because all segments are "onramp first, offramp last")
                 if (link_in_id!=segment.fwy_id)
                     throw new Exception("Bad link in id in split ratio");
@@ -324,7 +324,7 @@ public class FreewayScenario {
         Node start_node = scenario.nodes.get(segment.fwy().start_node_id);
         Node end_node   = scenario.nodes.get(segment.fwy().end_node_id);
 
-        // connect upstream mainline segment to end node
+        // connect upstream freeway segment to end node
         if(segment.segment_fwy_up_id !=null){
 
             Segment segup = segments.get(segment.segment_fwy_up_id);
@@ -349,7 +349,7 @@ public class FreewayScenario {
 
         }
 
-        // fix downstream mainline segment
+        // fix downstream freeway segment
         if(segment.segment_fwy_dn_id !=null){
             Segment segdn = segments.get(segment.segment_fwy_dn_id);
             segdn.segment_fwy_up_id = segment.segment_fwy_up_id;

@@ -57,14 +57,14 @@ public class Segment {
                 .map(link_id->fwy_scenario.scenario.links.get(link_id))
                 .collect(Collectors.toList());
 
-        // find mainline link
+        // find freeway link
         Set<Link> fwy_links = links.stream()
                 .filter(link->link.type==Link.Type.freeway || link.type== Link.Type.connector)
                 .collect(Collectors.toSet());
 
         // check exactly one mailine link
         if( fwy_links.size()!=1 )
-            throw new Exception("All segments must contain exactly one mainline link");
+            throw new Exception("All segments must contain exactly one freeway link");
 
         Link fwy = fwy_links.iterator().next();
         fwy_id = fwy.id;
@@ -73,12 +73,12 @@ public class Segment {
         // check that what is remaining are at most two and all ramps
         if (links.size()>2)
             throw new Exception("Segment has too many links");
-        if (!links.stream().allMatch(link->link.type==Link.Type.ramp))
+        if (!links.stream().allMatch(link->link.is_ramp()))
             throw new Exception("Links in a segment must be either freeway or ramp");
 
         // find onramps
         Set<Link> ors = links.stream()
-                .filter(link-> link.type==Link.Type.ramp)
+                .filter(link-> link.is_ramp())
                 .filter(link-> link.end_node_id==fwy.start_node_id || link.end_node_id==fwy.end_node_id)
                 .collect(Collectors.toSet());
 
@@ -93,7 +93,7 @@ public class Segment {
 
         // find offramps
         Set<Link> frs = links.stream()
-                .filter(link-> link.type==Link.Type.ramp)
+                .filter(link-> link.is_ramp())
                 .filter(link-> link.start_node_id==fwy.start_node_id || link.start_node_id==fwy.end_node_id)
                 .collect(Collectors.toSet());
 
@@ -544,7 +544,7 @@ public class Segment {
         float jam_density_vpkpl = default_fr_jam_density_vpkpl;
         float ff_speed_kph = default_fr_ff_speed_kph;
 
-        Link fr = new Link(id,Link.Type.ramp,start_node_id,end_node_id,full_lanes,length,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
+        Link fr = new Link(id,Link.Type.offramp,start_node_id,end_node_id,full_lanes,length,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
         fr_id = fr.id;
         fr.mysegment = this;
         end_node.in_links.add(fr_id);
@@ -638,7 +638,7 @@ public class Segment {
         float capacity_vphpl = default_or_capacity_vphpl;
         float jam_density_vpkpl = default_or_jam_density_vpkpl;
         float ff_speed_kph = default_or_ff_speed_kph;
-        Link or = new Link(id,Link.Type.ramp,start_node_id,end_node_id,full_lanes,length,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
+        Link or = new Link(id,Link.Type.onramp,start_node_id,end_node_id,full_lanes,length,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
         or_id = or.id;
         or.mysegment = this;
         start_node.out_links.add(or_id);
@@ -714,7 +714,7 @@ public class Segment {
     /////////////////////////////////////
 
     /**
-     * Get the mainline demand for this segment, for a particular commodity.
+     * Get the freeway demand for this segment, for a particular commodity.
      * @param comm_id ID for the commodity
      * @return Profile1D object if demand is defined for this commodity. null otherwise.
      */
@@ -723,7 +723,7 @@ public class Segment {
     }
 
     /**
-     * Set the mainline demand in vehicles per hour.
+     * Set the freeway demand in vehicles per hour.
      * @param comm_id ID for the commodity
      * @param demand_vph Demand in veh/hr as a Profile1D object
      */

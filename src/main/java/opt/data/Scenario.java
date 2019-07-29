@@ -37,10 +37,13 @@ public class Scenario {
                 for(jaxb.Link jlink : network.getLinks().getLink()) {
                     Link link;
                     switch(jlink.getRoadType()){
-                        case "ramp":
-                            link = new Link(jlink,Link.Type.ramp,road_params.get(jlink.getRoadparam()));
+                        case "offramp":
+                            link = new Link(jlink,Link.Type.offramp,road_params.get(jlink.getRoadparam()));
                             break;
-                        case "mainline":
+                        case "onramp":
+                            link = new Link(jlink,Link.Type.onramp,road_params.get(jlink.getRoadparam()));
+                            break;
+                        case "freeway":
                             link = new Link(jlink,Link.Type.freeway,road_params.get(jlink.getRoadparam()));
                             break;
                         case "connector":
@@ -168,13 +171,7 @@ public class Scenario {
             jaxbLink.setFullLanes(link.full_lanes);
             jaxbLink.setEndNodeId(link.end_node_id);
             jaxbLink.setStartNodeId(link.start_node_id);
-
-            if(link.type==Link.Type.freeway)
-                jaxbLink.setRoadType("mainline");
-            if(link.type==Link.Type.ramp)
-                jaxbLink.setRoadType("ramp");
-            if(link.type==Link.Type.connector)
-                jaxbLink.setRoadType("connector");
+            jaxbLink.setRoadType(link.type.toString());
 
             // road params
             RoadParam link_rp = new RoadParam(link.capacity_vphpl,link.ff_speed_kph,link.jam_density_vpkpl);
