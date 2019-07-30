@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -57,12 +58,16 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_get_links(){
         Segment segment0 = sX.scenario.get_segment_by_name("sA1");
-        Set<Link> links1 = segment0.get_links();
-        assertEquals(links1.stream().map(x->x.get_id()).collect(toSet()),new HashSet(Arrays.asList(1l,7l)));
+        List<Link> links1 = segment0.get_links();
+        assertEquals(links1.stream()
+                .filter(x->x!=null)
+                .map(x->x.get_id()).collect(toSet()),new HashSet(Arrays.asList(1l,7l)));
 
         Segment segment2 = sX.scenario.get_segment_by_name("sA2");
-        Set<Link> links2 = segment2.get_links();
-        assertEquals(links2.stream().map(x->x.get_id()).collect(toSet()),new HashSet(Arrays.asList(2l)));
+        List<Link> links2 = segment2.get_links();
+        assertEquals(links2.stream()
+                .filter(x->x!=null)
+                .map(x->x.get_id()).collect(toSet()),new HashSet(Arrays.asList(2l)));
     }
 
     @Test

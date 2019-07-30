@@ -250,6 +250,8 @@ public class AppMainController {
             TreeItem<String> links_node = new TreeItem<String>(roadLinksTreeItem);
             scenario_node.getChildren().add(links_node);
             for (Link link : scenario.get_links()) {
+                if(link==null)
+                    continue;
                 TreeItem<String> link_node = new TreeItem<String>(link.get_name());
                 links_node.getChildren().add(link_node);
             }

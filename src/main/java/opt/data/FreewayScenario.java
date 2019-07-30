@@ -282,6 +282,14 @@ public class FreewayScenario {
      * get all segments in this scenario
      * @return Collection of segments
      */
+//    public Collection<Collection <Segment>> get_segment_tree(){
+//        return new HashSet<>(segments.values());
+//    }
+
+    /**
+     * get all segments in this scenario
+     * @return Collection of segments
+     */
     public Set<Segment> get_segments(){
         return new HashSet<>(segments.values());
     }
@@ -433,6 +441,8 @@ public class FreewayScenario {
         jaxbopt.Lnks lnks = new jaxbopt.Lnks();
         scn.setLnks(lnks);
         for(Link link : get_links()){
+            if(link==null)
+                continue;
             jaxbopt.Lnk lnk = new jaxbopt.Lnk();
             lnk.setId(link.id);
             lnk.setName(link.name);

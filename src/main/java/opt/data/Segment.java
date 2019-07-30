@@ -186,13 +186,17 @@ public class Segment {
     // network
     /////////////////////////////////////
 
-    public Set<Link> get_links(){
-        Set<Link> x = new HashSet<>();
+    /** Returns a list with exactly three items.
+     * 0: the onramp or null
+     * 1: the freeway
+     * 2: the offramp or null
+     * @return
+     */
+    public List<Link> get_links(){
+        List<Link> x = new ArrayList<>();
+        x.add(or());
         x.add(fwy());
-        if(or_id!=null)
-            x.add(or());
-        if(fr_id!=null)
-            x.add(fr());
+        x.add(fr());
         return x;
     }
 
@@ -234,6 +238,8 @@ public class Segment {
         Set<Link> x = new HashSet<>();
         for (Segment seg : get_upstrm_segments()){
             for (Link link : seg.get_links()){
+                if (link==null)
+                    continue;
                 if (link.end_node_id==fwy.start_node_id )
                     x.add(link);
                 if( has_onramp() && link.end_node_id==or().start_node_id)
@@ -265,6 +271,8 @@ public class Segment {
         Set<Link> x = new HashSet<>();
         for (Segment seg : get_dnstrm_segments()){
             for (Link link : seg.get_links()){
+                if (link==null)
+                    continue;
                 if (link.start_node_id==fwy.end_node_id )
                     x.add(link);
                 if( has_offramp() && link.start_node_id==fr().end_node_id)
@@ -875,7 +883,11 @@ public class Segment {
     public jaxbopt.Sgmt to_jaxb(){
         jaxbopt.Sgmt sgmt = new jaxbopt.Sgmt();
         sgmt.setName(name);
-        sgmt.setLinks(OTMUtils.comma_format(get_links().stream().map(link->link.get_id()).collect(Collectors.toSet())));
+        sgmt.setLinks(OTMUtils.comma_format(
+                get_links().stream()
+                        .filter(x->x!=null)
+                        .map(link->link.get_id())
+                        .collect(Collectors.toSet())));
         return sgmt;
     }
 

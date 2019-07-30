@@ -35,7 +35,7 @@ public class TestFreewayScenario extends AbstractTest {
         TestData X = new TestData();
         Collection<Link> links = X.scenario.get_links();
         assertNotNull(links);
-        assertEquals(18,links.size());
+        assertEquals(18,links.stream().filter(x->x!=null).count());
     }
 
     /////////////////////////////////////
