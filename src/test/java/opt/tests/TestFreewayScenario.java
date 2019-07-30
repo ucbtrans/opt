@@ -8,6 +8,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -41,6 +43,23 @@ public class TestFreewayScenario extends AbstractTest {
     /////////////////////////////////////
     // segment getters
     /////////////////////////////////////
+
+    @Test
+    public void test_get_segments_tree(){
+        TestData X = new TestData();
+        List<List<Segment>> segments = X.scenario.get_segments_tree();
+        assertNotNull(segments);
+        assertEquals(4,segments.get(0).size());
+        assertEquals(7,segments.get(1).size());
+    }
+
+    @Test
+    public void test_get_links_tree(){
+        TestData X = new TestData();
+        List<List<Link>> links = X.scenario.get_links_tree();
+        assertEquals(6,links.get(0).size());
+        assertEquals(12,links.get(1).size());
+    }
 
     @Test
     public void test_get_segments(){
