@@ -282,7 +282,7 @@ public class Segment {
         return x;
     }
 
-    public Segment insert_upstrm_hov_segment(){
+    public Segment insert_upstrm_managed_segment(){
         System.err.println("NOT IMPLEMENTED!!!");
         return null;
     }
@@ -372,7 +372,7 @@ public class Segment {
         return newseg;
     }
 
-    public Segment insert_dnstrm_hov_segment(){
+    public Segment insert_dnstrm_managed_segment(){
         System.err.println("NOT IMPLEMENTED!!!");
         return null;
     }
@@ -469,6 +469,10 @@ public class Segment {
         return fr_id!=null;
     }
 
+    public float get_fr_length_meters(){
+        return has_offramp() ? fr().length_meters : Float.NaN;
+    }
+
     public String get_fr_name(){
         return has_offramp() ? fr().name : null;
     }
@@ -487,6 +491,11 @@ public class Segment {
             return fr.jam_density_vpkpl * fr.full_lanes * fr.length_meters / 1000f;
         }
         else return 0d;
+    }
+
+    public void set_fr_length_meters(float x){
+        if( has_offramp() )
+            fr().length_meters = x;
     }
 
     public void set_fr_name(String newname) {
@@ -568,6 +577,10 @@ public class Segment {
         return or_id!=null;
     }
 
+    public float get_or_length_meters(){
+        return has_onramp() ? or().length_meters : Float.NaN;
+    }
+
     public String get_or_name(){
         return has_onramp() ? or().name : null;
     }
@@ -586,6 +599,11 @@ public class Segment {
             return or.jam_density_vpkpl * or.full_lanes * or.length_meters / 1000f;
         }
         else return 0d;
+    }
+
+    public void set_or_length_meters(float x){
+        if( has_onramp() )
+            or().length_meters = x;
     }
 
     public void set_or_name(String newname) {
@@ -666,7 +684,7 @@ public class Segment {
         return fwy().full_lanes;
     }
 
-    public int get_hov_lanes(){
+    public int get_managed_lanes(){
         System.out.println("NOT IMPLEMENTED!");
         return 0;
     }
@@ -693,7 +711,7 @@ public class Segment {
         fwy().full_lanes = x;
     }
 
-    public void set_hov_lanes(int x) throws Exception {
+    public void set_managed_lanes(int x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive number of lanes");
         System.out.println("NOT IMPLEMENTED!");
