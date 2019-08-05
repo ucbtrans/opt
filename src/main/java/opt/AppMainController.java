@@ -43,6 +43,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -62,6 +63,7 @@ import opt.data.Project;
 public class AppMainController {
     
     private Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
+    private UserSettings userSettings = new UserSettings();
     private boolean projectModified = false;
     private String projectFilePath = null;
     private String optProjectFileDir_String = "optProjectFileDir_String";
@@ -72,6 +74,7 @@ public class AppMainController {
     private Map<TreeItem, Object> tree2object = new HashMap<TreeItem, Object>();
     private Map<Object, TreeItem> object2tree = new HashMap<Object, TreeItem>();
     
+    private SplitPane linkEditorPane = null;
     private LinkEditorController linkEditorController = null;
     
     @FXML // fx:id="topPane"
@@ -103,6 +106,10 @@ public class AppMainController {
 
     @FXML // fx:id="configTabPane"
     private Tab configTabPane; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="configAnchorPane"
+    private AnchorPane configAnchorPane; // Value injected by FXMLLoader
+    
 
     @FXML // fx:id="simTabPane"
     private Tab simTabPane; // Value injected by FXMLLoader
@@ -134,8 +141,19 @@ public class AppMainController {
     }
     
     
+    public UserSettings getUserSettings() {
+        return userSettings;
+    }
+    
+    
+    
     @FXML
     private void onClickMenuFileNew(ActionEvent event) {
+        if (projectModified) {
+            toSaveProjectOrNot();
+        }
+        reset();
+        
         opt.utils.Dialogs.ErrorDialog("Cannot create new OPT project...", "The code is not written. You must be patient!");
         
         projectModified = true;
@@ -144,6 +162,11 @@ public class AppMainController {
     
     @FXML
     private void onClickMenuFileOpen(ActionEvent event) {
+        if (projectModified) {
+            toSaveProjectOrNot();
+        }
+        reset();
+        
         boolean validate = true; 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open the OPT Project");
@@ -222,6 +245,29 @@ public class AppMainController {
     
     
     
+    @FXML // This method is called by the FXMLLoader when initialization is complete
+    void initialize() {
+        
+        // Tree action listener
+        projectTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+           processTreeSelection((TreeItem<String>)newValue); 
+        });
+        
+        // Initialize link editor
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/link_editor.fxml"));
+            linkEditorPane = loader.load();
+            linkEditorController = loader.getController();
+            linkEditorController.setAppMainController(this);
+            linkEditorController.initWithLinkData(null);
+        } catch (IOException e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot initialize section editor...", e);
+        }
+        
+        
+    }
+    
+    
     
     
     
@@ -250,9 +296,11 @@ public class AppMainController {
             TreeItem<String> links_node = new TreeItem<String>(roadLinksTreeItem);
             scenario_node.getChildren().add(links_node);
             for (Link link : scenario.get_links()) {
-                if(link==null)
+                if (link == null)
                     continue;
                 TreeItem<String> link_node = new TreeItem<String>(link.get_name());
+                tree2object.put(link_node, link);
+                object2tree.put(link, link_node);
                 links_node.getChildren().add(link_node);
             }
             
@@ -269,18 +317,19 @@ public class AppMainController {
     
     
     private void processTreeSelection(TreeItem<String> treeItem) {
+        if (treeItem == null)
+            return;
+        
         if (treeItem.isLeaf()) {
             if (treeItem.getParent().getValue() == roadLinksTreeItem) { //a link was selected
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/link_editor.fxml"));
-                    SplitPane linkEditor = loader.load();
-                    linkEditorController = loader.getController();
-                    configTabPane.setContent(linkEditor);
-                } catch (IOException e) {
-                    opt.utils.Dialogs.ExceptionDialog("Cannot open editor for section '" + treeItem.getValue() + "'...", e);
+                //configAnchorPane.getChildren().clear();
+                //configAnchorPane.getChildren().setAll(linkEditorPane);
+                configTabPane.setContent(linkEditorPane);
+                Link lnk = (Link)tree2object.get(treeItem);
+                if (lnk != null) {
+                    linkEditorController.initWithLinkData(lnk);
                 }
             }
-            
         } else {
             ; //TODO
         }
@@ -289,15 +338,17 @@ public class AppMainController {
     
     
     
-    
-    @FXML // This method is called by the FXMLLoader when initialization is complete
-    void initialize() {
+    private void reset() {
+        projectModified = false;
+        projectFilePath = null;
+        tree2object = new HashMap<TreeItem, Object>();
+        object2tree = new HashMap<Object, TreeItem>();
         
-        // Tree action listener
-        projectTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-           processTreeSelection((TreeItem<String>)newValue); 
-        });
+        if (projectTree.getRoot() != null)
+            projectTree.getRoot().getChildren().clear();
         
+        actionPane.getSelectionModel().select(configTabPane);
+        configTabPane.setContent(null);
     }
     
     

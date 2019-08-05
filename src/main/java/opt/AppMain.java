@@ -32,7 +32,7 @@ public class AppMain extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/opt_main.fxml"));
         VBox root = (VBox)loader.load();
         main_controller = loader.getController();
-        Scene scene = new Scene(root, 1200, 800);
+        Scene scene = new Scene(root, 1500, 1000);
         //setUserAgentStylesheet(STYLESHEET_CASPIAN);
         setUserAgentStylesheet(STYLESHEET_MODENA);
         primaryStage.setTitle("OPT");

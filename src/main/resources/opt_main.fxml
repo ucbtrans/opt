@@ -19,7 +19,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox id="topPane" fx:id="topPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.AppMainController">
+<VBox id="topPane" fx:id="topPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.AppMainController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -67,17 +67,20 @@
       </menus>
     </MenuBar>
       <ToolBar prefHeight="40.0" prefWidth="200.0" visible="false" />
-    <SplitPane dividerPositions="0.23162583518930957, 0.8095768374164811" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <SplitPane dividerPositions="0.19492656875834447, 0.7983978638184246" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
             <AnchorPane prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <TreeView id="projectTree" fx:id="projectTree" prefHeight="511.0" prefWidth="248.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <TreeView id="projectTree" fx:id="projectTree" prefHeight="911.0" prefWidth="289.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
             <TabPane id="actionPane" fx:id="actionPane" tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                <Tab id="configTabPane" fx:id="configTabPane" text="Configuration" />
-                <Tab id="simTabPane" fx:id="simTabPane" disable="true" text="Simulation" />
+                <Tab id="configTabPane" fx:id="configTabPane" text="Configuration">
+                     <content>
+                        <AnchorPane id="configAnchorPane" fx:id="configAnchorPane" prefHeight="200.0" prefWidth="200.0" />
+                     </content></Tab>
+                <Tab id="simTabPane" fx:id="simTabPane" text="Simulation" />
                   <Tab id="reportTabPane" fx:id="reportTabPane" disable="true" text="Reports" />
               </tabs>
             </TabPane>
