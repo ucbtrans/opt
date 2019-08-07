@@ -32,6 +32,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
@@ -40,6 +41,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -122,15 +124,6 @@ public class LinkEditorController {
     @FXML // fx:id="laneProperties"
     private TitledPane laneProperties; // Value injected by FXMLLoader
 
-    @FXML // fx:id="labelCapacityPerLane"
-    private Label labelCapacityPerLane; // Value injected by FXMLLoader
-
-    @FXML // fx:id="labelFreeFlowSpeed"
-    private Label labelFreeFlowSpeed; // Value injected by FXMLLoader
-
-    @FXML // fx:id="labelJamDensity"
-    private Label labelJamDensity; // Value injected by FXMLLoader
-
     @FXML // fx:id="numGPLanes"
     private Spinner<Integer> numGPLanes; // Value injected by FXMLLoader
 
@@ -140,14 +133,14 @@ public class LinkEditorController {
     @FXML // fx:id="numManagedLanes"
     private Spinner<Integer> numManagedLanes; // Value injected by FXMLLoader
 
-    @FXML // fx:id="capacityGP"
-    private Spinner<Double> capacityGP; // Value injected by FXMLLoader
+    @FXML // fx:id="capacityGPLane"
+    private Spinner<Double> capacityGPLane; // Value injected by FXMLLoader
 
-    @FXML // fx:id="capacityAux"
-    private Spinner<Double> capacityAux; // Value injected by FXMLLoader
+    @FXML // fx:id="capacityAuxLane"
+    private Spinner<Double> capacityAuxLane; // Value injected by FXMLLoader
 
-    @FXML // fx:id="capacityManaged"
-    private Spinner<Double> capacityManaged; // Value injected by FXMLLoader
+    @FXML // fx:id="capacityManagedLane"
+    private Spinner<Double> capacityManagedLane; // Value injected by FXMLLoader
 
     @FXML // fx:id="ffSpeedGP"
     private Spinner<Double> ffSpeedGP; // Value injected by FXMLLoader
@@ -158,14 +151,47 @@ public class LinkEditorController {
     @FXML // fx:id="ffSpeedManaged"
     private Spinner<Double> ffSpeedManaged; // Value injected by FXMLLoader
 
-    @FXML // fx:id="jamDensityGP"
-    private Spinner<Double> jamDensityGP; // Value injected by FXMLLoader
+    @FXML // fx:id="jamDensityGPLane"
+    private Spinner<Double> jamDensityGPLane; // Value injected by FXMLLoader
 
-    @FXML // fx:id="jamDensityAux"
-    private Spinner<Double> jamDensityAux; // Value injected by FXMLLoader
+    @FXML // fx:id="jamDensityAuxLane"
+    private Spinner<Double> jamDensityAuxLane; // Value injected by FXMLLoader
 
-    @FXML // fx:id="jamDensityManaged"
-    private Spinner<Double> jamDensityManaged; // Value injected by FXMLLoader
+    @FXML // fx:id="jamDensityManagedLane"
+    private Spinner<Double> jamDensityManagedLane; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="cbBarrier"
+    private CheckBox cbBarrier; // Value injected by FXMLLoader
+
+    @FXML // fx:id="cbSeparated"
+    private CheckBox cbSeparated; // Value injected by FXMLLoader
+    
+     @FXML // fx:id="labelManagedLaneCapacity"
+    private Label labelManagedLaneCapacity; // Value injected by FXMLLoader
+
+    @FXML // fx:id="labelGPLaneCapacity"
+    private Label labelGPLaneCapacity; // Value injected by FXMLLoader
+
+    @FXML // fx:id="labelAuxLaneCapacity"
+    private Label labelAuxLaneCapacity; // Value injected by FXMLLoader
+
+    @FXML // fx:id="labelFreeFlowSpeedManaged"
+    private Label labelFreeFlowSpeedManaged; // Value injected by FXMLLoader
+
+    @FXML // fx:id="labelFreeFlowSpeedGP"
+    private Label labelFreeFlowSpeedGP; // Value injected by FXMLLoader
+
+    @FXML // fx:id="labelFreeFlowSpeedAux"
+    private Label labelFreeFlowSpeedAux; // Value injected by FXMLLoader
+
+    @FXML // fx:id="labelJamDensityManaged"
+    private Label labelJamDensityManaged; // Value injected by FXMLLoader
+
+    @FXML // fx:id="labelJamDensityGP"
+    private Label labelJamDensityGP; // Value injected by FXMLLoader
+
+    @FXML // fx:id="labelJamDensityAux"
+    private Label labelJamDensityAux; // Value injected by FXMLLoader
 
     @FXML // fx:id="rampsPane"
     private TitledPane rampsPane; // Value injected by FXMLLoader
@@ -187,6 +213,8 @@ public class LinkEditorController {
 
     @FXML // fx:id="trafficSplitDownstream"
     private TitledPane trafficSplitDownstream; // Value injected by FXMLLoader
+
+
 
     
 
@@ -257,7 +285,7 @@ public class LinkEditorController {
                 onLinkLengthChange();
         });
         
-        numLanesGPSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0, 1);
+        numLanesGPSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1, 1);
         numGPLanes.setValueFactory(numLanesGPSpinnerValueFactory);
         numGPLanes.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
@@ -279,22 +307,22 @@ public class LinkEditorController {
         });
         
         capacityGPSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
-        capacityGP.setValueFactory(capacityGPSpinnerValueFactory);
-        capacityGP.valueProperty().addListener((observable, oldValue, newValue) -> {
+        capacityGPLane.setValueFactory(capacityGPSpinnerValueFactory);
+        capacityGPLane.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
                 onCapacityChange();
         });
         
         capacityAuxSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
-        capacityAux.setValueFactory(capacityAuxSpinnerValueFactory);
-        capacityAux.valueProperty().addListener((observable, oldValue, newValue) -> {
+        capacityAuxLane.setValueFactory(capacityAuxSpinnerValueFactory);
+        capacityAuxLane.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
                 onCapacityChange();
         });
         
         capacityManagedSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
-        capacityManaged.setValueFactory(capacityManagedSpinnerValueFactory);
-        capacityManaged.valueProperty().addListener((observable, oldValue, newValue) -> {
+        capacityManagedLane.setValueFactory(capacityManagedSpinnerValueFactory);
+        capacityManagedLane.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
                 onCapacityChange();
         });
@@ -321,22 +349,22 @@ public class LinkEditorController {
         });
         
         jamDensityGPSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
-        jamDensityGP.setValueFactory(jamDensityGPSpinnerValueFactory);
-        jamDensityGP.valueProperty().addListener((observable, oldValue, newValue) -> {
+        jamDensityGPLane.setValueFactory(jamDensityGPSpinnerValueFactory);
+        jamDensityGPLane.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
                 onJamDensityChange();
         });
         
         jamDensityAuxSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
-        jamDensityAux.setValueFactory(jamDensityAuxSpinnerValueFactory);
-        jamDensityAux.valueProperty().addListener((observable, oldValue, newValue) -> {
+        jamDensityAuxLane.setValueFactory(jamDensityAuxSpinnerValueFactory);
+        jamDensityAuxLane.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
                 onJamDensityChange();
         });
         
         jamDensityManagedSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
-        jamDensityManaged.setValueFactory(jamDensityManagedSpinnerValueFactory);
-        jamDensityManaged.valueProperty().addListener((observable, oldValue, newValue) -> {
+        jamDensityManagedLane.setValueFactory(jamDensityManagedSpinnerValueFactory);
+        jamDensityManagedLane.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
                 onJamDensityChange();
         });
@@ -356,6 +384,9 @@ public class LinkEditorController {
         linkEditorCanvas.heightProperty().addListener((observable, oldValue, newValue) -> {
            drawRoadSection(); 
         });
+        
+        
+        cbBarrier.setTooltip(new Tooltip("Sets barrier between managed and GP lanes"));
         
     }
     
@@ -406,7 +437,35 @@ public class LinkEditorController {
         } else if (lnkType == opt.data.Link.Type.offramp) {
             numLanesGPSpinnerValueFactory.setValue(myLink.get_segment().get_fr_lanes());
         }
-
+        
+        int managed_lanes = myLink.get_segment().get_managed_lanes();
+        int gp_lanes = myLink.get_segment().get_mixed_lanes();
+        int aux_lanes = 0;
+        if (myLink.get_type() == Link.Type.onramp)
+            gp_lanes = myLink.get_segment().get_or_lanes();
+        if (myLink.get_type() == Link.Type.offramp)
+            gp_lanes = myLink.get_segment().get_fr_lanes();
+        
+        numLanesManagedSpinnerValueFactory.setValue(managed_lanes);
+        numLanesGPSpinnerValueFactory.setValue(gp_lanes);
+        numLanesAuxSpinnerValueFactory.setValue(aux_lanes);
+        
+        
+        if (myLink.get_type() != Link.Type.freeway) {
+            boolean flag = true;
+            numAuxLanes.setDisable(flag);
+            capacityAuxLane.setDisable(flag);
+            ffSpeedAux.setDisable(flag);
+            jamDensityAuxLane.setDisable(flag);
+        } else {
+            boolean flag = false;
+            numAuxLanes.setDisable(flag);
+            capacityAuxLane.setDisable(flag);
+            ffSpeedAux.setDisable(flag);
+            jamDensityAuxLane.setDisable(flag);
+        }
+        
+        
         
         
         
@@ -425,20 +484,36 @@ public class LinkEditorController {
     /**
      * Draw the road section according to its type, lane configuration and ramps.
      */
+    @FXML
     private void drawRoadSection() {
         int ramp_angle = 30;
         double width = linkEditorCanvas.getWidth();
         double height = linkEditorCanvas.getHeight();
         boolean rightSideRoads = appMainController.getUserSettings().rightSideDrivingRoads();
         
-        
-        int gp_lanes = 4;
-        if (myLink.get_type() == opt.data.Link.Type.freeway) {
-            gp_lanes = myLink.get_segment().get_mixed_lanes();
-        }
-        int managed_lanes = 2;
-        int aux_lanes = 1;
+        int managed_lanes = numLanesManagedSpinnerValueFactory.getValue();
+        int gp_lanes = numLanesGPSpinnerValueFactory.getValue();
+        int aux_lanes = numLanesAuxSpinnerValueFactory.getValue();
         int total_lanes = gp_lanes + managed_lanes + aux_lanes;
+        
+        if (managed_lanes > 0) {
+            cbBarrier.setDisable(false);
+            if (managed_lanes > 1) {
+                cbSeparated.setDisable(false);
+            } else {
+                cbSeparated.setDisable(true);
+            }
+        } else {
+            cbBarrier.setDisable(true);
+        }
+        
+        boolean barrier = cbBarrier.isSelected();
+        boolean separated = cbSeparated.isSelected();
+        
+        
+        // TODO: set lane properties to link
+        
+        
         
         GraphicsContext g = linkEditorCanvas.getGraphicsContext2D();
         g.setFill(Color.WHITE);
@@ -475,13 +550,42 @@ public class LinkEditorController {
                 g.rotate(-ramp_angle);
                 g.translate(-rotationCenterX, -rotationCenterY);
                 g.fillRect(x0-ramp_length/2, base_y-or_width/2, ramp_length, or_width);
-                g.setFill(Color.WHITE);
+                g.setStroke(Color.WHITE);
                 for (int i = 1; i < or_lanes; i++) {
                     y0 = base_y+or_width/2 - i*lane_width;
+                    g.setLineDashes(lane_width/3, lane_width/2);
+                    g.setLineWidth(1);
                     g.strokeLine(x0-ramp_length/2, y0, x0+ramp_length/2, y0);
                 }
                 g.restore();
             }
+            
+            // Draw outer off-ramps
+            if ((myLink.get_type() == Link.Type.freeway) && 
+                myLink.get_segment().has_offramp()) {
+                g.setFill(Color.DARKGREY);
+                if (aux_lanes > 0)
+                    g.setFill(Color.LIGHTGREY);
+                double fr_lanes = myLink.get_segment().get_fr_lanes();
+                double fr_width = fr_lanes * lane_width;
+                double rotationCenterX = x1;
+                double rotationCenterY = base_y;
+                g.save();
+                g.translate(rotationCenterX, rotationCenterY);
+                g.rotate(ramp_angle);
+                g.translate(-rotationCenterX, -rotationCenterY);
+                g.fillRect(x1-ramp_length/2, base_y-fr_width/2, ramp_length, fr_width);
+                g.setStroke(Color.WHITE);
+                for (int i = 1; i < fr_lanes; i++) {
+                    y0 = base_y+fr_width/2 - i*lane_width;
+                    g.setLineDashes(lane_width/3, lane_width/2);
+                    g.setLineWidth(1);
+                    g.strokeLine(x1-ramp_length/2, y0, x1+ramp_length/2, y0);
+                }
+                g.restore();
+            }
+            
+            
             
             
             
@@ -509,8 +613,22 @@ public class LinkEditorController {
             
             g.setStroke(Color.WHITE);
             g.setLineWidth(1);
-            g.setLineDashes(lane_width/3, lane_width/3);
+            //g.setLineDashes(lane_width/3, lane_width/3);
             for (int i = 1; i < total_lanes; i++) {
+                if (i == aux_lanes) {
+                    g.setLineDashes(lane_width/4, lane_width/3);
+                    g.setLineWidth(1);
+                } else if (barrier && (i == aux_lanes + gp_lanes)) {
+                    g.setLineDashes();
+                    g.setLineWidth(2);
+                } else if (separated && (i > aux_lanes + gp_lanes)) {
+                    g.setLineDashes();
+                    g.setLineWidth(1);
+                } else {
+                    g.setLineDashes(lane_width/3, lane_width/2);
+                    g.setLineWidth(1);
+                }
+                    
                 y0 = base_y - lane_width*i;
                 g.strokeLine(x0, y0, x1, y0);
                 
@@ -569,6 +687,7 @@ public class LinkEditorController {
     
     private void onNumLanesChange() {    
         
+    
         
         
         System.err.println("Lane number change!");
@@ -598,6 +717,8 @@ public class LinkEditorController {
         System.err.println("Jam Density change!");
     }
     
+    
+
     
     
     

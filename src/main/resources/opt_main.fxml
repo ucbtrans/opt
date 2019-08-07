@@ -84,7 +84,7 @@
                   <Tab id="reportTabPane" fx:id="reportTabPane" disable="true" text="Reports" />
               </tabs>
             </TabPane>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+            <AnchorPane disable="true" prefHeight="200.0" prefWidth="200.0" />
       </items>
     </SplitPane>
     <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
