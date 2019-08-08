@@ -1,8 +1,7 @@
 package opt.tests;
 
 import error.OTMException;
-import opt.data.ProjectFactory;
-import opt.data.Project;
+import opt.data.*;
 import org.junit.Test;
 import xml.JaxbLoader;
 
@@ -37,8 +36,13 @@ public class TestProjectFactory extends AbstractTest {
 
     @Test
     public void test_create_empty_project(){
-        Project project = ProjectFactory.create_empty_project();
+        LinkParameters params = new LinkParameters(100f,200f,300f);
+        Project project = ProjectFactory.create_empty_project(params);
         assertNotNull(project);
+        FreewayScenario scenario = project.get_scenario_with_name("Unnamed scenario");
+        assertNotNull(scenario);
+        Segment segment = scenario.get_segment_by_name("Unnamed segment");
+        assertNotNull(segment);
     }
 
     @Test

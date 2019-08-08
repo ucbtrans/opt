@@ -1,6 +1,5 @@
 package opt.data;
 
-import jaxbopt.Prj;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -40,8 +39,8 @@ public class ProjectFactory {
      * Create an empty project.
      * @return Project object
      */
-    public static Project create_empty_project(){
-        return new Project();
+    public static Project create_empty_project(LinkParameters params) {
+        return new Project(params);
     }
 
     /**

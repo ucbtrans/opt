@@ -26,7 +26,46 @@ public class FreewayScenario {
     // construction
     /////////////////////////////////////
 
-    public FreewayScenario(){}
+    public FreewayScenario(String name) {
+        this.name = name;
+    }
+
+    public FreewayScenario(String name,LinkParameters params){
+
+        this.name = name;
+
+        max_link_id = -1l;
+        max_node_id = -1l;
+        max_seg_id = -1l;
+
+        // create a segment
+        Long segment_id = ++max_seg_id;
+        Segment segment = new Segment(segment_id,"Unnamed segment",this);
+        segments.put(segment_id,segment);
+
+        // create nodes and freeway link
+        Node start_node = new Node(++max_node_id);
+        Node end_node = new Node(++max_node_id);
+
+        Link link = new Link(
+                ++max_link_id,
+                Link.Type.freeway,
+                start_node.id,end_node.id,
+                1,
+                500f,
+                params.capacity_vphpl,params.jam_density_vpkpl,params.ff_speed_kph,
+                segment);
+
+        start_node.out_links.add(link.id);
+        end_node.in_links.add(link.id);
+
+        // add to the scenario
+        scenario = new Scenario();
+        scenario.nodes.put(start_node.id,start_node);
+        scenario.nodes.put(end_node.id,end_node);
+        scenario.links.put(link.id,link);
+
+    }
 
     public FreewayScenario(String name,jaxbopt.Lnks jaxb_lnks,jaxbopt.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
 
@@ -246,8 +285,7 @@ public class FreewayScenario {
      * @return new FreewayScenario object
      */
     public FreewayScenario deep_copy(){
-        FreewayScenario scn_cpy = new FreewayScenario();
-        scn_cpy.name = name;
+        FreewayScenario scn_cpy = new FreewayScenario(name);
         scn_cpy.scenario = scenario.deep_copy();
         scn_cpy.segments = new HashMap<>();
         for(Map.Entry<Long,Segment> e : segments.entrySet())

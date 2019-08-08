@@ -111,7 +111,7 @@ public class Scenario {
     protected Set<RoadParam> get_road_params(){
         Set<RoadParam> road_params = new HashSet<>();
         for(Link link : links.values())
-            road_params.add(new RoadParam(link.capacity_vphpl,link.ff_speed_kph,link.jam_density_vpkpl));
+            road_params.add(new RoadParam(link.param.capacity_vphpl,link.param.ff_speed_kph,link.param.jam_density_vpkpl));
 
         // set ids
         long id = 0;
@@ -174,7 +174,7 @@ public class Scenario {
             jaxbLink.setRoadType(link.type.toString());
 
             // road params
-            RoadParam link_rp = new RoadParam(link.capacity_vphpl,link.ff_speed_kph,link.jam_density_vpkpl);
+            RoadParam link_rp = new RoadParam(link.param.capacity_vphpl,link.param.ff_speed_kph,link.param.jam_density_vpkpl);
             long rp_id = road_params.stream().filter(rp->rp.equals(link_rp)).findFirst().get().id;
 
             jaxbLink.setRoadparam(rp_id);

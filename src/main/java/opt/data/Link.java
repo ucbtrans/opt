@@ -16,9 +16,10 @@ public class Link {
     protected int full_lanes;
     protected float length_meters;
 
-    protected float capacity_vphpl;
-    protected float jam_density_vpkpl;
-    protected float ff_speed_kph;
+//    protected float capacity_vphpl;
+//    protected float jam_density_vpkpl;
+//    protected float ff_speed_kph;
+    protected LinkParameters param;
 
     protected Segment mysegment;
 
@@ -33,9 +34,7 @@ public class Link {
         this.end_node_id = link.getEndNodeId();
         this.full_lanes = link.getFullLanes();
         this.length_meters = link.getLength();
-        this.capacity_vphpl = rp.getCapacity();
-        this.jam_density_vpkpl = rp.getJamDensity();
-        this.ff_speed_kph = rp.getSpeed();
+        this.param = new LinkParameters(rp);
     }
 
     public Link(Long id, Type type, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
@@ -45,10 +44,7 @@ public class Link {
         this.end_node_id = end_node_id;
         this.full_lanes = full_lanes;
         this.length_meters = length;
-
-        this.capacity_vphpl = capacity_vphpl;
-        this.jam_density_vpkpl = jam_density_vpkpl;
-        this.ff_speed_kph = ff_speed_kph;
+        this.param = new LinkParameters(capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
         this.mysegment = mysegment;
 
     }
@@ -64,9 +60,9 @@ public class Link {
                     end_node_id,
                     full_lanes,
                     length_meters,
-                    capacity_vphpl,
-                    jam_density_vpkpl,
-                    ff_speed_kph,
+                    param.capacity_vphpl,
+                    param.jam_density_vpkpl,
+                    param.ff_speed_kph,
                     mysegment);
             new_link.name = name;
         } catch (InstantiationException ex) {
@@ -129,7 +125,7 @@ public class Link {
                         "\tcapacity_vphpl\t%f\n" +
                         "\tjam_density_vpkpl\t%f\n" +
                         "\tff_speed_kph\t%f",
-                id,start_node_id,end_node_id,full_lanes, length_meters,capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
+                id,start_node_id,end_node_id,full_lanes, length_meters,param.capacity_vphpl,param.jam_density_vpkpl,param.ff_speed_kph);
         return str;
     }
 
@@ -144,14 +140,14 @@ public class Link {
                 end_node_id == that.end_node_id &&
                 full_lanes == that.full_lanes &&
                 Float.compare(that.length_meters, length_meters) == 0 &&
-                Float.compare(that.capacity_vphpl, capacity_vphpl) == 0 &&
-                Float.compare(that.jam_density_vpkpl, jam_density_vpkpl) == 0 &&
-                Float.compare(that.ff_speed_kph, ff_speed_kph) == 0 &&
+                Float.compare(that.param.capacity_vphpl, param.capacity_vphpl) == 0 &&
+                Float.compare(that.param.jam_density_vpkpl, param.jam_density_vpkpl) == 0 &&
+                Float.compare(that.param.ff_speed_kph, param.ff_speed_kph) == 0 &&
                 name.equals(that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, start_node_id, end_node_id, full_lanes, length_meters, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+        return Objects.hash(id, type, name, start_node_id, end_node_id, full_lanes, length_meters,param.capacity_vphpl, param.jam_density_vpkpl, param.ff_speed_kph);
     }
 }

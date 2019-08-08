@@ -41,8 +41,10 @@ public class Segment {
     /////////////////////////////////////
 
     // used in deep copy
-    public Segment(long id){
+    public Segment(long id,String name, FreewayScenario fwy_scenario){
         this.id = id;
+        this.name = name;
+        this.fwy_scenario = fwy_scenario;
     }
 
     // used by FreewayScenario jaxb constructor
@@ -119,9 +121,7 @@ public class Segment {
     }
 
     public Segment deep_copy(FreewayScenario scenario){
-        Segment seg_cpy = new Segment(id);
-        seg_cpy.name = name;
-        seg_cpy.fwy_scenario = scenario;
+        Segment seg_cpy = new Segment(id,name,scenario);
         seg_cpy.fwy_id = fwy_id;
         seg_cpy.or_id = or_id;
         seg_cpy.fr_id = fr_id;
@@ -482,13 +482,13 @@ public class Segment {
     }
 
     public float get_fr_capacity_vphpl(){
-        return has_offramp() ? fr().capacity_vphpl : Float.NaN;
+        return has_offramp() ? fr().param.capacity_vphpl : Float.NaN;
     }
 
     public double get_fr_max_vehicles(){
         if(has_offramp()){
             Link fr = fr();
-            return fr.jam_density_vpkpl * fr.full_lanes * fr.length_meters / 1000f;
+            return fr.param.jam_density_vpkpl * fr.full_lanes * fr.length_meters / 1000f;
         }
         else return 0d;
     }
@@ -516,7 +516,7 @@ public class Segment {
             throw new Exception("Invalid capacity");
         if(!has_offramp())
             add_offramp();
-        fr().capacity_vphpl = x;
+        fr().param.capacity_vphpl = x;
     }
 
     public void set_fr_max_vehicles(float x) throws Exception {
@@ -525,7 +525,7 @@ public class Segment {
         if(!has_offramp())
             add_offramp();
         Link fr = fr();
-        fr.jam_density_vpkpl = x / (fr.length_meters /1000f) / fr.full_lanes;
+        fr.param.jam_density_vpkpl = x / (fr.length_meters /1000f) / fr.full_lanes;
     }
 
     /**
@@ -590,13 +590,13 @@ public class Segment {
     }
 
     public float get_or_capacity_vphpl(){
-        return has_onramp() ? or().capacity_vphpl: Float.NaN;
+        return has_onramp() ? or().param.capacity_vphpl: Float.NaN;
     }
 
     public double get_or_max_vehicles(){
         if (has_onramp()){
             Link or = or();
-            return or.jam_density_vpkpl * or.full_lanes * or.length_meters / 1000f;
+            return or.param.jam_density_vpkpl * or.full_lanes * or.length_meters / 1000f;
         }
         else return 0d;
     }
@@ -620,14 +620,14 @@ public class Segment {
     public void set_or_capacity_vphpl(float x){
         if(!has_onramp())
             add_onramp();
-        or().capacity_vphpl = x;
+        or().param.capacity_vphpl = x;
     }
 
     public void set_or_max_vehicles(float x){
         if(!has_onramp())
             add_onramp();
         Link or = or();
-        or.jam_density_vpkpl = x / (or.length_meters /1000f) / or.full_lanes;
+        or.param.jam_density_vpkpl = x / (or.length_meters /1000f) / or.full_lanes;
     }
 
     /**
@@ -690,15 +690,15 @@ public class Segment {
     }
 
     public float get_capacity_vphpl(){
-        return fwy().capacity_vphpl;
+        return fwy().param.capacity_vphpl;
     }
 
     public float get_jam_density_vpkpl(){
-        return fwy().jam_density_vpkpl;
+        return fwy().param.jam_density_vpkpl;
     }
 
     public float get_freespeed_kph(){
-        return fwy().ff_speed_kph;
+        return fwy().param.ff_speed_kph;
     }
 
     public void set_fwy_name(String newname) {
@@ -720,19 +720,19 @@ public class Segment {
     public void set_capacity_vphpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive capacity");
-        fwy().capacity_vphpl = x;
+        fwy().param.capacity_vphpl = x;
     }
 
     public void set_jam_density_vpkpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive jam density");
-        fwy().jam_density_vpkpl = x;
+        fwy().param.jam_density_vpkpl = x;
     }
 
     public void set_freespeed_kph(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive free speed");
-        fwy().ff_speed_kph = x;
+        fwy().param.ff_speed_kph = x;
     }
 
     /////////////////////////////////////
