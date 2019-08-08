@@ -167,8 +167,6 @@ public class AppMainController {
     /***************************************************************************
      *  CALLBACKS
      **************************************************************************/
-     * @param event 
-     */
     
     @FXML
     private void onClickMenuFileNew(ActionEvent event) {

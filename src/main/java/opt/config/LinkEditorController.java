@@ -514,7 +514,6 @@ public class LinkEditorController {
         // TODO: set lane properties to link
         try {
             if ((myLink.get_type() == Link.Type.freeway) || (myLink.get_type() == Link.Type.connector)) {
-                System.err.println("SETTING LANES!");
                 myLink.get_segment().set_mixed_lanes(gp_lanes);
             }
         
