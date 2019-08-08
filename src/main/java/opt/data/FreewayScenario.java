@@ -31,40 +31,12 @@ public class FreewayScenario {
     }
 
     public FreewayScenario(String name,LinkParameters params){
-
         this.name = name;
-
         max_link_id = -1l;
         max_node_id = -1l;
         max_seg_id = -1l;
-
-        // create a segment
-        Long segment_id = ++max_seg_id;
-        Segment segment = new Segment(segment_id,"Unnamed segment",this);
-        segments.put(segment_id,segment);
-
-        // create nodes and freeway link
-        Node start_node = new Node(++max_node_id);
-        Node end_node = new Node(++max_node_id);
-
-        Link link = new Link(
-                ++max_link_id,
-                Link.Type.freeway,
-                start_node.id,end_node.id,
-                1,
-                500f,
-                params.capacity_vphpl,params.jam_density_vpkpl,params.ff_speed_kph,
-                segment);
-
-        start_node.out_links.add(link.id);
-        end_node.in_links.add(link.id);
-
-        // add to the scenario
         scenario = new Scenario();
-        scenario.nodes.put(start_node.id,start_node);
-        scenario.nodes.put(end_node.id,end_node);
-        scenario.links.put(link.id,link);
-
+        create_isolated_segment("Unnamed segment",params);
     }
 
     public FreewayScenario(String name,jaxbopt.Lnks jaxb_lnks,jaxbopt.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
@@ -430,8 +402,9 @@ public class FreewayScenario {
         start_node.out_links.add(link.id);
         end_node.in_links.add(link.id);
 
+        segment.fwy_id = link.get_id();
+
         // add to the scenario
-        scenario = new Scenario();
         scenario.nodes.put(start_node.id,start_node);
         scenario.nodes.put(end_node.id,end_node);
         scenario.links.put(link.id,link);

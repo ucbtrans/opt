@@ -1,15 +1,13 @@
 package opt.tests;
 
-import opt.data.Link;
-import opt.data.Commodity;
-import opt.data.FreewayScenario;
-import opt.data.Segment;
+import opt.data.*;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -20,6 +18,28 @@ public class TestFreewayScenario extends AbstractTest {
         TestData X = new TestData();
         FreewayScenario new_scn = X.scenario.deep_copy();
         assertTrue(new_scn.equals(X.scenario));
+    }
+
+    @Test
+    public void test_create_isolated_segment() {
+        TestData X = new TestData();
+        LinkParameters params = new LinkParameters(100,200,300);
+        Segment new_segment =  X.scenario.create_isolated_segment("Lonely segment",params);
+        assertNotNull(new_segment);
+    }
+
+    @Test
+    public void test_is_valid_segment_name() {
+        TestData X = new TestData();
+        assertFalse(X.scenario.is_valid_segment_name("sA3"));
+        assertTrue(X.scenario.is_valid_segment_name("invalid name"));
+    }
+
+    @Test
+    public void test_is_valid_link_name() {
+        TestData X = new TestData();
+        assertFalse(X.scenario.is_valid_link_name("lA13"));
+        assertTrue(X.scenario.is_valid_link_name("invalid name"));
     }
 
     /////////////////////////////////////
@@ -120,8 +140,6 @@ public class TestFreewayScenario extends AbstractTest {
         }
 
     }
-
-
 
     @Test
     public void test_delete_segment() {
