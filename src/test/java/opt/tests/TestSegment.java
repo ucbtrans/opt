@@ -1,6 +1,7 @@
 package opt.tests;
 
 import opt.data.Link;
+import opt.data.LinkParameters;
 import opt.data.Segment;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -164,7 +165,7 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_fr_lanes(){
         TestData X = new TestData();
-        Segment segment2 = X.scenario.get_segment_by_name("sA2");
+        Segment segment2 = X.scenario.get_segment_by_name("sA3");
         try {
             int fr_lanes = 125;
             segment2.set_fr_lanes(fr_lanes);
@@ -177,7 +178,7 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_fr_capacity_vphpl(){
         TestData X = new TestData();
-        Segment segment2 = X.scenario.get_segment_by_name("sA2");
+        Segment segment2 = X.scenario.get_segment_by_name("sA3");
         try {
             float fr_capacity = 123.4563f;
             segment2.set_fr_capacity_vphpl(fr_capacity);
@@ -190,7 +191,7 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_fr_max_vehicles(){
         TestData X = new TestData();
-        Segment segment2 = X.scenario.get_segment_by_name("sA2");
+        Segment segment2 = X.scenario.get_segment_by_name("sA3");
         try {
             float fr_max_vehicles = 235567.346f;
             segment2.set_fr_max_vehicles(fr_max_vehicles);
@@ -213,11 +214,16 @@ public class TestSegment extends AbstractTest {
 
     @Test
     public void test_add_offramp(){
-        TestData X = new TestData();
-        Segment segment0 = X.scenario.get_segment_by_name("sA2");
-        assertFalse(segment0.has_offramp());
-        segment0.add_offramp();
-        assertTrue(segment0.has_offramp());
+        try {
+            TestData X = new TestData();
+            Segment segment0 = X.scenario.get_segment_by_name("sA2");
+            assertFalse(segment0.has_offramp());
+            LinkParameters params = new LinkParameters(100,200,300);
+            segment0.add_offramp(params);
+            assertTrue(segment0.has_offramp());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 
     /////////////////////////////////////
@@ -244,7 +250,7 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_or_lanes(){
         TestData X = new TestData();
-        Segment segment2 = X.scenario.get_segment_by_name("sA2");
+        Segment segment2 = X.scenario.get_segment_by_name("sA3");
         try {
             int or_lanes = 12;
             segment2.set_or_lanes(or_lanes);
@@ -257,7 +263,7 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_or_capacity_vphpl(){
         TestData X = new TestData();
-        Segment segment2 = X.scenario.get_segment_by_name("sA2");
+        Segment segment2 = X.scenario.get_segment_by_name("sA3");
         try {
             float or_capacity = 123.4563f;
             segment2.set_or_capacity_vphpl(or_capacity);
@@ -270,7 +276,7 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_set_get_or_max_vehicles(){
         TestData X = new TestData();
-        Segment segment2 = X.scenario.get_segment_by_name("sA2");
+        Segment segment2 = X.scenario.get_segment_by_name("sA3");
         try {
             float or_max_vehicles = 24983.234f;
             segment2.set_or_max_vehicles(or_max_vehicles);
@@ -298,7 +304,8 @@ public class TestSegment extends AbstractTest {
         TestData X = new TestData();
         Segment segment = X.scenario.get_segment_by_name("sA1");
         assertFalse(segment.has_onramp());
-        segment.add_onramp();
+        LinkParameters params = new LinkParameters(100,200,300);
+        segment.add_onramp(params);
         assertTrue(segment.has_onramp());
     }
 

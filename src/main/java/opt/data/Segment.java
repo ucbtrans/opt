@@ -9,15 +9,6 @@ import java.util.stream.Collectors;
 
 public class Segment {
 
-    ///////////////////////////
-    private final static float default_or_capacity_vphpl = 1500f;
-    private final static float default_or_jam_density_vpkpl = 100f;
-    private final static float default_or_ff_speed_kph = 40f;
-    private final static float default_fr_capacity_vphpl = 1500f;
-    private final static float default_fr_jam_density_vpkpl = 100f;
-    private final static float default_fr_ff_speed_kph = 40f;
-    ///////////////////////////
-
     protected FreewayScenario fwy_scenario;
 
     protected String name;
@@ -183,104 +174,8 @@ public class Segment {
     }
 
     /////////////////////////////////////
-    // network
+    // insert
     /////////////////////////////////////
-
-    /** Returns a list with exactly three items.
-     * 0: the onramp or null
-     * 1: the freeway
-     * 2: the offramp or null
-     * @return
-     */
-    public List<Link> get_links(){
-        List<Link> x = new ArrayList<>();
-        x.add(or());
-        x.add(fwy());
-        x.add(fr());
-        return x;
-    }
-
-    public Segment get_upstrm_fwy_segment(){
-        return segment_fwy_up_id ==null ? null : fwy_scenario.segments.get(segment_fwy_up_id);
-    }
-
-    public Segment get_upstrm_or_segment(){
-        return segment_or_up_id==null ? null : fwy_scenario.segments.get(segment_or_up_id);
-    }
-
-    public Segment get_dnstrm_fwy_segment(){
-        return segment_fwy_dn_id ==null ? null : fwy_scenario.segments.get(segment_fwy_dn_id);
-    }
-
-    public Segment get_dnstrm_fr_segment(){
-        return segment_fr_dn_id==null ? null : fwy_scenario.segments.get(segment_fr_dn_id);
-    }
-
-    /**
-     * Get the segments that are immediately upstream from this one
-     * @return Set<Segment>
-     */
-    public Set<Segment> get_upstrm_segments(){
-        Set<Segment> x = new HashSet<>();
-        if (segment_fwy_up_id !=null)
-            x.add(fwy_scenario.segments.get(segment_fwy_up_id));
-        if (segment_or_up_id!=null)
-            x.add(fwy_scenario.segments.get(segment_or_up_id));
-        return x;
-    }
-
-    /**
-     * Get the links that are immediately upstream from this one
-     * @return Set<Link>
-     */
-    public Set<Link> get_upstrm_links(){
-        Link fwy = fwy();
-        Set<Link> x = new HashSet<>();
-        for (Segment seg : get_upstrm_segments()){
-            for (Link link : seg.get_links()){
-                if (link==null)
-                    continue;
-                if (link.end_node_id==fwy.start_node_id )
-                    x.add(link);
-                if( has_onramp() && link.end_node_id==or().start_node_id)
-                    x.add(link);
-            }
-        }
-        return x;
-    }
-
-    /**
-     * Get the segments that are immediately downstream from this one
-     * @return Set<Segment>
-     */
-    public Set<Segment> get_dnstrm_segments() {
-        Set<Segment> x = new HashSet<>();
-        if(segment_fwy_dn_id !=null)
-            x.add(fwy_scenario.segments.get(segment_fwy_dn_id));
-        if(segment_fr_dn_id!=null)
-            x.add(fwy_scenario.segments.get(segment_fr_dn_id));
-        return x;
-    }
-
-    /**
-     * Get the links that are immediately downstream from this one
-     * @return Set<Link>
-     */
-    public Set<Link> get_dnstrm_links(){
-        Link fwy = fwy();
-        Set<Link> x = new HashSet<>();
-        for (Segment seg : get_dnstrm_segments()){
-            for (Link link : seg.get_links()){
-                if (link==null)
-                    continue;
-                if (link.start_node_id==fwy.end_node_id )
-                    x.add(link);
-                if( has_offramp() && link.start_node_id==fr().end_node_id)
-                    x.add(link);
-            }
-        }
-        return x;
-    }
 
     public Segment insert_upstrm_managed_segment(){
         System.err.println("NOT IMPLEMENTED!!!");
@@ -462,6 +357,148 @@ public class Segment {
     }
 
     /////////////////////////////////////
+    // connect
+    /////////////////////////////////////
+
+//    public boolean connect_dnstrm_onramp(Link onramp) throws Exception {
+//
+//        // checks
+//        if(!fwy().type.equals(Link.Type.connector))
+//            throw new Exception("This method can only be called on connector segments");
+//        if(segment_fwy_dn_id!=null)
+//            throw new Exception("This segment is already connected downstream");
+//
+//
+//        Segment dnstrm_segment = onramp.mysegment;
+//        if(dnstrm_segment.fwy().type.equals(Link.Type.connector))
+//            throw new Exception("The downstream segment cannot be a connector");
+//        if(!onramp.type.equals(Link.Type.onramp))
+//            throw new Exception("The provided link is not an onramp");
+//        if(!dnstrm_segment.or_demands.isEmpty())
+//            throw new Exception("Please delete onramp demands before calling this method");
+//        if(dnstrm_segment.segment_or_up_id!=null)
+//            throw new Exception("The onramp segment is already connected upstream");
+//
+//
+//
+//        Node node = fwy_scenario.scenario.nodes.get(onramp.start_node_id);
+//
+//        if(!node.in_links.isEmpty())
+//            throw new Exception("The onramp already has an upstream connection");
+//
+//
+//
+//        return false;
+//    }
+//
+//    public boolean connect_upstream_offramp(Link offramp){
+//
+//    }
+
+
+
+
+    /////////////////////////////////////
+    // network getter
+    /////////////////////////////////////
+
+    /** Returns a list with exactly three items.
+     * 0: the onramp or null
+     * 1: the freeway
+     * 2: the offramp or null
+     * @return
+     */
+    public List<Link> get_links(){
+        List<Link> x = new ArrayList<>();
+        x.add(or());
+        x.add(fwy());
+        x.add(fr());
+        return x;
+    }
+
+    public Segment get_upstrm_fwy_segment(){
+        return segment_fwy_up_id ==null ? null : fwy_scenario.segments.get(segment_fwy_up_id);
+    }
+
+    public Segment get_upstrm_or_segment(){
+        return segment_or_up_id==null ? null : fwy_scenario.segments.get(segment_or_up_id);
+    }
+
+    public Segment get_dnstrm_fwy_segment(){
+        return segment_fwy_dn_id ==null ? null : fwy_scenario.segments.get(segment_fwy_dn_id);
+    }
+
+    public Segment get_dnstrm_fr_segment(){
+        return segment_fr_dn_id==null ? null : fwy_scenario.segments.get(segment_fr_dn_id);
+    }
+
+    /**
+     * Get the segments that are immediately upstream from this one
+     * @return Set<Segment>
+     */
+    public Set<Segment> get_upstrm_segments(){
+        Set<Segment> x = new HashSet<>();
+        if (segment_fwy_up_id !=null)
+            x.add(fwy_scenario.segments.get(segment_fwy_up_id));
+        if (segment_or_up_id!=null)
+            x.add(fwy_scenario.segments.get(segment_or_up_id));
+        return x;
+    }
+
+    /**
+     * Get the links that are immediately upstream from this one
+     * @return Set<Link>
+     */
+    public Set<Link> get_upstrm_links(){
+        Link fwy = fwy();
+        Set<Link> x = new HashSet<>();
+        for (Segment seg : get_upstrm_segments()){
+            for (Link link : seg.get_links()){
+                if (link==null)
+                    continue;
+                if (link.end_node_id==fwy.start_node_id )
+                    x.add(link);
+                if( has_onramp() && link.end_node_id==or().start_node_id)
+                    x.add(link);
+            }
+        }
+        return x;
+    }
+
+    /**
+     * Get the segments that are immediately downstream from this one
+     * @return Set<Segment>
+     */
+    public Set<Segment> get_dnstrm_segments() {
+        Set<Segment> x = new HashSet<>();
+        if(segment_fwy_dn_id !=null)
+            x.add(fwy_scenario.segments.get(segment_fwy_dn_id));
+        if(segment_fr_dn_id!=null)
+            x.add(fwy_scenario.segments.get(segment_fr_dn_id));
+        return x;
+    }
+
+    /**
+     * Get the links that are immediately downstream from this one
+     * @return Set<Link>
+     */
+    public Set<Link> get_dnstrm_links(){
+        Link fwy = fwy();
+        Set<Link> x = new HashSet<>();
+        for (Segment seg : get_dnstrm_segments()){
+            for (Link link : seg.get_links()){
+                if (link==null)
+                    continue;
+                if (link.start_node_id==fwy.end_node_id )
+                    x.add(link);
+                if( has_offramp() && link.start_node_id==fr().end_node_id)
+                    x.add(link);
+            }
+        }
+        return x;
+    }
+
+    /////////////////////////////////////
     // offramp
     /////////////////////////////////////
 
@@ -507,7 +544,7 @@ public class Segment {
         if (x<=0)
             throw new Exception("Invalid number of lanes");
         if(!has_offramp())
-            add_offramp();
+            throw new Exception("No offramp");
         fr().full_lanes = x;
     }
 
@@ -515,7 +552,7 @@ public class Segment {
         if (x<=0)
             throw new Exception("Invalid capacity");
         if(!has_offramp())
-            add_offramp();
+            throw new Exception("No offramp");
         fr().param.capacity_vphpl = x;
     }
 
@@ -523,7 +560,7 @@ public class Segment {
         if (x<=0)
             throw new Exception("Invalid max vehicles");
         if(!has_offramp())
-            add_offramp();
+            throw new Exception("No offramp");
         Link fr = fr();
         fr.param.jam_density_vpkpl = x / (fr.length_meters /1000f) / fr.full_lanes;
     }
@@ -547,7 +584,7 @@ public class Segment {
         return true;
     }
 
-    public void add_offramp(){
+    public void add_offramp(LinkParameters params){
         if(has_offramp())
             return;
         long id = fwy_scenario.new_link_id();
@@ -557,11 +594,13 @@ public class Segment {
         long end_node_id = end_node.id;
         int full_lanes = 1;
         float length = 100f;
-        float capacity_vphpl = default_fr_capacity_vphpl;
-        float jam_density_vpkpl = default_fr_jam_density_vpkpl;
-        float ff_speed_kph = default_fr_ff_speed_kph;
 
-        Link fr = new Link(id,Link.Type.offramp,start_node_id,end_node_id,full_lanes,length,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
+        Link fr = new Link(id,Link.Type.offramp,start_node_id,end_node_id,full_lanes,length,
+                params.capacity_vphpl,
+                params.jam_density_vpkpl,
+                params.ff_speed_kph,
+                this);
+
         fr_id = fr.id;
         fr.mysegment = this;
         end_node.in_links.add(fr_id);
@@ -577,55 +616,56 @@ public class Segment {
         return or_id!=null;
     }
 
-    public float get_or_length_meters(){
+    public float get_or_length_meters() {
         return has_onramp() ? or().length_meters : Float.NaN;
     }
 
-    public String get_or_name(){
+    public String get_or_name() {
         return has_onramp() ? or().name : null;
     }
 
-    public int get_or_lanes(){
+    public int get_or_lanes() {
         return has_onramp() ? or().full_lanes : 0;
     }
 
-    public float get_or_capacity_vphpl(){
-        return has_onramp() ? or().param.capacity_vphpl: Float.NaN;
+    public float get_or_capacity_vphpl() {
+        return has_onramp() ? or().param.capacity_vphpl : Float.NaN;
     }
 
-    public double get_or_max_vehicles(){
-        if (has_onramp()){
-            Link or = or();
-            return or.param.jam_density_vpkpl * or.full_lanes * or.length_meters / 1000f;
-        }
-        else return 0d;
-    }
-
-    public void set_or_length_meters(float x){
-        if( has_onramp() )
-            or().length_meters = x;
-    }
-
-    public void set_or_name(String newname) {
-        if(has_onramp())
-            or().name = newname;
-    }
-
-    public void set_or_lanes(int x){
+    public double get_or_max_vehicles() {
         if(!has_onramp())
-            add_onramp();
+            return Float.NaN;
+        Link or = or();
+        return or.param.jam_density_vpkpl * or.full_lanes * or.length_meters / 1000f;
+    }
+
+    public void set_or_length_meters(float x) throws Exception {
+        if(!has_onramp())
+            throw new Exception("No onramp");
+        or().length_meters = x;
+    }
+
+    public void set_or_name(String newname) throws Exception {
+        if(!has_onramp())
+            throw new Exception("No onramp");
+        or().name = newname;
+    }
+
+    public void set_or_lanes(int x) throws Exception {
+        if(!has_onramp())
+            throw new Exception("No onramp");
         or().full_lanes = x;
     }
 
-    public void set_or_capacity_vphpl(float x){
+    public void set_or_capacity_vphpl(float x) throws Exception {
         if(!has_onramp())
-            add_onramp();
+            throw new Exception("No onramp");
         or().param.capacity_vphpl = x;
     }
 
-    public void set_or_max_vehicles(float x){
+    public void set_or_max_vehicles(float x) throws Exception {
         if(!has_onramp())
-            add_onramp();
+            throw new Exception("No onramp");
         Link or = or();
         or.param.jam_density_vpkpl = x / (or.length_meters /1000f) / or.full_lanes;
     }
@@ -652,7 +692,7 @@ public class Segment {
     /**
      * Add an onramp if there is none.
      */
-    public void add_onramp(){
+    public void add_onramp(LinkParameters params){
         if(has_onramp())
             return;
         long id = fwy_scenario.new_link_id();
@@ -661,10 +701,10 @@ public class Segment {
         long end_node_id = fwy().end_node_id;
         int full_lanes = 1;
         float length = 100f;
-        float capacity_vphpl = default_or_capacity_vphpl;
-        float jam_density_vpkpl = default_or_jam_density_vpkpl;
-        float ff_speed_kph = default_or_ff_speed_kph;
-        Link or = new Link(id,Link.Type.onramp,start_node_id,end_node_id,full_lanes,length,capacity_vphpl, jam_density_vpkpl,ff_speed_kph,this);
+        Link or = new Link(id,Link.Type.onramp,start_node_id,end_node_id,full_lanes,length,
+                params.capacity_vphpl,
+                params.jam_density_vpkpl,
+                params.ff_speed_kph,this);
         or_id = or.id;
         or.mysegment = this;
         start_node.out_links.add(or_id);
