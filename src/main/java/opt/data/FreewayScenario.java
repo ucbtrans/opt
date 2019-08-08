@@ -313,7 +313,7 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
-    // segment getters and delete
+    // segment getters, create, and delete
     /////////////////////////////////////
 
     /**
@@ -401,6 +401,42 @@ public class FreewayScenario {
      */
     public Segment get_segment_with_id(Long id){
         return segments.containsKey(id) ? segments.get(id) : null;
+    }
+
+    /**
+     * Create an isolated segment
+     * @return A new segment
+     */
+    public Segment create_isolated_segment(String segment_name,LinkParameters params){
+
+        // create a segment
+        Long segment_id = ++max_seg_id;
+        Segment segment = new Segment(segment_id,segment_name,this);
+        segments.put(segment_id,segment);
+
+        // create nodes and freeway link
+        Node start_node = new Node(++max_node_id);
+        Node end_node = new Node(++max_node_id);
+
+        Link link = new Link(
+                ++max_link_id,
+                Link.Type.freeway,
+                start_node.id,end_node.id,
+                1,
+                500f,
+                params.capacity_vphpl,params.jam_density_vpkpl,params.ff_speed_kph,
+                segment);
+
+        start_node.out_links.add(link.id);
+        end_node.in_links.add(link.id);
+
+        // add to the scenario
+        scenario = new Scenario();
+        scenario.nodes.put(start_node.id,start_node);
+        scenario.nodes.put(end_node.id,end_node);
+        scenario.links.put(link.id,link);
+
+        return segment;
     }
 
     /**
@@ -501,6 +537,18 @@ public class FreewayScenario {
         Commodity new_comm = new Commodity(max_id,name);
         scenario.commodities.put(new_comm.id,new_comm);
         return new_comm;
+    }
+
+    /////////////////////////////////////
+    // utilities
+    /////////////////////////////////////
+
+    public boolean is_valid_segment_name(String name){
+        return !segments.values().stream().anyMatch(seg->seg.name.equals(name));
+    }
+
+    public boolean is_valid_link_name(String name){
+        return !scenario.links.values().stream().anyMatch(link->link.name.equals(name));
     }
 
     /////////////////////////////////////
