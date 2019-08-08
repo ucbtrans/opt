@@ -78,13 +78,13 @@
               <tabs>
                 <Tab id="configTabPane" fx:id="configTabPane" text="Configuration">
                      <content>
-                        <AnchorPane id="configAnchorPane" fx:id="configAnchorPane" prefHeight="200.0" prefWidth="200.0" />
+                        <AnchorPane id="configAnchorPane" fx:id="configAnchorPane" minHeight="200.0" minWidth="200.0" prefHeight="900.0" />
                      </content></Tab>
-                <Tab id="simTabPane" fx:id="simTabPane" text="Simulation" />
+                <Tab id="simTabPane" fx:id="simTabPane" disable="true" text="Simulation" />
                   <Tab id="reportTabPane" fx:id="reportTabPane" disable="true" text="Reports" />
               </tabs>
             </TabPane>
-            <AnchorPane disable="true" prefHeight="200.0" prefWidth="200.0" />
+            <AnchorPane id="infoAnchorPane" fx:id="infoAnchorPane" minHeight="200.0" minWidth="200.0" />
       </items>
     </SplitPane>
     <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">

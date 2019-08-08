@@ -110,12 +110,15 @@ public class AppMainController {
     @FXML // fx:id="configAnchorPane"
     private AnchorPane configAnchorPane; // Value injected by FXMLLoader
     
-
     @FXML // fx:id="simTabPane"
     private Tab simTabPane; // Value injected by FXMLLoader
 
     @FXML // fx:id="reportTabPane"
     private Tab reportTabPane; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="infoAnchorPane"
+    private AnchorPane infoAnchorPane; // Value injected by FXMLLoader
+
 
 
     @FXML // fx:id="x3"
@@ -141,11 +144,31 @@ public class AppMainController {
     }
     
     
+    
     public UserSettings getUserSettings() {
         return userSettings;
     }
     
     
+    
+    public void setProjectModified(boolean val) {
+        projectModified = val;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /***************************************************************************
+     *  CALLBACKS
+     **************************************************************************/
+     * @param event 
+     */
     
     @FXML
     private void onClickMenuFileNew(ActionEvent event) {
@@ -322,9 +345,13 @@ public class AppMainController {
         
         if (treeItem.isLeaf()) {
             if (treeItem.getParent().getValue() == roadLinksTreeItem) { //a link was selected
-                //configAnchorPane.getChildren().clear();
-                //configAnchorPane.getChildren().setAll(linkEditorPane);
-                configTabPane.setContent(linkEditorPane);
+                configAnchorPane.getChildren().clear();
+                configAnchorPane.getChildren().setAll(linkEditorPane);
+                configAnchorPane.setTopAnchor(linkEditorPane, 0.0);
+                configAnchorPane.setBottomAnchor(linkEditorPane, 0.0);
+                configAnchorPane.setLeftAnchor(linkEditorPane, 0.0);
+                configAnchorPane.setRightAnchor(linkEditorPane, 0.0);
+
                 Link lnk = (Link)tree2object.get(treeItem);
                 if (lnk != null) {
                     linkEditorController.initWithLinkData(lnk);
@@ -348,7 +375,7 @@ public class AppMainController {
             projectTree.getRoot().getChildren().clear();
         
         actionPane.getSelectionModel().select(configTabPane);
-        configTabPane.setContent(null);
+        configAnchorPane.getChildren().clear();
     }
     
     

@@ -512,7 +512,22 @@ public class LinkEditorController {
         
         
         // TODO: set lane properties to link
+        try {
+            if ((myLink.get_type() == Link.Type.freeway) || (myLink.get_type() == Link.Type.connector)) {
+                System.err.println("SETTING LANES!");
+                myLink.get_segment().set_mixed_lanes(gp_lanes);
+            }
         
+            if (myLink.get_type() == Link.Type.onramp) {
+                myLink.get_segment().set_or_lanes(gp_lanes);
+            }
+        
+            if (myLink.get_type() == Link.Type.offramp) {
+                myLink.get_segment().set_fr_lanes(gp_lanes);
+            }
+        } catch(Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Could not change number of lanes...", e);
+        }
         
         
         GraphicsContext g = linkEditorCanvas.getGraphicsContext2D();
@@ -668,14 +683,22 @@ public class LinkEditorController {
     }
     
     
-    
+    @FXML
     private void onLinkLengthChange() {
         String unitsLength = appMainController.getUserSettings().getUnitsLength();
         double length = lengthSpinnerValueFactory.getValue();
         length = appMainController.getUserSettings().convertFlow(length, unitsLength, "meters");
         length = Math.max(length, 0.001);
         try {
-            myLink.get_segment().set_length_meters((float)length);
+            if ((myLink.get_type() == Link.Type.freeway) || (myLink.get_type() == Link.Type.connector)) {
+                myLink.get_segment().set_length_meters((float)length);
+            }
+            if (myLink.get_type() == Link.Type.onramp) {
+                myLink.get_segment().set_or_length_meters((float)length);
+            }
+            if (myLink.get_type() == Link.Type.offramp) {
+                myLink.get_segment().set_fr_length_meters((float)length);
+            }
         } catch(Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not change section length...", e);
         }
