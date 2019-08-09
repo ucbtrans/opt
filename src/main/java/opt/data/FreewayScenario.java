@@ -206,21 +206,6 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
-    // link delete
-    /////////////////////////////////////
-
-    protected void delete_link(AbstractLink link){
-
-        Node start_node = scenario.nodes.get(link.start_node_id);
-        start_node.out_links.remove(link.id);
-
-        Node end_node = scenario.nodes.get(link.end_node_id);
-        end_node.in_links.remove(link.id);
-
-        scenario.links.remove(link.id);
-    }
-
-    /////////////////////////////////////
     // segment getters, create, and delete
     /////////////////////////////////////
 
@@ -472,7 +457,7 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
-    // protected
+    // protected and private
     /////////////////////////////////////
 
     protected jaxbopt.Scn to_jaxb(){
@@ -532,6 +517,17 @@ public class FreewayScenario {
 
     protected long new_seg_id(){
         return ++max_seg_id;
+    }
+
+    protected void delete_link(AbstractLink link){
+
+        Node start_node = scenario.nodes.get(link.start_node_id);
+        start_node.out_links.remove(link.id);
+
+        Node end_node = scenario.nodes.get(link.end_node_id);
+        end_node.in_links.remove(link.id);
+
+        scenario.links.remove(link.id);
     }
 
     /////////////////////////////////////

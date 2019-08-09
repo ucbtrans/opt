@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Node {
+
     protected long id;
     protected HashSet<Long> in_links = new HashSet<>();
     protected HashSet<Long> out_links = new HashSet<>();
@@ -52,6 +53,5 @@ public class Node {
     public String toString() {
         return String.format("%d",id);
     }
-
 
 }

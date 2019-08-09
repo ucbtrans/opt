@@ -123,11 +123,9 @@ public abstract class AbstractLink implements Comparable {
         return mysegment.fwy_scenario.scenario.nodes.get(end_node_id).out_links.isEmpty();
     }
 
-
     public final boolean is_ramp(){
         return this.type== Type.onramp || type==Type.offramp;
     }
-
 
     public float get_capacity_vphpl(){
         return param.capacity_vphpl;
@@ -171,7 +169,6 @@ public abstract class AbstractLink implements Comparable {
         param.ff_speed_kph = x;
     }
 
-
     /////////////////////////////////////
     // demands and splits
     /////////////////////////////////////
@@ -203,12 +200,10 @@ public abstract class AbstractLink implements Comparable {
         return str;
     }
 
-
     @Override
     public int compareTo(Object that) {
         return Long.compare(this.id,((AbstractLink) that).id);
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -226,7 +221,6 @@ public abstract class AbstractLink implements Comparable {
                 demands.equals(that.demands) &&
                 splits.equals(that.splits);
     }
-
 
     @Override
     public int hashCode() {

@@ -21,7 +21,6 @@ public class TestSegment extends AbstractTest {
     static{
         sX = new TestData();
     }
-
     /////////////////////////////////////
     // name and length
     /////////////////////////////////////
@@ -176,12 +175,6 @@ public class TestSegment extends AbstractTest {
 //        assertFalse(sX.scenario.get_segment_by_name("sA2").has_onramp());
 //        assertTrue(sX.scenario.get_segment_by_name("sA3").has_onramp());
 //    }
-
-
-
-
-
-
 
 //    @Test
 //    public void test_delete_onramp(){

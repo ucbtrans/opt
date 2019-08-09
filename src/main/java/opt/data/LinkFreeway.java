@@ -5,6 +5,10 @@ import profiles.Profile1D;
 
 public class LinkFreeway extends LinkFreewayOrConnector {
 
+    /////////////////////////////////////
+    // construction
+    /////////////////////////////////////
+
     public LinkFreeway(jaxb.Link link, Roadparam rp) {
         super(link, Type.freeway, rp);
     }
@@ -13,10 +17,18 @@ public class LinkFreeway extends LinkFreewayOrConnector {
         super(id, Type.freeway, start_node_id, end_node_id, full_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
     }
 
+    /////////////////////////////////////
+    // override
+    /////////////////////////////////////
+
     @Override
     public void set_split(Long comm_id, Profile1D profile) throws Exception {
         this.splits.put(comm_id,profile);
     }
+
+    /////////////////////////////////////
+    // insert
+    /////////////////////////////////////
 
 //    public Segment insert_upstrm_mainline_segment(){
 //

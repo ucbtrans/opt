@@ -83,11 +83,10 @@ public class Scenario {
     }
 
     /////////////////////////////////////
-    // getters
+    // protected and private
     /////////////////////////////////////
 
-
-    public jaxb.Scenario to_jaxb(Collection<Segment> segments){
+    protected jaxb.Scenario to_jaxb(Collection<Segment> segments){
         jaxb.Scenario jScn = new jaxb.Scenario();
 
         // models : Hard code single CTM model
@@ -259,10 +258,6 @@ public class Scenario {
         return jScn;
     }
 
-    /////////////////////////////////////
-    // private
-    /////////////////////////////////////
-
     private Map<Long,LinkParameters> get_link_params(){
         Set<LinkParameters> link_params_set = links.values().stream()
                 .map(link->link.param)
@@ -277,7 +272,7 @@ public class Scenario {
     }
 
     /////////////////////////////////////
-    // Override
+    // override
     /////////////////////////////////////
 
     @Override

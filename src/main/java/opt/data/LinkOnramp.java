@@ -5,6 +5,10 @@ import profiles.Profile1D;
 
 public class LinkOnramp extends AbstractLink {
 
+    /////////////////////////////////////
+    // construction
+    /////////////////////////////////////
+
     public LinkOnramp(jaxb.Link link, Roadparam rp) {
         super(link, AbstractLink.Type.onramp, rp);
     }
@@ -12,6 +16,10 @@ public class LinkOnramp extends AbstractLink {
     public LinkOnramp(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
         super(id, AbstractLink.Type.onramp, start_node_id, end_node_id, full_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
     }
+
+    /////////////////////////////////////
+    // override
+    /////////////////////////////////////
 
     @Override
     public int get_managed_lanes() {
@@ -28,6 +36,10 @@ public class LinkOnramp extends AbstractLink {
     public void set_demand_vph(Long comm_id, Profile1D profile) throws Exception {
         this.demands.put(comm_id,profile);
     }
+
+    /////////////////////////////////////
+    // insert
+    /////////////////////////////////////
 
 //    public Segment insert_upstrm_segment() {
 //

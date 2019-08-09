@@ -9,9 +9,7 @@ import static java.util.stream.Collectors.toSet;
 public class Segment implements Comparable {
 
     protected FreewayScenario fwy_scenario;
-
     protected long id;
-
     public String name;
     public LinkFreewayOrConnector fwy;
     protected List<LinkOnramp> in_ors = new ArrayList<>();
@@ -55,14 +53,6 @@ public class Segment implements Comparable {
         for(AbstractLink link : get_links())
             link.mysegment = this;
     }
-
-    // used by Segment.create_new_segment
-//    public Segment(FreewayScenario fwy_scenario,long id,String name,Long fwy_id){
-//        this.fwy_scenario = fwy_scenario;
-//        this.id = id;
-//        this.name = name;
-//        this.fwy_id = fwy_id;
-//    }
 
     public Segment clone() {
         Segment new_seg = new Segment();
@@ -319,6 +309,62 @@ public class Segment implements Comparable {
         }
     }
 
+    protected jaxbopt.Sgmt to_jaxb(){
+        jaxbopt.Sgmt sgmt = new jaxbopt.Sgmt();
+        sgmt.setName(name);
+        sgmt.setType(get_type());
+
+        sgmt.setFwy(String.format("%d",fwy.id));
+
+        if(!out_ors.isEmpty())
+            sgmt.setOutOrs(OTMUtils.comma_format(out_ors.stream().map(x -> x.id).collect(toSet())));
+
+        if(!in_ors.isEmpty())
+            sgmt.setInOrs(OTMUtils.comma_format(in_ors.stream().map(x -> x.id).collect(toSet())));
+
+        if(!out_frs.isEmpty())
+            sgmt.setOutFrs(OTMUtils.comma_format(out_frs.stream().map(x -> x.id).collect(toSet())));
+
+        if(!in_frs.isEmpty())
+            sgmt.setInFrs(OTMUtils.comma_format(in_frs.stream().map(x -> x.id).collect(toSet())));
+
+        return sgmt;
+    }
+
+    /////////////////////////////////////
+    // override
+    /////////////////////////////////////
+
+    @Override
+    public int compareTo(Object that) {
+        return this.name.compareTo(((Segment) that).name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Segment segment = (Segment) o;
+        return id == segment.id &&
+                name.equals(segment.name) &&
+                fwy.equals(segment.fwy) &&
+                in_ors.equals(segment.in_ors) &&
+                out_ors.equals(segment.out_ors) &&
+                in_frs.equals(segment.in_frs) &&
+                out_frs.equals(segment.out_frs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, fwy, in_ors, out_ors, in_frs, out_frs);
+    }
+
+
+
+
+
+
+
 //    protected void set_start_node(long new_start_node){
 //        fwy().start_node_id = new_start_node;
 //        if(has_offramp())
@@ -386,53 +432,5 @@ public class Segment implements Comparable {
 //        return newseg;
 //    }
 
-    /////////////////////////////////////
-    // override
-    /////////////////////////////////////
 
-    public jaxbopt.Sgmt to_jaxb(){
-        jaxbopt.Sgmt sgmt = new jaxbopt.Sgmt();
-        sgmt.setName(name);
-        sgmt.setType(get_type());
-
-        sgmt.setFwy(String.format("%d",fwy.id));
-
-        if(!out_ors.isEmpty())
-            sgmt.setOutOrs(OTMUtils.comma_format(out_ors.stream().map(x -> x.id).collect(toSet())));
-
-        if(!in_ors.isEmpty())
-            sgmt.setInOrs(OTMUtils.comma_format(in_ors.stream().map(x -> x.id).collect(toSet())));
-
-        if(!out_frs.isEmpty())
-            sgmt.setOutFrs(OTMUtils.comma_format(out_frs.stream().map(x -> x.id).collect(toSet())));
-
-        if(!in_frs.isEmpty())
-            sgmt.setInFrs(OTMUtils.comma_format(in_frs.stream().map(x -> x.id).collect(toSet())));
-
-        return sgmt;
-    }
-
-    @Override
-    public int compareTo(Object that) {
-        return this.name.compareTo(((Segment) that).name);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Segment segment = (Segment) o;
-        return id == segment.id &&
-                name.equals(segment.name) &&
-                fwy.equals(segment.fwy) &&
-                in_ors.equals(segment.in_ors) &&
-                out_ors.equals(segment.out_ors) &&
-                in_frs.equals(segment.in_frs) &&
-                out_frs.equals(segment.out_frs);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, fwy, in_ors, out_ors, in_frs, out_frs);
-    }
 }

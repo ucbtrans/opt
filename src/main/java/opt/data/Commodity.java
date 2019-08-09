@@ -24,7 +24,6 @@ public class Commodity {
         this.weight = weight;
     }
 
-
     public Commodity clone(){
         return new Commodity(id,name,weight);
     }
@@ -62,4 +61,5 @@ public class Commodity {
     public int hashCode() {
         return Objects.hash(id, name, weight);
     }
+
 }

@@ -91,7 +91,6 @@ public class Project {
         return scenarios.containsKey(name) ? scenarios.get(name) : null;
     }
 
-
     /**
      * Change the name of a scenario
      * @param oldname Current name of the scenario
@@ -139,7 +138,7 @@ public class Project {
     }
 
     /////////////////////////////////////
-    // private
+    // protected and private
     /////////////////////////////////////
 
     protected jaxbopt.Prj to_jaxb(Map<String,String> scenario_file_names){

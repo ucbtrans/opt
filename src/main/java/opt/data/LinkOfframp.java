@@ -5,6 +5,10 @@ import profiles.Profile1D;
 
 public class LinkOfframp extends AbstractLink {
 
+    /////////////////////////////////////
+    // construction
+    /////////////////////////////////////
+
     public LinkOfframp(jaxb.Link link, Roadparam rp) {
         super(link, AbstractLink.Type.offramp, rp);
     }
@@ -12,6 +16,10 @@ public class LinkOfframp extends AbstractLink {
     public LinkOfframp(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
         super(id, AbstractLink.Type.offramp, start_node_id, end_node_id, full_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
     }
+
+    /////////////////////////////////////
+    // override
+    /////////////////////////////////////
 
     @Override
     public int get_managed_lanes() {
@@ -28,6 +36,10 @@ public class LinkOfframp extends AbstractLink {
     public void set_split(Long comm_id, Profile1D profile) throws Exception {
         this.splits.put(comm_id,profile);
     }
+
+    /////////////////////////////////////
+    // insert
+    /////////////////////////////////////
 
 //    public boolean has_offramp(){
 //        return !frs.isEmpty();
