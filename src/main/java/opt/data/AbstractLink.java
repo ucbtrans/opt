@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public abstract class AbstractLink {
+public abstract class AbstractLink implements Comparable {
 
     public enum Type {freeway,offramp,onramp,connector}
 
@@ -222,4 +222,10 @@ public abstract class AbstractLink {
     public int hashCode() {
         return Objects.hash(id, type, name, start_node_id, end_node_id, full_lanes, length_meters,param.capacity_vphpl, param.jam_density_vpkpl, param.ff_speed_kph);
     }
+
+    @Override
+    public int compareTo(Object that) {
+        return Long.compare(this.id,((AbstractLink) that).id);
+    }
+
 }

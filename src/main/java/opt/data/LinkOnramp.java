@@ -4,9 +4,6 @@ import jaxb.Roadparam;
 import profiles.Profile1D;
 
 public class LinkOnramp extends AbstractLink {
-    protected Long id;
-    protected Long seg_up_id = null;
-
 
     public LinkOnramp(jaxb.Link link, Roadparam rp) {
         super(link, AbstractLink.Type.onramp, rp);

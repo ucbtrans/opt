@@ -16,15 +16,13 @@
 				<lnk id="11" name="lA11"/>
 				<lnk id="12" name="lA12"/>
 				<lnk id="13" name="lA13"/>
-				<lnk id="14" name="lA14"/>
 				<lnk id="15" name="lA15"/>
 				<lnk id="16" name="lA16"/>
-				<lnk id="17" name="lA17"/>
 				<lnk id="18" name="lA18"/>
 			</lnks>
 			<sgmts>
 				<sgmt type="fwy" name="sA1" fwy="1" out_frs="7"/>
-				<sgmt type="fwy" name="sA2" fwy="2" />
+				<sgmt type="fwy" name="sA2" fwy="2"/>
 				<sgmt type="fwy" name="sA3" fwy="3" out_ors="8" out_frs="9"/>
 				<sgmt type="fwy" name="sA4" fwy="4" out_frs="10"/>
 				<sgmt type="fwy" name="sA5" fwy="5"/>

@@ -8,15 +8,14 @@ import java.util.Map;
 
 public class LinkConnector extends LinkFreewayOrConnector {
 
-    protected Map<Long, Profile1D> fwy_demands = new HashMap<>();     // commodity -> Profile1D
-
     public LinkConnector(jaxb.Link link, Roadparam rp) {
-        super(link, AbstractLink.Type.freeway, rp);
+        super(link, Type.connector, rp);
     }
 
     public LinkConnector(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
-        super(id, AbstractLink.Type.freeway, start_node_id, end_node_id, full_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
+        super(id, Type.connector, start_node_id, end_node_id, full_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
     }
+
 
 //    public boolean connect_dnstrm_onramp(AbstractLink onramp) throws Exception {
 //

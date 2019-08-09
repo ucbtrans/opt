@@ -1,6 +1,9 @@
 package opt.data;
 
 import jaxb.ModelParams;
+import output.animation.AbstractLinkInfo;
+import profiles.Profile1D;
+import utils.OTMUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,86 +61,6 @@ public class Scenario {
                 }
         }
 
-        // make link connections
-        for(AbstractLink abslink : links.values()){
-
-            Set<AbstractLink> up_links = nodes.get(abslink.start_node_id).in_links.stream()
-                    .map(link_id -> links.get(link_id))
-                    .collect(Collectors.toSet());
-
-            Set<AbstractLink> dn_links = nodes.get(abslink.end_node_id).out_links.stream()
-                    .map(link_id -> links.get(link_id))
-                    .collect(Collectors.toSet());
-
-            Set<AbstractLink> up_links_f = null;
-            Set<AbstractLink> dn_links_f = null;
-            switch(abslink.type){
-
-                case freeway:
-
-                    up_links_f = up_links.stream()
-                            .filter(link -> link instanceof LinkFreeway)
-                            .map(link -> (LinkFreeway)link)
-                            .collect(Collectors.toSet());
-
-                    dn_links_f = dn_links.stream()
-                            .filter(link -> link instanceof LinkFreeway)
-                            .map(link -> (LinkFreeway)link)
-                            .collect(Collectors.toSet());
-
-                    break;
-
-                case connector:
-
-                    up_links_f = up_links.stream()
-                            .filter(link -> link instanceof LinkOfframp)
-                            .map(link -> (LinkOfframp)link)
-                            .collect(Collectors.toSet());
-
-                    dn_links_f = dn_links.stream()
-                            .filter(link -> link instanceof LinkOnramp)
-                            .map(link -> (LinkOnramp)link)
-                            .collect(Collectors.toSet());
-
-                    break;
-
-                case onramp:
-
-                    up_links_f = up_links.stream()
-                            .filter(link -> link instanceof LinkConnector)
-                            .map(link -> (LinkConnector)link)
-                            .collect(Collectors.toSet());
-
-                    dn_links_f = dn_links.stream()
-                            .filter(link -> link instanceof LinkFreeway)
-                            .map(link -> (LinkFreeway)link)
-                            .collect(Collectors.toSet());
-
-                    break;
-
-                case offramp:
-
-                    up_links_f = up_links.stream()
-                            .filter(link -> link instanceof LinkFreeway)
-                            .map(link -> (LinkFreeway)link)
-                            .collect(Collectors.toSet());
-
-                    dn_links_f = dn_links.stream()
-                            .filter(link -> link instanceof LinkConnector)
-                            .map(link -> (LinkConnector)link)
-                            .collect(Collectors.toSet());
-
-                    break;
-            }
-
-            if(up_links_f!=null && !up_links_f.isEmpty())
-                abslink.up_link = up_links_f.iterator().next();
-
-            if(dn_links_f!=null && !dn_links_f.isEmpty())
-                abslink.dn_link = dn_links_f.iterator().next();
-
-        }
-
         // commodities
         if(scenario.getCommodities()!=null)
             for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
@@ -145,29 +68,29 @@ public class Scenario {
 
     }
 
-    public Scenario deep_copy() {
-        Scenario jscn_cpy = new Scenario();
-
-        // create new nodes
-        for (Map.Entry<Long, Node> e : nodes.entrySet())
-            jscn_cpy.nodes.put(e.getKey(), new Node(e.getKey()));
-
-        // create new links
-        for (Map.Entry<Long, AbstractLink> e : links.entrySet())
-            jscn_cpy.links.put(e.getKey(),e.getValue().deep_copy());
-
-        // set node inlinks and outlinks
-        for (Node node_cpy : jscn_cpy.nodes.values()){
-            Node node_org = nodes.get(node_cpy.id);
-            node_cpy.out_links.addAll(node_org.out_links);
-            node_cpy.in_links.addAll(node_org.in_links);
-        }
-
-        // commodities
-        for (Map.Entry<Long,Commodity> e : commodities.entrySet())
-            jscn_cpy.commodities.put(e.getKey(),e.getValue().deep_copy());
-
-
+//    public Scenario deep_copy() {
+//        Scenario jscn_cpy = new Scenario();
+//
+//        // create new nodes
+//        for (Map.Entry<Long, Node> e : nodes.entrySet())
+//            jscn_cpy.nodes.put(e.getKey(), new Node(e.getKey()));
+//
+//        // create new links
+//        for (Map.Entry<Long, AbstractLink> e : links.entrySet())
+//            jscn_cpy.links.put(e.getKey(),e.getValue().deep_copy());
+//
+//        // set node inlinks and outlinks
+//        for (Node node_cpy : jscn_cpy.nodes.values()){
+//            Node node_org = nodes.get(node_cpy.id);
+//            node_cpy.out_links.addAll(node_org.out_links);
+//            node_cpy.in_links.addAll(node_org.in_links);
+//        }
+//
+//        // commodities
+//        for (Map.Entry<Long,Commodity> e : commodities.entrySet())
+//            jscn_cpy.commodities.put(e.getKey(),e.getValue().deep_copy());
+//
+//
 //        // set road parameters
 //        for(Map.Entry<Long,jaxb.Roadparam> e : jscn_org.road_params.entrySet()) {
 //            long rp_id = e.getKey();
@@ -180,9 +103,9 @@ public class Scenario {
 //            rp_cpy.setSpeed(rp.getSpeed());
 //            jscn_cpy.road_params.put(rp_id, rp_cpy);
 //        }
-
-        return jscn_cpy;
-    }
+//
+//        return jscn_cpy;
+//    }
 
     /////////////////////////////////////
     // getters
@@ -275,65 +198,95 @@ public class Scenario {
             jLinks.getLink().add(jaxbLink);
         }
 
-        // demands and splits
+        // demands
         jaxb.Demands jdemands = new jaxb.Demands();
         jScn.setDemands(jdemands);
+        for(AbstractLink link : links.values()) {
+            for (Map.Entry<Long, Profile1D> e : link.demands.entrySet()) {
+                Long comm_id = e.getKey();
+                Profile1D profile = e.getValue();
+
+                jaxb.Demand jdemand = new jaxb.Demand();
+                jdemands.getDemand().add(jdemand);
+                jdemand.setCommodityId(comm_id);
+                jdemand.setDt(profile.dt);
+                jdemand.setStartTime(profile.start_time);
+                jdemand.setLinkId(link.id);
+                jdemand.setContent(OTMUtils.comma_format(profile.get_values()));
+            }
+        }
+
+        // splits
         jaxb.Splits jsplits = new jaxb.Splits();
         jScn.setSplits(jsplits);
 
-        // TODO PUT THIS BACK IN
-//        for(Segment segment : segments){
-//
-//            if(!segment.fr_splits.isEmpty()) {
-//
-//
-//                for (Map.Entry<Long, Profile1D> e : segment.fr_splits.entrySet()) {
-//                    jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
-//                    jsplits.getSplitNode().add(jsplitnode);
-//                    jaxb.Split jsplit = new jaxb.Split();
-//                    jsplitnode.getSplit().add(jsplit);
-//
-//                    jsplitnode.setCommodityId(e.getKey());
-//                    Profile1D profile = e.getValue();
-//
-//                    if(profile.dt!=null)
-//                        jsplitnode.setDt(profile.dt);
-//                    jsplitnode.setStartTime(profile.start_time);
-//                    jsplitnode.setLinkIn(segment.fwy_id);
-//                    jsplitnode.setNodeId(segment.fwy().end_node_id);
-//                    jsplit.setLinkOut(segment.fr_id);
-//                    jsplit.setContent(OTMUtils.comma_format(profile.values));
-//                }
-//            }
-//
-//            if(!segment.or_demands.isEmpty()) {
-//                for (Map.Entry<Long, Profile1D> e : segment.or_demands.entrySet()) {
-//                    jaxb.Demand jdemand = new jaxb.Demand();
-//                    jdemands.getDemand().add(jdemand);
-//                    jdemand.setCommodityId(e.getKey());
-//                    Profile1D profile = e.getValue();
-//                    jdemand.setDt(profile.dt);
-//                    jdemand.setStartTime(profile.start_time);
-//                    jdemand.setLinkId(segment.or_id);
-//                    jdemand.setContent(OTMUtils.comma_format(profile.get_values()));
-//                }
-//            }
-//
-//            if(!segment.fwy_demands.isEmpty()) {
-//                for (Map.Entry<Long, Profile1D> e : segment.fwy_demands.entrySet()) {
-//                    jaxb.Demand jdemand = new jaxb.Demand();
-//                    jdemands.getDemand().add(jdemand);
-//                    jdemand.setCommodityId(e.getKey());
-//                    Profile1D profile = e.getValue();
-//                    if(profile.dt!=null)
-//                        jdemand.setDt(profile.dt);
-//                    jdemand.setStartTime(profile.start_time);
-//                    jdemand.setLinkId(segment.fwy_id);
-//                    jdemand.setContent(OTMUtils.comma_format(profile.get_values()));
-//                }
-//            }
-//
-//        }
+        for(Node node : nodes.values() ) {
+
+            boolean has_splits = node.out_links.stream()
+                    .map(link_id->links.get(link_id))
+                    .anyMatch(link->!link.splits.isEmpty());
+
+            if(!has_splits)
+                continue;
+
+            Set<LinkFreeway> in_links = node.in_links.stream()
+                    .map(link_id->links.get(link_id))
+                    .filter(link->link instanceof LinkFreeway)
+                    .map(link-> (LinkFreeway) link)
+                    .collect(Collectors.toSet());
+
+            if(in_links.size()>1)
+                System.err.println("90443j2f");
+
+            LinkFreeway in_link = in_links.iterator().next();
+
+            Set<Long> comm_ids = node.out_links.stream()
+                    .map(link_id->links.get(link_id))
+                    .flatMap(link->link.splits.keySet().stream())
+                    .collect(Collectors.toSet());
+
+            for(Long comm_id : comm_ids){
+
+                // get unique dt and start_time
+                Set<Profile1D> profiles = node.out_links.stream()
+                        .map(link_id->links.get(link_id))
+                        .map(link->link.splits.get(comm_id))
+                        .collect(Collectors.toSet());
+
+                Set<Float> dts = profiles.stream().map(prof->prof.dt).collect(Collectors.toSet());
+                if(dts.size()!=1)
+                    System.err.println("RG)@J$G 2-43j");
+
+                Set<Float> start_times = profiles.stream().map(prof->prof.start_time).collect(Collectors.toSet());
+                if(start_times.size()!=1)
+                    System.err.println("535h3");
+
+                // to jaxb
+                jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
+                jsplits.getSplitNode().add(jsplitnode);
+                jsplitnode.setCommodityId(comm_id);
+                jsplitnode.setNodeId(node.id);
+                jsplitnode.setLinkIn(in_link.id);
+                jsplitnode.setDt(dts.iterator().next());
+                jsplitnode.setStartTime(start_times.iterator().next());
+
+
+                // assumes that *all* out links have splits defined
+                // and they sum up to 1.
+
+                for( Long outlink_id : node.out_links ){
+
+                    jaxb.Split jsplit = new jaxb.Split();
+                    jsplitnode.getSplit().add(jsplit);
+
+                    AbstractLink outlink = links.get(outlink_id);
+                    jsplit.setLinkOut(outlink_id);
+                    jsplit.setContent(OTMUtils.comma_format(outlink.splits.get(comm_id).values));
+                }
+
+            }
+
+        }
 
         return jScn;
     }
@@ -358,4 +311,22 @@ public class Scenario {
     public int hashCode() {
         return Objects.hash(nodes, links, commodities);
     }
+
+    private static Profile1D sum_profiles(Set<Profile1D> profiles){
+        Set<Float> dts = profiles.stream().map(p->p.dt).collect(Collectors.toSet());
+        Set<Float> start_times = profiles.stream().map(p->p.start_time).collect(Collectors.toSet());
+        Set<Integer> sizes = profiles.stream().map(p->p.get_length()).collect(Collectors.toSet());
+        if(dts.size()!=1 || start_times.size()!=1 || sizes.size()!=1)
+            return null;
+
+        Profile1D X = new Profile1D(start_times.iterator().next(),dts.iterator().next());
+        for(int i=0;i<sizes.iterator().next();i++)
+            X.add(0f);
+        for(Profile1D profile : profiles)
+            for(int i=0;i<profile.get_length();i++)
+                X.values.set(i,X.values.get(i) + profile.values.get(i));
+
+        return X;
+    }
+
 }

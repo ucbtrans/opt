@@ -60,6 +60,88 @@ public class FreewayScenario {
                 segments.put(segment.id,segment);
             }
 
+        // make link connections
+        for(AbstractLink abslink : scenario.links.values()){
+
+            Set<AbstractLink> up_links = scenario.nodes.get(abslink.start_node_id).in_links.stream()
+                    .map(link_id -> scenario.links.get(link_id))
+                    .filter(link -> link.mysegment!=null )
+                    .collect(Collectors.toSet());
+
+            Set<AbstractLink> dn_links = scenario.nodes.get(abslink.end_node_id).out_links.stream()
+                    .map(link_id -> scenario.links.get(link_id))
+                    .filter(link -> link.mysegment!=null )
+                    .collect(Collectors.toSet());
+
+            Set<AbstractLink> up_links_f = null;
+            Set<AbstractLink> dn_links_f = null;
+            switch(abslink.type){
+
+                case freeway:
+
+                    up_links_f = up_links.stream()
+                            .filter(link -> link instanceof LinkFreeway)
+                            .map(link -> (LinkFreeway)link)
+                            .collect(Collectors.toSet());
+
+                    dn_links_f = dn_links.stream()
+                            .filter(link -> link instanceof LinkFreeway)
+                            .map(link -> (LinkFreeway)link)
+                            .collect(Collectors.toSet());
+
+                    break;
+
+                case connector:
+
+                    up_links_f = up_links.stream()
+                            .filter(link -> link instanceof LinkOfframp)
+                            .map(link -> (LinkOfframp)link)
+                            .collect(Collectors.toSet());
+
+                    dn_links_f = dn_links.stream()
+                            .filter(link -> link instanceof LinkOnramp)
+                            .map(link -> (LinkOnramp)link)
+                            .collect(Collectors.toSet());
+
+                    break;
+
+                case onramp:
+
+                    up_links_f = up_links.stream()
+                            .filter(link -> link instanceof LinkConnector)
+                            .map(link -> (LinkConnector)link)
+                            .collect(Collectors.toSet());
+
+                    dn_links_f = dn_links.stream()
+                            .filter(link -> link instanceof LinkFreeway)
+                            .map(link -> (LinkFreeway)link)
+                            .collect(Collectors.toSet());
+
+                    break;
+
+                case offramp:
+
+                    up_links_f = up_links.stream()
+                            .filter(link -> link instanceof LinkFreeway)
+                            .map(link -> (LinkFreeway)link)
+                            .collect(Collectors.toSet());
+
+                    dn_links_f = dn_links.stream()
+                            .filter(link -> link instanceof LinkConnector)
+                            .map(link -> (LinkConnector)link)
+                            .collect(Collectors.toSet());
+
+                    break;
+            }
+
+            if(up_links_f!=null && !up_links_f.isEmpty())
+                abslink.up_link = up_links_f.iterator().next();
+
+            if(dn_links_f!=null && !dn_links_f.isEmpty())
+                abslink.dn_link = dn_links_f.iterator().next();
+
+        }
+
         // assign demands
         if (jaxb_scenario.getDemands()!=null)
             for(jaxb.Demand dem : jaxb_scenario.getDemands().getDemand())
@@ -104,10 +186,25 @@ public class FreewayScenario {
     // scenario getters
     /////////////////////////////////////
 
-    public Set<AbstractLink> get_links(){
+    public List<AbstractLink> get_links(){
         return segments.values().stream()
                 .flatMap(sgmt->sgmt.get_links().stream())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
+    }
+
+    /////////////////////////////////////
+    // link delete
+    /////////////////////////////////////
+
+    protected void delete_link(AbstractLink link){
+
+        Node start_node = scenario.nodes.get(link.start_node_id);
+        start_node.out_links.remove(link.id);
+
+        Node end_node = scenario.nodes.get(link.end_node_id);
+        end_node.in_links.remove(link.id);
+
+        scenario.links.remove(link.id);
     }
 
     /////////////////////////////////////
@@ -372,7 +469,9 @@ public class FreewayScenario {
 
         jaxbopt.Lnks lnks = new jaxbopt.Lnks();
         scn.setLnks(lnks);
-        for(AbstractLink link : get_links()){
+        List<AbstractLink> all_links = get_links();
+        Collections.sort(all_links);
+        for(AbstractLink link : all_links ){
             if(link==null)
                 continue;
             jaxbopt.Lnk lnk = new jaxbopt.Lnk();

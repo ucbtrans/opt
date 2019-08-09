@@ -3,12 +3,7 @@ package opt.data;
 import jaxb.Roadparam;
 import profiles.Profile1D;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class LinkFreeway extends LinkFreewayOrConnector {
-
-    protected Map<Long, Profile1D> fwy_demands = new HashMap<>();     // commodity -> Profile1D
 
     public LinkFreeway(jaxb.Link link, Roadparam rp) {
         super(link, Type.freeway, rp);

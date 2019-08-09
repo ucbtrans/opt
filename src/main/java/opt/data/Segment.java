@@ -6,7 +6,7 @@ import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
 
-public class Segment {
+public class Segment implements Comparable {
 
     protected FreewayScenario fwy_scenario;
 
@@ -155,152 +155,68 @@ public class Segment {
     // add ramps
     ////////////////////////////////////////
 
-    public void add_in_or(LinkOnramp x){
-        if(x==null)
-            return;
-        in_ors.add(x);
-
-        // TODO FINISH THIS
+    public LinkOnramp add_in_or(LinkParameters params,int gp_lanes,float length){
+        LinkOnramp link = create_onramp(params,gp_lanes,length);
+        in_ors.add(link);
+        return link;
     }
 
-    public void add_out_or(LinkOnramp x){
-        if(x==null)
-            return;
-        out_ors.add(x);
-
-        // TODO FINISH THIS
-
-//        long id = fwy_scenario.new_link_id();
-//        Node start_node = new Node(fwy_scenario.new_node_id());
-//        long start_node_id = start_node.id;
-//        long end_node_id = fwy().end_node_id;
-//        int full_lanes = 1;
-//        float length = 100f;
-//        AbstractLink or = new AbstractLink(id, AbstractLink.Type.onramp,start_node_id,end_node_id,full_lanes,length,
-//                params.capacity_vphpl,
-//                params.jam_density_vpkpl,
-//                params.ff_speed_kph,this);
-//        or_id = or.id;
-//        or.mysegment = this;
-//        start_node.out_links.add(or_id);
-//        fwy_scenario.scenario.nodes.put(start_node.id,start_node);
-//        fwy_scenario.scenario.links.put(or.id,or);
+    public LinkOnramp add_out_or(LinkParameters params,int gp_lanes,float length){
+        LinkOnramp link = create_onramp(params,gp_lanes,length);
+        out_ors.add(link);
+        return link;
     }
 
-    public void add_in_fr(LinkOfframp x){
-        if(x==null)
-            return;
-        in_frs.add(x);
-
-        // TODO FINISH THIS
-
-//        long id = fwy_scenario.new_link_id();
-//        AbstractLink fwy = fwy();
-//        long start_node_id = fwy.start_node_id;
-//        Node end_node = new Node(fwy_scenario.new_node_id());
-//        long end_node_id = end_node.id;
-//        int full_lanes = 1;
-//        float length = 100f;
-//
-//        AbstractLink fr = new AbstractLink(id, AbstractLink.Type.offramp,start_node_id,end_node_id,full_lanes,length,
-//                params.capacity_vphpl,
-//                params.jam_density_vpkpl,
-//                params.ff_speed_kph,
-//                this);
-//
-//        fr_id = fr.id;
-//        fr.mysegment = this;
-//        end_node.in_links.add(fr_id);
-//        fwy_scenario.scenario.nodes.put(end_node.id,end_node);
-//        fwy_scenario.scenario.links.put(fr.id,fr);
+    public LinkOfframp add_in_fr(LinkParameters params,int gp_lanes,float length){
+        LinkOfframp link = create_offramp(params,gp_lanes,length);
+        in_frs.add(link);
+        return link;
     }
 
-    public void add_out_fr(LinkOfframp x){
-        if(x==null)
-            return;
-        out_frs.add(x);
-
-        // TODO FINISH THIS
+    public LinkOfframp add_out_fr(LinkParameters params,int gp_lanes,float length){
+        LinkOfframp link = create_offramp(params,gp_lanes,length);
+        out_frs.add(link);
+        return link;
     }
 
     ////////////////////////////////////////
     // delete ramps
     ////////////////////////////////////////
 
-    public boolean delete_in_or(LinkOnramp x){
-        if( in_ors.contains(x) ){
-
-            in_ors.remove(x);
-
-            // TODO FINISH THIS
-
+    public boolean delete_in_or(LinkOnramp link){
+        if( in_ors.contains(link) ){
+            fwy_scenario.delete_link(link);
+            in_ors.remove(link);
             return true;
         } else
             return false;
-
     }
 
-    public boolean delete_out_or(LinkOnramp x){
-
-        if( out_ors.contains(x) ){
-
-            out_ors.remove(x);
-
-            // TODO FINISH THIS
-//            AbstractLink or = or();
-//            fwy_scenario.scenario.nodes.remove(or.start_node_id);
-//            fwy_scenario.scenario.links.remove(or.id);
-//            if(fwy_scenario.scenario.nodes.containsKey(or.end_node_id)) {
-//                Node end_node = fwy_scenario.scenario.nodes.get(or.end_node_id);
-//                end_node.in_links.remove(or.id);
-//            }
-//            or_id = null;
-//            or_demands = new HashMap<>();
-//            return true;
-
+    public boolean delete_out_or(LinkOnramp link){
+        if( out_ors.contains(link) ){
+            fwy_scenario.delete_link(link);
+            out_ors.remove(link);
             return true;
         } else
             return false;
-
     }
 
-    public boolean delete_in_fr(LinkOfframp x){
-
-        if( in_frs.contains(x) ){
-
-            in_frs.remove(x);
-
-            // TODO FINISH THIS
-
-//            fwy_scenario.scenario.nodes.remove(fr.end_node_id);
-//            fwy_scenario.scenario.links.remove(fr.id);
-//            if(fwy_scenario.scenario.nodes.containsKey(fr.start_node_id)){
-//                Node start_node = fwy_scenario.scenario.nodes.get(fr.start_node_id);
-//                start_node.out_links.remove(fr.id);
-//            }
-//            fr_id = null;
-//            fr_splits = new HashMap<>();
-//            return true;
-
-
+    public boolean delete_in_fr(LinkOfframp link){
+        if( in_frs.contains(link) ){
+            fwy_scenario.delete_link(link);
+            in_frs.remove(link);
             return true;
         } else
             return false;
-
     }
 
-    public boolean delete_out_fr(LinkOfframp x){
-
-        if( out_frs.contains(x) ){
-
-            out_frs.remove(x);
-
-            // TODO FINISH THIS
-
+    public boolean delete_out_fr(LinkOfframp link){
+        if( out_frs.contains(link) ){
+            fwy_scenario.delete_link(link);
+            out_frs.remove(link);
             return true;
         } else
             return false;
-
     }
 
     /////////////////////////////////////
@@ -343,6 +259,62 @@ public class Segment {
     // protected and private
     /////////////////////////////////////
 
+    private LinkOnramp create_onramp(LinkParameters params,int gp_lanes,float length){
+
+        Long link_id = fwy_scenario.new_link_id();
+        Node start_node = new Node(fwy_scenario.new_node_id());
+        long end_node_id = this.fwy.start_node_id;
+
+        LinkOnramp link = new LinkOnramp(link_id,
+                start_node.id,
+                end_node_id,
+                gp_lanes,
+                length,
+                params.capacity_vphpl,
+                params.jam_density_vpkpl,
+                params.ff_speed_kph,
+                this);
+
+        start_node.in_links.add(link.id);
+        fwy_scenario.scenario.nodes.put(start_node.id,start_node);
+        fwy_scenario.scenario.links.put(link.id,link);
+
+        return link;
+    }
+
+    private LinkOfframp create_offramp(LinkParameters params,int gp_lanes,float length){
+
+        Long link_id = fwy_scenario.new_link_id();
+        Node end_node = new Node(fwy_scenario.new_node_id());
+        long start_node_id = this.fwy.end_node_id;
+
+        LinkOfframp link = new LinkOfframp(link_id,
+                start_node_id,
+                end_node.id,
+                gp_lanes,
+                length,
+                params.capacity_vphpl,
+                params.jam_density_vpkpl,
+                params.ff_speed_kph,
+                this);
+
+        end_node.out_links.add(link.id);
+        fwy_scenario.scenario.nodes.put(end_node.id,end_node);
+        fwy_scenario.scenario.links.put(link.id,link);
+
+        return link;
+    }
+
+    private String get_type(){
+        switch (fwy.get_type()){
+            case freeway:
+                return "fwy";
+            case connector:
+                return "con";
+            default:
+                return "";
+        }
+    }
 
 //    protected void set_start_node(long new_start_node){
 //        fwy().start_node_id = new_start_node;
@@ -417,13 +389,29 @@ public class Segment {
 
     public jaxbopt.Sgmt to_jaxb(){
         jaxbopt.Sgmt sgmt = new jaxbopt.Sgmt();
-//        sgmt.setName(name);
-//        sgmt.setLinks(OTMUtils.comma_format(
-//                get_links().stream()
-//                        .filter(x->x!=null)
-//                        .map(link->link.get_id())
-//                        .collect(toSet())));
+        sgmt.setName(name);
+        sgmt.setType(get_type());
+
+        sgmt.setFwy(String.format("%d",fwy.id));
+
+        if(!out_ors.isEmpty())
+            sgmt.setOutOrs(OTMUtils.comma_format(out_ors.stream().map(x -> x.id).collect(toSet())));
+
+        if(!in_ors.isEmpty())
+            sgmt.setInOrs(OTMUtils.comma_format(in_ors.stream().map(x -> x.id).collect(toSet())));
+
+        if(!out_frs.isEmpty())
+            sgmt.setOutFrs(OTMUtils.comma_format(out_frs.stream().map(x -> x.id).collect(toSet())));
+
+        if(!in_frs.isEmpty())
+            sgmt.setInFrs(OTMUtils.comma_format(in_frs.stream().map(x -> x.id).collect(toSet())));
+
         return sgmt;
+    }
+
+    @Override
+    public int compareTo(Object that) {
+        return this.name.compareTo(((Segment) that).name);
     }
 
 //    @Override

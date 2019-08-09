@@ -1,22 +1,9 @@
 package opt.data;
 
-import error.OTMErrorLog;
 import jaxb.Roadparam;
 import profiles.Profile1D;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 public class LinkOfframp extends AbstractLink {
-    protected Long id;
-    protected Map<Long, Profile1D> fr_splits = new HashMap<>();      // commodity -> Profile1D
-    protected Long seg_dn_id = null;
-
-//    public LinkOfframp(Long id) {
-//        this.id = id;
-//    }
-
 
     public LinkOfframp(jaxb.Link link, Roadparam rp) {
         super(link, AbstractLink.Type.offramp, rp);
