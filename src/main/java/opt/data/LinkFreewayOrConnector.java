@@ -2,6 +2,7 @@ package opt.data;
 
 import jaxb.Link;
 import jaxb.Roadparam;
+import profiles.Profile1D;
 
 public abstract class LinkFreewayOrConnector extends AbstractLink {
 
@@ -13,18 +14,22 @@ public abstract class LinkFreewayOrConnector extends AbstractLink {
         super(id, type, start_node_id, end_node_id, full_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
     }
 
+    @Override
+    public void set_demand_vph(Long comm_id, Profile1D profile) throws Exception {
+        this.demands.put(comm_id,profile);
+    }
 
+    @Override
     public int get_managed_lanes(){
         System.out.println("NOT IMPLEMENTED!");
         return 0;
     }
 
+    @Override
     public int get_aux_lanes(){
         System.out.println("NOT IMPLEMENTED!");
         return 0;
     }
-
-
 
 //    /**
 //     * Get the freeway demand for this segment, for a particular commodity.

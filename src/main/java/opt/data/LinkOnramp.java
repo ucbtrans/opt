@@ -1,23 +1,18 @@
 package opt.data;
 
-import error.OTMErrorLog;
 import jaxb.Roadparam;
 import profiles.Profile1D;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class Onramp extends AbstractLink {
+public class LinkOnramp extends AbstractLink {
     protected Long id;
-    protected Map<Long, Profile1D> or_demands = new HashMap<>();     // commodity -> Profile1D
     protected Long seg_up_id = null;
 
 
-    public Onramp(jaxb.Link link, Roadparam rp) {
+    public LinkOnramp(jaxb.Link link, Roadparam rp) {
         super(link, AbstractLink.Type.onramp, rp);
     }
 
-    public Onramp(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
+    public LinkOnramp(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
         super(id, AbstractLink.Type.onramp, start_node_id, end_node_id, full_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
     }
 
@@ -30,6 +25,11 @@ public class Onramp extends AbstractLink {
     @Override
     public int get_aux_lanes() {
         return 0;
+    }
+
+    @Override
+    public void set_demand_vph(Long comm_id, Profile1D profile) throws Exception {
+        this.demands.put(comm_id,profile);
     }
 
 //    public Segment insert_upstrm_segment() {

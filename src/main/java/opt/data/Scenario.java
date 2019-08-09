@@ -1,10 +1,9 @@
 package opt.data;
 
 import jaxb.ModelParams;
-import profiles.Profile1D;
-import utils.OTMUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Scenario {
 
@@ -39,10 +38,10 @@ public class Scenario {
                     AbstractLink link;
                     switch(jlink.getRoadType()){
                         case "offramp":
-                            link = new Offramp(jlink,road_params.get(jlink.getRoadparam()));
+                            link = new LinkOfframp(jlink,road_params.get(jlink.getRoadparam()));
                             break;
                         case "onramp":
-                            link = new Onramp(jlink,road_params.get(jlink.getRoadparam()));
+                            link = new LinkOnramp(jlink,road_params.get(jlink.getRoadparam()));
                             break;
                         case "freeway":
                             link = new LinkFreeway(jlink,road_params.get(jlink.getRoadparam()));
@@ -57,6 +56,86 @@ public class Scenario {
                     nodes.get(jlink.getEndNodeId()).in_links.add(link.id);
                     nodes.get(jlink.getStartNodeId()).out_links.add(link.id);
                 }
+        }
+
+        // make link connections
+        for(AbstractLink abslink : links.values()){
+
+            Set<AbstractLink> up_links = nodes.get(abslink.start_node_id).in_links.stream()
+                    .map(link_id -> links.get(link_id))
+                    .collect(Collectors.toSet());
+
+            Set<AbstractLink> dn_links = nodes.get(abslink.end_node_id).out_links.stream()
+                    .map(link_id -> links.get(link_id))
+                    .collect(Collectors.toSet());
+
+            Set<AbstractLink> up_links_f = null;
+            Set<AbstractLink> dn_links_f = null;
+            switch(abslink.type){
+
+                case freeway:
+
+                    up_links_f = up_links.stream()
+                            .filter(link -> link instanceof LinkFreeway)
+                            .map(link -> (LinkFreeway)link)
+                            .collect(Collectors.toSet());
+
+                    dn_links_f = dn_links.stream()
+                            .filter(link -> link instanceof LinkFreeway)
+                            .map(link -> (LinkFreeway)link)
+                            .collect(Collectors.toSet());
+
+                    break;
+
+                case connector:
+
+                    up_links_f = up_links.stream()
+                            .filter(link -> link instanceof LinkOfframp)
+                            .map(link -> (LinkOfframp)link)
+                            .collect(Collectors.toSet());
+
+                    dn_links_f = dn_links.stream()
+                            .filter(link -> link instanceof LinkOnramp)
+                            .map(link -> (LinkOnramp)link)
+                            .collect(Collectors.toSet());
+
+                    break;
+
+                case onramp:
+
+                    up_links_f = up_links.stream()
+                            .filter(link -> link instanceof LinkConnector)
+                            .map(link -> (LinkConnector)link)
+                            .collect(Collectors.toSet());
+
+                    dn_links_f = dn_links.stream()
+                            .filter(link -> link instanceof LinkFreeway)
+                            .map(link -> (LinkFreeway)link)
+                            .collect(Collectors.toSet());
+
+                    break;
+
+                case offramp:
+
+                    up_links_f = up_links.stream()
+                            .filter(link -> link instanceof LinkFreeway)
+                            .map(link -> (LinkFreeway)link)
+                            .collect(Collectors.toSet());
+
+                    dn_links_f = dn_links.stream()
+                            .filter(link -> link instanceof LinkConnector)
+                            .map(link -> (LinkConnector)link)
+                            .collect(Collectors.toSet());
+
+                    break;
+            }
+
+            if(up_links_f!=null && !up_links_f.isEmpty())
+                abslink.up_link = up_links_f.iterator().next();
+
+            if(dn_links_f!=null && !dn_links_f.isEmpty())
+                abslink.dn_link = dn_links_f.iterator().next();
+
         }
 
         // commodities

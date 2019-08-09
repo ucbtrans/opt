@@ -1,5 +1,8 @@
 package opt.data;
 
+import profiles.Profile1D;
+import utils.OTMUtils;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,192 +47,39 @@ public class FreewayScenario {
         this.scenario = new Scenario(jaxb_scenario);
 
         // attach link names
-        if (jaxb_lnks!=null){
-            for(jaxbopt.Lnk lnk : jaxb_lnks.getLnk()){
-                if (scenario.links.containsKey(lnk.getId())){
-                    AbstractLink link = scenario.links.get(lnk.getId());
-                    if( link.name!=null )
-                        throw new Exception("AbstractLink named twice");
-                    link.name = lnk.getName();
-                }
-            }
-        }
+        if (jaxb_lnks!=null)
+            for(jaxbopt.Lnk lnk : jaxb_lnks.getLnk())
+                if (scenario.links.containsKey(lnk.getId()))
+                    scenario.links.get(lnk.getId()).name = lnk.getName();
 
         // create segments
         long max_sgmt_id = 0;
-        if(jaxb_segments!=null) {
+        if(jaxb_segments!=null)
             for (jaxbopt.Sgmt sgmt : jaxb_segments.getSgmt()) {
-                long sgmt_id = max_sgmt_id++;
-                Segment segment = new Segment(this,sgmt_id, sgmt);
-                segments.put(sgmt_id,segment);
-
-                // assign segments to links
-                segment.fwy.mysegment = segment;
-                for(AbstractLink link : segment.get_links())
-                    link.mysegment = segment;
+                Segment segment = new Segment(this,max_sgmt_id++, sgmt);
+                segments.put(segment.id,segment);
             }
-        }
 
-        // segment adjacency mappings ..................................
-//        for(Segment segment : segments.values()){
-//
-//            // upstream freeway segment ..............
-//            Node start_node = scenario.nodes.get(segment.fwy.start_node_id);
-//            Set<Long> segments_fwy_up = start_node.in_links.stream()
-//                    .map(id->scenario.links.get(id))
-//                    .filter(link->!link.is_ramp())
-//                    .map(link -> link.mysegment.id)
-//                    .filter(seg->seg!=segment.id)
-//                    .collect(toSet());
-//
-//            if (segments_fwy_up.size()>1)
-//                throw new Exception("Level 3 networks has not been implemented");
-//
-//            if (segments_fwy_up.size()==1)
-//                segment.segment_fwy_up_id = segments_fwy_up.iterator().next();
-//
-//            // downstream freeway segment ..............
-//            Node end_node = scenario.nodes.get(segment.fwy().end_node_id);
-//            Set<Long> segments_ml_dn = end_node.out_links.stream()
-//                    .map(id->scenario.links.get(id))
-//                    .filter(link->!link.is_ramp())
-//                    .map(link -> link.mysegment.id)
-//                    .filter(seg->seg!=segment.id)
-//                    .collect(toSet());
-//
-//            if (segments_ml_dn.size()>1)
-//                throw new Exception("Level 3 networks has not been implemented");
-//
-//            if (segments_ml_dn.size()==1)
-//                segment.segment_fwy_dn_id = segments_ml_dn.iterator().next();
-//
-//            // downstream offramp connector segment ...........
-//            if(segment.has_offramp()){
-//                end_node = scenario.nodes.get(segment.fr().end_node_id);
-//                Set<Long> segments_fr_dn = end_node.out_links.stream()
-//                        .map(id->scenario.links.get(id))
-//                        .filter(link->link.type== AbstractLink.Type.connector)
-//                        .map(link -> link.mysegment.id)
-//                        .filter(seg->seg!=segment.id)
-//                        .collect(toSet());
-//
-//                if (segments_fr_dn.size()>1)
-//                    throw new Exception("Level 3 networks has not been implemented");
-//
-//                if (segments_fr_dn.size()==1)
-//                    segment.segment_fr_dn_id = segments_fr_dn.iterator().next();
-//            }
-//
-//            // upstream onramp connector segment ...........
-//            if(segment.has_onramp()){
-//                start_node = scenario.nodes.get(segment.or().start_node_id);
-//                Set<Long> segments_or_up = start_node.in_links.stream()
-//                        .map(id->scenario.links.get(id))
-//                        .filter(link->link.type== AbstractLink.Type.connector)
-//                        .map(link -> link.mysegment.id)
-//                        .filter(seg->seg!=segment.id)
-//                        .collect(toSet());
-//
-//                if (segments_or_up.size()>1)
-//                    throw new Exception("Level 3 networks has not been implemented");
-//
-//                if (segments_or_up.size()==1)
-//                    segment.segment_or_up_id = segments_or_up.iterator().next();
-//            }
-//
-//        }
+        // assign demands
+        if (jaxb_scenario.getDemands()!=null)
+            for(jaxb.Demand dem : jaxb_scenario.getDemands().getDemand())
+                scenario.links.get(dem.getLinkId()).set_demand_vph(
+                        dem.getCommodityId(),
+                        new Profile1D(
+                                dem.getStartTime(),
+                                dem.getDt(),
+                                OTMUtils.csv2list(dem.getContent())));
 
-//        // assign demands
-//        if (jaxb_scenario.getDemands()!=null)
-//            for(jaxb.Demand dem : jaxb_scenario.getDemands().getDemand()){
-//
-//                long comm_id = dem.getCommodityId();
-//
-//                if( !get_commodities().containsKey(comm_id))
-//                    throw new Exception("Bad commodity id in demand profile");
-//
-//                if(dem.getLinkId()==null)
-//                    throw new Exception("AbstractLink not specified in demand profile for commodity " + comm_id);
-//
-//                if(!scenario.links.containsKey(dem.getLinkId()))
-//                    throw new Exception("Bad link id in demand profile.");
-//
-//                AbstractLink link = scenario.links.get(dem.getLinkId());
-//
-//                if(!link.is_source())
-//                    throw new Exception("Demand assigned to invalid link.");
-//
-//                Profile1D profile = new Profile1D(
-//                        dem.getStartTime(),
-//                        dem.getDt(),
-//                        OTMUtils.csv2list(dem.getContent()));
-//
-//                Segment segment = link.get_segment();
-//                if (segment.fwy_id ==link.id)
-//                    link.get_segment().set_fwy_demand_vph(comm_id,profile);
-//                else if (segment.or_id==link.id)
-//                    link.get_segment().set_or_demand_vph(comm_id,profile);
-//                else
-//                    throw new Exception("Strange error 2094gj09t2");
-//            }
-
-//        // assign splits
-//        if (jaxb_scenario.getSplits()!=null)
-//            for(jaxb.SplitNode jsplitnode : jaxb_scenario.getSplits().getSplitNode()){
-//
-//                long node_id = jsplitnode.getNodeId();
-//                long comm_id = jsplitnode.getCommodityId();
-//                long link_in_id = jsplitnode.getLinkIn();
-//
-//                if (!scenario.nodes.containsKey(node_id))
-//                    throw new Exception("Bad node id in split ratio");
-//
-//                if (!scenario.commodities.containsKey(comm_id))
-//                    throw new Exception("Bad commodity id in split ratio");
-//
-//                if(!scenario.links.containsKey(link_in_id))
-//                    throw new Exception("Bad link in id in split ratio");
-//
-//                // from the splits of jsplitnode, extract the outlinks.
-//                // Identify the offramp, and ignore the rest.
-//                Set<AbstractLink> jofframps = new HashSet<>();
-//                for(jaxb.Split split : jsplitnode.getSplit()){
-//                    if(!scenario.links.containsKey(split.getLinkOut()))
-//                        throw new Exception("Bad outlink in splits");
-//                    AbstractLink outlink = scenario.links.get(split.getLinkOut());
-//                    if ( outlink.type!= AbstractLink.Type.freeway )
-//                        jofframps.add(outlink);
-//                }
-//
-//                // check that there is only one offramp
-//                if(jofframps.size()!=1)
-//                    throw new Exception("Stranprojecge error: Please report code 2303409.");
-//
-//                AbstractLink offramp = jofframps.iterator().next();
-//                Segment segment = offramp.mysegment;
-//
-//                // the link in should be the freeway
-//                // (because all segments are "onramp first, offramp last")
-//                if (link_in_id!=segment.fwy_id)
-//                    throw new Exception("Bad link in id in split ratio");
-//
-//                // and the node should be the end node of the segment
-//                if(segment.fwy().end_node_id!=node_id)
-//                    throw new Exception("Bad node in id in split ratio");
-//
-//                // get values and create profile
-//                Set<String> strings = jsplitnode.getSplit().stream()
-//                        .filter(x->x.getLinkOut()==offramp.id)
-//                        .map(x->x.getContent())
-//                        .collect(toSet());
-//
-//                segment.set_fr_split(
-//                        comm_id,
-//                        new Profile1D(
-//                                jsplitnode.getStartTime(),
-//                                jsplitnode.getDt(),
-//                                OTMUtils.csv2list(strings.iterator().next())) );
-//            }
+        // assign splits
+        if (jaxb_scenario.getSplits()!=null)
+            for(jaxb.SplitNode jsplitnode : jaxb_scenario.getSplits().getSplitNode())
+                for(jaxb.Split split : jsplitnode.getSplit())
+                    scenario.links.get(split.getLinkOut()).set_split(
+                            jsplitnode.getCommodityId(),
+                            new Profile1D(
+                                    jsplitnode.getStartTime(),
+                                    jsplitnode.getDt(),
+                                    OTMUtils.csv2list(split.getContent())));
 
         // max ids
         reset_max_ids();

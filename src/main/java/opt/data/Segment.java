@@ -14,10 +14,10 @@ public class Segment {
 
     public String name;
     public LinkFreewayOrConnector fwy;
-    protected List<Onramp> in_ors = new ArrayList<>();
-    protected List<Onramp> out_ors = new ArrayList<>();
-    protected List<Offramp> in_frs = new ArrayList<>();
-    protected List<Offramp> out_frs = new ArrayList<>();
+    protected List<LinkOnramp> in_ors = new ArrayList<>();
+    protected List<LinkOnramp> out_ors = new ArrayList<>();
+    protected List<LinkOfframp> in_frs = new ArrayList<>();
+    protected List<LinkOfframp> out_frs = new ArrayList<>();
 
     /////////////////////////////////////
     // construction
@@ -37,22 +37,28 @@ public class Segment {
         this.fwy_scenario = fwy_scenario;
         this.name = sgmt.getName();
 
+        this.fwy = (LinkFreewayOrConnector) fwy_scenario.scenario.links.get(Long.valueOf(sgmt.getFwy()));
+
         // onramps and offramps
-        if(!sgmt.getInOrs().isEmpty())
+        if(sgmt.getInOrs()!=null && !sgmt.getInOrs().isEmpty())
             for (Long orid : OTMUtils.csv2longlist(sgmt.getInOrs()))
-                in_ors.add((Onramp)fwy_scenario.scenario.links.get(orid));
+                in_ors.add((LinkOnramp)fwy_scenario.scenario.links.get(orid));
 
-        if(!sgmt.getOutOrs().isEmpty())
+        if(sgmt.getOutOrs()!=null && !sgmt.getOutOrs().isEmpty())
             for(Long orid : OTMUtils.csv2longlist(sgmt.getOutOrs()))
-                out_ors.add((Onramp)fwy_scenario.scenario.links.get(orid));
+                out_ors.add((LinkOnramp)fwy_scenario.scenario.links.get(orid));
 
-        if(!sgmt.getInFrs().isEmpty())
+        if(sgmt.getInFrs()!=null && !sgmt.getInFrs().isEmpty())
             for(Long frid : OTMUtils.csv2longlist(sgmt.getInFrs()))
-                in_frs.add((Offramp)fwy_scenario.scenario.links.get(frid));
+                in_frs.add((LinkOfframp)fwy_scenario.scenario.links.get(frid));
 
-        if(!sgmt.getOutFrs().isEmpty())
+        if(sgmt.getOutFrs()!=null && !sgmt.getOutFrs().isEmpty())
             for(Long frid : OTMUtils.csv2longlist(sgmt.getOutFrs()))
-                out_frs.add((Offramp)fwy_scenario.scenario.links.get(frid));
+                out_frs.add((LinkOfframp)fwy_scenario.scenario.links.get(frid));
+
+        // assign segment to links
+        for(AbstractLink link : get_links())
+            link.mysegment = this;
     }
 
     // used by Segment.create_new_segment
@@ -129,19 +135,19 @@ public class Segment {
         return out_frs.size();
     }
 
-    public Onramp in_ors(int i){
+    public LinkOnramp in_ors(int i){
         return in_ors.get(i);
     }
 
-    public Onramp out_ors(int i){
+    public LinkOnramp out_ors(int i){
         return out_ors.get(i);
     }
 
-    public Offramp in_frs(int i){
+    public LinkOfframp in_frs(int i){
         return in_frs.get(i);
     }
 
-    public Offramp out_frs(int i){
+    public LinkOfframp out_frs(int i){
         return out_frs.get(i);
     }
 
@@ -149,7 +155,7 @@ public class Segment {
     // add ramps
     ////////////////////////////////////////
 
-    public void add_in_or(Onramp x){
+    public void add_in_or(LinkOnramp x){
         if(x==null)
             return;
         in_ors.add(x);
@@ -157,7 +163,7 @@ public class Segment {
         // TODO FINISH THIS
     }
 
-    public void add_out_or(Onramp x){
+    public void add_out_or(LinkOnramp x){
         if(x==null)
             return;
         out_ors.add(x);
@@ -181,7 +187,7 @@ public class Segment {
 //        fwy_scenario.scenario.links.put(or.id,or);
     }
 
-    public void add_in_fr(Offramp x){
+    public void add_in_fr(LinkOfframp x){
         if(x==null)
             return;
         in_frs.add(x);
@@ -209,7 +215,7 @@ public class Segment {
 //        fwy_scenario.scenario.links.put(fr.id,fr);
     }
 
-    public void add_out_fr(Offramp x){
+    public void add_out_fr(LinkOfframp x){
         if(x==null)
             return;
         out_frs.add(x);
@@ -221,7 +227,7 @@ public class Segment {
     // delete ramps
     ////////////////////////////////////////
 
-    public boolean delete_in_or(Onramp x){
+    public boolean delete_in_or(LinkOnramp x){
         if( in_ors.contains(x) ){
 
             in_ors.remove(x);
@@ -234,7 +240,7 @@ public class Segment {
 
     }
 
-    public boolean delete_out_or(Onramp x){
+    public boolean delete_out_or(LinkOnramp x){
 
         if( out_ors.contains(x) ){
 
@@ -258,7 +264,7 @@ public class Segment {
 
     }
 
-    public boolean delete_in_fr(Offramp x){
+    public boolean delete_in_fr(LinkOfframp x){
 
         if( in_frs.contains(x) ){
 
@@ -283,7 +289,7 @@ public class Segment {
 
     }
 
-    public boolean delete_out_fr(Offramp x){
+    public boolean delete_out_fr(LinkOfframp x){
 
         if( out_frs.contains(x) ){
 

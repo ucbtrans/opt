@@ -8,21 +8,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Offramp extends AbstractLink {
+public class LinkOfframp extends AbstractLink {
     protected Long id;
     protected Map<Long, Profile1D> fr_splits = new HashMap<>();      // commodity -> Profile1D
     protected Long seg_dn_id = null;
 
-//    public Offramp(Long id) {
+//    public LinkOfframp(Long id) {
 //        this.id = id;
 //    }
 
 
-    public Offramp(jaxb.Link link, Roadparam rp) {
+    public LinkOfframp(jaxb.Link link, Roadparam rp) {
         super(link, AbstractLink.Type.offramp, rp);
     }
 
-    public Offramp(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
+    public LinkOfframp(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
         super(id, AbstractLink.Type.offramp, start_node_id, end_node_id, full_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
     }
 
@@ -37,9 +37,10 @@ public class Offramp extends AbstractLink {
         return 0;
     }
 
-    /////////////////////////////////////
-    // offramp
-    /////////////////////////////////////
+    @Override
+    public void set_split(Long comm_id, Profile1D profile) throws Exception {
+        this.splits.put(comm_id,profile);
+    }
 
 //    public boolean has_offramp(){
 //        return !frs.isEmpty();

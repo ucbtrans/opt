@@ -1,5 +1,9 @@
 package opt.data;
 
+import profiles.Profile1D;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public abstract class AbstractLink {
@@ -19,6 +23,8 @@ public abstract class AbstractLink {
     public int full_lanes;
     public float length_meters;
     public LinkParameters param;
+    protected Map<Long, Profile1D> demands = new HashMap<>();    // commodity -> Profile1D
+    protected Map<Long, Profile1D> splits = new HashMap<>();     // commodity -> Profile1D
 
     /////////////////////////////////////
     // abstract methods
@@ -26,6 +32,8 @@ public abstract class AbstractLink {
 
     abstract public int get_managed_lanes();
     abstract public int get_aux_lanes();
+
+
 
     /////////////////////////////////////
     // construction
@@ -159,6 +167,19 @@ public abstract class AbstractLink {
         if(x<=0)
             throw new Exception("Non-positive free speed");
         param.ff_speed_kph = x;
+    }
+
+
+    /////////////////////////////////////
+    // demands and splits
+    /////////////////////////////////////
+
+    public void set_demand_vph(Long comm_id, Profile1D profile) throws Exception {
+        throw new Exception("Invalid call");
+    }
+
+    public void set_split(Long comm_id,Profile1D profile) throws Exception {
+        throw new Exception("Invalid call");
     }
 
     /////////////////////////////////////
