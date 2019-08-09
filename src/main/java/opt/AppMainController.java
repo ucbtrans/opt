@@ -49,7 +49,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import opt.config.LinkEditorController;
-import opt.data.Link;
+import opt.data.AbstractLink;
 import opt.data.FreewayScenario;
 import opt.data.ProjectFactory;
 import opt.data.Project;
@@ -306,7 +306,7 @@ public class AppMainController {
         TreeItem<String> root = new TreeItem<String>("Project");
         Collection<FreewayScenario> scenarios = project.get_scenarios();
         for (FreewayScenario scenario : scenarios) {
-            TreeItem<String> scenario_node = new TreeItem<String>(scenario.get_name());
+            TreeItem<String> scenario_node = new TreeItem<String>(scenario.name);
             tree2object.put(scenario_node, scenario);
             object2tree.put(scenario, scenario_node);
             
@@ -316,10 +316,10 @@ public class AppMainController {
             
             TreeItem<String> links_node = new TreeItem<String>(roadLinksTreeItem);
             scenario_node.getChildren().add(links_node);
-            for (Link link : scenario.get_links()) {
+            for (AbstractLink link : scenario.get_links()) {
                 if (link == null)
                     continue;
-                TreeItem<String> link_node = new TreeItem<String>(link.get_name());
+                TreeItem<String> link_node = new TreeItem<String>(link.name);
                 tree2object.put(link_node, link);
                 object2tree.put(link, link_node);
                 links_node.getChildren().add(link_node);
@@ -350,7 +350,7 @@ public class AppMainController {
                 configAnchorPane.setLeftAnchor(linkEditorPane, 0.0);
                 configAnchorPane.setRightAnchor(linkEditorPane, 0.0);
 
-                Link lnk = (Link)tree2object.get(treeItem);
+                AbstractLink lnk = (AbstractLink)tree2object.get(treeItem);
                 if (lnk != null) {
                     linkEditorController.initWithLinkData(lnk);
                 }

@@ -11,12 +11,12 @@ import static org.junit.Assert.*;
 
 public class TestFreewayScenario extends AbstractTest {
 
-    @Test
-    public void test_deep_copy(){
-        TestData X = new TestData();
-        FreewayScenario new_scn = X.scenario.deep_copy();
-        assertTrue(new_scn.equals(X.scenario));
-    }
+//    @Test
+//    public void test_deep_copy(){
+//        TestData X = new TestData();
+//        FreewayScenario new_scn = X.scenario.deep_copy();
+//        assertTrue(new_scn.equals(X.scenario));
+//    }
 
     @Test
     public void test_create_isolated_segment() {
@@ -45,15 +45,9 @@ public class TestFreewayScenario extends AbstractTest {
     /////////////////////////////////////
 
     @Test
-    public void test_get_name(){
-        TestData X = new TestData();
-        assertEquals("scenarioA",X.scenario.get_name());
-    }
-
-    @Test
     public void test_get_links(){
         TestData X = new TestData();
-        Collection<Link> links = X.scenario.get_links();
+        Collection<AbstractLink> links = X.scenario.get_links();
         assertNotNull(links);
         assertEquals(18,links.stream().filter(x->x!=null).count());
     }
@@ -74,7 +68,7 @@ public class TestFreewayScenario extends AbstractTest {
     @Test
     public void test_get_links_tree(){
         TestData X = new TestData();
-        List<List<Link>> links = X.scenario.get_links_tree();
+        List<List<AbstractLink>> links = X.scenario.get_links_tree();
         assertEquals(6,links.get(0).size());
         assertEquals(12,links.get(1).size());
     }
@@ -96,7 +90,7 @@ public class TestFreewayScenario extends AbstractTest {
     @Test
     public void test_get_segment_by_name(){
         TestData X = new TestData();
-        assertEquals("sA1",X.scenario.get_segment_by_name("sA1").get_name());
+        assertEquals("sA1",X.scenario.get_segment_by_name("sA1").name);
     }
 
     @Test

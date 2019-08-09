@@ -1,8 +1,5 @@
 package opt.data;
 
-import profiles.Profile1D;
-import utils.OTMUtils;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -14,7 +11,7 @@ public class FreewayScenario {
     private Long max_node_id;
     private Long max_seg_id;
 
-    protected String name;
+    public String name;
 
     // similar to the jax scenario, but with extended functionality
     protected Scenario scenario;
@@ -50,9 +47,9 @@ public class FreewayScenario {
         if (jaxb_lnks!=null){
             for(jaxbopt.Lnk lnk : jaxb_lnks.getLnk()){
                 if (scenario.links.containsKey(lnk.getId())){
-                    Link link = scenario.links.get(lnk.getId());
+                    AbstractLink link = scenario.links.get(lnk.getId());
                     if( link.name!=null )
-                        throw new Exception("Link named twice");
+                        throw new Exception("AbstractLink named twice");
                     link.name = lnk.getName();
                 }
             }
@@ -67,185 +64,172 @@ public class FreewayScenario {
                 segments.put(sgmt_id,segment);
 
                 // assign segments to links
-                if (segment.fwy().mysegment!=null)
-                    throw new Exception("Link " + segment.fwy_id + " assigned to multiple segments");
-                segment.fwy().mysegment = segment;
-
-                if (segment.has_onramp()){
-                    if (segment.or().mysegment!=null)
-                        throw new Exception("Link " + segment.or_id + " assigned to multiple segments");
-                    segment.or().mysegment = segment;
-                }
-
-                if (segment.has_offramp()){
-                    if (segment.fr().mysegment!=null)
-                        throw new Exception("Link " + segment.fr_id + " assigned to multiple segments");
-                    segment.fr().mysegment = segment;
-                }
-
+                segment.fwy.mysegment = segment;
+                for(AbstractLink link : segment.get_links())
+                    link.mysegment = segment;
             }
         }
 
         // segment adjacency mappings ..................................
-        for(Segment segment : segments.values()){
+//        for(Segment segment : segments.values()){
+//
+//            // upstream freeway segment ..............
+//            Node start_node = scenario.nodes.get(segment.fwy.start_node_id);
+//            Set<Long> segments_fwy_up = start_node.in_links.stream()
+//                    .map(id->scenario.links.get(id))
+//                    .filter(link->!link.is_ramp())
+//                    .map(link -> link.mysegment.id)
+//                    .filter(seg->seg!=segment.id)
+//                    .collect(toSet());
+//
+//            if (segments_fwy_up.size()>1)
+//                throw new Exception("Level 3 networks has not been implemented");
+//
+//            if (segments_fwy_up.size()==1)
+//                segment.segment_fwy_up_id = segments_fwy_up.iterator().next();
+//
+//            // downstream freeway segment ..............
+//            Node end_node = scenario.nodes.get(segment.fwy().end_node_id);
+//            Set<Long> segments_ml_dn = end_node.out_links.stream()
+//                    .map(id->scenario.links.get(id))
+//                    .filter(link->!link.is_ramp())
+//                    .map(link -> link.mysegment.id)
+//                    .filter(seg->seg!=segment.id)
+//                    .collect(toSet());
+//
+//            if (segments_ml_dn.size()>1)
+//                throw new Exception("Level 3 networks has not been implemented");
+//
+//            if (segments_ml_dn.size()==1)
+//                segment.segment_fwy_dn_id = segments_ml_dn.iterator().next();
+//
+//            // downstream offramp connector segment ...........
+//            if(segment.has_offramp()){
+//                end_node = scenario.nodes.get(segment.fr().end_node_id);
+//                Set<Long> segments_fr_dn = end_node.out_links.stream()
+//                        .map(id->scenario.links.get(id))
+//                        .filter(link->link.type== AbstractLink.Type.connector)
+//                        .map(link -> link.mysegment.id)
+//                        .filter(seg->seg!=segment.id)
+//                        .collect(toSet());
+//
+//                if (segments_fr_dn.size()>1)
+//                    throw new Exception("Level 3 networks has not been implemented");
+//
+//                if (segments_fr_dn.size()==1)
+//                    segment.segment_fr_dn_id = segments_fr_dn.iterator().next();
+//            }
+//
+//            // upstream onramp connector segment ...........
+//            if(segment.has_onramp()){
+//                start_node = scenario.nodes.get(segment.or().start_node_id);
+//                Set<Long> segments_or_up = start_node.in_links.stream()
+//                        .map(id->scenario.links.get(id))
+//                        .filter(link->link.type== AbstractLink.Type.connector)
+//                        .map(link -> link.mysegment.id)
+//                        .filter(seg->seg!=segment.id)
+//                        .collect(toSet());
+//
+//                if (segments_or_up.size()>1)
+//                    throw new Exception("Level 3 networks has not been implemented");
+//
+//                if (segments_or_up.size()==1)
+//                    segment.segment_or_up_id = segments_or_up.iterator().next();
+//            }
+//
+//        }
 
-            // upstream freeway segment ..............
-            Node start_node = scenario.nodes.get(segment.fwy().start_node_id);
-            Set<Long> segments_fwy_up = start_node.in_links.stream()
-                    .map(id->scenario.links.get(id))
-                    .filter(link->!link.is_ramp())
-                    .map(link -> link.mysegment.id)
-                    .filter(seg->seg!=segment.id)
-                    .collect(toSet());
+//        // assign demands
+//        if (jaxb_scenario.getDemands()!=null)
+//            for(jaxb.Demand dem : jaxb_scenario.getDemands().getDemand()){
+//
+//                long comm_id = dem.getCommodityId();
+//
+//                if( !get_commodities().containsKey(comm_id))
+//                    throw new Exception("Bad commodity id in demand profile");
+//
+//                if(dem.getLinkId()==null)
+//                    throw new Exception("AbstractLink not specified in demand profile for commodity " + comm_id);
+//
+//                if(!scenario.links.containsKey(dem.getLinkId()))
+//                    throw new Exception("Bad link id in demand profile.");
+//
+//                AbstractLink link = scenario.links.get(dem.getLinkId());
+//
+//                if(!link.is_source())
+//                    throw new Exception("Demand assigned to invalid link.");
+//
+//                Profile1D profile = new Profile1D(
+//                        dem.getStartTime(),
+//                        dem.getDt(),
+//                        OTMUtils.csv2list(dem.getContent()));
+//
+//                Segment segment = link.get_segment();
+//                if (segment.fwy_id ==link.id)
+//                    link.get_segment().set_fwy_demand_vph(comm_id,profile);
+//                else if (segment.or_id==link.id)
+//                    link.get_segment().set_or_demand_vph(comm_id,profile);
+//                else
+//                    throw new Exception("Strange error 2094gj09t2");
+//            }
 
-            if (segments_fwy_up.size()>1)
-                throw new Exception("Level 3 networks has not been implemented");
-
-            if (segments_fwy_up.size()==1)
-                segment.segment_fwy_up_id = segments_fwy_up.iterator().next();
-
-            // downstream freeway segment ..............
-            Node end_node = scenario.nodes.get(segment.fwy().end_node_id);
-            Set<Long> segments_ml_dn = end_node.out_links.stream()
-                    .map(id->scenario.links.get(id))
-                    .filter(link->!link.is_ramp())
-                    .map(link -> link.mysegment.id)
-                    .filter(seg->seg!=segment.id)
-                    .collect(toSet());
-
-            if (segments_ml_dn.size()>1)
-                throw new Exception("Level 3 networks has not been implemented");
-
-            if (segments_ml_dn.size()==1)
-                segment.segment_fwy_dn_id = segments_ml_dn.iterator().next();
-
-            // downstream offramp connector segment ...........
-            if(segment.has_offramp()){
-                end_node = scenario.nodes.get(segment.fr().end_node_id);
-                Set<Long> segments_fr_dn = end_node.out_links.stream()
-                        .map(id->scenario.links.get(id))
-                        .filter(link->link.type==Link.Type.connector)
-                        .map(link -> link.mysegment.id)
-                        .filter(seg->seg!=segment.id)
-                        .collect(toSet());
-
-                if (segments_fr_dn.size()>1)
-                    throw new Exception("Level 3 networks has not been implemented");
-
-                if (segments_fr_dn.size()==1)
-                    segment.segment_fr_dn_id = segments_fr_dn.iterator().next();
-            }
-
-            // upstream onramp connector segment ...........
-            if(segment.has_onramp()){
-                start_node = scenario.nodes.get(segment.or().start_node_id);
-                Set<Long> segments_or_up = start_node.in_links.stream()
-                        .map(id->scenario.links.get(id))
-                        .filter(link->link.type==Link.Type.connector)
-                        .map(link -> link.mysegment.id)
-                        .filter(seg->seg!=segment.id)
-                        .collect(toSet());
-
-                if (segments_or_up.size()>1)
-                    throw new Exception("Level 3 networks has not been implemented");
-
-                if (segments_or_up.size()==1)
-                    segment.segment_or_up_id = segments_or_up.iterator().next();
-            }
-
-        }
-
-        // assign demands
-        if (jaxb_scenario.getDemands()!=null)
-            for(jaxb.Demand dem : jaxb_scenario.getDemands().getDemand()){
-
-                long comm_id = dem.getCommodityId();
-
-                if( !get_commodities().containsKey(comm_id))
-                    throw new Exception("Bad commodity id in demand profile");
-
-                if(dem.getLinkId()==null)
-                    throw new Exception("Link not specified in demand profile for commodity " + comm_id);
-
-                if(!scenario.links.containsKey(dem.getLinkId()))
-                    throw new Exception("Bad link id in demand profile.");
-
-                Link link = scenario.links.get(dem.getLinkId());
-
-                if(!link.is_source())
-                    throw new Exception("Demand assigned to invalid link.");
-
-                Profile1D profile = new Profile1D(
-                        dem.getStartTime(),
-                        dem.getDt(),
-                        OTMUtils.csv2list(dem.getContent()));
-
-                Segment segment = link.get_segment();
-                if (segment.fwy_id ==link.id)
-                    link.get_segment().set_fwy_demand_vph(comm_id,profile);
-                else if (segment.or_id==link.id)
-                    link.get_segment().set_or_demand_vph(comm_id,profile);
-                else
-                    throw new Exception("Strange error 2094gj09t2");
-            }
-
-        // assign splits
-        if (jaxb_scenario.getSplits()!=null)
-            for(jaxb.SplitNode jsplitnode : jaxb_scenario.getSplits().getSplitNode()){
-
-                long node_id = jsplitnode.getNodeId();
-                long comm_id = jsplitnode.getCommodityId();
-                long link_in_id = jsplitnode.getLinkIn();
-
-                if (!scenario.nodes.containsKey(node_id))
-                    throw new Exception("Bad node id in split ratio");
-
-                if (!scenario.commodities.containsKey(comm_id))
-                    throw new Exception("Bad commodity id in split ratio");
-
-                if(!scenario.links.containsKey(link_in_id))
-                    throw new Exception("Bad link in id in split ratio");
-
-                // from the splits of jsplitnode, extract the outlinks.
-                // Identify the offramp, and ignore the rest.
-                Set<Link> jofframps = new HashSet<>();
-                for(jaxb.Split split : jsplitnode.getSplit()){
-                    if(!scenario.links.containsKey(split.getLinkOut()))
-                        throw new Exception("Bad outlink in splits");
-                    Link outlink = scenario.links.get(split.getLinkOut());
-                    if ( outlink.type!=Link.Type.freeway )
-                        jofframps.add(outlink);
-                }
-
-                // check that there is only one offramp
-                if(jofframps.size()!=1)
-                    throw new Exception("Stranprojecge error: Please report code 2303409.");
-
-                Link offramp = jofframps.iterator().next();
-                Segment segment = offramp.mysegment;
-
-                // the link in should be the freeway
-                // (because all segments are "onramp first, offramp last")
-                if (link_in_id!=segment.fwy_id)
-                    throw new Exception("Bad link in id in split ratio");
-
-                // and the node should be the end node of the segment
-                if(segment.fwy().end_node_id!=node_id)
-                    throw new Exception("Bad node in id in split ratio");
-
-                // get values and create profile
-                Set<String> strings = jsplitnode.getSplit().stream()
-                        .filter(x->x.getLinkOut()==offramp.id)
-                        .map(x->x.getContent())
-                        .collect(toSet());
-
-                segment.set_fr_split(
-                        comm_id,
-                        new Profile1D(
-                                jsplitnode.getStartTime(),
-                                jsplitnode.getDt(),
-                                OTMUtils.csv2list(strings.iterator().next())) );
-            }
+//        // assign splits
+//        if (jaxb_scenario.getSplits()!=null)
+//            for(jaxb.SplitNode jsplitnode : jaxb_scenario.getSplits().getSplitNode()){
+//
+//                long node_id = jsplitnode.getNodeId();
+//                long comm_id = jsplitnode.getCommodityId();
+//                long link_in_id = jsplitnode.getLinkIn();
+//
+//                if (!scenario.nodes.containsKey(node_id))
+//                    throw new Exception("Bad node id in split ratio");
+//
+//                if (!scenario.commodities.containsKey(comm_id))
+//                    throw new Exception("Bad commodity id in split ratio");
+//
+//                if(!scenario.links.containsKey(link_in_id))
+//                    throw new Exception("Bad link in id in split ratio");
+//
+//                // from the splits of jsplitnode, extract the outlinks.
+//                // Identify the offramp, and ignore the rest.
+//                Set<AbstractLink> jofframps = new HashSet<>();
+//                for(jaxb.Split split : jsplitnode.getSplit()){
+//                    if(!scenario.links.containsKey(split.getLinkOut()))
+//                        throw new Exception("Bad outlink in splits");
+//                    AbstractLink outlink = scenario.links.get(split.getLinkOut());
+//                    if ( outlink.type!= AbstractLink.Type.freeway )
+//                        jofframps.add(outlink);
+//                }
+//
+//                // check that there is only one offramp
+//                if(jofframps.size()!=1)
+//                    throw new Exception("Stranprojecge error: Please report code 2303409.");
+//
+//                AbstractLink offramp = jofframps.iterator().next();
+//                Segment segment = offramp.mysegment;
+//
+//                // the link in should be the freeway
+//                // (because all segments are "onramp first, offramp last")
+//                if (link_in_id!=segment.fwy_id)
+//                    throw new Exception("Bad link in id in split ratio");
+//
+//                // and the node should be the end node of the segment
+//                if(segment.fwy().end_node_id!=node_id)
+//                    throw new Exception("Bad node in id in split ratio");
+//
+//                // get values and create profile
+//                Set<String> strings = jsplitnode.getSplit().stream()
+//                        .filter(x->x.getLinkOut()==offramp.id)
+//                        .map(x->x.getContent())
+//                        .collect(toSet());
+//
+//                segment.set_fr_split(
+//                        comm_id,
+//                        new Profile1D(
+//                                jsplitnode.getStartTime(),
+//                                jsplitnode.getDt(),
+//                                OTMUtils.csv2list(strings.iterator().next())) );
+//            }
 
         // max ids
         reset_max_ids();
@@ -256,29 +240,21 @@ public class FreewayScenario {
      * Create a deep copy of a given scenario
      * @return new FreewayScenario object
      */
-    public FreewayScenario deep_copy(){
-        FreewayScenario scn_cpy = new FreewayScenario(name);
-        scn_cpy.scenario = scenario.deep_copy();
-        scn_cpy.segments = new HashMap<>();
-        for(Map.Entry<Long,Segment> e : segments.entrySet())
-            scn_cpy.segments.put(e.getKey(),e.getValue().deep_copy(scn_cpy));
-        scn_cpy.reset_max_ids();
-        return scn_cpy;
-    }
+//    public FreewayScenario deep_copy(){
+//        FreewayScenario scn_cpy = new FreewayScenario(name);
+//        scn_cpy.scenario = scenario.deep_copy();
+//        scn_cpy.segments = new HashMap<>();
+//        for(Map.Entry<Long,Segment> e : segments.entrySet())
+//            scn_cpy.segments.put(e.getKey(),e.getValue().deep_copy(scn_cpy));
+//        scn_cpy.reset_max_ids();
+//        return scn_cpy;
+//    }
 
     /////////////////////////////////////
     // scenario getters
     /////////////////////////////////////
 
-    /**
-     * Get the name of the scenario
-     * @return String
-     */
-    public String get_name(){
-        return name;
-    }
-
-    public Set<Link> get_links(){
+    public Set<AbstractLink> get_links(){
         return segments.values().stream()
                 .flatMap(sgmt->sgmt.get_links().stream())
                 .collect(Collectors.toSet());
@@ -293,50 +269,50 @@ public class FreewayScenario {
      * @return Collection of segments
      */
     public List<List <Segment>> get_segments_tree(){
-
-        Set<Segment> source_segments = this.segments.values().stream()
-                .map(s->s.fwy())
-                .filter(link->link.is_source())
-                .map(link->link.mysegment)
-                .collect(toSet());
-
-        Set<Long> all_segment_ids = new HashSet<>();
-        all_segment_ids.addAll(segments.keySet());
-
         List<List <Segment>> result = new ArrayList<>();
-        for(Segment source_segment : source_segments){
-            List<Segment> thisfreeway = new ArrayList<>();
-            Segment curr_segment = source_segment;
-            thisfreeway.add(curr_segment);
-            all_segment_ids.remove(curr_segment.id);
-            if (curr_segment.segment_fr_dn_id!=null){
-                thisfreeway.add(segments.get(curr_segment.segment_fr_dn_id));
-                all_segment_ids.remove(curr_segment.segment_fr_dn_id);
-            }
-            while(curr_segment.segment_fwy_dn_id!=null){
-                curr_segment = segments.get(curr_segment.segment_fwy_dn_id);
-                thisfreeway.add(curr_segment);
-                all_segment_ids.remove(curr_segment.id);
-                if (curr_segment.segment_fr_dn_id!=null){
-                    thisfreeway.add(segments.get(curr_segment.segment_fr_dn_id));
-                    all_segment_ids.remove(curr_segment.segment_fr_dn_id);
-                }
-            }
-            result.add(thisfreeway);
-        }
 
-        assert(all_segment_ids.isEmpty());
-
-        result.sort(Comparator.comparing(List::size));
+//        Set<Segment> source_segments = this.segments.values().stream()
+//                .map(s->s.fwy)
+//                .filter(link->link.is_source())
+//                .map(link->link.mysegment)
+//                .collect(toSet());
+//
+//        Set<Long> all_segment_ids = new HashSet<>();
+//        all_segment_ids.addAll(segments.keySet());
+//
+//        for(Segment source_segment : source_segments){
+//            List<Segment> thisfreeway = new ArrayList<>();
+//            Segment curr_segment = source_segment;
+//            thisfreeway.add(curr_segment);
+//            all_segment_ids.remove(curr_segment.id);
+//            if (curr_segment.segment_fr_dn_id!=null){
+//                thisfreeway.add(segments.get(curr_segment.segment_fr_dn_id));
+//                all_segment_ids.remove(curr_segment.segment_fr_dn_id);
+//            }
+//            while(curr_segment.segment_fwy_dn_id!=null){
+//                curr_segment = segments.get(curr_segment.segment_fwy_dn_id);
+//                thisfreeway.add(curr_segment);
+//                all_segment_ids.remove(curr_segment.id);
+//                if (curr_segment.segment_fr_dn_id!=null){
+//                    thisfreeway.add(segments.get(curr_segment.segment_fr_dn_id));
+//                    all_segment_ids.remove(curr_segment.segment_fr_dn_id);
+//                }
+//            }
+//            result.add(thisfreeway);
+//        }
+//
+//        assert(all_segment_ids.isEmpty());
+//
+//        result.sort(Comparator.comparing(List::size));
 
         return result;
     }
 
-    public List<List<Link>> get_links_tree(){
+    public List<List<AbstractLink>> get_links_tree(){
         List<List <Segment>> segments_tree = get_segments_tree();
-        List<List<Link>> result = new ArrayList<>();
+        List<List<AbstractLink>> result = new ArrayList<>();
         for(List<Segment> seg_list : segments_tree){
-            List<Link> fwy_links = new ArrayList<>();
+            List<AbstractLink> fwy_links = new ArrayList<>();
             result.add(fwy_links);
             for(Segment segment : seg_list)
                 fwy_links.addAll(segment.get_links().stream().filter(x->x!=null).collect(Collectors.toList()));
@@ -390,9 +366,8 @@ public class FreewayScenario {
         Node start_node = new Node(++max_node_id);
         Node end_node = new Node(++max_node_id);
 
-        Link link = new Link(
+        LinkFreeway link = new LinkFreeway(
                 ++max_link_id,
-                Link.Type.freeway,
                 start_node.id,end_node.id,
                 1,
                 500f,
@@ -402,7 +377,7 @@ public class FreewayScenario {
         start_node.out_links.add(link.id);
         end_node.in_links.add(link.id);
 
-        segment.fwy_id = link.get_id();
+        segment.fwy = link;
 
         // add to the scenario
         scenario.nodes.put(start_node.id,start_node);
@@ -418,57 +393,57 @@ public class FreewayScenario {
      */
     public void delete_segment(Segment segment) throws Exception {
 
-        if(segments.size()==1)
-            throw new Exception("Removing the sole segment is not allowed.");
-
-        if(segment.segment_or_up_id!=null || segment.segment_fr_dn_id!=null)
-            throw new Exception("Removing a segment with a ramp connector is not allowed.");
-
-        Node start_node = scenario.nodes.get(segment.fwy().start_node_id);
-        Node end_node   = scenario.nodes.get(segment.fwy().end_node_id);
-
-        // connect upstream freeway segment to end node
-        if(segment.segment_fwy_up_id !=null){
-
-            Segment segup = segments.get(segment.segment_fwy_up_id);
-            segup.segment_fwy_dn_id = segment.segment_fwy_dn_id;
-
-            // fwy link
-            segup.fwy().end_node_id = end_node.id;
-            start_node.in_links.remove(segup.fwy().id);
-            end_node.in_links.add(segup.fwy().id);
-
-            if(segup.has_onramp() && segup.or().end_node_id==start_node.id) {
-                segup.or().end_node_id = end_node.id;
-                start_node.in_links.remove(segup.or().id);
-                end_node.in_links.add(segup.or().id);
-            }
-
-            if(segup.has_offramp() && segup.fr().start_node_id==start_node.id){
-                segup.fr().start_node_id = end_node.id;
-                start_node.out_links.remove(segup.fr().id);
-                end_node.out_links.add(segup.fr().id);
-            }
-
-        }
-
-        // fix downstream freeway segment
-        if(segment.segment_fwy_dn_id !=null){
-            Segment segdn = segments.get(segment.segment_fwy_dn_id);
-            segdn.segment_fwy_up_id = segment.segment_fwy_up_id;
-        }
-
-        // delete the start node
-        scenario.nodes.remove(segment.fwy().start_node_id);
-
-        // delete segment links
-        segment.delete_offramp();
-        segment.delete_onramp();
-        scenario.links.remove(segment.fwy_id);
-        end_node.in_links.remove(segment.fwy_id);
-
-        // remove the segment
-        segments.remove(segment.id);
+//        if(segments.size()==1)
+//            throw new Exception("Removing the sole segment is not allowed.");
+//
+//        if(segment.segment_or_up_id!=null || segment.segment_fr_dn_id!=null)
+//            throw new Exception("Removing a segment with a ramp connector is not allowed.");
+//
+//        Node start_node = scenario.nodes.get(segment.fwy().start_node_id);
+//        Node end_node   = scenario.nodes.get(segment.fwy().end_node_id);
+//
+//        // connect upstream freeway segment to end node
+//        if(segment.segment_fwy_up_id !=null){
+//
+//            Segment segup = segments.get(segment.segment_fwy_up_id);
+//            segup.segment_fwy_dn_id = segment.segment_fwy_dn_id;
+//
+//            // fwy link
+//            segup.fwy().end_node_id = end_node.id;
+//            start_node.in_links.remove(segup.fwy().id);
+//            end_node.in_links.add(segup.fwy().id);
+//
+//            if(segup.has_onramp() && segup.or().end_node_id==start_node.id) {
+//                segup.or().end_node_id = end_node.id;
+//                start_node.in_links.remove(segup.or().id);
+//                end_node.in_links.add(segup.or().id);
+//            }
+//
+//            if(segup.has_offramp() && segup.fr().start_node_id==start_node.id){
+//                segup.fr().start_node_id = end_node.id;
+//                start_node.out_links.remove(segup.fr().id);
+//                end_node.out_links.add(segup.fr().id);
+//            }
+//
+//        }
+//
+//        // fix downstream freeway segment
+//        if(segment.segment_fwy_dn_id !=null){
+//            Segment segdn = segments.get(segment.segment_fwy_dn_id);
+//            segdn.segment_fwy_up_id = segment.segment_fwy_up_id;
+//        }
+//
+//        // delete the start node
+//        scenario.nodes.remove(segment.fwy().start_node_id);
+//
+//        // delete segment links
+//        segment.delete_offramp();
+//        segment.delete_onramp();
+//        scenario.links.remove(segment.fwy_id);
+//        end_node.in_links.remove(segment.fwy_id);
+//
+//        // remove the segment
+//        segments.remove(segment.id);
     }
 
     /////////////////////////////////////
@@ -547,7 +522,7 @@ public class FreewayScenario {
 
         jaxbopt.Lnks lnks = new jaxbopt.Lnks();
         scn.setLnks(lnks);
-        for(Link link : get_links()){
+        for(AbstractLink link : get_links()){
             if(link==null)
                 continue;
             jaxbopt.Lnk lnk = new jaxbopt.Lnk();
@@ -558,7 +533,7 @@ public class FreewayScenario {
         return scn;
     }
 
-    protected Link get_link(Long id){
+    protected AbstractLink get_link(Long id){
         return scenario.links.get(id);
     }
 

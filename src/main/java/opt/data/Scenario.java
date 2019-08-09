@@ -9,7 +9,7 @@ import java.util.*;
 public class Scenario {
 
     protected Map<Long, Node> nodes = new HashMap<>();
-    protected Map<Long, Link> links = new HashMap<>();
+    protected Map<Long, AbstractLink> links = new HashMap<>();
     protected Map<Long, Commodity> commodities = new HashMap<>();
 
     /////////////////////////////////////
@@ -36,19 +36,19 @@ public class Scenario {
 
             if (network.getLinks()!=null)
                 for(jaxb.Link jlink : network.getLinks().getLink()) {
-                    Link link;
+                    AbstractLink link;
                     switch(jlink.getRoadType()){
                         case "offramp":
-                            link = new Link(jlink,Link.Type.offramp,road_params.get(jlink.getRoadparam()));
+                            link = new Offramp(jlink,road_params.get(jlink.getRoadparam()));
                             break;
                         case "onramp":
-                            link = new Link(jlink,Link.Type.onramp,road_params.get(jlink.getRoadparam()));
+                            link = new Onramp(jlink,road_params.get(jlink.getRoadparam()));
                             break;
                         case "freeway":
-                            link = new Link(jlink,Link.Type.freeway,road_params.get(jlink.getRoadparam()));
+                            link = new LinkFreeway(jlink,road_params.get(jlink.getRoadparam()));
                             break;
                         case "connector":
-                            link = new Link(jlink,Link.Type.connector,road_params.get(jlink.getRoadparam()));
+                            link = new LinkConnector(jlink,road_params.get(jlink.getRoadparam()));
                             break;
                         default:
                             throw new Exception("Bad road type");
@@ -74,7 +74,7 @@ public class Scenario {
             jscn_cpy.nodes.put(e.getKey(), new Node(e.getKey()));
 
         // create new links
-        for (Map.Entry<Long, Link> e : links.entrySet())
+        for (Map.Entry<Long, AbstractLink> e : links.entrySet())
             jscn_cpy.links.put(e.getKey(),e.getValue().deep_copy());
 
         // set node inlinks and outlinks
@@ -111,7 +111,7 @@ public class Scenario {
 
     protected Set<RoadParam> get_road_params(){
         Set<RoadParam> road_params = new HashSet<>();
-        for(Link link : links.values())
+        for(AbstractLink link : links.values())
             road_params.add(new RoadParam(link.param.capacity_vphpl,link.param.ff_speed_kph,link.param.jam_density_vpkpl));
 
         // set ids
@@ -179,7 +179,7 @@ public class Scenario {
         // links
         jaxb.Links jLinks = new jaxb.Links();
         jNet.setLinks(jLinks);
-        for(Link link : links.values()){
+        for(AbstractLink link : links.values()){
             jaxb.Link jaxbLink = new jaxb.Link();
             jaxbLink.setId(link.id);
             jaxbLink.setLength(link.length_meters);
@@ -202,58 +202,59 @@ public class Scenario {
         jaxb.Splits jsplits = new jaxb.Splits();
         jScn.setSplits(jsplits);
 
-        for(Segment segment : segments){
-
-            if(!segment.fr_splits.isEmpty()) {
-
-
-                for (Map.Entry<Long, Profile1D> e : segment.fr_splits.entrySet()) {
-                    jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
-                    jsplits.getSplitNode().add(jsplitnode);
-                    jaxb.Split jsplit = new jaxb.Split();
-                    jsplitnode.getSplit().add(jsplit);
-
-                    jsplitnode.setCommodityId(e.getKey());
-                    Profile1D profile = e.getValue();
-
-                    if(profile.dt!=null)
-                        jsplitnode.setDt(profile.dt);
-                    jsplitnode.setStartTime(profile.start_time);
-                    jsplitnode.setLinkIn(segment.fwy_id);
-                    jsplitnode.setNodeId(segment.fwy().end_node_id);
-                    jsplit.setLinkOut(segment.fr_id);
-                    jsplit.setContent(OTMUtils.comma_format(profile.values));
-                }
-            }
-
-            if(!segment.or_demands.isEmpty()) {
-                for (Map.Entry<Long, Profile1D> e : segment.or_demands.entrySet()) {
-                    jaxb.Demand jdemand = new jaxb.Demand();
-                    jdemands.getDemand().add(jdemand);
-                    jdemand.setCommodityId(e.getKey());
-                    Profile1D profile = e.getValue();
-                    jdemand.setDt(profile.dt);
-                    jdemand.setStartTime(profile.start_time);
-                    jdemand.setLinkId(segment.or_id);
-                    jdemand.setContent(OTMUtils.comma_format(profile.get_values()));
-                }
-            }
-
-            if(!segment.fwy_demands.isEmpty()) {
-                for (Map.Entry<Long, Profile1D> e : segment.fwy_demands.entrySet()) {
-                    jaxb.Demand jdemand = new jaxb.Demand();
-                    jdemands.getDemand().add(jdemand);
-                    jdemand.setCommodityId(e.getKey());
-                    Profile1D profile = e.getValue();
-                    if(profile.dt!=null)
-                        jdemand.setDt(profile.dt);
-                    jdemand.setStartTime(profile.start_time);
-                    jdemand.setLinkId(segment.fwy_id);
-                    jdemand.setContent(OTMUtils.comma_format(profile.get_values()));
-                }
-            }
-
-        }
+        // TODO PUT THIS BACK IN
+//        for(Segment segment : segments){
+//
+//            if(!segment.fr_splits.isEmpty()) {
+//
+//
+//                for (Map.Entry<Long, Profile1D> e : segment.fr_splits.entrySet()) {
+//                    jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
+//                    jsplits.getSplitNode().add(jsplitnode);
+//                    jaxb.Split jsplit = new jaxb.Split();
+//                    jsplitnode.getSplit().add(jsplit);
+//
+//                    jsplitnode.setCommodityId(e.getKey());
+//                    Profile1D profile = e.getValue();
+//
+//                    if(profile.dt!=null)
+//                        jsplitnode.setDt(profile.dt);
+//                    jsplitnode.setStartTime(profile.start_time);
+//                    jsplitnode.setLinkIn(segment.fwy_id);
+//                    jsplitnode.setNodeId(segment.fwy().end_node_id);
+//                    jsplit.setLinkOut(segment.fr_id);
+//                    jsplit.setContent(OTMUtils.comma_format(profile.values));
+//                }
+//            }
+//
+//            if(!segment.or_demands.isEmpty()) {
+//                for (Map.Entry<Long, Profile1D> e : segment.or_demands.entrySet()) {
+//                    jaxb.Demand jdemand = new jaxb.Demand();
+//                    jdemands.getDemand().add(jdemand);
+//                    jdemand.setCommodityId(e.getKey());
+//                    Profile1D profile = e.getValue();
+//                    jdemand.setDt(profile.dt);
+//                    jdemand.setStartTime(profile.start_time);
+//                    jdemand.setLinkId(segment.or_id);
+//                    jdemand.setContent(OTMUtils.comma_format(profile.get_values()));
+//                }
+//            }
+//
+//            if(!segment.fwy_demands.isEmpty()) {
+//                for (Map.Entry<Long, Profile1D> e : segment.fwy_demands.entrySet()) {
+//                    jaxb.Demand jdemand = new jaxb.Demand();
+//                    jdemands.getDemand().add(jdemand);
+//                    jdemand.setCommodityId(e.getKey());
+//                    Profile1D profile = e.getValue();
+//                    if(profile.dt!=null)
+//                        jdemand.setDt(profile.dt);
+//                    jdemand.setStartTime(profile.start_time);
+//                    jdemand.setLinkId(segment.fwy_id);
+//                    jdemand.setContent(OTMUtils.comma_format(profile.get_values()));
+//                }
+//            }
+//
+//        }
 
         return jScn;
     }

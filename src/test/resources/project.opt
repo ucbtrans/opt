@@ -23,17 +23,15 @@
 				<lnk id="18" name="lA18"/>
 			</lnks>
 			<sgmts>
-				<sgmt name="sA1" links="1,7"/>
-				<sgmt name="sA2" links="2"/>
-				<sgmt name="sA3" links="3,8,9"/>
-				<sgmt name="sA4" links="4,10"/>
-				<sgmt name="sA5" links="5"/>
-				<sgmt name="sA6" links="6,11"/>
-				<sgmt name="sA7" links="12"/>
-				<sgmt name="sA8" links="13,15"/>
-				<sgmt name="sA9" links="16,18"/>
-				<sgmt name="sa" links="14"/>
-				<sgmt name="sb" links="17"/>
+				<sgmt type="fwy" name="sA1" fwy="1" out_frs="7"/>
+				<sgmt type="fwy" name="sA2" fwy="2" />
+				<sgmt type="fwy" name="sA3" fwy="3" out_ors="8" out_frs="9"/>
+				<sgmt type="fwy" name="sA4" fwy="4" out_frs="10"/>
+				<sgmt type="fwy" name="sA5" fwy="5"/>
+				<sgmt type="fwy" name="sA6" fwy="6" out_ors="11"/>
+				<sgmt type="con" name="sA7" fwy="12"/>
+				<sgmt type="fwy" name="sA8" fwy="15" out_ors="13"/>
+				<sgmt type="fwy" name="sA9" fwy="16" out_frs="18"/>
 			</sgmts>
 		</scn>
 	</scns>

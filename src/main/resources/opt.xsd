@@ -61,8 +61,20 @@
 
 	<xs:element name="sgmt">
 		<xs:complexType>
+
+			<xs:attribute name="type" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:pattern value="con|fwy"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
 			<xs:attribute name="name" type="xs:string" default="unnamed" />
-			<xs:attribute name="links" type="xs:string" use="required" />
+			<xs:attribute name="fwy" type="xs:string" use="required" />
+			<xs:attribute name="in_ors" type="xs:string"  />
+			<xs:attribute name="out_ors" type="xs:string"  />
+			<xs:attribute name="in_frs" type="xs:string" />
+			<xs:attribute name="out_frs" type="xs:string" />
 		</xs:complexType>
 	</xs:element>
 

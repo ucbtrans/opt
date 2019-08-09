@@ -38,16 +38,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import opt.AppMainController;
-import opt.data.Link;
-
+import opt.data.AbstractLink;
 
 
 /**
@@ -56,7 +53,7 @@ import opt.data.Link;
  */
 public class LinkEditorController {
     private AppMainController appMainController = null;
-    private Link myLink = null;
+    private AbstractLink myLink = null;
     private boolean ignoreChange  = true;
     
     private SpinnerValueFactory<Double> lengthSpinnerValueFactory = null;
@@ -110,7 +107,7 @@ public class LinkEditorController {
     private TextField linkName; // Value injected by FXMLLoader
 
     @FXML // fx:id="linkType"
-    private ChoiceBox<opt.data.Link.Type> linkType; // Value injected by FXMLLoader
+    private ChoiceBox<AbstractLink.Type> linkType; // Value injected by FXMLLoader
 
     @FXML // fx:id="linkLength"
     private Spinner<Double> linkLength; // Value injected by FXMLLoader
@@ -272,7 +269,7 @@ public class LinkEditorController {
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
-        linkType.setItems(FXCollections.observableArrayList(opt.data.Link.Type.values()));
+        linkType.setItems(FXCollections.observableArrayList(AbstractLink.Type.values()));
         linkType.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
                 onLinkTypeChange();
@@ -407,7 +404,7 @@ public class LinkEditorController {
      * configuration module.
      * @param lnk 
      */
-    public void initWithLinkData(Link lnk) {
+    public void initWithLinkData(AbstractLink lnk) {
         laneProperties.setExpanded(false);
         
         if (lnk == null)
@@ -416,10 +413,10 @@ public class LinkEditorController {
         ignoreChange = true;
                 
         myLink = lnk;
-        linkName.setText(myLink.get_name());
+        linkName.setText(myLink.name);
         laneProperties.setExpanded(true);
         
-        opt.data.Link.Type lnkType = myLink.get_type();
+        AbstractLink.Type lnkType = myLink.get_type();
         linkType.setItems(FXCollections.observableArrayList(lnkType)); // to enable choice, remove this line
         linkType.setValue(lnkType);;
         
@@ -430,28 +427,16 @@ public class LinkEditorController {
         //if ((unitsLength.equals("miles")) || (unitsLength.equals("kilometers")))
         lengthSpinnerValueFactory.setValue(length);
         
-        if (lnkType == opt.data.Link.Type.freeway) {
-            numLanesGPSpinnerValueFactory.setValue(myLink.get_segment().get_mixed_lanes());
-        } else if (lnkType == opt.data.Link.Type.onramp) {
-            numLanesGPSpinnerValueFactory.setValue(myLink.get_segment().get_or_lanes());
-        } else if (lnkType == opt.data.Link.Type.offramp) {
-            numLanesGPSpinnerValueFactory.setValue(myLink.get_segment().get_fr_lanes());
-        }
-        
-        int managed_lanes = myLink.get_segment().get_managed_lanes();
-        int gp_lanes = myLink.get_segment().get_mixed_lanes();
-        int aux_lanes = 0;
-        if (myLink.get_type() == Link.Type.onramp)
-            gp_lanes = myLink.get_segment().get_or_lanes();
-        if (myLink.get_type() == Link.Type.offramp)
-            gp_lanes = myLink.get_segment().get_fr_lanes();
+        int managed_lanes = myLink.get_managed_lanes();
+        int gp_lanes = myLink.get_gp_lanes();
+        int aux_lanes = myLink.get_aux_lanes();;
         
         numLanesManagedSpinnerValueFactory.setValue(managed_lanes);
         numLanesGPSpinnerValueFactory.setValue(gp_lanes);
         numLanesAuxSpinnerValueFactory.setValue(aux_lanes);
         
         
-        if (myLink.get_type() != Link.Type.freeway) {
+        if (myLink.get_type() != AbstractLink.Type.freeway) {
             boolean flag = true;
             numAuxLanes.setDisable(flag);
             capacityAuxLane.setDisable(flag);
@@ -513,17 +498,7 @@ public class LinkEditorController {
         
         // TODO: set lane properties to link
         try {
-            if ((myLink.get_type() == Link.Type.freeway) || (myLink.get_type() == Link.Type.connector)) {
-                myLink.get_segment().set_mixed_lanes(gp_lanes);
-            }
-        
-            if (myLink.get_type() == Link.Type.onramp) {
-                myLink.get_segment().set_or_lanes(gp_lanes);
-            }
-        
-            if (myLink.get_type() == Link.Type.offramp) {
-                myLink.get_segment().set_fr_lanes(gp_lanes);
-            }
+            myLink.set_gp_lanes(gp_lanes);
         } catch(Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not change number of lanes...", e);
         }
@@ -550,54 +525,56 @@ public class LinkEditorController {
             double y0 = y1;
             
             // Draw outer on-ramps
-            if ((myLink.get_type() == Link.Type.freeway) && 
-                myLink.get_segment().has_onramp()) {
-                g.setFill(Color.DARKGREY);
-                if (aux_lanes > 0)
-                    g.setFill(Color.LIGHTGREY);
-                double or_lanes = myLink.get_segment().get_or_lanes();
-                double or_width = or_lanes * lane_width;
-                double rotationCenterX = x0;
-                double rotationCenterY = base_y;
-                g.save();
-                g.translate(rotationCenterX, rotationCenterY);
-                g.rotate(-ramp_angle);
-                g.translate(-rotationCenterX, -rotationCenterY);
-                g.fillRect(x0-ramp_length/2, base_y-or_width/2, ramp_length, or_width);
-                g.setStroke(Color.WHITE);
-                for (int i = 1; i < or_lanes; i++) {
-                    y0 = base_y+or_width/2 - i*lane_width;
-                    g.setLineDashes(lane_width/3, lane_width/2);
-                    g.setLineWidth(1);
-                    g.strokeLine(x0-ramp_length/2, y0, x0+ramp_length/2, y0);
-                }
-                g.restore();
-            }
+            // TODO GG: TEMPORARILY BROKEN
+//            if ((myLink.get_type() == AbstractLink.Type.freeway) &&
+//                myLink.get_segment().has_onramp()) {
+//                g.setFill(Color.DARKGREY);
+//                if (aux_lanes > 0)
+//                    g.setFill(Color.LIGHTGREY);
+//                double or_lanes = myLink.get_segment().get_or_lanes();
+//                double or_width = or_lanes * lane_width;
+//                double rotationCenterX = x0;
+//                double rotationCenterY = base_y;
+//                g.save();
+//                g.translate(rotationCenterX, rotationCenterY);
+//                g.rotate(-ramp_angle);
+//                g.translate(-rotationCenterX, -rotationCenterY);
+//                g.fillRect(x0-ramp_length/2, base_y-or_width/2, ramp_length, or_width);
+//                g.setStroke(Color.WHITE);
+//                for (int i = 1; i < or_lanes; i++) {
+//                    y0 = base_y+or_width/2 - i*lane_width;
+//                    g.setLineDashes(lane_width/3, lane_width/2);
+//                    g.setLineWidth(1);
+//                    g.strokeLine(x0-ramp_length/2, y0, x0+ramp_length/2, y0);
+//                }
+//                g.restore();
+//            }
             
             // Draw outer off-ramps
-            if ((myLink.get_type() == Link.Type.freeway) && 
-                myLink.get_segment().has_offramp()) {
-                g.setFill(Color.DARKGREY);
-                if (aux_lanes > 0)
-                    g.setFill(Color.LIGHTGREY);
-                double fr_lanes = myLink.get_segment().get_fr_lanes();
-                double fr_width = fr_lanes * lane_width;
-                double rotationCenterX = x1;
-                double rotationCenterY = base_y;
-                g.save();
-                g.translate(rotationCenterX, rotationCenterY);
-                g.rotate(ramp_angle);
-                g.translate(-rotationCenterX, -rotationCenterY);
-                g.fillRect(x1-ramp_length/2, base_y-fr_width/2, ramp_length, fr_width);
-                g.setStroke(Color.WHITE);
-                for (int i = 1; i < fr_lanes; i++) {
-                    y0 = base_y+fr_width/2 - i*lane_width;
-                    g.setLineDashes(lane_width/3, lane_width/2);
-                    g.setLineWidth(1);
-                    g.strokeLine(x1-ramp_length/2, y0, x1+ramp_length/2, y0);
-                }
-                g.restore();
-            }
+            // TODO GG: TEMPORARILY BROKEN
+//            if ((myLink.get_type() == AbstractLink.Type.freeway) &&
+//                myLink.get_segment().has_offramp()) {
+//                g.setFill(Color.DARKGREY);
+//                if (aux_lanes > 0)
+//                    g.setFill(Color.LIGHTGREY);
+//                double fr_lanes = myLink.get_segment().get_fr_lanes();
+//                double fr_width = fr_lanes * lane_width;
+//                double rotationCenterX = x1;
+//                double rotationCenterY = base_y;
+//                g.save();
+//                g.translate(rotationCenterX, rotationCenterY);
+//                g.rotate(ramp_angle);
+//                g.translate(-rotationCenterX, -rotationCenterY);
+//                g.fillRect(x1-ramp_length/2, base_y-fr_width/2, ramp_length, fr_width);
+//                g.setStroke(Color.WHITE);
+//                for (int i = 1; i < fr_lanes; i++) {
+//                    y0 = base_y+fr_width/2 - i*lane_width;
+//                    g.setLineDashes(lane_width/3, lane_width/2);
+//                    g.setLineWidth(1);
+//                    g.strokeLine(x1-ramp_length/2, y0, x1+ramp_length/2, y0);
+//                }
+//                g.restore();
+//            }
             
             
             
@@ -675,7 +652,7 @@ public class LinkEditorController {
 
     private void onLinkTypeChange() {    
         int linkTypeSelectedIndex = linkType.getSelectionModel().getSelectedIndex();
-        opt.data.Link.Type lnkType = opt.data.Link.Type.values()[linkTypeSelectedIndex];
+        AbstractLink.Type lnkType = AbstractLink.Type.values()[linkTypeSelectedIndex];
         //myLink.get_segment().set_type(lnkType);
         
         System.err.println("Type: " + lnkType + " (" + linkTypeSelectedIndex + ")");
@@ -689,15 +666,7 @@ public class LinkEditorController {
         length = appMainController.getUserSettings().convertFlow(length, unitsLength, "meters");
         length = Math.max(length, 0.001);
         try {
-            if ((myLink.get_type() == Link.Type.freeway) || (myLink.get_type() == Link.Type.connector)) {
-                myLink.get_segment().set_length_meters((float)length);
-            }
-            if (myLink.get_type() == Link.Type.onramp) {
-                myLink.get_segment().set_or_length_meters((float)length);
-            }
-            if (myLink.get_type() == Link.Type.offramp) {
-                myLink.get_segment().set_fr_length_meters((float)length);
-            }
+            myLink.length_meters = (float)length;
         } catch(Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not change section length...", e);
         }

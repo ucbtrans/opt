@@ -105,15 +105,15 @@ public class TestProject extends AbstractTest {
         }
     }
 
-    @Test
-    public void test_clone_scenario(){
-        try {
-            TestData X = new TestData();
-            X.project.clone_scenario("scenarioA","new_scenario");
-            assertNotNull(X.project.get_scenario_with_name("new_scenario"));
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
+//    @Test
+//    public void test_clone_scenario(){
+//        try {
+//            TestData X = new TestData();
+//            X.project.clone_scenario("scenarioA","new_scenario");
+//            assertNotNull(X.project.get_scenario_with_name("new_scenario"));
+//        } catch (Exception e) {
+//            fail(e.getMessage());
+//        }
+//    }
 
 }
