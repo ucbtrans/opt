@@ -10,15 +10,17 @@ public abstract class AbstractLink implements Comparable {
 
     public enum Type {freeway,offramp,onramp,connector}
 
-    protected final Type type;
+    // refs
     protected Segment mysegment;
     protected AbstractLink up_link;
     protected AbstractLink dn_link;
 
+    protected final Type type;
     protected long start_node_id;
     protected long end_node_id;
 
     public final long id;
+
     public String name;
     public int full_lanes;
     public float length_meters;
@@ -60,8 +62,9 @@ public abstract class AbstractLink implements Comparable {
         this.mysegment = mysegment;
     }
 
-    public AbstractLink deep_copy(){
-        AbstractLink new_link = null;
+
+//    public AbstractLink deep_copy(){
+//        AbstractLink new_link = null;
 //        try {
 //            Constructor<AbstractLink> constr = (Constructor<AbstractLink>)getClass().getConstructor(Long.class, AbstractLink.Type.class, Long.class, Long.class, Integer.class, Float.class, Float.class, Float.class, Float.class, Segment.class);
 //            new_link = constr.newInstance(
@@ -85,9 +88,9 @@ public abstract class AbstractLink implements Comparable {
 //        } catch (NoSuchMethodException ex) {
 //            ex.printStackTrace();
 //        }
-        return new_link;
-
-    }
+//        return new_link;
+//
+//    }
 
     /////////////////////////////////////
     // getters
@@ -201,31 +204,33 @@ public abstract class AbstractLink implements Comparable {
         return str;
     }
 
+
+    @Override
+    public int compareTo(Object that) {
+        return Long.compare(this.id,((AbstractLink) that).id);
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AbstractLink that = (AbstractLink) o;
-        return id == that.id &&
-                type== that.type &&
-                start_node_id == that.start_node_id &&
+        return start_node_id == that.start_node_id &&
                 end_node_id == that.end_node_id &&
+                id == that.id &&
                 full_lanes == that.full_lanes &&
                 Float.compare(that.length_meters, length_meters) == 0 &&
-                Float.compare(that.param.capacity_vphpl, param.capacity_vphpl) == 0 &&
-                Float.compare(that.param.jam_density_vpkpl, param.jam_density_vpkpl) == 0 &&
-                Float.compare(that.param.ff_speed_kph, param.ff_speed_kph) == 0 &&
-                name.equals(that.name);
+                type == that.type &&
+                Objects.equals(name, that.name) &&
+                param.equals(that.param) &&
+                demands.equals(that.demands) &&
+                splits.equals(that.splits);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, start_node_id, end_node_id, full_lanes, length_meters,param.capacity_vphpl, param.jam_density_vpkpl, param.ff_speed_kph);
-    }
-
-    @Override
-    public int compareTo(Object that) {
-        return Long.compare(this.id,((AbstractLink) that).id);
+        return Objects.hash(type, start_node_id, end_node_id, id, name, full_lanes, length_meters, param, demands, splits);
     }
 
 }

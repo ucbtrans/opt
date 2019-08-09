@@ -168,17 +168,13 @@ public class FreewayScenario {
 
     }
 
-    /**
-     * Create a deep copy of a given scenario
-     * @return new FreewayScenario object
-     */
+
 //    public FreewayScenario deep_copy(){
 //        FreewayScenario scn_cpy = new FreewayScenario(name);
 //        scn_cpy.scenario = scenario.deep_copy();
 //        scn_cpy.segments = new HashMap<>();
 //        for(Map.Entry<Long,Segment> e : segments.entrySet())
 //            scn_cpy.segments.put(e.getKey(),e.getValue().deep_copy(scn_cpy));
-//        scn_cpy.reset_max_ids();
 //        return scn_cpy;
 //    }
 
@@ -306,7 +302,10 @@ public class FreewayScenario {
 
         // create a segment
         Long segment_id = ++max_seg_id;
-        Segment segment = new Segment(segment_id,segment_name,this);
+        Segment segment = new Segment();
+        segment.id = segment_id;
+        segment.name = segment_name;
+        segment.fwy_scenario = this;
         segments.put(segment_id,segment);
 
         // create nodes and freeway link

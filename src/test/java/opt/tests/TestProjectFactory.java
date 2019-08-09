@@ -2,7 +2,6 @@ package opt.tests;
 
 import error.OTMException;
 import opt.data.*;
-import org.junit.Ignore;
 import org.junit.Test;
 import xml.JaxbLoader;
 
@@ -45,7 +44,6 @@ public class TestProjectFactory extends AbstractTest {
         assertNotNull(segment);
     }
 
-    @Ignore
     @Test
     public void test_save_project_to_file() {
         try {

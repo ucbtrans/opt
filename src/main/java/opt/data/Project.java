@@ -121,12 +121,12 @@ public class Project {
         scenarios.put(name,new FreewayScenario(name,null,null,new jaxb.Scenario()));
     }
 
-//    /**
-//     * Clone an existing scenario.
-//     * @param from_name Name of the existing scenario
-//     * @param to_name Name of the clone
-//     * @throws Exception
-//     */
+    /**
+     * Clone an existing scenario.
+     * @param from_name Name of the existing scenario
+     * @param to_name Name of the clone
+     * @throws Exception
+     */
 //    public void clone_scenario(String from_name,String to_name) throws Exception {
 //
 //        if(!scenarios.containsKey(from_name))

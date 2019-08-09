@@ -1,10 +1,6 @@
 package opt.data;
 
 import jaxb.Roadparam;
-import profiles.Profile1D;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class LinkConnector extends LinkFreewayOrConnector {
 

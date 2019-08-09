@@ -1,7 +1,6 @@
 package opt.data;
 
 import jaxb.ModelParams;
-import output.animation.AbstractLinkInfo;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
@@ -68,41 +67,17 @@ public class Scenario {
 
     }
 
-//    public Scenario deep_copy() {
+//    protected Scenario deep_copy() {
 //        Scenario jscn_cpy = new Scenario();
 //
-//        // create new nodes
 //        for (Map.Entry<Long, Node> e : nodes.entrySet())
-//            jscn_cpy.nodes.put(e.getKey(), new Node(e.getKey()));
+//            jscn_cpy.nodes.put(e.getKey(), e.getValue().deep_copy());
 //
-//        // create new links
 //        for (Map.Entry<Long, AbstractLink> e : links.entrySet())
 //            jscn_cpy.links.put(e.getKey(),e.getValue().deep_copy());
 //
-//        // set node inlinks and outlinks
-//        for (Node node_cpy : jscn_cpy.nodes.values()){
-//            Node node_org = nodes.get(node_cpy.id);
-//            node_cpy.out_links.addAll(node_org.out_links);
-//            node_cpy.in_links.addAll(node_org.in_links);
-//        }
-//
-//        // commodities
 //        for (Map.Entry<Long,Commodity> e : commodities.entrySet())
 //            jscn_cpy.commodities.put(e.getKey(),e.getValue().deep_copy());
-//
-//
-//        // set road parameters
-//        for(Map.Entry<Long,jaxb.Roadparam> e : jscn_org.road_params.entrySet()) {
-//            long rp_id = e.getKey();
-//            jaxb.Roadparam rp = e.getValue();
-//            jaxb.Roadparam rp_cpy = new Roadparam();
-//            rp_cpy.setId(rp_id);
-//            rp_cpy.setName(rp.getName());
-//            rp_cpy.setCapacity(rp.getCapacity());
-//            rp_cpy.setJamDensity(rp.getJamDensity());
-//            rp_cpy.setSpeed(rp.getSpeed());
-//            jscn_cpy.road_params.put(rp_id, rp_cpy);
-//        }
 //
 //        return jscn_cpy;
 //    }
@@ -111,17 +86,6 @@ public class Scenario {
     // getters
     /////////////////////////////////////
 
-    protected Set<RoadParam> get_road_params(){
-        Set<RoadParam> road_params = new HashSet<>();
-        for(AbstractLink link : links.values())
-            road_params.add(new RoadParam(link.param.capacity_vphpl,link.param.ff_speed_kph,link.param.jam_density_vpkpl));
-
-        // set ids
-        long id = 0;
-        for(RoadParam roadParam : road_params)
-            roadParam.id = id++;
-        return road_params;
-    }
 
     public jaxb.Scenario to_jaxb(Collection<Segment> segments){
         jaxb.Scenario jScn = new jaxb.Scenario();
@@ -168,13 +132,15 @@ public class Scenario {
 
         jaxb.Roadparams jRoadParams = new jaxb.Roadparams();
         jNet.setRoadparams(jRoadParams);
-        Set<RoadParam> road_params = get_road_params();
-        for(RoadParam jrp : road_params){
+        Map<Long,LinkParameters> link_params = get_link_params();
+        for(Map.Entry<Long,LinkParameters> e : link_params.entrySet()){
+            Long id = e.getKey();
+            LinkParameters param = e.getValue();
             jaxb.Roadparam jaxbrp = new jaxb.Roadparam();
-            jaxbrp.setId(jrp.id);
-            jaxbrp.setCapacity(jrp.capacity);
-            jaxbrp.setSpeed(jrp.speed);
-            jaxbrp.setJamDensity(jrp.jam_density);
+            jaxbrp.setId(id);
+            jaxbrp.setCapacity(param.capacity_vphpl);
+            jaxbrp.setSpeed(param.ff_speed_kph);
+            jaxbrp.setJamDensity(param.jam_density_vpkpl);
             jRoadParams.getRoadparam().add(jaxbrp);
         }
 
@@ -183,6 +149,8 @@ public class Scenario {
         jNet.setLinks(jLinks);
         for(AbstractLink link : links.values()){
             jaxb.Link jaxbLink = new jaxb.Link();
+            jLinks.getLink().add(jaxbLink);
+
             jaxbLink.setId(link.id);
             jaxbLink.setLength(link.length_meters);
             jaxbLink.setFullLanes(link.full_lanes);
@@ -191,11 +159,12 @@ public class Scenario {
             jaxbLink.setRoadType(link.type.toString());
 
             // road params
-            RoadParam link_rp = new RoadParam(link.param.capacity_vphpl,link.param.ff_speed_kph,link.param.jam_density_vpkpl);
-            long rp_id = road_params.stream().filter(rp->rp.equals(link_rp)).findFirst().get().id;
+            Set<Long> param_ids = link_params.entrySet().stream()
+                    .filter(e->e.getValue().equals(link.param))
+                    .map(e->e.getKey())
+                    .collect(Collectors.toSet());
+            jaxbLink.setRoadparam(param_ids.iterator().next());
 
-            jaxbLink.setRoadparam(rp_id);
-            jLinks.getLink().add(jaxbLink);
         }
 
         // demands
@@ -270,7 +239,6 @@ public class Scenario {
                 jsplitnode.setDt(dts.iterator().next());
                 jsplitnode.setStartTime(start_times.iterator().next());
 
-
                 // assumes that *all* out links have splits defined
                 // and they sum up to 1.
 
@@ -291,11 +259,26 @@ public class Scenario {
         return jScn;
     }
 
+    /////////////////////////////////////
+    // private
+    /////////////////////////////////////
+
+    private Map<Long,LinkParameters> get_link_params(){
+        Set<LinkParameters> link_params_set = links.values().stream()
+                .map(link->link.param)
+                .collect(Collectors.toSet());
+
+        // set ids
+        Map<Long,LinkParameters> link_params_map = new HashMap<>();
+        long id = 0;
+        for(LinkParameters link_param : link_params_set)
+            link_params_map.put(id++,link_param);
+        return link_params_map;
+    }
 
     /////////////////////////////////////
     // Override
     /////////////////////////////////////
-
 
     @Override
     public boolean equals(Object o) {
@@ -310,23 +293,6 @@ public class Scenario {
     @Override
     public int hashCode() {
         return Objects.hash(nodes, links, commodities);
-    }
-
-    private static Profile1D sum_profiles(Set<Profile1D> profiles){
-        Set<Float> dts = profiles.stream().map(p->p.dt).collect(Collectors.toSet());
-        Set<Float> start_times = profiles.stream().map(p->p.start_time).collect(Collectors.toSet());
-        Set<Integer> sizes = profiles.stream().map(p->p.get_length()).collect(Collectors.toSet());
-        if(dts.size()!=1 || start_times.size()!=1 || sizes.size()!=1)
-            return null;
-
-        Profile1D X = new Profile1D(start_times.iterator().next(),dts.iterator().next());
-        for(int i=0;i<sizes.iterator().next();i++)
-            X.add(0f);
-        for(Profile1D profile : profiles)
-            for(int i=0;i<profile.get_length();i++)
-                X.values.set(i,X.values.get(i) + profile.values.get(i));
-
-        return X;
     }
 
 }

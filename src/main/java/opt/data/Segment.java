@@ -23,12 +23,7 @@ public class Segment implements Comparable {
     // construction
     /////////////////////////////////////
 
-    // used in deep copy
-    public Segment(long id,String name, FreewayScenario fwy_scenario){
-        this.id = id;
-        this.name = name;
-        this.fwy_scenario = fwy_scenario;
-    }
+    public Segment(){}
 
     // used by FreewayScenario jaxb constructor
     public Segment(FreewayScenario fwy_scenario,long id, jaxbopt.Sgmt sgmt) {
@@ -69,23 +64,10 @@ public class Segment implements Comparable {
 //        this.fwy_id = fwy_id;
 //    }
 
-//    public Segment deep_copy(FreewayScenario scenario){
-//        Segment seg_cpy = new Segment(id,name,scenario);
-//        seg_cpy.fwy_id = fwy_id;
-//
-//        seg_cpy.in_ors = new ArrayList<>(in_ors);
-//        seg_cpy.out_ors = new ArrayList<>(out_ors);
-//        seg_cpy.in_frs = new ArrayList<>(in_frs);
-//        seg_cpy.out_frs = new ArrayList<>(out_frs);
-//
-//        seg_cpy.segment_fwy_dn_id = segment_fwy_dn_id;
-//        seg_cpy.segment_fwy_up_id = segment_fwy_up_id;
-//
-//        for(Map.Entry<Long,Profile1D> e : fwy_demands.entrySet())
-//            seg_cpy.fwy_demands.put(e.getKey(),e.getValue().clone());
-//
-//        return seg_cpy;
-//    }
+    public Segment deep_copy(FreewayScenario scenario){
+        // TODO IMPLEMENT
+        return null;
+    }
 
     /////////////////////////////////////
     // getters / setters
@@ -420,32 +402,22 @@ public class Segment implements Comparable {
         return this.name.compareTo(((Segment) that).name);
     }
 
-//    @Override
-//    public String toString() {
-//        return String.format("name\t%s\nfr\t%s\nfwy:\t%s\nor:\t%s", name, fr_id, fwy_id, or_id);
-//    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Segment segment = (Segment) o;
+        return id == segment.id &&
+                name.equals(segment.name) &&
+                fwy.equals(segment.fwy) &&
+                in_ors.equals(segment.in_ors) &&
+                out_ors.equals(segment.out_ors) &&
+                in_frs.equals(segment.in_frs) &&
+                out_frs.equals(segment.out_frs);
+    }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        Segment segment = (Segment) o;
-//        return id == segment.id &&
-//                name.equals(segment.name) &&
-//                fwy_id.equals(segment.fwy_id) &&
-//                Objects.equals(or_id, segment.or_id) &&
-//                Objects.equals(fr_id, segment.fr_id) &&
-//                Objects.equals(segment_fwy_dn_id, segment.segment_fwy_dn_id) &&
-//                Objects.equals(segment_fwy_up_id, segment.segment_fwy_up_id) &&
-//                Objects.equals(segment_fr_dn_id, segment.segment_fr_dn_id) &&
-//                Objects.equals(segment_or_up_id, segment.segment_or_up_id) &&
-//                fwy_demands.equals(segment.fwy_demands) &&
-//                or_demands.equals(segment.or_demands) &&
-//                fr_splits.equals(segment.fr_splits);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(name, id, fwy_id, or_id, fr_id, segment_fwy_dn_id, segment_fwy_up_id, segment_fr_dn_id, segment_or_up_id, fwy_demands, or_demands, fr_splits);
-//    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, fwy, in_ors, out_ors, in_frs, out_frs);
+    }
 }
