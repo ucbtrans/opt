@@ -26,8 +26,7 @@ public class FreewayScenario {
     // construction
     /////////////////////////////////////
 
-    public FreewayScenario(String name) {
-        this.name = name;
+    public FreewayScenario() {
     }
 
     public FreewayScenario(String name,LinkParameters params){
@@ -168,15 +167,33 @@ public class FreewayScenario {
 
     }
 
+    public FreewayScenario clone(){
+        FreewayScenario scn_cpy = new FreewayScenario();
+        scn_cpy.name = name;
+        scn_cpy.max_link_id = max_link_id;
+        scn_cpy.max_node_id = max_node_id;
+        scn_cpy.max_seg_id = max_seg_id;
+        scn_cpy.scenario = scenario.clone();
+        scn_cpy.segments = new HashMap<>();
+        for(Map.Entry<Long,Segment> e : segments.entrySet()) {
+            Segment new_segment = e.getValue().clone();
+            new_segment.fwy_scenario = scn_cpy;
+            scn_cpy.segments.put(e.getKey(),new_segment );
+        }
 
-//    public FreewayScenario deep_copy(){
-//        FreewayScenario scn_cpy = new FreewayScenario(name);
-//        scn_cpy.scenario = scenario.deep_copy();
-//        scn_cpy.segments = new HashMap<>();
-//        for(Map.Entry<Long,Segment> e : segments.entrySet())
-//            scn_cpy.segments.put(e.getKey(),e.getValue().deep_copy(scn_cpy));
-//        return scn_cpy;
-//    }
+        // make link connections
+        for(AbstractLink link : scenario.links.values()){
+            AbstractLink new_link = scn_cpy.scenario.links.get(link.id);
+            if(link.mysegment!=null)
+                new_link.mysegment = scn_cpy.segments.get(link.mysegment.id);
+            if(link.up_link!=null)
+                new_link.up_link = scn_cpy.scenario.links.get(link.up_link.id);
+            if(link.dn_link!=null)
+                new_link.dn_link = scn_cpy.scenario.links.get(link.dn_link.id);
+        }
+
+        return scn_cpy;
+    }
 
     /////////////////////////////////////
     // scenario getters

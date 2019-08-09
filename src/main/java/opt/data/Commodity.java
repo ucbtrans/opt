@@ -24,9 +24,10 @@ public class Commodity {
         this.weight = weight;
     }
 
-//    public Commodity deep_copy(){
-//        return new Commodity(this.id, this.name, this.weight);
-//    }
+
+    public Commodity clone(){
+        return new Commodity(id,name,weight);
+    }
 
     /////////////////////////////////////
     // getters

@@ -1,5 +1,7 @@
 package opt.data;
 
+import sun.awt.image.ImageWatched;
+
 import java.util.Objects;
 
 public class LinkParameters {
@@ -19,9 +21,9 @@ public class LinkParameters {
         this(rp.getCapacity(),rp.getJamDensity(),rp.getSpeed());
     }
 
-//    public LinkParameters deep_copy(){
-//
-//    }
+    public LinkParameters clone() {
+        return new LinkParameters( capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+    }
 
     @Override
     public boolean equals(Object o) {

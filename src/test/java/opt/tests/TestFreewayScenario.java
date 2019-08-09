@@ -11,12 +11,12 @@ import static org.junit.Assert.*;
 
 public class TestFreewayScenario extends AbstractTest {
 
-//    @Test
-//    public void test_deep_copy(){
-//        TestData X = new TestData();
-//        FreewayScenario new_scn = X.scenario.deep_copy();
-//        assertTrue(new_scn.equals(X.scenario));
-//    }
+    @Test
+    public void test_clone(){
+        TestData X = new TestData();
+        FreewayScenario new_scn = X.scenario.clone();
+        assertTrue(new_scn.equals(X.scenario));
+    }
 
     @Test
     public void test_create_isolated_segment() {

@@ -127,16 +127,16 @@ public class Project {
      * @param to_name Name of the clone
      * @throws Exception
      */
-//    public void clone_scenario(String from_name,String to_name) throws Exception {
-//
-//        if(!scenarios.containsKey(from_name))
-//            throw new Exception("The project does not have a scenario by this name.");
-//
-//        if(scenarios.containsKey(to_name))
-//            throw new Exception("The project already has a scenario by this name.");
-//
-//        scenarios.put( to_name , scenarios.get(from_name).deep_copy() );
-//    }
+    public void clone_scenario(String from_name,String to_name) throws Exception {
+
+        if(!scenarios.containsKey(from_name))
+            throw new Exception("The project does not have a scenario by this name.");
+
+        if(scenarios.containsKey(to_name))
+            throw new Exception("The project already has a scenario by this name.");
+
+        scenarios.put( to_name , scenarios.get(from_name).clone() );
+    }
 
     /////////////////////////////////////
     // private

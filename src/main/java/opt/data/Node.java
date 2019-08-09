@@ -22,12 +22,12 @@ public class Node {
         this.id = id;
     }
 
-//    protected Node deep_copy(){
-//        Node new_node = new Node(this.id);
-//        new_node.in_links = (HashSet<Long>) in_links.clone();
-//        new_node.out_links = (HashSet<Long>) out_links.clone();
-//        return new_node;
-//    }
+    protected Node clone(){
+        Node new_node = new Node(this.id);
+        new_node.in_links.addAll(in_links);
+        new_node.out_links.addAll(out_links);
+        return new_node;
+    }
 
     /////////////////////////////////////
     // override

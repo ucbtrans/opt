@@ -12,7 +12,6 @@ public class LinkConnector extends LinkFreewayOrConnector {
         super(id, Type.connector, start_node_id, end_node_id, full_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
     }
 
-
 //    public boolean connect_dnstrm_onramp(AbstractLink onramp) throws Exception {
 //
 //        // checks

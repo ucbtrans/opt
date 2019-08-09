@@ -67,20 +67,20 @@ public class Scenario {
 
     }
 
-//    protected Scenario deep_copy() {
-//        Scenario jscn_cpy = new Scenario();
-//
-//        for (Map.Entry<Long, Node> e : nodes.entrySet())
-//            jscn_cpy.nodes.put(e.getKey(), e.getValue().deep_copy());
-//
-//        for (Map.Entry<Long, AbstractLink> e : links.entrySet())
-//            jscn_cpy.links.put(e.getKey(),e.getValue().deep_copy());
-//
-//        for (Map.Entry<Long,Commodity> e : commodities.entrySet())
-//            jscn_cpy.commodities.put(e.getKey(),e.getValue().deep_copy());
-//
-//        return jscn_cpy;
-//    }
+    protected Scenario clone() {
+        Scenario jscn_cpy = new Scenario();
+
+        for (Map.Entry<Long, Node> e : nodes.entrySet())
+            jscn_cpy.nodes.put(e.getKey(), e.getValue().clone());
+
+        for (Map.Entry<Long, AbstractLink> e : links.entrySet())
+            jscn_cpy.links.put(e.getKey(), e.getValue().clone());
+
+        for (Map.Entry<Long,Commodity> e : commodities.entrySet())
+            jscn_cpy.commodities.put(e.getKey(),e.getValue().clone());
+
+        return jscn_cpy;
+    }
 
     /////////////////////////////////////
     // getters

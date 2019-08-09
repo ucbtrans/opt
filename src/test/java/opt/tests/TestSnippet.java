@@ -18,10 +18,14 @@ public class TestSnippet {
         newset.add(a);
 
         // clone the hash set
-        HashSet <LinkParameters>  cloneset = (HashSet)newset.clone();
+        HashSet <LinkParameters>  cloneset = new HashSet<>();
+        newset.forEach(x->cloneset.add(x.clone()));
+        LinkParameters b = cloneset.iterator().next();
 
-        System.out.println("Hash set values: "+ newset);
-        System.out.println("Clone Hash set values: "+ cloneset);
+        System.out.println(newset==cloneset);
+        System.out.println(newset.equals(cloneset));
+        System.out.println(a==b);
+        System.out.println(a.equals(b));
 
     }
 }

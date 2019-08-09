@@ -2,6 +2,7 @@ package opt.data;
 
 import profiles.Profile1D;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -35,8 +36,6 @@ public abstract class AbstractLink implements Comparable {
     abstract public int get_managed_lanes();
     abstract public int get_aux_lanes();
 
-
-
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
@@ -62,35 +61,35 @@ public abstract class AbstractLink implements Comparable {
         this.mysegment = mysegment;
     }
 
+    @Override
+    public AbstractLink clone(){
+        AbstractLink new_link = null;
+        try {
+            new_link = this.getClass()
+                    .getConstructor(Long.class,Long.class,Long.class,Integer.class,Float.class,Float.class,Float.class,Float.class,Segment.class)
+                    .newInstance(id,start_node_id,end_node_id,full_lanes,length_meters,
+                            param.capacity_vphpl,
+                            param.jam_density_vpkpl,
+                            param.ff_speed_kph,
+                            null);
+            new_link.name = name;
 
-//    public AbstractLink deep_copy(){
-//        AbstractLink new_link = null;
-//        try {
-//            Constructor<AbstractLink> constr = (Constructor<AbstractLink>)getClass().getConstructor(Long.class, AbstractLink.Type.class, Long.class, Long.class, Integer.class, Float.class, Float.class, Float.class, Float.class, Segment.class);
-//            new_link = constr.newInstance(
-//                    id,
-//                    type,
-//                    start_node_id,
-//                    end_node_id,
-//                    full_lanes,
-//                    length_meters,
-//                    param.capacity_vphpl,
-//                    param.jam_density_vpkpl,
-//                    param.ff_speed_kph,
-//                    mysegment);
-//            new_link.name = name;
-//        } catch (InstantiationException ex) {
-//            ex.printStackTrace();
-//        } catch (IllegalAccessException ex) {
-//            ex.printStackTrace();
-//        } catch (InvocationTargetException ex) {
-//            ex.printStackTrace();
-//        } catch (NoSuchMethodException ex) {
-//            ex.printStackTrace();
-//        }
-//        return new_link;
-//
-//    }
+            for(Map.Entry<Long, Profile1D> e : demands.entrySet())
+                new_link.demands.put(e.getKey(),e.getValue().clone());
+            for(Map.Entry<Long, Profile1D> e : splits.entrySet())
+                new_link.splits.put(e.getKey(),e.getValue().clone());
+
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return new_link;
+    }
 
     /////////////////////////////////////
     // getters
@@ -227,6 +226,7 @@ public abstract class AbstractLink implements Comparable {
                 demands.equals(that.demands) &&
                 splits.equals(that.splits);
     }
+
 
     @Override
     public int hashCode() {

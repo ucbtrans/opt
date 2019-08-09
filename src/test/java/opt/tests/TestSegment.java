@@ -292,24 +292,4 @@ public class TestSegment extends AbstractTest {
         }
     }
 
-
-//////////////////////////////////////////////////////////////////////
-
-
-
-
-
-    @Test
-    public void test_delete_ramp() {
-
-        try {
-
-
-
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-
 }
