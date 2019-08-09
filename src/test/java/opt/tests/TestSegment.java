@@ -70,8 +70,8 @@ public class TestSegment extends AbstractTest {
     public void test_get_upstrm_links(){
         Segment segment = sX.scenario.get_segment_by_name("sA8");
         Set<AbstractLink> x = segment.get_upstrm_links();
-        assertEquals(2,x.size());
-        assertEquals(new HashSet<>(Arrays.asList(14l,12l)),x.stream().map(link->link.id).collect(toSet()));
+        assertEquals(1,x.size());
+        assertEquals(new HashSet<>(Arrays.asList(12l)),x.stream().map(link->link.id).collect(toSet()));
     }
 
     @Test

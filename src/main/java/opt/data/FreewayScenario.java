@@ -443,7 +443,8 @@ public class FreewayScenario {
     }
 
     public boolean is_valid_link_name(String name){
-        return !scenario.links.values().stream().anyMatch(link->link.name.equals(name));
+        return !scenario.links.values().stream()
+                .anyMatch(link->link.name!=null && link.name.equals(name));
     }
 
     /////////////////////////////////////

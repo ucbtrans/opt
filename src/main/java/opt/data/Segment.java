@@ -228,22 +228,27 @@ public class Segment implements Comparable {
         X.add(fwy.get_up_segment());
         X.addAll(in_ors.stream().map(x->x.get_up_segment()).collect(toSet()));
         X.addAll(out_ors.stream().map(x->x.get_up_segment()).collect(toSet()));
+        X.remove(null);
         return X;
     }
 
     public Set<AbstractLink> get_upstrm_links(){
         Set<AbstractLink> X = new HashSet<>();
-        X.add(fwy.up_link);
+        if(fwy.up_link!=null)
+            X.add(fwy.up_link);
         X.addAll(in_ors.stream().map(x->x.up_link).collect(toSet()));
         X.addAll(out_ors.stream().map(x->x.up_link).collect(toSet()));
+        X.remove(null);
         return X;
     }
 
     public Set<Segment> get_dnstrm_segments(){
         Set<Segment> X = new HashSet<>();
-        X.add(fwy.get_dn_segment());
+        if(fwy.dn_link!=null & fwy.dn_link.mysegment!=null)
+            X.add(fwy.dn_link.mysegment);
         X.addAll(in_frs.stream().map(x->x.get_dn_segment()).collect(toSet()));
         X.addAll(out_frs.stream().map(x->x.get_dn_segment()).collect(toSet()));
+        X.remove(null);
         return X;
     }
 
@@ -252,6 +257,7 @@ public class Segment implements Comparable {
         X.add(fwy.dn_link);
         X.addAll(in_frs.stream().map(x->x.dn_link).collect(toSet()));
         X.addAll(out_frs.stream().map(x->x.dn_link).collect(toSet()));
+        X.remove(null);
         return X;
     }
 
