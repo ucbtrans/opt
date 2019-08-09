@@ -4,7 +4,7 @@
     xmlns:opt="https://github.com/ucbtrans/opt"
 	elementFormDefault="qualified">
 
-	<xs:import schemaLocation="otm.xsd" namespace="opentrafficmodels" />
+<!--	<xs:import schemaLocation="otm.xsd" namespace="opentrafficmodels" />-->
 
 	<xs:element name="prj">
 		<xs:complexType>

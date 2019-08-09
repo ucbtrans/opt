@@ -1,5 +1,6 @@
 package opt.data;
 
+import jaxb.ModelParams;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
@@ -123,6 +124,20 @@ public class Scenario {
     public jaxb.Scenario to_jaxb(Collection<Segment> segments){
         jaxb.Scenario jScn = new jaxb.Scenario();
 
+        // models : Hard code single CTM model
+        jaxb.Models models = new jaxb.Models();
+        jScn.setModels(models);
+        jaxb.Model model = new jaxb.Model();
+        models.getModel().add(model);
+
+        model.setIsDefault(true);
+        model.setName("ctm");
+        model.setType("ctm");
+        ModelParams params = new ModelParams();
+        params.setMaxCellLength(100f);
+        params.setSimDt(2f);
+        model.setModelParams(params);
+
         // commodities
         jaxb.Commodities jComms = new jaxb.Commodities();
         jScn.setCommodities(jComms);
@@ -190,6 +205,7 @@ public class Scenario {
         for(Segment segment : segments){
 
             if(!segment.fr_splits.isEmpty()) {
+
 
                 for (Map.Entry<Long, Profile1D> e : segment.fr_splits.entrySet()) {
                     jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
