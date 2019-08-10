@@ -6,7 +6,7 @@ import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
 
-public class Segment implements Comparable {
+public final class Segment implements Comparable {
 
     protected FreewayScenario fwy_scenario;
     protected long id;
@@ -139,7 +139,19 @@ public class Segment implements Comparable {
     }
 
     ////////////////////////////////////////
-    // add ramps
+    // insert / delete segments
+    ////////////////////////////////////////
+
+    public Segment insert_up_segment(){
+        return fwy.insert_up_segment();
+    }
+
+    public Segment insert_dn_segment(){
+        return fwy.insert_dn_segment();
+    }
+
+    ////////////////////////////////////////
+    // add / delete ramps
     ////////////////////////////////////////
 
     public LinkOnramp add_in_or(LinkParameters params,int gp_lanes,float length){
@@ -165,10 +177,6 @@ public class Segment implements Comparable {
         out_frs.add(link);
         return link;
     }
-
-    ////////////////////////////////////////
-    // delete ramps
-    ////////////////////////////////////////
 
     public boolean delete_in_or(LinkOnramp link){
         if( in_ors.contains(link) ){
@@ -268,6 +276,7 @@ public class Segment implements Comparable {
                 params.ff_speed_kph,
                 this);
 
+        link.dn_link = fwy;
         start_node.in_links.add(link.id);
         fwy_scenario.scenario.nodes.put(start_node.id,start_node);
         fwy_scenario.scenario.links.put(link.id,link);
@@ -291,6 +300,7 @@ public class Segment implements Comparable {
                 params.ff_speed_kph,
                 this);
 
+        link.up_link = fwy;
         end_node.out_links.add(link.id);
         fwy_scenario.scenario.nodes.put(end_node.id,end_node);
         fwy_scenario.scenario.links.put(link.id,link);
@@ -365,6 +375,10 @@ public class Segment implements Comparable {
 
 
 
+
+
+
+
 //    protected void set_start_node(long new_start_node){
 //        fwy().start_node_id = new_start_node;
 //        if(has_offramp())
@@ -377,60 +391,6 @@ public class Segment implements Comparable {
 //            or().end_node_id = new_end_node;
 //    }
 //
-//    private static void connect_segment_to_downstream_node(Segment segment, Node new_dwn_node){
-//
-//        if(segment==null)
-//            return;
-//
-//        Node old_dwn_node = segment.fwy_scenario.scenario.nodes.get(segment.fwy().end_node_id);
-//        segment.fwy().end_node_id = new_dwn_node.id;
-//        old_dwn_node.in_links.remove(segment.fwy_id);
-//        new_dwn_node.in_links.add(segment.fwy_id);
-//
-//        if(segment.has_onramp() && segment.or().end_node_id==old_dwn_node.id) {
-//            segment.or().end_node_id = new_dwn_node.id;
-//            old_dwn_node.in_links.remove(segment.or_id);
-//            new_dwn_node.in_links.add(segment.or_id);
-//        }
-//
-//        if(segment.has_offramp() && segment.fr().start_node_id==old_dwn_node.id) {
-//            segment.fr().start_node_id = new_dwn_node.id;
-//            old_dwn_node.out_links.remove(segment.fr_id);
-//            new_dwn_node.out_links.add(segment.fr_id);
-//        }
-//    }
-//
-//    private static void connect_segment_to_upstream_node(Segment segment, Node new_up_node){
-//
-//        if(segment==null)
-//            return;
-//
-//        Node old_up_node = segment.fwy_scenario.scenario.nodes.get(segment.fwy().start_node_id);
-//        segment.fwy().start_node_id = new_up_node.id;
-//        old_up_node.out_links.remove(segment.fwy_id);
-//        new_up_node.out_links.add(segment.fwy_id);
-//
-//        if(segment.has_onramp() && segment.or().end_node_id==old_up_node.id) {
-//            segment.or().end_node_id = new_up_node.id;
-//            old_up_node.out_links.remove(segment.or_id);
-//            new_up_node.out_links.add(segment.or_id);
-//        }
-//
-//        if(segment.has_offramp() && segment.fr().start_node_id==old_up_node.id) {
-//            segment.fr().start_node_id = new_up_node.id;
-//            old_up_node.in_links.remove(segment.fr_id);
-//            new_up_node.in_links.add(segment.fr_id);
-//        }
-//    }
-//
-//    private Segment create_new_segment(AbstractLink newfwy){
-//        Long new_seg_id = fwy_scenario.new_seg_id();
-//        String new_seg_name = String.format("segment %d",new_seg_id);
-//        Segment newseg = new Segment(fwy_scenario,new_seg_id,new_seg_name,newfwy.id);
-//        newfwy.mysegment = newseg;
-//        newseg.segment_fwy_dn_id = this.id;
-//        return newseg;
-//    }
 
 
 }

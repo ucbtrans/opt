@@ -15,11 +15,7 @@ public class FreewayScenario {
     private Long max_seg_id;
 
     public String name;
-
-    // similar to the jax scenario, but with extended functionality
     protected Scenario scenario;
-
-    // interface to the ui
     protected Map<Long,Segment> segments = new HashMap<>();
 
     /////////////////////////////////////
@@ -35,7 +31,7 @@ public class FreewayScenario {
         max_node_id = -1l;
         max_seg_id = -1l;
         scenario = new Scenario();
-        create_isolated_segment("Unnamed segment",params);
+        create_isolated_segment("Unnamed segment",params, AbstractLink.Type.freeway);
     }
 
     public FreewayScenario(String name,jaxbopt.Lnks jaxb_lnks,jaxbopt.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
@@ -206,7 +202,7 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
-    // segment getters, create, and delete
+    // segment getters
     /////////////////////////////////////
 
     /**
@@ -296,11 +292,15 @@ public class FreewayScenario {
         return segments.containsKey(id) ? segments.get(id) : null;
     }
 
+    /////////////////////////////////////
+    // segment create / delete
+    /////////////////////////////////////
+
     /**
      * Create an isolated segment
      * @return A new segment
      */
-    public Segment create_isolated_segment(String segment_name,LinkParameters params){
+    public Segment create_isolated_segment(String segment_name,LinkParameters params,AbstractLink.Type linktype){
 
         // create a segment
         Long segment_id = ++max_seg_id;
@@ -314,13 +314,28 @@ public class FreewayScenario {
         Node start_node = new Node(++max_node_id);
         Node end_node = new Node(++max_node_id);
 
-        LinkFreeway link = new LinkFreeway(
-                ++max_link_id,
-                start_node.id,end_node.id,
-                1,
-                500f,
-                params.capacity_vphpl,params.jam_density_vpkpl,params.ff_speed_kph,
-                segment);
+        LinkFreewayOrConnector link = null;
+        switch(linktype){
+            case freeway:
+
+                link = new LinkFreeway(
+                        ++max_link_id,
+                        start_node.id,end_node.id,
+                        1,
+                        500f,
+                        params.capacity_vphpl,params.jam_density_vpkpl,params.ff_speed_kph,
+                        segment);
+                break;
+            case connector:
+                link = new LinkConnector(
+                        ++max_link_id,
+                        start_node.id,end_node.id,
+                        1,
+                        500f,
+                        params.capacity_vphpl,params.jam_density_vpkpl,params.ff_speed_kph,
+                        segment);
+                break;
+        }
 
         start_node.out_links.add(link.id);
         end_node.in_links.add(link.id);

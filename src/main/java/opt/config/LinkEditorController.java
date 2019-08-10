@@ -496,7 +496,7 @@ public class LinkEditorController {
         boolean separated = cbSeparated.isSelected();
         
         
-        // TODO: set lane properties to link
+        // TODO AK: set lane properties to link
         try {
             myLink.set_gp_lanes(gp_lanes);
         } catch(Exception e) {
@@ -632,7 +632,7 @@ public class LinkEditorController {
             
         
         } else {
-            ;//TODO left-side driving road
+            ;//TODO AK left-side driving road
         }
         
         

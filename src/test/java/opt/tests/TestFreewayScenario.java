@@ -11,35 +11,6 @@ import static org.junit.Assert.*;
 
 public class TestFreewayScenario extends AbstractTest {
 
-    @Test
-    public void test_clone(){
-        TestData X = new TestData();
-        FreewayScenario new_scn = X.scenario.clone();
-        assertTrue(new_scn.equals(X.scenario));
-    }
-
-    @Test
-    public void test_create_isolated_segment() {
-        TestData X = new TestData();
-        LinkParameters params = new LinkParameters(100,200,300);
-        Segment new_segment =  X.scenario.create_isolated_segment("Lonely segment",params);
-        assertNotNull(new_segment);
-    }
-
-    @Test
-    public void test_is_valid_segment_name() {
-        TestData X = new TestData();
-        assertFalse(X.scenario.is_valid_segment_name("sA3"));
-        assertTrue(X.scenario.is_valid_segment_name("invalid name"));
-    }
-
-    @Test
-    public void test_is_valid_link_name() {
-        TestData X = new TestData();
-        assertFalse(X.scenario.is_valid_link_name("lA13"));
-        assertTrue(X.scenario.is_valid_link_name("invalid name"));
-    }
-
     /////////////////////////////////////
     // scenario getters
     /////////////////////////////////////
@@ -103,6 +74,29 @@ public class TestFreewayScenario extends AbstractTest {
     }
 
     /////////////////////////////////////
+    // segment create / delete
+    /////////////////////////////////////
+
+    @Test
+    public void test_create_isolated_segment() {
+        TestData X = new TestData();
+        LinkParameters params = new LinkParameters(100,200,300);
+        Segment new_segment =  X.scenario.create_isolated_segment("Lonely segment",params,AbstractLink.Type.freeway);
+        assertNotNull(new_segment);
+    }
+
+    @Test
+    public void test_delete_segment() {
+        try {
+            TestData X = new TestData();
+            Segment segment2 = X.scenario.get_segment_by_name("sA3");
+            X.scenario.delete_segment(segment2);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    /////////////////////////////////////
     // commodity getters and setters
     /////////////////////////////////////
 
@@ -135,22 +129,32 @@ public class TestFreewayScenario extends AbstractTest {
 
     }
 
+    /////////////////////////////////////
+    // utilities
+    /////////////////////////////////////
+
     @Test
-    public void test_delete_segment() {
-        try {
-            TestData X = new TestData();
-            Segment segment2 = X.scenario.get_segment_by_name("sA3");
-            X.scenario.delete_segment(segment2);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+    public void test_is_valid_segment_name() {
+        TestData X = new TestData();
+        assertFalse(X.scenario.is_valid_segment_name("sA3"));
+        assertTrue(X.scenario.is_valid_segment_name("invalid name"));
     }
+
+    @Test
+    public void test_is_valid_link_name() {
+        TestData X = new TestData();
+        assertFalse(X.scenario.is_valid_link_name("lA13"));
+        assertTrue(X.scenario.is_valid_link_name("invalid name"));
+    }
+
+    /////////////////////////////////////
+    // run
+    /////////////////////////////////////
 
     @Ignore
     @Test
     public void test_run_on_new_thread(){
 
     }
-
 
 }

@@ -1,7 +1,6 @@
 package opt.tests;
 
 import opt.data.AbstractLink;
-import opt.data.LinkParameters;
 import opt.data.Segment;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -21,8 +20,9 @@ public class TestSegment extends AbstractTest {
     static{
         sX = new TestData();
     }
+
     /////////////////////////////////////
-    // name and length
+    // getters / setters
     /////////////////////////////////////
 
     @Test
@@ -38,10 +38,6 @@ public class TestSegment extends AbstractTest {
         }
     }
 
-    /////////////////////////////////////
-    // network
-    /////////////////////////////////////
-
     @Test
     public void test_get_links(){
         Segment segment0 = sX.scenario.get_segment_by_name("sA1");
@@ -56,6 +52,148 @@ public class TestSegment extends AbstractTest {
                 .filter(x->x!=null)
                 .map(x->x.id).collect(toSet()),new HashSet(Arrays.asList(2l)));
     }
+
+    @Ignore
+    @Test
+    public void test_num_in_ors(){
+    }
+
+    @Ignore
+    @Test
+    public void test_num_out_ors(){
+    }
+
+    @Ignore
+    @Test
+    public void test_num_in_frs(){
+    }
+
+    @Ignore
+    @Test
+    public void test_num_out_frs(){
+    }
+
+    @Ignore
+    @Test
+    public void test_in_ors(){
+    }
+
+    @Ignore
+    @Test
+    public void test_out_ors(){
+    }
+
+    @Ignore
+    @Test
+    public void test_in_frs(){
+    }
+
+    @Ignore
+    @Test
+    public void test_out_frs(){
+    }
+
+    ////////////////////////////////////////
+    // add / delete segments
+    ////////////////////////////////////////
+
+    @Ignore
+    @Test
+    public void test_add_up_segment(){
+//        TestData X = new TestData();
+//        Segment segment = X.scenario.get_segment_by_name("sA4").insert_dnstrm_mainline_segment();
+//        assertNotNull(segment);
+    }
+
+    @Ignore
+    @Test
+    public void test_add_dn_segment(){
+//        TestData X = new TestData();
+//        Segment segment = X.scenario.get_segment_by_name("sA4").insert_dnstrm_offramp_segment();
+//        assertNotNull(segment);
+    }
+
+    ////////////////////////////////////////
+    // add / delete ramps
+    ////////////////////////////////////////
+
+    @Ignore
+    @Test
+    public void test_add_in_or(){
+    }
+
+    @Ignore
+    @Test
+    public void test_add_out_or(){
+//        TestData X = new TestData();
+//        Segment segment = X.scenario.get_segment_by_name("sA1");
+//        assertFalse(segment.has_onramp());
+//        LinkParameters params = new LinkParameters(100,200,300);
+//        segment.add_onramp(params);
+//        assertTrue(segment.has_onramp());
+    }
+
+    @Ignore
+    @Test
+    public void test_add_in_fr(){
+    }
+
+    @Ignore
+    @Test
+    public void test_add_out_fr(){
+//        try {
+//            TestData X = new TestData();
+//            Segment segment0 = X.scenario.get_segment_by_name("sA2");
+//            assertFalse(segment0.has_offramp());
+//            LinkParameters params = new LinkParameters(100,200,300);
+//            segment0.add_offramp(params);
+//            assertTrue(segment0.has_offramp());
+//        } catch (Exception e) {
+//            fail(e.getMessage());
+//        }
+    }
+
+    @Ignore
+    @Test
+    public void test_delete_in_or(){
+    }
+
+    @Ignore
+    @Test
+    public void test_delete_out_or(){
+//        TestData X = new TestData();
+//
+//        // delete an existing onramp
+//        Segment segment2 = X.scenario.get_segment_by_name("sA3");
+//        assertTrue(segment2.delete_onramp());
+//
+//        // try to delete an non-existing onramp
+//        Segment segment4 = X.scenario.get_segment_by_name("sA4");
+//        assertFalse(segment4.delete_onramp());
+    }
+
+    @Ignore
+    @Test
+    public void test_delete_in_fr(){
+    }
+
+    @Ignore
+    @Test
+    public void test_delete_out_fr(){
+//
+//        TestData X = new TestData();
+//
+//        // try to delete an non-existing offramp
+//        assertFalse(X.scenario.get_segment_by_name("sA2").delete_offramp());
+//
+//        // delete an existing offramp
+//        assertTrue(X.scenario.get_segment_by_name("sA4").delete_offramp());
+
+    }
+
+    /////////////////////////////////////
+    // segment and link getters
+    /////////////////////////////////////
 
     @Test
     public void test_get_upstrm_segments(){
@@ -89,200 +227,6 @@ public class TestSegment extends AbstractTest {
         assertEquals(new HashSet<>(Arrays.asList(2l,12l)),x.stream().map(link->link.id).collect(toSet()));
     }
 
-    @Ignore
-    @Test
-    public void test_insert_upstrm_hov_segment(){
-    }
 
-//    @Test
-//    public void test_insert_upstrm_mainline_segment(){
-//        TestData X = new TestData();
-//        Segment segment = X.scenario.get_segment_by_name("sA3").insert_upstrm_mainline_segment();
-//        assertNotNull(segment);
-//    }
-//
-//    @Test
-//    public void test_insert_upstrm_onramp_segment(){
-//        TestData X = new TestData();
-//        Segment segment = X.scenario.get_segment_by_name("sA6").insert_upstrm_onramp_segment();
-//        assertNotNull(segment);
-//    }
-
-    @Ignore
-    @Test
-    public void test_insert_dnstrm_hov_segment(){
-    }
-
-//    @Test
-//    public void test_insert_dnstrm_mainline_segment(){
-//        TestData X = new TestData();
-//        Segment segment = X.scenario.get_segment_by_name("sA4").insert_dnstrm_mainline_segment();
-//        assertNotNull(segment);
-//    }
-//
-//    @Test
-//    public void test_insert_dnstrm_offramp_segment(){
-//        TestData X = new TestData();
-//        Segment segment = X.scenario.get_segment_by_name("sA4").insert_dnstrm_offramp_segment();
-//        assertNotNull(segment);
-//    }
-
-    /////////////////////////////////////
-    // offramp
-    /////////////////////////////////////
-
-//    @Test
-//    public void test_has_offramp(){
-//        assertFalse(sX.scenario.get_segment_by_name("sA2").has_offramp());
-//        assertTrue(sX.scenario.get_segment_by_name("sA1").has_offramp());
-//    }
-
-
-
-
-
-//    @Test
-//    public void test_delete_offramp(){
-//        TestData X = new TestData();
-//
-//        // try to delete an non-existing offramp
-//        assertFalse(X.scenario.get_segment_by_name("sA2").delete_offramp());
-//
-//        // delete an existing offramp
-//        assertTrue(X.scenario.get_segment_by_name("sA4").delete_offramp());
-//    }
-
-//    @Test
-//    public void test_add_offramp(){
-//        try {
-//            TestData X = new TestData();
-//            Segment segment0 = X.scenario.get_segment_by_name("sA2");
-//            assertFalse(segment0.has_offramp());
-//            LinkParameters params = new LinkParameters(100,200,300);
-//            segment0.add_offramp(params);
-//            assertTrue(segment0.has_offramp());
-//        } catch (Exception e) {
-//            fail(e.getMessage());
-//        }
-//    }
-
-    /////////////////////////////////////
-    // onramp
-    /////////////////////////////////////
-
-//    @Test
-//    public void test_has_onramp(){
-//        assertFalse(sX.scenario.get_segment_by_name("sA2").has_onramp());
-//        assertTrue(sX.scenario.get_segment_by_name("sA3").has_onramp());
-//    }
-
-//    @Test
-//    public void test_delete_onramp(){
-//        TestData X = new TestData();
-//
-//        // delete an existing onramp
-//        Segment segment2 = X.scenario.get_segment_by_name("sA3");
-//        assertTrue(segment2.delete_onramp());
-//
-//        // try to delete an non-existing onramp
-//        Segment segment4 = X.scenario.get_segment_by_name("sA4");
-//        assertFalse(segment4.delete_onramp());
-//    }
-
-//    @Test
-//    public void test_add_onramp(){
-//        TestData X = new TestData();
-//        Segment segment = X.scenario.get_segment_by_name("sA1");
-//        assertFalse(segment.has_onramp());
-//        LinkParameters params = new LinkParameters(100,200,300);
-//        segment.add_onramp(params);
-//        assertTrue(segment.has_onramp());
-//    }
-
-    @Ignore
-    @Test
-    public void test_set_get_or_demand_vph(){
-        try {
-
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /////////////////////////////////////
-    // mainline
-    /////////////////////////////////////
-
-    @Ignore
-    @Test
-    public void test_set_get_hov_lanes(){
-    }
-
-    @Test
-    public void test_set_get_ml_name(){
-        try {
-            try {
-                TestData X = new TestData();
-                Segment segment2 = X.scenario.get_segment_by_name("sA2");
-                assertEquals("lA2",segment2.fwy.name);
-            } catch (Exception e) {
-                fail(e.getMessage());
-            }
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void test_set_get_mixed_lanes(){
-        TestData X = new TestData();
-        Segment segment2 = X.scenario.get_segment_by_name("sA2");
-        try {
-            int ml_lanes = 2436;
-            segment2.fwy.set_gp_lanes(ml_lanes);
-            assertEquals(ml_lanes,segment2.fwy.get_gp_lanes());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void test_set_get_capacity_vphpl(){
-        TestData X = new TestData();
-        Segment segment2 = X.scenario.get_segment_by_name("sA2");
-        try {
-            float ml_capacity = 3498.2356f;
-            segment2.fwy.set_capacity_vphpl(ml_capacity);
-            assertEquals(ml_capacity,segment2.fwy.get_capacity_vphpl(),0.001);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void test_set_get_jam_density_vpmpl(){
-        TestData X = new TestData();
-        Segment segment2 = X.scenario.get_segment_by_name("sA2");
-        try {
-            float ml_jam_density = 245.234f;
-            segment2.fwy.set_jam_density_vpkpl(ml_jam_density);
-            assertEquals(ml_jam_density,segment2.fwy.get_jam_density_vpkpl(),0.001);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void test_set_get_freespeed_mph(){
-        TestData X = new TestData();
-        Segment segment2 = X.scenario.get_segment_by_name("sA2");
-        try {
-            float ml_speed = 348934.435f;
-            segment2.fwy.set_freespeed_kph(ml_speed);
-            assertEquals(ml_speed,segment2.fwy.get_freespeed_kph(),0.001);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
 
 }

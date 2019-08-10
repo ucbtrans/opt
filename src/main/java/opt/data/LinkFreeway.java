@@ -30,86 +30,44 @@ public class LinkFreeway extends LinkFreewayOrConnector {
     // insert
     /////////////////////////////////////
 
-//    public Segment insert_upstrm_mainline_segment(){
-//
-//        // create new upstream node
-//        Node existing_node = fwy_scenario.scenario.nodes.get(fwy().start_node_id);
-//        Node new_node = new Node(fwy_scenario.new_node_id());
-//
-//        // connect upstream links to new node
-//        connect_segment_to_downstream_node(get_upstrm_fwy_segment(),new_node);
-//
-//        // create new freeway link
-//        AbstractLink new_link = new AbstractLink(
-//                fwy_scenario.new_link_id(),
-//                AbstractLink.Type.freeway,
-//                new_node.id,
-//                existing_node.id,
-//                get_mixed_lanes(),
-//                get_length_meters(),
-//                get_capacity_vphpl(),
-//                get_jam_density_vpkpl(),
-//                get_freespeed_kph(),null);
-//
-//        // connect new link to start and end nodes
-//        existing_node.in_links.add(new_link.id);
-//        new_node.out_links.add(new_link.id);
-//
-//        // add link to scenario
-//        fwy_scenario.scenario.links.put(new_link.id,new_link);
-//
-//        // create new segment
-//        Segment newseg = create_new_segment(new_link);
-//        newseg.segment_fwy_dn_id = this.id;
-//        newseg.segment_fwy_up_id = this.segment_fwy_up_id;
-//        this.segment_fwy_up_id = newseg.id;
-//
-//        // add to fwy scenario
-//        fwy_scenario.segments.put(newseg.id,newseg);
-//
-//        return newseg;
-//    }
+    @Override
+    public Segment insert_up_segment() {
 
+        // create new upstream link
+        LinkFreeway new_link = (LinkFreeway) create_up_FwyOrConnLink(Type.freeway);
 
+        // wrap in a segment
+        Segment new_segment = create_segment(new_link);
 
-//    public Segment insert_dnstrm_mainline_segment(){
-//
-//        // existing node and new node
-//        Node existing_node = fwy_scenario.scenario.nodes.get(fwy().end_node_id);
-//        Node new_node = new Node(fwy_scenario.new_node_id());
-//
-//        // connect downstream links to new node
-//        connect_segment_to_upstream_node(get_dnstrm_fwy_segment(),new_node);
-//
-//        // create new freeway link
-//        AbstractLink new_link = new AbstractLink(
-//                fwy_scenario.new_link_id(),
-//                AbstractLink.Type.freeway,
-//                existing_node.id,
-//                new_node.id,
-//                get_mixed_lanes(),
-//                get_length_meters(),
-//                get_capacity_vphpl(),
-//                get_jam_density_vpkpl(),
-//                get_freespeed_kph(),null);
-//
-//        // connect new link to start and end nodes
-//        existing_node.out_links.add(new_link.id);
-//        new_node.in_links.add(new_link.id);
-//
-//        // add link to scenario
-//        fwy_scenario.scenario.links.put(new_link.id,new_link);
-//
-//        // create new segment
-//        Segment newseg = create_new_segment(new_link);
-//        newseg.segment_fwy_dn_id = this.segment_fwy_dn_id;
-//        this.segment_fwy_dn_id = newseg.id;
-//
-//        // add to fwy scenario
-//        fwy_scenario.segments.put(newseg.id,newseg);
-//
-//        return newseg;
-//    }
-//
+        // connect upstream segment to new node
+        Segment up_segment = get_up_segment();
+        if(up_segment!=null) {
+            connect_segments_dwnstr_node_to(up_segment, new_link.start_node_id);
+            new_link.up_link = up_segment.fwy;
+            up_segment.fwy.dn_link = new_link;
+        }
+
+        return new_segment;
+    }
+
+    @Override
+    public Segment insert_dn_segment() {
+
+        // create new dnstream link
+        LinkFreeway new_link = (LinkFreeway) create_dn_FwyOrConnLink(Type.freeway);
+
+        // wrap in a segment
+        Segment new_segment = create_segment(new_link);
+
+        // connect dnstream segment to new node
+        Segment dn_segment = get_dn_segment();
+        if(dn_segment!=null) {
+            connect_segments_upstr_node_to(dn_segment, new_link.end_node_id);
+            new_link.dn_link = dn_segment.fwy;
+            dn_segment.fwy.up_link = new_link;
+        }
+
+        return new_segment;
+    }
 
 }

@@ -41,132 +41,29 @@ public class LinkOnramp extends AbstractLink {
     // insert
     /////////////////////////////////////
 
-//    public Segment insert_upstrm_segment() {
-//
-//        if (!has_onramp())
-//            return null;
-//
-//        AbstractLink or = or();
-//
-//        // existing node and new node
-//        Node existing_node = fwy_scenario.scenario.nodes.get(or.end_node_id);
-//        Node new_node = new Node(fwy_scenario.new_node_id());
-//
-//        // connect upstream links to new node
-//        connect_segment_to_downstream_node(get_upstrm_or_segment(),new_node);
-//
-//        // create new freeway link
-//        AbstractLink new_link = new AbstractLink(
-//                fwy_scenario.new_link_id(),
-//                AbstractLink.Type.connector,
-//                new_node.id,
-//                existing_node.id,
-//                get_mixed_lanes(),
-//                get_length_meters(),
-//                get_capacity_vphpl(),
-//                get_jam_density_vpkpl(),
-//                get_freespeed_kph(),null);
-//
-//        // connect new link to start and end nodes
-//        existing_node.in_links.add(new_link.id);
-//        new_node.out_links.add(new_link.id);
-//
-//        // add link to scenario
-//        fwy_scenario.scenario.links.put(new_link.id,new_link);
-//
-//        // create new segment
-//        Segment newseg = create_new_segment(new_link);
-//        newseg.segment_fwy_dn_id = this.id;
-//        newseg.segment_fwy_up_id = this.segment_or_up_id;
-//        this.segment_or_up_id = newseg.id;
-//
-//        // add to fwy scenario
-//        fwy_scenario.segments.put(newseg.id,newseg);
-//
-//        return newseg;
-//    }
+    @Override
+    public Segment insert_up_segment() {
 
+        // create new upstream link
+        LinkConnector new_link = (LinkConnector) create_up_FwyOrConnLink(Type.connector);
 
+        // wrap in a segment
+        Segment new_segment = create_segment(new_link);
 
-//    public boolean has_onramp(){
-//        return or_id!=null;
-//    }
-//
-//    public float get_or_length_meters() {
-//        return has_onramp() ? or().length_meters : Float.NaN;
-//    }
-//
-//    public String get_or_name() {
-//        return has_onramp() ? or().name : null;
-//    }
-//
-//    public int get_or_lanes() {
-//        return has_onramp() ? or().full_lanes : 0;
-//    }
-//
-//    public float get_or_capacity_vphpl() {
-//        return has_onramp() ? or().param.capacity_vphpl : Float.NaN;
-//    }
-//
-//    public double get_or_max_vehicles() {
-//        if(!has_onramp())
-//            return Float.NaN;
-//        AbstractLink or = or();
-//        return or.param.jam_density_vpkpl * or.full_lanes * or.length_meters / 1000f;
-//    }
-//
-//    public void set_or_length_meters(float x) throws Exception {
-//        if(!has_onramp())
-//            throw new Exception("No onramp");
-//        or().length_meters = x;
-//    }
-//
-//    public void set_or_name(String newname) throws Exception {
-//        if(!has_onramp())
-//            throw new Exception("No onramp");
-//        or().name = newname;
-//    }
-//
-//    public void set_or_lanes(int x) throws Exception {
-//        if(!has_onramp())
-//            throw new Exception("No onramp");
-//        or().full_lanes = x;
-//    }
-//
-//    public void set_or_capacity_vphpl(float x) throws Exception {
-//        if(!has_onramp())
-//            throw new Exception("No onramp");
-//        or().param.capacity_vphpl = x;
-//    }
-//
-//    public void set_or_max_vehicles(float x) throws Exception {
-//        if(!has_onramp())
-//            throw new Exception("No onramp");
-//        AbstractLink or = or();
-//        or.param.jam_density_vpkpl = x / (or.length_meters /1000f) / or.full_lanes;
-//    }
+        // connect upstream segment to new node
+        Segment up_segment = get_up_segment();
+        if(up_segment!=null) {
+            connect_segments_dwnstr_node_to(up_segment, new_link.start_node_id);
+            new_link.up_link = up_segment.fwy;
+            up_segment.fwy.dn_link = new_link;
+        }
 
+        return new_segment;
+    }
 
-//    /**
-//     * Get the onramp demand for this segment, for a particular commodity.
-//     * @param comm_id ID for the commodity
-//     * @return Profile1D object if demand is defined for this commodity. null otherwise.
-//     */
-//    public Profile1D get_or_demand_vph(long comm_id){
-//        return or_demands.containsKey(comm_id) ? or_demands.get(comm_id) : null;
-//    }
-//
-//    /**
-//     * Set the onramp demand in vehicles per hour.
-//     * @param comm_id ID for the commodity
-//     * @param demand_vph Demand in veh/hr as a Profile1D object
-//     */
-//    public void set_or_demand_vph(long comm_id,Profile1D demand_vph)throws Exception {
-//        OTMErrorLog errorLog = new OTMErrorLog();
-//        demand_vph.validate(errorLog);
-//        if (errorLog.haserror())
-//            throw new Exception(errorLog.format_errors());
-//        this.or_demands.put(comm_id,demand_vph);
-//    }
+    @Override
+    public Segment insert_dn_segment() {
+        return null;
+    }
 
 }

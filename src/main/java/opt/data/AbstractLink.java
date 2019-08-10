@@ -3,9 +3,7 @@ package opt.data;
 import profiles.Profile1D;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public abstract class AbstractLink implements Comparable {
 
@@ -35,6 +33,8 @@ public abstract class AbstractLink implements Comparable {
 
     abstract public int get_managed_lanes();
     abstract public int get_aux_lanes();
+    abstract public Segment insert_up_segment();
+    abstract public Segment insert_dn_segment();
 
     /////////////////////////////////////
     // construction
@@ -92,27 +92,11 @@ public abstract class AbstractLink implements Comparable {
     }
 
     /////////////////////////////////////
-    // getters
+    // basic getters
     /////////////////////////////////////
-
-    public int get_gp_lanes(){
-        return full_lanes;
-    }
-
-    public final Segment get_up_segment(){
-        return up_link==null ? null : up_link.mysegment;
-    }
-
-    public final Segment get_dn_segment(){
-        return dn_link==null ? null : dn_link.mysegment;
-    }
 
     public final AbstractLink.Type get_type(){
         return this.type;
-    }
-
-    public final Segment get_segment(){
-        return mysegment;
     }
 
     public final boolean is_source(){
@@ -127,6 +111,46 @@ public abstract class AbstractLink implements Comparable {
         return this.type== Type.onramp || type==Type.offramp;
     }
 
+    public final Segment get_segment(){
+        return mysegment;
+    }
+
+    /////////////////////////////////////
+    // lanes
+    /////////////////////////////////////
+
+    public int get_gp_lanes(){
+        return full_lanes;
+    }
+
+    public void set_gp_lanes(int x) throws Exception {
+        if(x<=0)
+            throw new Exception("Non-positive number of lanes");
+        full_lanes = x;
+    }
+
+    /////////////////////////////////////
+    // segment getters
+    /////////////////////////////////////
+
+    public final Segment get_up_segment(){
+        if(this instanceof LinkOfframp)
+            return up_link.get_up_segment();
+        else
+            return up_link==null ? null : up_link.mysegment;
+    }
+
+    public final Segment get_dn_segment(){
+        if(this instanceof LinkOnramp)
+            return dn_link.get_dn_segment();
+        else
+            return dn_link==null ? null : dn_link.mysegment;
+    }
+
+    /////////////////////////////////////
+    // link parameters
+    /////////////////////////////////////
+
     public float get_capacity_vphpl(){
         return param.capacity_vphpl;
     }
@@ -137,18 +161,6 @@ public abstract class AbstractLink implements Comparable {
 
     public float get_freespeed_kph(){
         return param.ff_speed_kph;
-    }
-
-    public void set_gp_lanes(int x) throws Exception {
-        if(x<=0)
-            throw new Exception("Non-positive number of lanes");
-        full_lanes = x;
-    }
-
-    public void set_managed_lanes(int x) throws Exception {
-        if(x<=0)
-            throw new Exception("Non-positive number of lanes");
-        System.out.println("NOT IMPLEMENTED!");
     }
 
     public void set_capacity_vphpl(float x) throws Exception {
@@ -225,6 +237,175 @@ public abstract class AbstractLink implements Comparable {
     @Override
     public int hashCode() {
         return Objects.hash(type, start_node_id, end_node_id, id, name, full_lanes, length_meters, param, demands, splits);
+    }
+
+    /////////////////////////////////////
+    // protected and private
+    /////////////////////////////////////
+
+    protected LinkFreewayOrConnector create_up_FwyOrConnLink(Type linktype){
+
+        FreewayScenario fwy_scenario = mysegment.fwy_scenario;
+
+        // create new upstream node
+        Node existing_node = fwy_scenario.scenario.nodes.get(start_node_id);
+        Node new_node = new Node(fwy_scenario.new_node_id());
+        fwy_scenario.scenario.nodes.put(new_node.id,new_node);
+
+        // create new freeway link
+        LinkFreewayOrConnector new_link=null;
+        switch(linktype){
+            case freeway:
+                new_link = new LinkFreeway(
+                        fwy_scenario.new_link_id(),
+                        new_node.id,
+                        existing_node.id,
+                        full_lanes,
+                        length_meters,
+                        get_capacity_vphpl(),
+                        get_jam_density_vpkpl(),
+                        get_freespeed_kph(),
+                        null);
+                break;
+            case connector:
+                new_link = new LinkConnector(
+                        fwy_scenario.new_link_id(),
+                        new_node.id,
+                        existing_node.id,
+                        full_lanes,
+                        length_meters,
+                        get_capacity_vphpl(),
+                        get_jam_density_vpkpl(),
+                        get_freespeed_kph(),
+                        null);
+                break;
+            default:
+                System.err.println("3409gj");
+        }
+
+        fwy_scenario.scenario.links.put(new_link.id,new_link);
+
+        new_link.dn_link = this;
+        this.up_link = new_link;
+
+        new_node.out_links.add(new_link.id);
+        existing_node.in_links.add(new_link.id);
+
+
+        return new_link;
+    }
+
+    protected LinkFreewayOrConnector create_dn_FwyOrConnLink(Type linktype){
+
+        FreewayScenario fwy_scenario = mysegment.fwy_scenario;
+
+        // create new dnstream node
+        Node existing_node = fwy_scenario.scenario.nodes.get(end_node_id);
+        Node new_node = new Node(fwy_scenario.new_node_id());
+        fwy_scenario.scenario.nodes.put(new_node.id,new_node);
+
+        // create new freeway link
+        LinkFreewayOrConnector new_link=null;
+        switch(linktype){
+            case freeway:
+                new_link = new LinkFreeway(
+                        fwy_scenario.new_link_id(),
+                        existing_node.id,
+                        new_node.id,
+                        full_lanes,
+                        length_meters,
+                        get_capacity_vphpl(),
+                        get_jam_density_vpkpl(),
+                        get_freespeed_kph(),
+                        null);
+                break;
+            case connector:
+                new_link = new LinkConnector(
+                        fwy_scenario.new_link_id(),
+                        existing_node.id,
+                        new_node.id,
+                        full_lanes,
+                        length_meters,
+                        get_capacity_vphpl(),
+                        get_jam_density_vpkpl(),
+                        get_freespeed_kph(),
+                        null);
+                break;
+            default:
+                System.err.println("3409gj");
+        }
+
+        fwy_scenario.scenario.links.put(new_link.id,new_link);
+
+        new_link.up_link = this;
+        this.dn_link = new_link;
+
+        new_node.in_links.add(new_link.id);
+        existing_node.out_links.add(new_link.id);
+
+        return new_link;
+    }
+
+    protected Segment create_segment(LinkFreewayOrConnector fwy){
+
+        FreewayScenario fwy_scenario = mysegment.fwy_scenario;
+
+        // create new segment
+        Segment newseg = new Segment();
+        newseg.fwy_scenario = fwy_scenario;
+        newseg.id = fwy_scenario.new_seg_id();
+        newseg.name = String.format("Segment %d",newseg.id);
+        newseg.fwy = fwy;
+        fwy.mysegment = newseg;
+        fwy_scenario.segments.put(newseg.id,newseg);
+        return newseg;
+    }
+
+    protected static void connect_segments_dwnstr_node_to(Segment segment, Long new_node_id){
+
+        if(segment==null)
+            return;
+
+        FreewayScenario fwy_scenario = segment.fwy_scenario;
+
+        Node new_node = fwy_scenario.scenario.nodes.get(new_node_id);
+
+        Node old_dwn_node = fwy_scenario.scenario.nodes.get(segment.fwy.end_node_id);
+        segment.fwy.end_node_id = new_node.id;
+        old_dwn_node.in_links.remove(segment.fwy.id);
+        new_node.in_links.add(segment.fwy.id);
+
+        Set<LinkOfframp> all_frs = new HashSet<>();
+        all_frs.addAll(segment.in_frs);
+        all_frs.addAll(segment.out_frs);
+        for(LinkOfframp fr : all_frs){
+            fr.start_node_id = new_node.id;
+            old_dwn_node.out_links.remove(fr.id);
+            new_node.out_links.add(fr.id);
+        }
+    }
+
+    protected static void connect_segments_upstr_node_to(Segment segment, Long new_node_id){
+
+        if(segment==null)
+            return;
+
+        FreewayScenario fwy_scenario = segment.fwy_scenario;
+        Node new_node = fwy_scenario.scenario.nodes.get(new_node_id);
+
+        Node old_up_node = fwy_scenario.scenario.nodes.get(segment.fwy.start_node_id);
+        segment.fwy.start_node_id = new_node.id;
+        old_up_node.out_links.remove(segment.fwy.id);
+        new_node.out_links.add(segment.fwy.id);
+
+        Set<LinkOnramp> all_ors = new HashSet<>();
+        all_ors.addAll(segment.in_ors);
+        all_ors.addAll(segment.out_ors);
+        for(LinkOnramp or : all_ors){
+            or.end_node_id = new_node.id;
+            old_up_node.in_links.remove(or.id);
+            new_node.in_links.add(or.id);
+        }
     }
 
 }
