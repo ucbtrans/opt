@@ -282,7 +282,7 @@ public class LinkEditorController {
     void initialize() {
         // Initialize new link window
         
-        linkType.setItems(FXCollections.observableArrayList(opt.data.Link.Type.values()));
+        linkType.setItems(FXCollections.observableArrayList(AbstractLink.Type.values()));
         linkType.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
                 onLinkTypeChange();
@@ -430,35 +430,21 @@ public class LinkEditorController {
         double length = myLink.get_segment().get_length_meters();
         length = appMainController.getUserSettings().convertFlow(length, "meters", unitsLength);
         labelLength.setText("Length (" + unitsLength + "):");
-        //if ((unitsLength.equals("miles")) || (unitsLength.equals("kilometers")))
         lengthSpinnerValueFactory.setValue(length);
         
-        if (lnkType == opt.data.Link.Type.freeway) {
-            numLanesGPSpinnerValueFactory.setValue(myLink.get_segment().get_mixed_lanes());
+        if (lnkType == AbstractLink.Type.freeway) {
             rampsPane.setVisible(true);
-        } else if (lnkType == opt.data.Link.Type.onramp) {
-            numLanesGPSpinnerValueFactory.setValue(myLink.get_segment().get_or_lanes());
-            rampsPane.setVisible(false);
-        } else if (lnkType == opt.data.Link.Type.offramp) {
-            numLanesGPSpinnerValueFactory.setValue(myLink.get_segment().get_fr_lanes());
-            rampsPane.setVisible(false);
-        } else if (lnkType == opt.data.Link.Type.connector) {
-            numLanesGPSpinnerValueFactory.setValue(myLink.get_segment().get_mixed_lanes());
+        } else {
             rampsPane.setVisible(false);
         }
         
-        int managed_lanes = myLink.get_segment().get_managed_lanes();
-        int gp_lanes = myLink.get_segment().get_mixed_lanes();
-        int aux_lanes = 0;
-        if (myLink.get_type() == Link.Type.onramp)
-            gp_lanes = myLink.get_segment().get_or_lanes();
-        if (myLink.get_type() == Link.Type.offramp)
-            gp_lanes = myLink.get_segment().get_fr_lanes();
+        int managed_lanes = myLink.get_managed_lanes();
+        int gp_lanes = myLink.get_gp_lanes();
+        int aux_lanes = myLink.get_aux_lanes();
         
         numLanesManagedSpinnerValueFactory.setValue(managed_lanes);
         numLanesGPSpinnerValueFactory.setValue(gp_lanes);
         numLanesAuxSpinnerValueFactory.setValue(aux_lanes);
-        
         
         if (myLink.get_type() != AbstractLink.Type.freeway) {
             boolean flag = true;
@@ -522,14 +508,16 @@ public class LinkEditorController {
         
         // TODO AK: set lane properties to link
         try {
+            myLink.set_managed_lanes(managed_lanes);
             myLink.set_gp_lanes(gp_lanes);
+            myLink.set_aux_lanes(aux_lanes);
         } catch(Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not change number of lanes...", e);
         }
         
         
         GraphicsContext g = linkEditorCanvas.getGraphicsContext2D();
-        g.setFill(Color.WHITE);
+        //g.setFill(Color.WHITE);
         g.clearRect(0, 0, width, height);
 
         double lane_length = 2*width/3;
@@ -548,7 +536,18 @@ public class LinkEditorController {
             double y1 = base_y;
             double y0 = y1;
             
-            // Draw outer on-ramps
+            if (myLink.get_type() == AbstractLink.Type.freeway) {
+                // Draw outer on-ramps
+                int num_ramps = myLink.get_segment().num_out_ors();
+                
+                
+                
+                
+            }
+            
+            
+            
+            
             // TODO GG: TEMPORARILY BROKEN
 //            if ((myLink.get_type() == AbstractLink.Type.freeway) &&
 //                myLink.get_segment().has_onramp()) {
@@ -628,7 +627,6 @@ public class LinkEditorController {
             
             g.setStroke(Color.WHITE);
             g.setLineWidth(1);
-            //g.setLineDashes(lane_width/3, lane_width/3);
             for (int i = 1; i < total_lanes; i++) {
                 if (i == aux_lanes) {
                     g.setLineDashes(lane_width/4, lane_width/3);

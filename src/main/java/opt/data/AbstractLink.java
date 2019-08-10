@@ -94,6 +94,14 @@ public abstract class AbstractLink implements Comparable {
     /////////////////////////////////////
     // basic getters
     /////////////////////////////////////
+    
+    public final AbstractLink get_up_link() {
+        return up_link;
+    }
+    
+    public final AbstractLink get_dn_link() {
+        return dn_link;
+    }
 
     public final AbstractLink.Type get_type(){
         return this.type;
@@ -127,6 +135,18 @@ public abstract class AbstractLink implements Comparable {
         if(x<=0)
             throw new Exception("Non-positive number of lanes");
         full_lanes = x;
+    }
+    
+    public void set_managed_lanes(int x) throws Exception {
+        if(x<0)
+            throw new Exception("Negative number of lanes");
+        System.err.println("set_managed_lanes() not implemented!"); //FIXME
+    }
+    
+    public void set_aux_lanes(int x) throws Exception {
+        if(x<0)
+            throw new Exception("Negative number of lanes");
+        System.err.println("set_aux_lanes() not implemented!"); //FIXME
     }
 
     /////////////////////////////////////

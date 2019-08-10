@@ -96,26 +96,41 @@ public class LinkInfoController {
         listUpstreamSections.getItems().clear();
         listDownstreamSections.getItems().clear();
         
-        if (myLink.get_type() == AbstractLink.Type.freeway) {
-            Segment seg = myLink.get_segment().get_upstrm_fwy_segment();
-            AbstractLink ramp = myLink.get_segment().get_links().get(0);
-            if (seg != null)
-                predecessors.add(seg.get_links().get(1));
-            if (ramp != null)
-                predecessors.add(ramp);
-            
-            seg = myLink.get_segment().get_dnstrm_fwy_segment();
-            ramp = myLink.get_segment().get_links().get(2);
-            if (seg != null)
-                successors.add(seg.get_links().get(1));
-            if (ramp != null)
-                successors.add(ramp);
+        
+        AbstractLink neighbor = myLink.get_up_link();
+        if (neighbor != null)
+            predecessors.add(neighbor);
+        int num_ramps = myLink.get_segment().num_in_ors();
+        for (int i = 0; i < num_ramps; i++) {
+            AbstractLink or = myLink.get_segment().in_ors(i);
+            AbstractLink up = or.get_up_link();
+            if (up != null)
+                predecessors.add(up);
         }
-        if (myLink.get_type() == AbstractLink.Type.onramp) {
-            successors.add(myLink.get_segment().get_links().get(1));
+        num_ramps = myLink.get_segment().num_out_ors();
+        for (int i = 0; i < num_ramps; i++) {
+            AbstractLink or = myLink.get_segment().out_ors(i);
+            AbstractLink up = or.get_up_link();
+            if (up != null)
+                predecessors.add(up);
         }
-        if (myLink.get_type() == AbstractLink.Type.offramp) {
-            predecessors.add(myLink.get_segment().get_links().get(1));
+        
+        neighbor = myLink.get_dn_link();
+        if (neighbor != null)
+            successors.add(neighbor);
+        num_ramps = myLink.get_segment().num_in_frs();
+        for (int i = 0; i < num_ramps; i++) {
+            AbstractLink fr = myLink.get_segment().in_frs(i);
+            AbstractLink dn = fr.get_dn_link();
+            if (dn != null)
+                successors.add(dn);
+        }
+        num_ramps = myLink.get_segment().num_out_frs();
+        for (int i = 0; i < num_ramps; i++) {
+            AbstractLink fr = myLink.get_segment().out_frs(i);
+            AbstractLink dn = fr.get_dn_link();
+            if (dn != null)
+                successors.add(dn);
         }
         
         for (int i = 0; i < predecessors.size(); i++) {

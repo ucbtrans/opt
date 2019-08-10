@@ -52,7 +52,7 @@ import javafx.stage.FileChooser;
 import opt.config.LinkEditorController;
 import opt.config.LinkInfoController;
 import opt.config.NewLinkController;
-import opt.data.Link;
+import opt.data.AbstractLink;
 import opt.data.FreewayScenario;
 import opt.data.ProjectFactory;
 import opt.data.Project;
