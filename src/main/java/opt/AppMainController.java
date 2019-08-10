@@ -51,6 +51,7 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import opt.config.LinkEditorController;
 import opt.config.LinkInfoController;
+import opt.config.NewLinkController;
 import opt.data.Link;
 import opt.data.FreewayScenario;
 import opt.data.ProjectFactory;
@@ -83,6 +84,8 @@ public class AppMainController {
     private LinkEditorController linkEditorController = null;
     private GridPane linkInfoPane = null;
     private LinkInfoController linkInfoController = null;
+    private GridPane newLinkPane = null;
+    private NewLinkController newLinkController = null;
     
     
     
@@ -162,6 +165,17 @@ public class AppMainController {
     
     public void setProjectModified(boolean val) {
         projectModified = val;
+    }
+    
+    
+    public GridPane getNewLinkPane() {
+        return newLinkPane;
+    }
+    
+    
+    
+    public NewLinkController getNewLinkController() {
+        return newLinkController;
     }
     
     
@@ -297,9 +311,14 @@ public class AppMainController {
             linkInfoController = loader.getController();
             linkInfoController.setAppMainController(this);
             
+            loader = new FXMLLoader(getClass().getResource("/new_link.fxml"));
+            newLinkPane = loader.load();
+            newLinkController = loader.getController();
+            newLinkController.setAppMainController(this);
+            
             
         } catch (IOException e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot initialize section editor...", e);
+            opt.utils.Dialogs.ExceptionDialog("Cannot initialize UI modules...", e);
         }
         
         

@@ -25,9 +25,11 @@
  **/
 package opt.config;
 
+import java.io.IOException;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Accordion;
@@ -43,6 +45,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import opt.AppMainController;
@@ -76,6 +79,8 @@ public class LinkEditorController {
     private SpinnerValueFactory<Double> jamDensityGPSpinnerValueFactory = null;
     private SpinnerValueFactory<Double> jamDensityAuxSpinnerValueFactory = null;
     private SpinnerValueFactory<Double> jamDensityManagedSpinnerValueFactory = null;
+    
+    
     
     
     
@@ -213,9 +218,25 @@ public class LinkEditorController {
 
     @FXML // fx:id="trafficSplitDownstream"
     private TitledPane trafficSplitDownstream; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="linkControllerPane"
+    private TitledPane linkControllerPane; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="linkEventPane"
+    private TitledPane linkEventPane; // Value injected by FXMLLoader
 
 
 
+    
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the main app controller that is used to sync up
+     *               all sub-windows.
+     */
+    public void setAppMainController(AppMainController ctrl) {
+        appMainController = ctrl;
+    }
+    
     
 
     @FXML
@@ -239,27 +260,17 @@ public class LinkEditorController {
     }
 
     @FXML
-    void onDeleteOffRamps(ActionEvent event) {
+    void onDeleteOffRamp(ActionEvent event) {
 
     }
 
     @FXML
-    void onDeleteOnRamps(ActionEvent event) {
+    void onDeleteOnRamp(ActionEvent event) {
 
     }
 
     @FXML
     void onDeleteSection(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onDuplicateSectionDownstreamAction(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onDuplicateSectionUpstreamAction(ActionEvent event) {
 
     }
 
@@ -272,6 +283,8 @@ public class LinkEditorController {
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
+        // Initialize new link window
+        
         linkType.setItems(FXCollections.observableArrayList(opt.data.Link.Type.values()));
         linkType.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
@@ -392,14 +405,7 @@ public class LinkEditorController {
     
     
     
-    /**
-     * This function should called once: during the initialization.
-     * @param ctrl - pointer to the main app controller that is used to sync up
-     *               all sub-windows.
-     */
-    public void setAppMainController(AppMainController ctrl) {
-        appMainController = ctrl;
-    }
+    
     
     
     /**
@@ -432,10 +438,16 @@ public class LinkEditorController {
         
         if (lnkType == opt.data.Link.Type.freeway) {
             numLanesGPSpinnerValueFactory.setValue(myLink.get_segment().get_mixed_lanes());
+            rampsPane.setVisible(true);
         } else if (lnkType == opt.data.Link.Type.onramp) {
             numLanesGPSpinnerValueFactory.setValue(myLink.get_segment().get_or_lanes());
+            rampsPane.setVisible(false);
         } else if (lnkType == opt.data.Link.Type.offramp) {
             numLanesGPSpinnerValueFactory.setValue(myLink.get_segment().get_fr_lanes());
+            rampsPane.setVisible(false);
+        } else if (lnkType == opt.data.Link.Type.connector) {
+            numLanesGPSpinnerValueFactory.setValue(myLink.get_segment().get_mixed_lanes());
+            rampsPane.setVisible(false);
         }
         
         int managed_lanes = myLink.get_segment().get_managed_lanes();

@@ -44,6 +44,8 @@ import opt.data.Link;
 public class NewLinkController {
     private AppMainController appMainController = null;
     private Link myLink = null;
+    
+    
 
     @FXML // fx:id="buttonCancel"
     private Button buttonCancel; // Value injected by FXMLLoader
@@ -77,8 +79,21 @@ public class NewLinkController {
     
     
     
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the main app controller that is used to sync up
+     *               all sub-windows.
+     */
+    public void setAppMainController(AppMainController ctrl) {
+        appMainController = ctrl;
+    }
+    
+    
+    
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
+        
+        
         
     }
     

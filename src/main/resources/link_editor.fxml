@@ -40,16 +40,20 @@
                            <left>
                               <HBox prefHeight="30.0" prefWidth="257.0" BorderPane.alignment="CENTER">
                                  <children>
-                                    <Button id="addSeectionUpstream" fx:id="addSectionUpstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionUpstreamAction" text="&lt;&lt; Add Section" />
-                                    <Button id="duplicateSectionUpstream" fx:id="duplicateSectionUpstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onDuplicateSectionUpstreamAction" text="&lt;&lt; Duplicate Section" visible="false" />
+                                    <Button id="addSeectionUpstream" fx:id="addSectionUpstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionUpstreamAction" prefWidth="180.0" text="&lt;&lt;  Add Upstream Section">
+                                       <HBox.margin>
+                                          <Insets left="10.0" />
+                                       </HBox.margin></Button>
                                  </children>
                               </HBox>
                            </left>
                            <right>
                               <HBox alignment="TOP_RIGHT" prefHeight="30.0" prefWidth="257.0" BorderPane.alignment="CENTER">
                                  <children>
-                                    <Button id="duplicateSectionDownstream" fx:id="duplicateSectionDownstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onDuplicateSectionDownstreamAction" text="Duplicate Section &gt;&gt;" visible="false" />
-                                    <Button id="addSectionDownstream" fx:id="addSectionDownstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionDownstreamAction" text="Add Section &gt;&gt;" />
+                                    <Button id="addSectionDownstream" fx:id="addSectionDownstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionDownstreamAction" prefWidth="180.0" text="Add Downstream Section &gt;&gt;">
+                                       <HBox.margin>
+                                          <Insets right="10.0" />
+                                       </HBox.margin></Button>
                                  </children>
                               </HBox>
                            </right>
@@ -250,17 +254,28 @@
                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                             </rowConstraints>
                                              <children>
-                                                <Label text="On-Ramps:" GridPane.rowIndex="1" />
-                                                <Label text="Off-Ramps:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                <Label text="On-Ramps:" GridPane.rowIndex="1">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </Label>
+                                                <Label text="Off-Ramps:" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
                                                 <Button id="addOnRamp" fx:id="addOnRamp" alignment="CENTER_RIGHT" defaultButton="true" mnemonicParsing="false" onAction="#onAddOnRamp" text="Add On-Ramp" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
                                                 <Button id="addOffRamp" fx:id="addOffRamp" alignment="CENTER_RIGHT" defaultButton="true" mnemonicParsing="false" onAction="#onAddOffRamp" text="Add Off-Ramp" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
                                                 <ListView prefHeight="136.0" prefWidth="123.0" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
                                                 <ListView prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
-                                                <Button id="deleteOnRamps" fx:id="deleteOnRamps" alignment="CENTER_RIGHT" cancelButton="true" mnemonicParsing="false" onAction="#onDeleteOnRamps" text="Delete On-Ramp" GridPane.rowIndex="5" />
-                                                <Button id="deleteOffRamps" fx:id="deleteOffRamps" cancelButton="true" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onDeleteOffRamps" text="Delete Off-Ramp" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                <Button id="deleteOnRamps" fx:id="deleteOnRamps" alignment="CENTER_RIGHT" cancelButton="true" mnemonicParsing="false" onAction="#onDeleteOnRamp" text="Delete On-Ramp" GridPane.rowIndex="5" />
+                                                <Button id="deleteOffRamps" fx:id="deleteOffRamps" cancelButton="true" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onDeleteOffRamp" text="Delete Off-Ramp" GridPane.columnIndex="2" GridPane.rowIndex="5" />
                                              </children>
                                              <padding>
-                                                <Insets left="5.0" right="5.0" />
+                                                <Insets left="10.0" right="10.0" />
                                              </padding>
                                           </GridPane>
                                        </children></AnchorPane>
@@ -276,6 +291,16 @@
                                  </content>
                               </TitledPane>
                               <TitledPane id="trafficSplitDownstream" fx:id="trafficSplitDownstream" animated="false" disable="true" expanded="false" layoutX="10.0" layoutY="60.0" prefHeight="198.0" prefWidth="514.0" text="Traffic Split to Downstream Sections">
+                                 <content>
+                                    <AnchorPane prefHeight="300.0" prefWidth="512.0" />
+                                 </content>
+                              </TitledPane>
+                              <TitledPane id="linkControllerPane" fx:id="linkControllerPane" animated="false" disable="true" expanded="false" layoutX="10.0" layoutY="85.0" prefHeight="198.0" prefWidth="514.0" text="Controllers">
+                                 <content>
+                                    <AnchorPane prefHeight="300.0" prefWidth="512.0" />
+                                 </content>
+                              </TitledPane>
+                              <TitledPane id="linkEventPane" fx:id="linkEventPane" animated="false" disable="true" expanded="false" layoutX="10.0" layoutY="606.0" prefHeight="198.0" prefWidth="514.0" text="Events">
                                  <content>
                                     <AnchorPane prefHeight="300.0" prefWidth="512.0" />
                                  </content>
