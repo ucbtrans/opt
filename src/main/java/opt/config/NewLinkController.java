@@ -33,8 +33,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import opt.AppMainController;
-import opt.data.Link;
+import opt.data.AbstractLink;
 
+import static sun.plugin.javascript.navig.JSType.Link;
 
 
 /**
@@ -43,7 +44,7 @@ import opt.data.Link;
  */
 public class NewLinkController {
     private AppMainController appMainController = null;
-    private Link myLink = null;
+    private AbstractLink myLink = null;
 
     @FXML // fx:id="buttonCancel"
     private Button buttonCancel; // Value injected by FXMLLoader
@@ -55,7 +56,7 @@ public class NewLinkController {
     private ChoiceBox<String> createOption; // Value injected by FXMLLoader
 
     @FXML // fx:id="linkType"
-    private ChoiceBox<Link.Type> linkType; // Value injected by FXMLLoader
+    private ChoiceBox<AbstractLink.Type> linkType; // Value injected by FXMLLoader
 
     @FXML // fx:id="linkLength"
     private Spinner<?> linkLength; // Value injected by FXMLLoader

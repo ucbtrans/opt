@@ -32,10 +32,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import opt.AppMainController;
-import opt.data.Link;
+import opt.data.AbstractLink;
 import opt.data.Segment;
-
-
 
 /**
  *
@@ -43,9 +41,9 @@ import opt.data.Segment;
  */
 public class LinkInfoController {
     private AppMainController appMainController = null;
-    private Link myLink = null;
-    private List<Link> predecessors = new ArrayList<Link>();
-    private List<Link> successors = new ArrayList<Link>();
+    private AbstractLink myLink = null;
+    private List<AbstractLink> predecessors = new ArrayList<AbstractLink>();
+    private List<AbstractLink> successors = new ArrayList<AbstractLink>();
     
     
     
@@ -88,7 +86,7 @@ public class LinkInfoController {
      * configuration module.
      * @param lnk 
      */
-    public void initWithLinkData(Link lnk) {
+    public void initWithLinkData(AbstractLink lnk) {
         if (lnk == null)
             return;
         
@@ -98,9 +96,9 @@ public class LinkInfoController {
         listUpstreamSections.getItems().clear();
         listDownstreamSections.getItems().clear();
         
-        if (myLink.get_type() == Link.Type.freeway) {
+        if (myLink.get_type() == AbstractLink.Type.freeway) {
             Segment seg = myLink.get_segment().get_upstrm_fwy_segment();
-            Link ramp = myLink.get_segment().get_links().get(0);
+            AbstractLink ramp = myLink.get_segment().get_links().get(0);
             if (seg != null)
                 predecessors.add(seg.get_links().get(1));
             if (ramp != null)
@@ -113,18 +111,18 @@ public class LinkInfoController {
             if (ramp != null)
                 successors.add(ramp);
         }
-        if (myLink.get_type() == Link.Type.onramp) {
+        if (myLink.get_type() == AbstractLink.Type.onramp) {
             successors.add(myLink.get_segment().get_links().get(1));
         }
-        if (myLink.get_type() == Link.Type.offramp) {
+        if (myLink.get_type() == AbstractLink.Type.offramp) {
             predecessors.add(myLink.get_segment().get_links().get(1));
         }
         
         for (int i = 0; i < predecessors.size(); i++) {
-            listUpstreamSections.getItems().add(predecessors.get(i).get_name() + " (" + predecessors.get(i).get_type() + ")");
+            listUpstreamSections.getItems().add(predecessors.get(i).name + " (" + predecessors.get(i).get_type() + ")");
         }
         for (int i = 0; i < successors.size(); i++) {
-            listDownstreamSections.getItems().add(successors.get(i).get_name() + " (" + successors.get(i).get_type() + ")");
+            listDownstreamSections.getItems().add(successors.get(i).name + " (" + successors.get(i).get_type() + ")");
         }
     }
     

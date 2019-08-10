@@ -51,7 +51,7 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import opt.config.LinkEditorController;
 import opt.config.LinkInfoController;
-import opt.data.Link;
+import opt.data.AbstractLink;
 import opt.data.FreewayScenario;
 import opt.data.ProjectFactory;
 import opt.data.Project;
@@ -382,7 +382,7 @@ public class AppMainController {
                 infoAnchorPane.setLeftAnchor(linkInfoPane, 0.0);
                 infoAnchorPane.setRightAnchor(linkInfoPane, 0.0);
 
-                Link lnk = (Link)tree2object.get(treeItem);
+                AbstractLink lnk = (AbstractLink)tree2object.get(treeItem);
                 if (lnk != null) {
                     linkEditorController.initWithLinkData(lnk);
                     linkInfoController.initWithLinkData(lnk);
@@ -403,7 +403,7 @@ public class AppMainController {
      * 
      * @param lnk - road link.
      */
-    public void selectLink(Link lnk) {
+    public void selectLink(AbstractLink lnk) {
         if (lnk == null) 
             return;
         
