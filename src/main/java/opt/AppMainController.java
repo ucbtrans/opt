@@ -44,11 +44,13 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import opt.config.LinkEditorController;
+import opt.config.LinkInfoController;
 import opt.data.Link;
 import opt.data.FreewayScenario;
 import opt.data.ProjectFactory;
@@ -69,6 +71,9 @@ public class AppMainController {
     private String optProjectFileDir_String = "optProjectFileDir_String";
     private File projectFileDir = null;
     private String roadLinksTreeItem = "Road Sections";
+    private String routesTreeItem = "Routes";
+    private String controllersTreeItem = "Controllers";
+    private String eventsTreeItem = "Events";
     private Project project = null;
     
     private Map<TreeItem, Object> tree2object = new HashMap<TreeItem, Object>();
@@ -76,6 +81,10 @@ public class AppMainController {
     
     private SplitPane linkEditorPane = null;
     private LinkEditorController linkEditorController = null;
+    private GridPane linkInfoPane = null;
+    private LinkInfoController linkInfoController = null;
+    
+    
     
     @FXML // fx:id="topPane"
     private VBox topPane; // Value injected by FXMLLoader
@@ -276,11 +285,19 @@ public class AppMainController {
         
         // Initialize link editor
         try {
+            
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/link_editor.fxml"));
             linkEditorPane = loader.load();
             linkEditorController = loader.getController();
             linkEditorController.setAppMainController(this);
-            linkEditorController.initWithLinkData(null);
+            //linkEditorController.initWithLinkData(null);
+            
+            loader = new FXMLLoader(getClass().getResource("/link_info.fxml"));
+            linkInfoPane = loader.load();
+            linkInfoController = loader.getController();
+            linkInfoController.setAppMainController(this);
+            
+            
         } catch (IOException e) {
             opt.utils.Dialogs.ExceptionDialog("Cannot initialize section editor...", e);
         }
@@ -325,6 +342,14 @@ public class AppMainController {
                 links_node.getChildren().add(link_node);
             }
             
+            TreeItem<String> routes_node = new TreeItem<String>(routesTreeItem);    
+            scenario_node.getChildren().add(routes_node);
+            
+            TreeItem<String> controllers_node = new TreeItem<String>(controllersTreeItem);    
+            scenario_node.getChildren().add(controllers_node);
+            
+            TreeItem<String> events_node = new TreeItem<String>(eventsTreeItem);    
+            scenario_node.getChildren().add(events_node);
             
             root.getChildren().add(scenario_node);
         }
@@ -349,10 +374,18 @@ public class AppMainController {
                 configAnchorPane.setBottomAnchor(linkEditorPane, 0.0);
                 configAnchorPane.setLeftAnchor(linkEditorPane, 0.0);
                 configAnchorPane.setRightAnchor(linkEditorPane, 0.0);
+                
+                infoAnchorPane.getChildren().clear();
+                infoAnchorPane.getChildren().setAll(linkInfoPane);
+                infoAnchorPane.setTopAnchor(linkInfoPane, 0.0);
+                infoAnchorPane.setBottomAnchor(linkInfoPane, 0.0);
+                infoAnchorPane.setLeftAnchor(linkInfoPane, 0.0);
+                infoAnchorPane.setRightAnchor(linkInfoPane, 0.0);
 
                 Link lnk = (Link)tree2object.get(treeItem);
                 if (lnk != null) {
                     linkEditorController.initWithLinkData(lnk);
+                    linkInfoController.initWithLinkData(lnk);
                 }
             }
         } else {
@@ -361,6 +394,30 @@ public class AppMainController {
         
     }
     
+
+    /**
+     * This function is called when the user navigates to the given link not
+     * from projectTree, but using other pointers. Now we need to change the
+     * selected tree item appropriately and open the corresponding action
+     * and info panels.
+     * 
+     * @param lnk - road link.
+     */
+    public void selectLink(Link lnk) {
+        if (lnk == null) 
+            return;
+        
+        TreeItem item = object2tree.get(lnk);
+        if (item == null) 
+            return;
+        
+        projectTree.getSelectionModel().select(item);  
+    }
+
+
+
+
+
     
     
     private void reset() {
@@ -374,6 +431,8 @@ public class AppMainController {
         
         actionPane.getSelectionModel().select(configTabPane);
         configAnchorPane.getChildren().clear();
+        infoAnchorPane.getChildren().clear();
+
     }
     
     

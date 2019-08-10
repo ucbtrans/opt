@@ -35,6 +35,7 @@ public class AppMain extends Application {
         Scene scene = new Scene(root, 1500, 1000);
         //setUserAgentStylesheet(STYLESHEET_CASPIAN);
         setUserAgentStylesheet(STYLESHEET_MODENA);
+        scene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
         primaryStage.setTitle("OPT");
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         primaryStage.setScene(scene);
