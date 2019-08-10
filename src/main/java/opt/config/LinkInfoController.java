@@ -72,7 +72,7 @@ public class LinkInfoController {
     
     
     /**
-     * This function should called once: during the initialization.
+     * This function should be called once: during the initialization.
      * @param ctrl - pointer to the main app controller that is used to sync up
      *               all sub-windows.
      */
