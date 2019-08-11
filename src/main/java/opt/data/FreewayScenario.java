@@ -322,6 +322,8 @@ public class FreewayScenario {
                         ++max_link_id,
                         start_node.id,end_node.id,
                         1,
+                        0,
+                        0,
                         500f,
                         params.capacity_vphpl,params.jam_density_vpkpl,params.ff_speed_kph,
                         segment);
@@ -331,6 +333,7 @@ public class FreewayScenario {
                         ++max_link_id,
                         start_node.id,end_node.id,
                         1,
+                        0,
                         500f,
                         params.capacity_vphpl,params.jam_density_vpkpl,params.ff_speed_kph,
                         segment);

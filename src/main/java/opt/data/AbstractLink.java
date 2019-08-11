@@ -18,6 +18,9 @@ public abstract class AbstractLink implements Comparable {
     protected long start_node_id;
     protected long end_node_id;
 
+    protected int managed_lanes;
+    protected int aux_lanes;
+
     public final long id;
 
     public String name;
@@ -31,8 +34,6 @@ public abstract class AbstractLink implements Comparable {
     // abstract methods
     /////////////////////////////////////
 
-    abstract public int get_managed_lanes();
-    abstract public int get_aux_lanes();
     abstract public Segment insert_up_segment();
     abstract public Segment insert_dn_segment();
 
@@ -48,14 +49,20 @@ public abstract class AbstractLink implements Comparable {
         this.full_lanes = link.getFullLanes();
         this.length_meters = link.getLength();
         this.param = new LinkParameters(rp);
+
+        // TODO GG : IMPLEMENT MANAGED LANES AND AUX LANES IN XML
+        this.managed_lanes = 0;
+        this.aux_lanes = 0;
     }
 
-    public AbstractLink(Long id, Type type, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
+    public AbstractLink(Long id, Type type, Long start_node_id, Long end_node_id, Integer full_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
         this.id = id;
         this.type = type;
         this.start_node_id = start_node_id;
         this.end_node_id = end_node_id;
         this.full_lanes = full_lanes;
+        this.managed_lanes = managed_lanes;
+        this.aux_lanes = aux_lanes;
         this.length_meters = length;
         this.param = new LinkParameters(capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
         this.mysegment = mysegment;
@@ -66,8 +73,16 @@ public abstract class AbstractLink implements Comparable {
         AbstractLink new_link = null;
         try {
             new_link = this.getClass()
-                    .getConstructor(Long.class,Long.class,Long.class,Integer.class,Float.class,Float.class,Float.class,Float.class,Segment.class)
-                    .newInstance(id,start_node_id,end_node_id,full_lanes,length_meters,
+                    .getConstructor(Long.class,Type.class,Long.class,Long.class,Integer.class,Integer.class,Integer.class,Float.class,Float.class,Float.class,Float.class,Segment.class)
+                    .newInstance(
+                            id,
+                            type,
+                            start_node_id,
+                            end_node_id,
+                            full_lanes,
+                            managed_lanes,
+                            aux_lanes,
+                            length_meters,
                             param.capacity_vphpl,
                             param.jam_density_vpkpl,
                             param.ff_speed_kph,
@@ -146,35 +161,37 @@ public abstract class AbstractLink implements Comparable {
             throw new Exception("Non-positive number of lanes");
         full_lanes = x;
     }
-    
+
+    public int get_managed_lanes() {
+        return managed_lanes;
+    }
+
     public void set_managed_lanes(int x) throws Exception {
         if(x<0)
-            throw new Exception("Negative number of lanes");
-        System.err.println("set_managed_lanes() not implemented!"); //FIXME
+            throw new Exception("Attempted to set negative number of lanes");
+        managed_lanes = x;
     }
-    
-    public void set_aux_lanes(int x) throws Exception {
+
+    public int get_aux_lanes(){
+        return aux_lanes;
+    }
+
+    public void set_aux_lanes(int x) throws Exception{
         if(x<0)
-            throw new Exception("Negative number of lanes");
-        System.err.println("set_aux_lanes() not implemented!"); //FIXME
+            throw new Exception("Attempted to set negative number of lanes");
+        aux_lanes = x;
     }
 
     /////////////////////////////////////
     // segment getters
     /////////////////////////////////////
 
-    public final Segment get_up_segment(){
-        if(this instanceof LinkOfframp)
-            return up_link.get_up_segment();
-        else
-            return up_link==null ? null : up_link.mysegment;
+    public Segment get_up_segment(){
+        return up_link==null ? null : up_link.mysegment;
     }
 
-    public final Segment get_dn_segment(){
-        if(this instanceof LinkOnramp)
-            return dn_link.get_dn_segment();
-        else
-            return dn_link==null ? null : dn_link.mysegment;
+    public Segment get_dn_segment(){
+        return dn_link==null ? null : dn_link.mysegment;
     }
 
     /////////////////////////////////////
@@ -256,6 +273,8 @@ public abstract class AbstractLink implements Comparable {
                 end_node_id == that.end_node_id &&
                 id == that.id &&
                 full_lanes == that.full_lanes &&
+                managed_lanes == that.managed_lanes &&
+                aux_lanes == that.aux_lanes &&
                 Float.compare(that.length_meters, length_meters) == 0 &&
                 type == that.type &&
                 Objects.equals(name, that.name) &&
@@ -266,7 +285,7 @@ public abstract class AbstractLink implements Comparable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, start_node_id, end_node_id, id, name, full_lanes, length_meters, param, demands, splits);
+        return Objects.hash(type, start_node_id, end_node_id, id, name, full_lanes, managed_lanes, aux_lanes, length_meters, param, demands, splits);
     }
 
     /////////////////////////////////////
@@ -291,6 +310,8 @@ public abstract class AbstractLink implements Comparable {
                         new_node.id,
                         existing_node.id,
                         full_lanes,
+                        managed_lanes,
+                        0,
                         length_meters,
                         get_capacity_vphpl(),
                         get_jam_density_vpkpl(),
@@ -303,6 +324,7 @@ public abstract class AbstractLink implements Comparable {
                         new_node.id,
                         existing_node.id,
                         full_lanes,
+                        managed_lanes,
                         length_meters,
                         get_capacity_vphpl(),
                         get_jam_density_vpkpl(),
@@ -343,6 +365,8 @@ public abstract class AbstractLink implements Comparable {
                         existing_node.id,
                         new_node.id,
                         full_lanes,
+                        managed_lanes,
+                        0,
                         length_meters,
                         get_capacity_vphpl(),
                         get_jam_density_vpkpl(),
@@ -355,6 +379,7 @@ public abstract class AbstractLink implements Comparable {
                         existing_node.id,
                         new_node.id,
                         full_lanes,
+                        managed_lanes,
                         length_meters,
                         get_capacity_vphpl(),
                         get_jam_density_vpkpl(),

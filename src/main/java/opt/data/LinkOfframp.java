@@ -13,24 +13,31 @@ public class LinkOfframp extends AbstractLink {
         super(link, AbstractLink.Type.offramp, rp);
     }
 
-    public LinkOfframp(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
-        super(id, AbstractLink.Type.offramp, start_node_id, end_node_id, full_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
+    public LinkOfframp(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Integer managed_lanes ,Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
+        super(id, AbstractLink.Type.offramp, start_node_id, end_node_id, full_lanes, managed_lanes, 0, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
     }
 
     /////////////////////////////////////
-    // override
+    // up and dn segment
     /////////////////////////////////////
 
     @Override
-    public int get_managed_lanes() {
-        System.out.println("NOT IMPLEMENTED!");
-        return 0;
+    public Segment get_up_segment(){
+        return up_link.get_up_segment();
     }
 
+    /////////////////////////////////////
+    // lanes
+    /////////////////////////////////////
+
     @Override
-    public int get_aux_lanes() {
-        return 0;
+    public void set_aux_lanes(int x) throws Exception {
+        throw new Exception("Attempted to set aux lanes on an offramp");
     }
+
+    /////////////////////////////////////
+    // demands and splits
+    /////////////////////////////////////
 
     @Override
     public void set_split(Long comm_id, Profile1D profile) throws Exception {
