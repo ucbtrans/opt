@@ -18,6 +18,16 @@ public class LinkOfframp extends AbstractLink {
         super(id, name, start_node_id, end_node_id, full_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
     }
 
+//    @Override
+//    protected void delete(){
+//        if(up_link!=null)
+//            up_link.dn_link = null;
+//        if(dn_link!=null)
+//            dn_link.up_link = null;
+//        demands = null;
+//        splits = null;
+//    }
+
     @Override
     public Type get_type() {
         return Type.offramp;

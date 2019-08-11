@@ -201,6 +201,10 @@ public class FreewayScenario {
                 .collect(Collectors.toList());
     }
 
+    public Collection<Node> get_nodes(){
+        return scenario.nodes.values();
+    }
+
     /////////////////////////////////////
     // segment getters
     /////////////////////////////////////
@@ -361,60 +365,49 @@ public class FreewayScenario {
      * @param segment
      */
     public void delete_segment(Segment segment) throws Exception {
-        
-        throw new Exception("FreewayScenario.delete_segment() not implemented!");
 
-//        if(segments.size()==1)
-//            throw new Exception("Removing the sole segment is not allowed.");
-//
-//        if(segment.segment_or_up_id!=null || segment.segment_fr_dn_id!=null)
-//            throw new Exception("Removing a segment with a ramp connector is not allowed.");
-//
-//        Node start_node = scenario.nodes.get(segment.fwy().start_node_id);
-//        Node end_node   = scenario.nodes.get(segment.fwy().end_node_id);
-//
-//        // connect upstream freeway segment to end node
-//        if(segment.segment_fwy_up_id !=null){
-//
-//            Segment segup = segments.get(segment.segment_fwy_up_id);
-//            segup.segment_fwy_dn_id = segment.segment_fwy_dn_id;
-//
-//            // fwy link
-//            segup.fwy().end_node_id = end_node.id;
-//            start_node.in_links.remove(segup.fwy().id);
-//            end_node.in_links.add(segup.fwy().id);
-//
-//            if(segup.has_onramp() && segup.or().end_node_id==start_node.id) {
-//                segup.or().end_node_id = end_node.id;
-//                start_node.in_links.remove(segup.or().id);
-//                end_node.in_links.add(segup.or().id);
-//            }
-//
-//            if(segup.has_offramp() && segup.fr().start_node_id==start_node.id){
-//                segup.fr().start_node_id = end_node.id;
-//                start_node.out_links.remove(segup.fr().id);
-//                end_node.out_links.add(segup.fr().id);
-//            }
-//
-//        }
-//
-//        // fix downstream freeway segment
-//        if(segment.segment_fwy_dn_id !=null){
-//            Segment segdn = segments.get(segment.segment_fwy_dn_id);
-//            segdn.segment_fwy_up_id = segment.segment_fwy_up_id;
-//        }
-//
-//        // delete the start node
-//        scenario.nodes.remove(segment.fwy().start_node_id);
-//
-//        // delete segment links
-//        segment.delete_offramp();
-//        segment.delete_onramp();
-//        scenario.links.remove(segment.fwy_id);
-//        end_node.in_links.remove(segment.fwy_id);
-//
-//        // remove the segment
-//        segments.remove(segment.id);
+        if(segments.size()==1)
+            throw new Exception("Removing the sole segment is not allowed.");
+
+        // disconnect ramps from connectors, or delete nodes
+        // delete links
+        for(LinkOnramp or : segment.get_ors())
+            if (or.up_link == null)
+                scenario.nodes.remove(or.start_node_id);
+            else
+                or.up_link.dn_link = null;
+
+        for(LinkOfframp fr : segment.get_frs())
+            if (fr.dn_link == null)
+                scenario.nodes.remove(fr.end_node_id);
+            else
+                fr.dn_link.up_link = null;
+
+        // disconnect fwy, or delete nodes
+        if(segment.fwy.up_link==null)
+            scenario.nodes.remove(segment.fwy.start_node_id);
+        else
+            segment.fwy.up_link.dn_link = null;
+
+        if(segment.fwy.dn_link==null)
+            scenario.nodes.remove(segment.fwy.end_node_id);
+        else
+            segment.fwy.dn_link.up_link = null;
+
+        // delete all links
+        for(AbstractLink link : segment.get_links()) {
+            link.demands = null;
+            link.splits = null;
+            scenario.links.remove(link.id);
+        }
+
+        // delete the segment
+        segment.in_ors = null;
+        segment.out_ors = null;
+        segment.in_frs = null;
+        segment.out_frs = null;
+        segments.remove(segment.id);
+
     }
 
     /////////////////////////////////////

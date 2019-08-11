@@ -113,6 +113,20 @@ public final class Segment implements Comparable {
         return X;
     }
 
+    public List<LinkOnramp> get_ors(){
+        List<LinkOnramp> X = new ArrayList<>();
+        X.addAll(in_ors);
+        X.addAll(out_ors);
+        return X;
+    }
+
+    public List<LinkOfframp> get_frs(){
+        List<LinkOfframp> X = new ArrayList<>();
+        X.addAll(in_frs);
+        X.addAll(out_frs);
+        return X;
+    }
+
     public int num_in_ors(){
         return in_ors.size();
     }
@@ -246,7 +260,7 @@ public final class Segment implements Comparable {
 
     public Set<Segment> get_dnstrm_segments(){
         Set<Segment> X = new HashSet<>();
-        if(fwy.dn_link!=null & fwy.dn_link.mysegment!=null)
+        if(fwy.dn_link!=null)
             X.add(fwy.dn_link.mysegment);
         X.addAll(in_frs.stream().map(x->x.get_dn_segment()).collect(toSet()));
         X.addAll(out_frs.stream().map(x->x.get_dn_segment()).collect(toSet()));

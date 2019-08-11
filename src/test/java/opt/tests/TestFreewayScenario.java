@@ -6,6 +6,8 @@ import org.junit.Test;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -89,8 +91,46 @@ public class TestFreewayScenario extends AbstractTest {
     public void test_delete_segment() {
         try {
             TestData X = new TestData();
-            Segment segment2 = X.scenario.get_segment_by_name("sA3");
-            X.scenario.delete_segment(segment2);
+            Segment sA2 = X.scenario.get_segment_by_name("sA2");
+            Segment sA3 = X.scenario.get_segment_by_name("sA3");
+            Segment sA4 = X.scenario.get_segment_by_name("sA4");
+
+            // delete internal segement
+
+            Set<String> link_names = X.scenario.get_links().stream()
+                    .map(link->link.name)
+                    .collect(Collectors.toSet());
+
+            Set<Long> node_ids = X.scenario.get_nodes().stream()
+                    .map(node->node.get_id())
+                    .collect(Collectors.toSet());
+
+            assertTrue(link_names.contains("lA3"));
+            assertTrue(link_names.contains("lA8"));
+            assertTrue(link_names.contains("lA9"));
+            assertTrue(node_ids.contains(9l));
+            assertTrue(node_ids.contains(10l));
+
+            X.scenario.delete_segment(sA3);
+
+            assertNull( X.scenario.get_segment_by_name("sA3") );
+            assertTrue( sA2.get_dnstrm_segments().isEmpty() );
+            assertTrue( sA4.get_upstrm_segments().isEmpty() );
+
+            link_names = X.scenario.get_links().stream()
+                    .map(link->link.name)
+                    .collect(Collectors.toSet());
+
+            node_ids = X.scenario.get_nodes().stream()
+                    .map(node->node.get_id())
+                    .collect(Collectors.toSet());
+
+            assertFalse(link_names.contains("lA3"));
+            assertFalse(link_names.contains("lA8"));
+            assertFalse(link_names.contains("lA9"));
+            assertFalse(node_ids.contains(9l));
+            assertFalse(node_ids.contains(10l));
+
         } catch (Exception e) {
             fail(e.getMessage());
         }

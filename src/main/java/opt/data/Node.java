@@ -30,6 +30,10 @@ public class Node {
         return new_node;
     }
 
+    public Long get_id(){
+        return id;
+    }
+
     /////////////////////////////////////
     // override
     /////////////////////////////////////
