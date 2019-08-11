@@ -77,6 +77,13 @@ public final class Segment implements Comparable {
     /////////////////////////////////////
     // getters / setters
     /////////////////////////////////////
+    
+    /**
+     * Get scenario, to which this segment belongs.
+     */
+    public FreewayScenario get_scenario() {
+        return fwy_scenario;
+    }
 
     /**
      * Get the length of this segment in meters

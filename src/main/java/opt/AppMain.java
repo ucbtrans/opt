@@ -32,6 +32,7 @@ public class AppMain extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/opt_main.fxml"));
         VBox root = (VBox)loader.load();
         main_controller = loader.getController();
+        main_controller.setPrimaryStage(primaryStage);
         Scene scene = new Scene(root, 1500, 1000);
         //setUserAgentStylesheet(STYLESHEET_CASPIAN);
         setUserAgentStylesheet(STYLESHEET_MODENA);

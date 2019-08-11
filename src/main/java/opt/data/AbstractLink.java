@@ -102,6 +102,16 @@ public abstract class AbstractLink implements Comparable {
     public final AbstractLink get_dn_link() {
         return dn_link;
     }
+    
+    public final double get_length_meters() {
+        return length_meters;
+    }
+    
+    public final void set_length_meters(float newlength) throws Exception {
+        if (newlength<=0.0001)
+            throw new Exception("Attempted to set a non-positive segment length");
+        length_meters = newlength;
+    }
 
     public final AbstractLink.Type get_type(){
         return this.type;

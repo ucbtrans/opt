@@ -30,6 +30,7 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Accordion;
@@ -43,11 +44,16 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.data.AbstractLink;
+import opt.utils.Misc;
 
 
 /**
@@ -55,7 +61,10 @@ import opt.data.AbstractLink;
  * @author Alex Kurzhanskiy
  */
 public class LinkEditorController {
+    private Stage primaryStage = null;
     private AppMainController appMainController = null;
+    private NewLinkController newLinkController = null;
+    private Scene newLinkScene = null;
     private AbstractLink myLink = null;
     private boolean ignoreChange  = true;
     
@@ -93,11 +102,11 @@ public class LinkEditorController {
     @FXML // fx:id="addSectionUpstream"
     private Button addSectionUpstream; // Value injected by FXMLLoader
 
-    @FXML // fx:id="duplicateSectionUpstream"
-    private Button duplicateSectionUpstream; // Value injected by FXMLLoader
+    @FXML // fx:id="connectSectionUpstream"
+    private Button connectSectionUpstream; // Value injected by FXMLLoader
 
-    @FXML // fx:id="duplicateSectionDownstream"
-    private Button duplicateSectionDownstream; // Value injected by FXMLLoader
+    @FXML // fx:id="connectSectionDownstream"
+    private Button connectSectionDownstream; // Value injected by FXMLLoader
 
     @FXML // fx:id="addSectionDownstream"
     private Button addSectionDownstream; // Value injected by FXMLLoader
@@ -105,14 +114,20 @@ public class LinkEditorController {
     @FXML // fx:id="deleteSection"
     private Button deleteSection; // Value injected by FXMLLoader
 
+    @FXML // fx:id="labelFromName"
+    private Label labelFromName; // Value injected by FXMLLoader
+
+    @FXML // fx:id="labelToName"
+    private Label labelToName; // Value injected by FXMLLoader
+    
     @FXML // fx:id="labelLength"
     private Label labelLength; // Value injected by FXMLLoader
 
-    @FXML // fx:id="linkName"
-    private TextField linkName; // Value injected by FXMLLoader
+    @FXML // fx:id="linkFromName"
+    private TextField linkFromName; // Value injected by FXMLLoader
 
-    @FXML // fx:id="linkType"
-    private ChoiceBox<AbstractLink.Type> linkType; // Value injected by FXMLLoader
+    @FXML // fx:id="linkToName"
+    private TextField linkToName; // Value injected by FXMLLoader
 
     @FXML // fx:id="linkLength"
     private Spinner<Double> linkLength; // Value injected by FXMLLoader
@@ -224,6 +239,9 @@ public class LinkEditorController {
 
 
 
+    public void setPrimaryStage(Stage s) {
+        primaryStage = s;
+    }
     
     /**
      * This function should be called once: during the initialization.
@@ -232,6 +250,16 @@ public class LinkEditorController {
      */
     public void setAppMainController(AppMainController ctrl) {
         appMainController = ctrl;
+    }
+    
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the new link controller that is used to set up
+     *               new road sections.
+     */
+    public void setNewLinkControllerAndScene(NewLinkController ctrl, Scene scn) {
+        newLinkController = ctrl;
+        newLinkScene = scn;
     }
     
     
@@ -248,12 +276,40 @@ public class LinkEditorController {
 
     @FXML
     void onAddSectionDownstreamAction(ActionEvent event) {
-
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(newLinkScene);
+        newLinkController.initWithTwoLinks(myLink, null);
+        inputStage.setTitle("Adding New Freeway Section");
+        if (myLink.get_type() != AbstractLink.Type.freeway)
+            inputStage.setTitle("Adding New Connector");
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.showAndWait();
     }
 
     @FXML
     void onAddSectionUpstreamAction(ActionEvent event) {
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(newLinkScene);
+        newLinkController.initWithTwoLinks(null, myLink);
+        inputStage.setTitle("Adding New Freeway Section");
+        if (myLink.get_type() != AbstractLink.Type.freeway)
+            inputStage.setTitle("Adding New Connector");
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.showAndWait();
+    }
+    
+    @FXML
+    void onConnectSectionDownstreamAction(ActionEvent event) {
+        opt.utils.Dialogs.ErrorDialog("Connection function is not yet implemented...", "Please, be patient!");
+    }
 
+    @FXML
+    void onConnectSectionUpstreamAction(ActionEvent event) {
+        opt.utils.Dialogs.ErrorDialog("Connection function is not yet implemented...", "Please, be patient!");
     }
 
     @FXML
@@ -268,25 +324,46 @@ public class LinkEditorController {
 
     @FXML
     void onDeleteSection(ActionEvent event) {
-
+        if (ignoreChange)
+            return;
+        
+        String header = "You are deleting " +
+                opt.utils.Misc.linkType2String(myLink.get_type()).toLowerCase() +
+                " section '" + myLink.name + "'...";
+                
+        if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
+            return;
+        
+        Object objectToOpen = myLink.get_dn_link();
+        if (objectToOpen == null) {
+            objectToOpen = myLink.get_up_link(); // still can be null if myLink is orphan
+            if (objectToOpen == null)
+                objectToOpen = myLink.get_segment().get_scenario();
+        }
+        
+        appMainController.deleteLink(myLink, objectToOpen);
     }
+    
+    
 
     @FXML
     void onLinkNameChanged(ActionEvent event) {
         if (ignoreChange)
             return;
         
+        String link_name = linkFromName.getText() + " -> " + linkToName.getText();
+        
+        myLink.name = link_name;
+        if ((myLink.get_type() == AbstractLink.Type.freeway) || (myLink.get_type() == AbstractLink.Type.connector))
+            myLink.get_segment().name = link_name;
+        
+        appMainController.linkNameUpdate(myLink);
     }
+    
+    
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
-        // Initialize new link window
-        
-        linkType.setItems(FXCollections.observableArrayList(AbstractLink.Type.values()));
-        linkType.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            if (!ignoreChange && (oldValue != newValue))
-                onLinkTypeChange();
-        });
         
         lengthSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
         linkLength.setValueFactory(lengthSpinnerValueFactory);
@@ -417,22 +494,96 @@ public class LinkEditorController {
             return;
         
         ignoreChange = true;
+        
+        laneProperties.setExpanded(true);
                 
         myLink = lnk;
-        linkName.setText(myLink.name);
-        laneProperties.setExpanded(true);
+        String link_name = myLink.name;
+        String[] name_subs = link_name.split(" -> ");
+        int sz = name_subs.length;
+        String from_name = name_subs[0];
+        String to_name = "";
+        for (int i = 1; i < sz; i++) {
+            to_name += name_subs[i];
+            if (i < sz - 1)
+                to_name += " -> ";
+        }
+        if (myLink.get_type() == AbstractLink.Type.onramp) {
+            if (from_name.equals(""))
+                linkFromName.setText(to_name);
+            else
+                linkFromName.setText(from_name);
+            linkToName.setText("");
+            linkFromName.setVisible(true);
+            linkToName.setVisible(false);
+            labelFromName.setVisible(true);
+            labelToName.setVisible(false);
+            deleteSection.setVisible(false);
+            addSectionDownstream.setVisible(false);
+            connectSectionDownstream.setVisible(false);
+            if (myLink.is_source()) {
+                addSectionUpstream.setVisible(true);
+            }
+            else
+                addSectionUpstream.setVisible(false);
+        } else if (myLink.get_type() == AbstractLink.Type.offramp) {
+            if (to_name.equals(""))
+                linkToName.setText(from_name);
+            else
+                linkToName.setText(to_name);
+            linkFromName.setText("");
+            linkFromName.setVisible(false);
+            linkToName.setVisible(true);
+            labelFromName.setVisible(false);
+            labelToName.setVisible(true);
+            deleteSection.setVisible(false);
+            addSectionUpstream.setVisible(false);
+            connectSectionUpstream.setVisible(false);
+            if (myLink.is_sink()) {
+                addSectionDownstream.setVisible(true);
+            }
+            else
+                addSectionDownstream.setVisible(false);
+        } else {
+            linkFromName.setText(from_name);
+            linkToName.setText(to_name);
+            linkFromName.setVisible(true);
+            linkToName.setVisible(true);
+            labelFromName.setVisible(true);
+            labelToName.setVisible(true);
+            deleteSection.setVisible(true);
+            addSectionUpstream.setVisible(true);
+            addSectionDownstream.setVisible(true);
+            if (myLink.is_source()) {
+                connectSectionUpstream.setVisible(true);
+            } else {
+                connectSectionUpstream.setVisible(false);
+                if (myLink.get_type() == AbstractLink.Type.connector)
+                    addSectionUpstream.setVisible(false);
+            }
+            if (myLink.is_sink()) {
+                connectSectionDownstream.setVisible(true);
+            } else {
+                connectSectionDownstream.setVisible(false);
+                if (myLink.get_type() == AbstractLink.Type.connector)
+                    addSectionDownstream.setVisible(false);
+            }
+        }
         
-        AbstractLink.Type lnkType = myLink.get_type();
-        linkType.setItems(FXCollections.observableArrayList(lnkType)); // to enable choice, remove this line
-        linkType.setValue(lnkType);;
+        
+        
+        
+        
+        
+
         
         String unitsLength = appMainController.getUserSettings().getUnitsLength();
-        double length = myLink.get_segment().get_length_meters();
+        double length = myLink.get_length_meters();
         length = appMainController.getUserSettings().convertFlow(length, "meters", unitsLength);
         labelLength.setText("Length (" + unitsLength + "):");
         lengthSpinnerValueFactory.setValue(length);
         
-        if (lnkType == AbstractLink.Type.freeway) {
+        if (myLink.get_type() == AbstractLink.Type.freeway) {
             rampsPane.setVisible(true);
         } else {
             rampsPane.setVisible(false);
@@ -539,65 +690,68 @@ public class LinkEditorController {
             if (myLink.get_type() == AbstractLink.Type.freeway) {
                 // Draw outer on-ramps
                 int num_ramps = myLink.get_segment().num_out_ors();
-                
-                
-                
+                double delta = 0.0;
+                g.setFill(Color.DARKGREY);
+                if (aux_lanes > 0)
+                    g.setFill(Color.LIGHTGREY);
+                for (int i = 0; i < num_ramps; i++) {
+                    int or_gp = myLink.get_segment().out_ors(i).get_gp_lanes();
+                    int or_managed = myLink.get_segment().out_ors(i).get_managed_lanes();
+                    double or_lanes = or_gp + or_managed;
+                    double or_width = or_lanes * lane_width;
+                    double rotationCenterX = x0 + delta;
+                    double rotationCenterY = base_y;
+                    g.save();
+                    g.translate(rotationCenterX, rotationCenterY);
+                    g.rotate(-ramp_angle);
+                    g.translate(-rotationCenterX, -rotationCenterY);
+                    g.fillRect(x0+delta-ramp_length/2, base_y-or_width/2, ramp_length, or_width);
+                    g.setStroke(Color.WHITE);
+                    for (int j = 1; j < or_lanes; j++) {
+                        y0 = base_y+or_width/2 - j*lane_width;
+                        g.setLineDashes(lane_width/3, lane_width/2);
+                        g.setLineWidth(1);
+                        g.strokeLine(x0+delta-ramp_length/2, y0, x0+delta+ramp_length/2, y0);
+                    }
+                    g.restore();
+                    delta += or_width + lane_width;
+                }
+
+
+
+                // Draw outer off-ramps
+                num_ramps = myLink.get_segment().num_out_frs();
+                delta = 0.0;
+                g.setFill(Color.DARKGREY);
+                if (aux_lanes > 0)
+                    g.setFill(Color.LIGHTGREY);
+                for (int i = num_ramps-1; i >= 0; i--) {
+                    int fr_gp = myLink.get_segment().out_frs(i).get_gp_lanes();
+                    int fr_managed = myLink.get_segment().out_frs(i).get_managed_lanes();
+                    double fr_lanes = fr_gp + fr_managed;
+                    double fr_width = fr_lanes * lane_width;
+                    double rotationCenterX = x1 - delta;
+                    double rotationCenterY = base_y;
+                    g.save();
+                    g.translate(rotationCenterX, rotationCenterY);
+                    g.rotate(ramp_angle);
+                    g.translate(-rotationCenterX, -rotationCenterY);
+                    g.fillRect(x1-delta-ramp_length/2, base_y-fr_width/2, ramp_length, fr_width);
+                    g.setStroke(Color.WHITE);
+                    for (int j = 1; j < fr_lanes; j++) {
+                        y0 = base_y+fr_width/2 - j*lane_width;
+                        g.setLineDashes(lane_width/3, lane_width/2);
+                        g.setLineWidth(1);
+                        g.strokeLine(x1-delta-ramp_length/2, y0, x1-delta+ramp_length/2, y0);
+                    }
+                    g.restore();
+                    delta += fr_width + lane_width;
+                }
+
+               
                 
             }
             
-            
-            
-            
-            // TODO GG: TEMPORARILY BROKEN
-//            if ((myLink.get_type() == AbstractLink.Type.freeway) &&
-//                myLink.get_segment().has_onramp()) {
-//                g.setFill(Color.DARKGREY);
-//                if (aux_lanes > 0)
-//                    g.setFill(Color.LIGHTGREY);
-//                double or_lanes = myLink.get_segment().get_or_lanes();
-//                double or_width = or_lanes * lane_width;
-//                double rotationCenterX = x0;
-//                double rotationCenterY = base_y;
-//                g.save();
-//                g.translate(rotationCenterX, rotationCenterY);
-//                g.rotate(-ramp_angle);
-//                g.translate(-rotationCenterX, -rotationCenterY);
-//                g.fillRect(x0-ramp_length/2, base_y-or_width/2, ramp_length, or_width);
-//                g.setStroke(Color.WHITE);
-//                for (int i = 1; i < or_lanes; i++) {
-//                    y0 = base_y+or_width/2 - i*lane_width;
-//                    g.setLineDashes(lane_width/3, lane_width/2);
-//                    g.setLineWidth(1);
-//                    g.strokeLine(x0-ramp_length/2, y0, x0+ramp_length/2, y0);
-//                }
-//                g.restore();
-//            }
-            
-            // Draw outer off-ramps
-            // TODO GG: TEMPORARILY BROKEN
-//            if ((myLink.get_type() == AbstractLink.Type.freeway) &&
-//                myLink.get_segment().has_offramp()) {
-//                g.setFill(Color.DARKGREY);
-//                if (aux_lanes > 0)
-//                    g.setFill(Color.LIGHTGREY);
-//                double fr_lanes = myLink.get_segment().get_fr_lanes();
-//                double fr_width = fr_lanes * lane_width;
-//                double rotationCenterX = x1;
-//                double rotationCenterY = base_y;
-//                g.save();
-//                g.translate(rotationCenterX, rotationCenterY);
-//                g.rotate(ramp_angle);
-//                g.translate(-rotationCenterX, -rotationCenterY);
-//                g.fillRect(x1-ramp_length/2, base_y-fr_width/2, ramp_length, fr_width);
-//                g.setStroke(Color.WHITE);
-//                for (int i = 1; i < fr_lanes; i++) {
-//                    y0 = base_y+fr_width/2 - i*lane_width;
-//                    g.setLineDashes(lane_width/3, lane_width/2);
-//                    g.setLineWidth(1);
-//                    g.strokeLine(x1-ramp_length/2, y0, x1+ramp_length/2, y0);
-//                }
-//                g.restore();
-//            }
             
             
             
@@ -647,6 +801,14 @@ public class LinkEditorController {
                 
             }
             
+            String label = Misc.linkType2String(myLink.get_type());
+            g.setStroke(Color.BLACK);
+            g.setFill(Color.BLACK);
+            g.setLineDashes();
+            g.setFont(new Font("Verdana", 18));
+            //g.strokeText(label, 0.46*width, 0.2*height);
+            g.fillText(label, 0.46*width, 0.2*height);
+            
             
             
             
@@ -671,16 +833,6 @@ public class LinkEditorController {
     
     
     
-
-    private void onLinkTypeChange() {    
-        int linkTypeSelectedIndex = linkType.getSelectionModel().getSelectedIndex();
-        AbstractLink.Type lnkType = AbstractLink.Type.values()[linkTypeSelectedIndex];
-        //myLink.get_segment().set_type(lnkType);
-        
-        System.err.println("Type: " + lnkType + " (" + linkTypeSelectedIndex + ")");
-    }
-    
-    
     @FXML
     private void onLinkLengthChange() {
         String unitsLength = appMainController.getUserSettings().getUnitsLength();
@@ -688,12 +840,11 @@ public class LinkEditorController {
         length = appMainController.getUserSettings().convertFlow(length, unitsLength, "meters");
         length = Math.max(length, 0.001);
         try {
-            myLink.length_meters = (float)length;
+            myLink.set_length_meters((float)length);
         } catch(Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not change section length...", e);
         }
-        
-        System.err.println("Length: " + length);
+
     }
     
     

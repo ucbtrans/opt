@@ -36,6 +36,7 @@ import java.util.prefs.Preferences;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
@@ -64,7 +65,7 @@ import opt.data.Project;
  * @author Alex Kurzhanskiy
  */
 public class AppMainController {
-    
+    private Stage primaryStage = null;
     private Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
     private UserSettings userSettings = new UserSettings();
     private boolean projectModified = false;
@@ -141,7 +142,9 @@ public class AppMainController {
     
     
     
-    
+    public void setPrimaryStage(Stage s) {
+        primaryStage = s;
+    }
     
     public void toSaveProjectOrNot() {
         if (projectModified) {
@@ -231,7 +234,7 @@ public class AppMainController {
             project = ProjectFactory.load_project(projectFilePath, validate);
             menuFileSave.setDisable(false);
             menuFileSaveAs.setDisable(false);
-            populateProjectTree(project);
+            populateProjectTree();
         } catch (Exception ex) {
             opt.utils.Dialogs.ExceptionDialog("Error loading OPT project", ex);
         }
@@ -303,6 +306,7 @@ public class AppMainController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/link_editor.fxml"));
             linkEditorPane = loader.load();
             linkEditorController = loader.getController();
+            linkEditorController.setPrimaryStage(primaryStage);
             linkEditorController.setAppMainController(this);
             //linkEditorController.initWithLinkData(null);
             
@@ -315,6 +319,7 @@ public class AppMainController {
             newLinkPane = loader.load();
             newLinkController = loader.getController();
             newLinkController.setAppMainController(this);
+            linkEditorController.setNewLinkControllerAndScene(newLinkController, new Scene(newLinkPane));
             
             
         } catch (IOException e) {
@@ -334,7 +339,7 @@ public class AppMainController {
     
     
     
-    private void populateProjectTree(Project project) {
+    private void populateProjectTree() {
         
         if (project == null)
             return;
@@ -408,6 +413,8 @@ public class AppMainController {
                 }
             }
         } else {
+            configAnchorPane.getChildren().clear();
+            infoAnchorPane.getChildren().clear();
             ; //TODO AK
         }
         
@@ -431,6 +438,56 @@ public class AppMainController {
             return;
         
         projectTree.getSelectionModel().select(item);  
+    }
+    
+    
+    
+    public void linkNameUpdate(AbstractLink lnk) {
+        if (lnk == null) 
+            return;
+        
+        if (projectTree.getRoot() != null)
+            projectTree.getRoot().getChildren().clear();
+        
+        tree2object = new HashMap<TreeItem, Object>();
+        object2tree = new HashMap<Object, TreeItem>();
+        
+        populateProjectTree();
+        
+        TreeItem item = object2tree.get(lnk);
+        if (item == null) 
+            return;
+        
+        projectTree.getSelectionModel().select(item);  
+    }
+    
+    
+    
+    public void deleteLink(AbstractLink lnk, Object toDisplay) {
+        if (lnk == null) 
+            return;
+        
+        FreewayScenario scenario = lnk.get_segment().get_scenario();
+        try {
+            scenario.delete_segment(lnk.get_segment());
+        } catch (Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Could not delete road section...", e);
+            return;
+        }
+        
+        if (projectTree.getRoot() != null)
+            projectTree.getRoot().getChildren().clear();
+        
+        tree2object = new HashMap<TreeItem, Object>();
+        object2tree = new HashMap<Object, TreeItem>();
+        
+        populateProjectTree();
+        
+        TreeItem item = object2tree.get(toDisplay);
+        if (item == null) 
+            return;
+        
+        projectTree.getSelectionModel().select(item);
     }
 
 

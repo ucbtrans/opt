@@ -355,6 +355,8 @@ public class FreewayScenario {
      * @param segment
      */
     public void delete_segment(Segment segment) throws Exception {
+        
+        throw new Exception("FreewayScenario.delete_segment() not implemented!");
 
 //        if(segments.size()==1)
 //            throw new Exception("Removing the sole segment is not allowed.");

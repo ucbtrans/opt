@@ -6,7 +6,6 @@
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
@@ -27,7 +26,7 @@
   <items>
       <AnchorPane id="canvasParent" fx:id="canvasParent" minHeight="170.0" minWidth="600.0" prefHeight="170.0" prefWidth="850.0">
          <children>
-            <Canvas id="linkEditorCanvas" fx:id="linkEditorCanvas" height="170.0" width="848.0" />
+            <Canvas id="linkEditorCanvas" fx:id="linkEditorCanvas" height="180.0" width="898.0" />
          </children>
       </AnchorPane>
       <AnchorPane prefHeight="151.0" prefWidth="800.0">
@@ -40,17 +39,19 @@
                            <left>
                               <HBox prefHeight="30.0" prefWidth="257.0" BorderPane.alignment="CENTER">
                                  <children>
-                                    <Button id="addSeectionUpstream" fx:id="addSectionUpstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionUpstreamAction" prefWidth="180.0" text="&lt;&lt;  Add Upstream Section">
+                                    <Button id="addSeectionUpstream" fx:id="addSectionUpstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionUpstreamAction" prefWidth="130.0" text="&lt;&lt; Add Section">
                                        <HBox.margin>
                                           <Insets left="10.0" />
                                        </HBox.margin></Button>
+                                    <Button id="connectSectionUpstream" fx:id="connectSectionUpstream" defaultButton="true" mnemonicParsing="false" onAction="#onConnectSectionUpstreamAction" prefWidth="130.0" text="&lt;&lt; Connect Section" visible="false" />
                                  </children>
                               </HBox>
                            </left>
                            <right>
                               <HBox alignment="TOP_RIGHT" prefHeight="30.0" prefWidth="257.0" BorderPane.alignment="CENTER">
                                  <children>
-                                    <Button id="addSectionDownstream" fx:id="addSectionDownstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionDownstreamAction" prefWidth="180.0" text="Add Downstream Section &gt;&gt;">
+                                    <Button id="connectSectionDownstream" fx:id="connectSectionDownstream" defaultButton="true" mnemonicParsing="false" onAction="#onConnectSectionDownstreamAction" prefWidth="130.0" text="Connect Section &gt;&gt;" visible="false" />
+                                    <Button id="addSectionDownstream" fx:id="addSectionDownstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionDownstreamAction" prefWidth="130.0" text="Add Section &gt;&gt;">
                                        <HBox.margin>
                                           <Insets right="10.0" />
                                        </HBox.margin></Button>
@@ -58,14 +59,14 @@
                               </HBox>
                            </right>
                            <center>
-                              <Button id="deleteSection" fx:id="deleteSection" cancelButton="true" mnemonicParsing="false" onAction="#onDeleteSection" text="Delete Section" BorderPane.alignment="CENTER" />
+                              <Button id="deleteSection" fx:id="deleteSection" cancelButton="true" mnemonicParsing="false" onAction="#onDeleteSection" prefWidth="130.0" text="Delete Section" BorderPane.alignment="CENTER" />
                            </center>
                         </BorderPane>
                      </children>
                   </AnchorPane>
                   <AnchorPane>
                      <children>
-                        <GridPane alignment="CENTER" hgap="10.0" prefHeight="63.0" prefWidth="514.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <GridPane alignment="CENTER" hgap="10.0" prefHeight="70.0" prefWidth="898.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <columnConstraints>
                               <ColumnConstraints hgrow="SOMETIMES" maxWidth="220.0" minWidth="10.0" prefWidth="182.66668701171875" />
                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="208.33331298828125" minWidth="10.0" prefWidth="208.33331298828125" />
@@ -76,11 +77,11 @@
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <Label text="Name:" />
-                              <Label text="Type:" GridPane.columnIndex="1" />
-                              <Label id="labelLength" fx:id="labelLength" text="Length:" GridPane.columnIndex="2" />
-                              <TextField id="linkName" fx:id="linkName" onAction="#onLinkNameChanged" GridPane.rowIndex="1" />
-                              <ChoiceBox id="linkType" fx:id="linkType" prefHeight="25.0" prefWidth="208.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label id="labelFromName" fx:id="labelFromName" text="FROM Name:" GridPane.valignment="BOTTOM" />
+                              <Label id="labelToName" fx:id="labelToName" text="TO Name:" GridPane.columnIndex="1" GridPane.valignment="BOTTOM" />
+                              <Label id="labelLength" fx:id="labelLength" text="Length (miles):" GridPane.columnIndex="2" GridPane.valignment="BOTTOM" />
+                              <TextField id="linkFromName" fx:id="linkFromName" onAction="#onLinkNameChanged" GridPane.rowIndex="1" />
+                              <TextField id="linkToName" fx:id="linkToName" onAction="#onLinkNameChanged" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                               <Spinner id="linkLength" fx:id="linkLength" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                            </children>
                            <padding>
