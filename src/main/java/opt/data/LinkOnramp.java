@@ -94,4 +94,13 @@ public class LinkOnramp extends AbstractLink {
         return null;
     }
 
+    @Override
+    protected boolean is_permitted_uplink(AbstractLink link) {
+        return link instanceof LinkConnector;
+    }
+
+    @Override
+    protected boolean is_permitted_dnlink(AbstractLink link) {
+        return link instanceof LinkFreeway;
+    }
 }

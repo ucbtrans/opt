@@ -306,6 +306,9 @@ public class FreewayScenario {
      */
     public Segment create_isolated_segment(String segment_name,String linkname,LinkParameters params,AbstractLink.Type linktype){
 
+        if(linktype!=AbstractLink.Type.freeway && linktype!= AbstractLink.Type.connector)
+            return null;
+
         // create a segment
         Long segment_id = ++max_seg_id;
         Segment segment = new Segment();
@@ -374,25 +377,33 @@ public class FreewayScenario {
         for(LinkOnramp or : segment.get_ors())
             if (or.up_link == null)
                 scenario.nodes.remove(or.start_node_id);
-            else
+            else {
                 or.up_link.dn_link = null;
+                scenario.nodes.get(or.up_link.end_node_id).out_links.remove(or.id);
+            }
 
         for(LinkOfframp fr : segment.get_frs())
             if (fr.dn_link == null)
                 scenario.nodes.remove(fr.end_node_id);
-            else
+            else {
                 fr.dn_link.up_link = null;
+                scenario.nodes.get(fr.dn_link.start_node_id).in_links.remove(fr.id);
+            }
 
         // disconnect fwy, or delete nodes
         if(segment.fwy.up_link==null)
             scenario.nodes.remove(segment.fwy.start_node_id);
-        else
+        else {
             segment.fwy.up_link.dn_link = null;
+            scenario.nodes.get(segment.fwy.up_link.end_node_id).out_links.remove(segment.fwy.id);
+        }
 
         if(segment.fwy.dn_link==null)
             scenario.nodes.remove(segment.fwy.end_node_id);
-        else
+        else {
             segment.fwy.dn_link.up_link = null;
+            scenario.nodes.get(segment.fwy.dn_link.start_node_id).in_links.remove(segment.fwy.id);
+        }
 
         // delete all links
         for(AbstractLink link : segment.get_links()) {

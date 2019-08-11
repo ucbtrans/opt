@@ -83,4 +83,14 @@ public class LinkFreeway extends LinkFreewayOrConnector {
         return new_segment;
     }
 
+    @Override
+    protected boolean is_permitted_uplink(AbstractLink link) {
+        return link instanceof LinkFreeway;
+    }
+
+    @Override
+    protected boolean is_permitted_dnlink(AbstractLink link) {
+        return link instanceof LinkFreeway;
+    }
+
 }

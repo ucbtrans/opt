@@ -27,7 +27,6 @@ public class LinkConnector extends LinkFreewayOrConnector {
         return false;
     }
 
-
     /////////////////////////////////////
     // lanes
     /////////////////////////////////////
@@ -61,6 +60,16 @@ public class LinkConnector extends LinkFreewayOrConnector {
         or.up_link = this;
         this.dn_link = or;
         return segment;
+    }
+
+    @Override
+    protected boolean is_permitted_uplink(AbstractLink link) {
+        return link instanceof LinkOfframp;
+    }
+
+    @Override
+    protected boolean is_permitted_dnlink(AbstractLink link) {
+        return link instanceof LinkOnramp;
     }
 
 }

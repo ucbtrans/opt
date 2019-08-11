@@ -11,7 +11,7 @@ public final class Segment implements Comparable {
     protected FreewayScenario fwy_scenario;
     protected long id;
     public String name;
-    public LinkFreewayOrConnector fwy;
+    protected LinkFreewayOrConnector fwy;
     protected List<LinkOnramp> in_ors = new ArrayList<>();
     protected List<LinkOnramp> out_ors = new ArrayList<>();
     protected List<LinkOfframp> in_frs = new ArrayList<>();
@@ -141,6 +141,10 @@ public final class Segment implements Comparable {
 
     public int num_out_frs(){
         return out_frs.size();
+    }
+
+    public LinkFreewayOrConnector fwy(){
+        return fwy;
     }
 
     public LinkOnramp in_ors(int i){
@@ -395,29 +399,5 @@ public final class Segment implements Comparable {
     public int hashCode() {
         return Objects.hash(id, name, fwy, in_ors, out_ors, in_frs, out_frs);
     }
-
-
-
-
-
-
-
-
-
-
-
-//    protected void set_start_node(long new_start_node){
-//        fwy().start_node_id = new_start_node;
-//        if(has_offramp())
-//            fr().start_node_id = new_start_node;
-//    }
-//
-//    protected void set_end_node(long new_end_node){
-//        fwy().end_node_id = new_end_node;
-//        if(has_onramp())
-//            or().end_node_id = new_end_node;
-//    }
-//
-
 
 }

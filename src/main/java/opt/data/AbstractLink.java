@@ -37,6 +37,8 @@ public abstract class AbstractLink implements Comparable {
     abstract public boolean is_ramp();
     abstract public Segment insert_up_segment(String seg_name,String link_name);
     abstract public Segment insert_dn_segment(String seg_name,String link_name);
+    abstract protected boolean is_permitted_uplink(AbstractLink link);
+    abstract protected boolean is_permitted_dnlink(AbstractLink link);
 
     /////////////////////////////////////
     // construction
@@ -230,6 +232,35 @@ public abstract class AbstractLink implements Comparable {
 
     public void set_split(Long comm_id,Profile1D profile) throws Exception {
         throw new Exception("Invalid call");
+    }
+
+    /////////////////////////////////////
+    // connect
+    /////////////////////////////////////
+
+    public boolean connect_to_upstream(AbstractLink conn_up_link){
+
+        if(up_link!=null || conn_up_link==null || conn_up_link.dn_link!=null)
+            return false;
+
+        if(!is_permitted_uplink(conn_up_link))
+            return false;
+
+        up_link = conn_up_link;
+        conn_up_link.dn_link = this;
+
+        // delete my start node
+        mysegment.fwy_scenario.scenario.nodes.remove(start_node_id);
+
+        // connect to upstream node
+        Node node = mysegment.fwy_scenario.scenario.nodes.remove(up_link.end_node_id);
+        start_node_id = node.id;
+        node.out_links.add(this.id);
+
+        // delete demands
+        demands = new HashMap<>();
+
+        return true;
     }
 
     /////////////////////////////////////

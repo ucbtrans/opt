@@ -37,6 +37,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.data.AbstractLink;
+import opt.data.LinkFreewayOrConnector;
 import opt.data.Segment;
 
 
@@ -216,7 +217,7 @@ public class NewLinkController {
         } else {
             new_segment = upstreamLink.insert_dn_segment(segment_name,link_name);
         }
-        AbstractLink new_link = new_segment.fwy;
+        LinkFreewayOrConnector new_link = new_segment.fwy();
 
         
         try {
