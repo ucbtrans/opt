@@ -1,5 +1,6 @@
 package opt.data;
 
+import jaxb.Link;
 import jaxb.Roadparam;
 import profiles.Profile1D;
 
@@ -9,13 +10,24 @@ public class LinkFreeway extends LinkFreewayOrConnector {
     // construction
     /////////////////////////////////////
 
-    public LinkFreeway(jaxb.Link link, Roadparam rp) {
-        super(link, Type.freeway, rp);
+    public LinkFreeway(Link link, Roadparam rp) {
+        super(link, rp);
     }
 
-    public LinkFreeway(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
-        super(id, Type.freeway, start_node_id, end_node_id, full_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
+    public LinkFreeway(Long id, String name, Long start_node_id, Long end_node_id, Integer full_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
+        super(id, name, start_node_id, end_node_id, full_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
     }
+
+    @Override
+    public Type get_type() {
+        return Type.freeway;
+    }
+
+    @Override
+    public boolean is_ramp() {
+        return false;
+    }
+
 
     /////////////////////////////////////
     // demands and splits
@@ -31,13 +43,13 @@ public class LinkFreeway extends LinkFreewayOrConnector {
     /////////////////////////////////////
 
     @Override
-    public Segment insert_up_segment() {
+    public Segment insert_up_segment(String seg_name,String link_name) {
 
         // create new upstream link
-        LinkFreeway new_link = (LinkFreeway) create_up_FwyOrConnLink(Type.freeway);
+        LinkFreeway new_link = (LinkFreeway) create_up_FwyOrConnLink(Type.freeway,link_name);
 
         // wrap in a segment
-        Segment new_segment = create_segment(new_link);
+        Segment new_segment = create_segment(new_link,seg_name);
 
         // connect upstream segment to new node
         Segment up_segment = get_up_segment();
@@ -51,13 +63,13 @@ public class LinkFreeway extends LinkFreewayOrConnector {
     }
 
     @Override
-    public Segment insert_dn_segment() {
+    public Segment insert_dn_segment(String seg_name,String link_name) {
 
         // create new dnstream link
-        LinkFreeway new_link = (LinkFreeway) create_dn_FwyOrConnLink(Type.freeway);
+        LinkFreeway new_link = (LinkFreeway) create_dn_FwyOrConnLink(Type.freeway,link_name);
 
         // wrap in a segment
-        Segment new_segment = create_segment(new_link);
+        Segment new_segment = create_segment(new_link,seg_name);
 
         // connect dnstream segment to new node
         Segment dn_segment = get_dn_segment();

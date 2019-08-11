@@ -14,9 +14,8 @@ public class Project {
     // construction
     /////////////////////////////////////
 
-    public Project(LinkParameters params){
-        String scenario_name = "Unnamed scenario";
-        scenarios.put(scenario_name,new FreewayScenario(scenario_name,params));
+    public Project(LinkParameters params,String scn_name,String sgmt_name,String link_name){
+        scenarios.put(scn_name,new FreewayScenario(scn_name,sgmt_name, link_name,params));
     }
 
     public Project(jaxbopt.Prj project,String folder,boolean validate) throws Exception {

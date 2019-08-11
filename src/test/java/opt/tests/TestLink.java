@@ -28,6 +28,14 @@ public class TestLink extends AbstractTest {
     @Ignore
     @Test
     public void test_insert_up_segment(){
+        TestData X = new TestData();
+
+        Segment sA3 = X.scenario.get_segment_by_name("sA3");
+
+        Segment sA3up = sA3.insert_up_segment("sA3up","new link");
+
+        System.out.println(sA3up);
+
 
     }
 

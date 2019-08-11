@@ -1,5 +1,6 @@
 package opt.data;
 
+import jaxb.Link;
 import jaxb.Roadparam;
 import profiles.Profile1D;
 
@@ -9,12 +10,22 @@ public class LinkOnramp extends AbstractLink {
     // construction
     /////////////////////////////////////
 
-    public LinkOnramp(jaxb.Link link, Roadparam rp) {
-        super(link, AbstractLink.Type.onramp, rp);
+    public LinkOnramp(Link link, Roadparam rp) {
+        super(link, rp);
     }
 
-    public LinkOnramp(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Integer managed_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
-        super(id, AbstractLink.Type.onramp, start_node_id, end_node_id, full_lanes, managed_lanes, 0, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
+    public LinkOnramp(Long id, String name, Long start_node_id, Long end_node_id, Integer full_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
+        super(id, name, start_node_id, end_node_id, full_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
+    }
+
+    @Override
+    public Type get_type() {
+        return Type.onramp;
+    }
+
+    @Override
+    public boolean is_ramp() {
+        return true;
     }
 
     /////////////////////////////////////
@@ -45,13 +56,13 @@ public class LinkOnramp extends AbstractLink {
     /////////////////////////////////////
 
     @Override
-    public Segment insert_up_segment() {
+    public Segment insert_up_segment(String seg_name,String link_name) {
 
         // create new upstream link
-        LinkConnector new_link = (LinkConnector) create_up_FwyOrConnLink(Type.connector);
+        LinkConnector new_link = (LinkConnector) create_up_FwyOrConnLink(Type.connector,link_name);
 
         // wrap in a segment
-        Segment new_segment = create_segment(new_link);
+        Segment new_segment = create_segment(new_link,seg_name);
 
         // connect upstream segment to new node
         Segment up_segment = get_up_segment();
@@ -65,7 +76,7 @@ public class LinkOnramp extends AbstractLink {
     }
 
     @Override
-    public Segment insert_dn_segment() {
+    public Segment insert_dn_segment(String seg_name,String link_name) {
         return null;
     }
 

@@ -40,16 +40,16 @@ public class Scenario {
                     AbstractLink link;
                     switch(jlink.getRoadType()){
                         case "offramp":
-                            link = new LinkOfframp(jlink,road_params.get(jlink.getRoadparam()));
+                            link = new LinkOfframp(jlink, road_params.get(jlink.getRoadparam()));
                             break;
                         case "onramp":
-                            link = new LinkOnramp(jlink,road_params.get(jlink.getRoadparam()));
+                            link = new LinkOnramp(jlink, road_params.get(jlink.getRoadparam()));
                             break;
                         case "freeway":
-                            link = new LinkFreeway(jlink,road_params.get(jlink.getRoadparam()));
+                            link = new LinkFreeway(jlink, road_params.get(jlink.getRoadparam()));
                             break;
                         case "connector":
-                            link = new LinkConnector(jlink,road_params.get(jlink.getRoadparam()));
+                            link = new LinkConnector(jlink, road_params.get(jlink.getRoadparam()));
                             break;
                         default:
                             throw new Exception("Bad road type");
@@ -155,7 +155,7 @@ public class Scenario {
             jaxbLink.setFullLanes(link.full_lanes);
             jaxbLink.setEndNodeId(link.end_node_id);
             jaxbLink.setStartNodeId(link.start_node_id);
-            jaxbLink.setRoadType(link.type.toString());
+            jaxbLink.setRoadType(link.get_type().toString());
 
             // road params
             Set<Long> param_ids = link_params.entrySet().stream()

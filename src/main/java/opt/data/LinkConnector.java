@@ -1,5 +1,6 @@
 package opt.data;
 
+import jaxb.Link;
 import jaxb.Roadparam;
 
 public class LinkConnector extends LinkFreewayOrConnector {
@@ -8,13 +9,24 @@ public class LinkConnector extends LinkFreewayOrConnector {
     // construction
     /////////////////////////////////////
 
-    public LinkConnector(jaxb.Link link, Roadparam rp) {
-        super(link, Type.connector, rp);
+    public LinkConnector(Link link, Roadparam rp) {
+        super(link, rp);
     }
 
-    public LinkConnector(Long id, Long start_node_id, Long end_node_id, Integer full_lanes, Integer managed_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
-        super(id, Type.connector, start_node_id, end_node_id, full_lanes, managed_lanes, 0, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
+    public LinkConnector(Long id, String name, Long start_node_id, Long end_node_id, Integer full_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
+        super(id, name, start_node_id, end_node_id, full_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
     }
+
+    @Override
+    public Type get_type() {
+        return Type.connector;
+    }
+
+    @Override
+    public boolean is_ramp() {
+        return false;
+    }
+
 
     /////////////////////////////////////
     // lanes
@@ -30,18 +42,18 @@ public class LinkConnector extends LinkFreewayOrConnector {
     /////////////////////////////////////
 
     @Override
-    public Segment insert_up_segment() {
-        Segment segment = mysegment.fwy_scenario.create_isolated_segment("New segment",this.param,Type.freeway);
-        LinkOfframp fr = segment.add_out_fr(param,full_lanes,managed_lanes,100f);
+    public Segment insert_up_segment(String seg_name,String fwy_name) {
+        Segment segment = mysegment.fwy_scenario.create_isolated_segment(seg_name,fwy_name,this.param,Type.freeway);
+        LinkOfframp fr = segment.add_out_fr("Unnamed offramp",param,full_lanes,managed_lanes,100f);
         fr.dn_link = this;
         this.up_link = fr;
         return segment;
     }
 
     @Override
-    public Segment insert_dn_segment() {
-        Segment segment = mysegment.fwy_scenario.create_isolated_segment("New segment",this.param,Type.freeway);
-        LinkOnramp or = segment.add_out_or(param,full_lanes,managed_lanes,100f);
+    public Segment insert_dn_segment(String seg_name,String link_name) {
+        Segment segment = mysegment.fwy_scenario.create_isolated_segment(seg_name,link_name,this.param,Type.freeway);
+        LinkOnramp or = segment.add_out_or("Unnamed onramp",param,full_lanes,managed_lanes,100f);
         or.up_link = this;
         this.dn_link = or;
         return segment;

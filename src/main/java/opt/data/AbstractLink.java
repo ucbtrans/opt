@@ -14,7 +14,6 @@ public abstract class AbstractLink implements Comparable {
     protected AbstractLink up_link;
     protected AbstractLink dn_link;
 
-    protected final Type type;
     protected long start_node_id;
     protected long end_node_id;
 
@@ -34,16 +33,17 @@ public abstract class AbstractLink implements Comparable {
     // abstract methods
     /////////////////////////////////////
 
-    abstract public Segment insert_up_segment();
-    abstract public Segment insert_dn_segment();
+    abstract public AbstractLink.Type get_type();
+    abstract public boolean is_ramp();
+    abstract public Segment insert_up_segment(String seg_name,String link_name);
+    abstract public Segment insert_dn_segment(String seg_name,String link_name);
 
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
 
-    public AbstractLink(jaxb.Link link, Type type, jaxb.Roadparam rp){
+    public AbstractLink(jaxb.Link link, jaxb.Roadparam rp){
         this.id = link.getId();
-        this.type = type;
         this.start_node_id = link.getStartNodeId();
         this.end_node_id = link.getEndNodeId();
         this.full_lanes = link.getFullLanes();
@@ -55,9 +55,9 @@ public abstract class AbstractLink implements Comparable {
         this.aux_lanes = 0;
     }
 
-    public AbstractLink(Long id, Type type, Long start_node_id, Long end_node_id, Integer full_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
+    public AbstractLink(Long id, String name, Long start_node_id, Long end_node_id, Integer full_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
         this.id = id;
-        this.type = type;
+        this.name = name;
         this.start_node_id = start_node_id;
         this.end_node_id = end_node_id;
         this.full_lanes = full_lanes;
@@ -73,10 +73,10 @@ public abstract class AbstractLink implements Comparable {
         AbstractLink new_link = null;
         try {
             new_link = this.getClass()
-                    .getConstructor(Long.class,Type.class,Long.class,Long.class,Integer.class,Integer.class,Integer.class,Float.class,Float.class,Float.class,Float.class,Segment.class)
+                    .getConstructor(Long.class,String.class,Long.class,Long.class,Integer.class,Integer.class,Integer.class,Float.class,Float.class,Float.class,Float.class,Segment.class)
                     .newInstance(
                             id,
-                            type,
+                            name,
                             start_node_id,
                             end_node_id,
                             full_lanes,
@@ -128,20 +128,12 @@ public abstract class AbstractLink implements Comparable {
         length_meters = newlength;
     }
 
-    public final AbstractLink.Type get_type(){
-        return this.type;
-    }
-
     public final boolean is_source(){
         return mysegment.fwy_scenario.scenario.nodes.get(start_node_id).in_links.isEmpty();
     }
 
     public final boolean is_sink(){
         return mysegment.fwy_scenario.scenario.nodes.get(end_node_id).out_links.isEmpty();
-    }
-
-    public final boolean is_ramp(){
-        return this.type== Type.onramp || type==Type.offramp;
     }
 
     public final Segment get_segment(){
@@ -248,6 +240,7 @@ public abstract class AbstractLink implements Comparable {
     public String toString() {
         String str = String.format(
                 "\tid\t%d\n" +
+                        "\tname\t%s\n" +
                         "\tstart_node_id\t%d\n" +
                         "\tend_node_id\t%d\n" +
                         "\tfull_lanes\t%d\n" +
@@ -255,7 +248,7 @@ public abstract class AbstractLink implements Comparable {
                         "\tcapacity_vphpl\t%f\n" +
                         "\tjam_density_vpkpl\t%f\n" +
                         "\tff_speed_kph\t%f",
-                id,start_node_id,end_node_id,full_lanes, length_meters,param.capacity_vphpl,param.jam_density_vpkpl,param.ff_speed_kph);
+                id,name,start_node_id,end_node_id,full_lanes, length_meters,param.capacity_vphpl,param.jam_density_vpkpl,param.ff_speed_kph);
         return str;
     }
 
@@ -276,7 +269,6 @@ public abstract class AbstractLink implements Comparable {
                 managed_lanes == that.managed_lanes &&
                 aux_lanes == that.aux_lanes &&
                 Float.compare(that.length_meters, length_meters) == 0 &&
-                type == that.type &&
                 Objects.equals(name, that.name) &&
                 param.equals(that.param) &&
                 demands.equals(that.demands) &&
@@ -285,14 +277,14 @@ public abstract class AbstractLink implements Comparable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, start_node_id, end_node_id, id, name, full_lanes, managed_lanes, aux_lanes, length_meters, param, demands, splits);
+        return Objects.hash(start_node_id, end_node_id, id, name, full_lanes, managed_lanes, aux_lanes, length_meters, param, demands, splits);
     }
 
     /////////////////////////////////////
     // protected and private
     /////////////////////////////////////
 
-    protected LinkFreewayOrConnector create_up_FwyOrConnLink(Type linktype){
+    protected LinkFreewayOrConnector create_up_FwyOrConnLink(Type linktype,String linkname){
 
         FreewayScenario fwy_scenario = mysegment.fwy_scenario;
 
@@ -307,6 +299,7 @@ public abstract class AbstractLink implements Comparable {
             case freeway:
                 new_link = new LinkFreeway(
                         fwy_scenario.new_link_id(),
+                        linkname,
                         new_node.id,
                         existing_node.id,
                         full_lanes,
@@ -321,10 +314,12 @@ public abstract class AbstractLink implements Comparable {
             case connector:
                 new_link = new LinkConnector(
                         fwy_scenario.new_link_id(),
+                        linkname,
                         new_node.id,
                         existing_node.id,
                         full_lanes,
                         managed_lanes,
+                        0,
                         length_meters,
                         get_capacity_vphpl(),
                         get_jam_density_vpkpl(),
@@ -343,11 +338,10 @@ public abstract class AbstractLink implements Comparable {
         new_node.out_links.add(new_link.id);
         existing_node.in_links.add(new_link.id);
 
-
         return new_link;
     }
 
-    protected LinkFreewayOrConnector create_dn_FwyOrConnLink(Type linktype){
+    protected LinkFreewayOrConnector create_dn_FwyOrConnLink(Type linktype, String linkname){
 
         FreewayScenario fwy_scenario = mysegment.fwy_scenario;
 
@@ -362,6 +356,7 @@ public abstract class AbstractLink implements Comparable {
             case freeway:
                 new_link = new LinkFreeway(
                         fwy_scenario.new_link_id(),
+                        linkname,
                         existing_node.id,
                         new_node.id,
                         full_lanes,
@@ -376,10 +371,12 @@ public abstract class AbstractLink implements Comparable {
             case connector:
                 new_link = new LinkConnector(
                         fwy_scenario.new_link_id(),
+                        linkname,
                         existing_node.id,
                         new_node.id,
                         full_lanes,
                         managed_lanes,
+                        0,
                         length_meters,
                         get_capacity_vphpl(),
                         get_jam_density_vpkpl(),
@@ -401,7 +398,7 @@ public abstract class AbstractLink implements Comparable {
         return new_link;
     }
 
-    protected Segment create_segment(LinkFreewayOrConnector fwy){
+    protected Segment create_segment(LinkFreewayOrConnector fwy,String seg_name){
 
         FreewayScenario fwy_scenario = mysegment.fwy_scenario;
 
@@ -409,7 +406,7 @@ public abstract class AbstractLink implements Comparable {
         Segment newseg = new Segment();
         newseg.fwy_scenario = fwy_scenario;
         newseg.id = fwy_scenario.new_seg_id();
-        newseg.name = String.format("Segment %d",newseg.id);
+        newseg.name = seg_name;
         newseg.fwy = fwy;
         fwy.mysegment = newseg;
         fwy_scenario.segments.put(newseg.id,newseg);

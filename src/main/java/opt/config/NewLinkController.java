@@ -210,14 +210,14 @@ public class NewLinkController {
         length = Math.max(length, 0.001);
         
         Segment new_segment;
+        String segment_name = link_name;
         if (downstreamLink != null) {
-            new_segment = downstreamLink.insert_up_segment();
+            new_segment = downstreamLink.insert_up_segment(segment_name,link_name);
         } else {
-            new_segment = upstreamLink.insert_dn_segment();
+            new_segment = upstreamLink.insert_dn_segment(segment_name,link_name);
         }
         AbstractLink new_link = new_segment.fwy;
-        new_link.name = link_name;
-        new_segment.name = link_name;
+
         
         try {
             new_link.set_length_meters((float)length);

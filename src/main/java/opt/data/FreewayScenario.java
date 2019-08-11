@@ -25,13 +25,13 @@ public class FreewayScenario {
     public FreewayScenario() {
     }
 
-    public FreewayScenario(String name,LinkParameters params){
-        this.name = name;
+    public FreewayScenario(String scnname,String segmentname,String linkname,LinkParameters params){
+        this.name = scnname;
         max_link_id = -1l;
         max_node_id = -1l;
         max_seg_id = -1l;
         scenario = new Scenario();
-        create_isolated_segment("Unnamed segment",params, AbstractLink.Type.freeway);
+        create_isolated_segment(segmentname,linkname,params, AbstractLink.Type.freeway);
     }
 
     public FreewayScenario(String name,jaxbopt.Lnks jaxb_lnks,jaxbopt.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
@@ -70,7 +70,7 @@ public class FreewayScenario {
 
             Set<AbstractLink> up_links_f = null;
             Set<AbstractLink> dn_links_f = null;
-            switch(abslink.type){
+            switch(abslink.get_type()){
 
                 case freeway:
 
@@ -300,7 +300,7 @@ public class FreewayScenario {
      * Create an isolated segment
      * @return A new segment
      */
-    public Segment create_isolated_segment(String segment_name,LinkParameters params,AbstractLink.Type linktype){
+    public Segment create_isolated_segment(String segment_name,String linkname,LinkParameters params,AbstractLink.Type linktype){
 
         // create a segment
         Long segment_id = ++max_seg_id;
@@ -320,6 +320,7 @@ public class FreewayScenario {
 
                 link = new LinkFreeway(
                         ++max_link_id,
+                        linkname,
                         start_node.id,end_node.id,
                         1,
                         0,
@@ -331,8 +332,10 @@ public class FreewayScenario {
             case connector:
                 link = new LinkConnector(
                         ++max_link_id,
+                        linkname,
                         start_node.id,end_node.id,
                         1,
+                        0,
                         0,
                         500f,
                         params.capacity_vphpl,params.jam_density_vpkpl,params.ff_speed_kph,

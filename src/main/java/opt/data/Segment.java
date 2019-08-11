@@ -149,38 +149,38 @@ public final class Segment implements Comparable {
     // insert / delete segments
     ////////////////////////////////////////
 
-    public Segment insert_up_segment(){
-        return fwy.insert_up_segment();
+    public Segment insert_up_segment(String seg_name,String link_name){
+        return fwy.insert_up_segment(seg_name,link_name);
     }
 
-    public Segment insert_dn_segment(){
-        return fwy.insert_dn_segment();
+    public Segment insert_dn_segment(String seg_name,String link_name){
+        return fwy.insert_dn_segment(seg_name,link_name);
     }
 
     ////////////////////////////////////////
     // add / delete ramps
     ////////////////////////////////////////
 
-    public LinkOnramp add_in_or(LinkParameters params,int gp_lanes,int managed_lanes,float length){
-        LinkOnramp link = create_onramp(params,gp_lanes,managed_lanes,length);
+    public LinkOnramp add_in_or(String or_name,LinkParameters params,int gp_lanes,int managed_lanes,float length){
+        LinkOnramp link = create_onramp(or_name,params,gp_lanes,managed_lanes,length);
         in_ors.add(link);
         return link;
     }
 
-    public LinkOnramp add_out_or(LinkParameters params,int gp_lanes,int managed_lanes,float length){
-        LinkOnramp link = create_onramp(params,gp_lanes,managed_lanes,length);
+    public LinkOnramp add_out_or(String or_name,LinkParameters params,int gp_lanes,int managed_lanes,float length){
+        LinkOnramp link = create_onramp(or_name,params,gp_lanes,managed_lanes,length);
         out_ors.add(link);
         return link;
     }
 
-    public LinkOfframp add_in_fr(LinkParameters params,int gp_lanes,int managed_lanes,float length){
-        LinkOfframp link = create_offramp(params,gp_lanes,managed_lanes,length);
+    public LinkOfframp add_in_fr(String fr_name,LinkParameters params,int gp_lanes,int managed_lanes,float length){
+        LinkOfframp link = create_offramp(fr_name,params,gp_lanes,managed_lanes,length);
         in_frs.add(link);
         return link;
     }
 
-    public LinkOfframp add_out_fr(LinkParameters params,int gp_lanes,int managed_lanes,float length){
-        LinkOfframp link = create_offramp(params,gp_lanes,managed_lanes,length);
+    public LinkOfframp add_out_fr(String fr_name,LinkParameters params,int gp_lanes,int managed_lanes,float length){
+        LinkOfframp link = create_offramp(fr_name,params,gp_lanes,managed_lanes,length);
         out_frs.add(link);
         return link;
     }
@@ -267,17 +267,19 @@ public final class Segment implements Comparable {
     // protected and private
     /////////////////////////////////////
 
-    private LinkOnramp create_onramp(LinkParameters params,int gp_lanes,int managed_lanes, float length){
+    private LinkOnramp create_onramp(String linkname,LinkParameters params,int gp_lanes,int managed_lanes, float length){
 
         Long link_id = fwy_scenario.new_link_id();
         Node start_node = new Node(fwy_scenario.new_node_id());
         long end_node_id = this.fwy.start_node_id;
 
         LinkOnramp link = new LinkOnramp(link_id,
+                linkname,
                 start_node.id,
                 end_node_id,
                 gp_lanes,
                 managed_lanes,
+                0,
                 length,
                 params.capacity_vphpl,
                 params.jam_density_vpkpl,
@@ -292,17 +294,19 @@ public final class Segment implements Comparable {
         return link;
     }
 
-    private LinkOfframp create_offramp(LinkParameters params,int gp_lanes,int managed_lanes, float length){
+    private LinkOfframp create_offramp(String linkname,LinkParameters params,int gp_lanes,int managed_lanes, float length){
 
         Long link_id = fwy_scenario.new_link_id();
         Node end_node = new Node(fwy_scenario.new_node_id());
         long start_node_id = this.fwy.end_node_id;
 
         LinkOfframp link = new LinkOfframp(link_id,
+                linkname,
                 start_node_id,
                 end_node.id,
                 gp_lanes,
                 managed_lanes,
+                0,
                 length,
                 params.capacity_vphpl,
                 params.jam_density_vpkpl,
