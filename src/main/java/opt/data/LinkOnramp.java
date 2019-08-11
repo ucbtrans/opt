@@ -58,6 +58,11 @@ public class LinkOnramp extends AbstractLink {
     @Override
     public Segment insert_up_segment(String seg_name,String link_name) {
 
+        if(up_link!=null)
+            return null;
+
+        Segment up_segment = get_up_segment();
+
         // create new upstream link
         LinkConnector new_link = (LinkConnector) create_up_FwyOrConnLink(Type.connector,link_name);
 
@@ -65,7 +70,6 @@ public class LinkOnramp extends AbstractLink {
         Segment new_segment = create_segment(new_link,seg_name);
 
         // connect upstream segment to new node
-        Segment up_segment = get_up_segment();
         if(up_segment!=null) {
             connect_segments_dwnstr_node_to(up_segment, new_link.start_node_id);
             new_link.up_link = up_segment.fwy;

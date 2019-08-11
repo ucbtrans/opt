@@ -62,6 +62,11 @@ public class LinkOfframp extends AbstractLink {
     @Override
     public Segment insert_dn_segment(String seg_name,String link_name) {
 
+        if(dn_link!=null)
+            return null;
+
+        Segment dn_segment = get_dn_segment();
+
         // create new dnstream link
         LinkConnector new_link = (LinkConnector) create_dn_FwyOrConnLink(Type.connector,link_name);
 
@@ -69,7 +74,6 @@ public class LinkOfframp extends AbstractLink {
         Segment new_segment = create_segment(new_link,seg_name);
 
         // connect dnstream segment to new node
-        Segment dn_segment = get_dn_segment();
         if(dn_segment!=null) {
             connect_segments_upstr_node_to(dn_segment, new_link.end_node_id);
             new_link.dn_link = dn_segment.fwy;

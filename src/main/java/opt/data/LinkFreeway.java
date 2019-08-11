@@ -28,7 +28,6 @@ public class LinkFreeway extends LinkFreewayOrConnector {
         return false;
     }
 
-
     /////////////////////////////////////
     // demands and splits
     /////////////////////////////////////
@@ -45,6 +44,8 @@ public class LinkFreeway extends LinkFreewayOrConnector {
     @Override
     public Segment insert_up_segment(String seg_name,String link_name) {
 
+        Segment up_segment = get_up_segment();
+
         // create new upstream link
         LinkFreeway new_link = (LinkFreeway) create_up_FwyOrConnLink(Type.freeway,link_name);
 
@@ -52,7 +53,6 @@ public class LinkFreeway extends LinkFreewayOrConnector {
         Segment new_segment = create_segment(new_link,seg_name);
 
         // connect upstream segment to new node
-        Segment up_segment = get_up_segment();
         if(up_segment!=null) {
             connect_segments_dwnstr_node_to(up_segment, new_link.start_node_id);
             new_link.up_link = up_segment.fwy;
@@ -65,6 +65,8 @@ public class LinkFreeway extends LinkFreewayOrConnector {
     @Override
     public Segment insert_dn_segment(String seg_name,String link_name) {
 
+        Segment dn_segment = get_dn_segment();
+
         // create new dnstream link
         LinkFreeway new_link = (LinkFreeway) create_dn_FwyOrConnLink(Type.freeway,link_name);
 
@@ -72,7 +74,6 @@ public class LinkFreeway extends LinkFreewayOrConnector {
         Segment new_segment = create_segment(new_link,seg_name);
 
         // connect dnstream segment to new node
-        Segment dn_segment = get_dn_segment();
         if(dn_segment!=null) {
             connect_segments_upstr_node_to(dn_segment, new_link.end_node_id);
             new_link.dn_link = dn_segment.fwy;

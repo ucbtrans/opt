@@ -1,11 +1,10 @@
 package opt.tests;
 
-import opt.data.Segment;
+import opt.data.*;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class TestLink extends AbstractTest {
 
@@ -25,24 +24,108 @@ public class TestLink extends AbstractTest {
 
     }
 
-    @Ignore
     @Test
     public void test_insert_up_segment(){
         TestData X = new TestData();
-
+        Segment sA1 = X.scenario.get_segment_by_name("sA1");
+        Segment sA2 = X.scenario.get_segment_by_name("sA2");
         Segment sA3 = X.scenario.get_segment_by_name("sA3");
+        Segment sA7 = X.scenario.get_segment_by_name("sA7");
+        Segment sA8 = X.scenario.get_segment_by_name("sA8");
+        LinkFreeway l1 = (LinkFreeway) sA1.fwy;
+        LinkFreeway l3 = (LinkFreeway) sA3.fwy;
+        LinkOnramp l8 = sA3.out_ors(0);
+        LinkOfframp l9 = sA3.out_frs(0);
+        LinkConnector l12 = (LinkConnector) sA7.fwy;
+        LinkOnramp l13 = sA8.out_ors(0);
 
-        Segment sA3up = sA3.insert_up_segment("sA3up","new link");
+        // case : fwy link has an upstream segment
+        Segment sNEW1 = l3.insert_up_segment("sNEW1","lNEW1");
+        assertEquals(2l,sNEW1.fwy.get_up_link().id);
+        assertEquals(3l,sNEW1.fwy.get_dn_link().id);
+        assertEquals("lNEW1",sA3.fwy.get_up_link().name);
+        assertEquals("lNEW1",sA2.fwy.get_dn_link().name);
 
-        System.out.println(sA3up);
+        // case : connector link has an upstream segment
+        Segment sNEW2 = l12.insert_up_segment("sNEW2","lNEW2");
+        assertNull(sNEW2);
 
+        // case : onramp link has an upstream segment
+        Segment sNEW3 = l13.insert_up_segment("sNEW3","lNEW3");
+        assertNull(sNEW3);
+
+        // case : offramp link
+        Segment sNEW4 = l9.insert_up_segment("sNEW4","lNEW4");
+        assertNull(sNEW4);
+
+        // case : fwy link has no upstream segment
+        Segment sNEW5 = l1.insert_up_segment("sNEW5","lNEW5");
+        assertNull(sNEW5.fwy.get_up_link());
+        assertEquals(1l,sNEW5.fwy.get_dn_link().id);
+        assertEquals("lNEW5",sA1.fwy.get_up_link().name);
+
+        // case : connector link has no upstream segment
+        // TODO
+
+        // case : onramp link has no upstream segment
+        Segment sNEW7 = l8.insert_up_segment("sNEW7","lNEW7");
+        assertEquals(AbstractLink.Type.connector,sNEW7.fwy.get_type());
+        assertEquals(8l,sNEW7.fwy.get_dn_link().id);
+        assertEquals("lNEW7",l8.get_up_link().name);
 
     }
 
-    @Ignore
     @Test
     public void test_insert_dn_segment(){
 
+        TestData X = new TestData();
+
+        Segment sA1 = X.scenario.get_segment_by_name("sA1");
+        Segment sA3 = X.scenario.get_segment_by_name("sA3");
+        Segment sA4 = X.scenario.get_segment_by_name("sA4");
+        Segment sA7 = X.scenario.get_segment_by_name("sA7");
+        Segment sA9 = X.scenario.get_segment_by_name("sA9");
+
+        LinkFreeway l3 = (LinkFreeway) sA3.fwy;
+        LinkOfframp l7 = sA1.out_frs(0);
+        LinkOnramp l8 = sA3.out_ors(0);
+        LinkOfframp l9 = sA3.out_frs(0);
+        LinkConnector l12 = (LinkConnector) sA7.fwy;
+        LinkFreeway l16 = (LinkFreeway) sA9.fwy;
+
+        // case : fwy link has a downstream segment
+        Segment sNEW1 = l3.insert_dn_segment("sNEW1","lNEW1");
+        assertEquals(3l,sNEW1.fwy.get_up_link().id);
+        assertEquals(4l,sNEW1.fwy.get_dn_link().id);
+        assertEquals("lNEW1",sA3.fwy.get_dn_link().name);
+        assertEquals("lNEW1",sA4.fwy.get_up_link().name);
+
+        // case : connector link has a dnstream segment
+        Segment sNEW2 = l12.insert_dn_segment("sNEW2","lNEW2");
+        assertNull(sNEW2);
+
+        // case : onramp link
+        Segment sNEW3 = l8.insert_dn_segment("sNEW3","lNEW3");
+        assertNull(sNEW3);
+
+        // case : offramp link has a downstream segment
+        Segment sNEW4 = l7.insert_dn_segment("sNEW4","lNEW4");
+        assertNull(sNEW4);
+
+        // case : fwy link has no dnstream segment
+        Segment sNEW5 = l16.insert_dn_segment("sNEW5","lNEW5");
+        assertNull(sNEW5.fwy.get_dn_link());
+        assertEquals(16l,sNEW5.fwy.get_up_link().id);
+        assertEquals("lNEW5",sA9.fwy.get_dn_link().name);
+
+        // case : connector link has no upstream segment
+        // TODO
+
+        // case : offramp link has no downstream segment
+        Segment sNEW7 = l9.insert_dn_segment("sNEW7","lNEW7");
+        assertEquals(AbstractLink.Type.connector,sNEW7.fwy.get_type());
+        assertEquals(9l,sNEW7.fwy.get_up_link().id);
+        assertEquals("lNEW7",l9.get_dn_link().name);
     }
 
     /////////////////////////////////////
