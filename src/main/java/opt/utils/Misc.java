@@ -6,6 +6,7 @@
 package opt.utils;
 
 import opt.data.AbstractLink.Type;
+import opt.data.FreewayScenario;
 
 /**
  *
@@ -26,5 +27,32 @@ public class Misc {
         
         return "Unknown";
     }
+    
+    
+    
+    public static String validateAndCorrectLinkName(String link_name, FreewayScenario scenario) {
+        String corrected_name = link_name;
+        if ((!scenario.is_valid_link_name(link_name)) ||
+            (!scenario.is_valid_segment_name(link_name))) {
+            int count = 1;
+            corrected_name = link_name + "(" + count + ")";
+            while ((!scenario.is_valid_link_name(corrected_name)) ||
+                   (!scenario.is_valid_segment_name(corrected_name))) {
+                count++;
+                corrected_name = link_name + "(" + count + ")";
+            }
+        }
+        return corrected_name;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
 }

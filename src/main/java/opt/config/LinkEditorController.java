@@ -54,6 +54,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.data.AbstractLink;
+import opt.data.LinkOfframp;
+import opt.data.LinkOnramp;
 import opt.utils.Misc;
 
 
@@ -279,6 +281,14 @@ public class LinkEditorController {
     
 
     @FXML
+    void onAddOnRamp(ActionEvent event) {
+        
+        
+    }
+    
+    
+    
+    @FXML
     void onAddOffRamp(ActionEvent event) {
         
         
@@ -287,23 +297,51 @@ public class LinkEditorController {
     
     
     @FXML
-    void onAddOnRamp(ActionEvent event) {
+    void onDeleteOnRamp(ActionEvent event) {
+        if (ignoreChange)
+            return;
         
+        int idx = listOnramps.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= onramps.size()))
+                return;
         
+        String header = "You are deleting on-ramp '" + onramps.get(idx).name + "'...";
+                
+        if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
+            return;
+     
+        if (idx < myLink.get_segment().num_out_ors())
+            myLink.get_segment().delete_out_or((LinkOnramp)onramps.get(idx));
+        else
+            myLink.get_segment().delete_in_or((LinkOnramp)onramps.get(idx));
+        
+        appMainController.linkNameUpdate(myLink);
     }
+    
     
     
     @FXML
     void onDeleteOffRamp(ActionEvent event) {
+        if (ignoreChange)
+            return;
         
+        int idx = listOfframps.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= offramps.size()))
+                return;
+            
+        String header = "You are deleting off-ramp '" + offramps.get(idx).name + "'...";
+                
+        if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
+            return;
+        
+        if (idx < myLink.get_segment().num_out_frs())
+            myLink.get_segment().delete_out_fr((LinkOfframp)offramps.get(idx));
+        else
+            myLink.get_segment().delete_in_fr((LinkOfframp)offramps.get(idx));
+        
+        appMainController.linkNameUpdate(myLink);
     }
 
-    
-    
-    @FXML
-    void onDeleteOnRamp(ActionEvent event) {
-        
-    }
     
     
     
@@ -419,6 +457,7 @@ public class LinkEditorController {
             return;
         
         String link_name = linkFromName.getText() + " -> " + linkToName.getText();
+        link_name = opt.utils.Misc.validateAndCorrectLinkName(link_name, myLink.get_segment().get_scenario());
         
         myLink.name = link_name;
         if ((myLink.get_type() == AbstractLink.Type.freeway) || (myLink.get_type() == AbstractLink.Type.connector))

@@ -192,17 +192,7 @@ public class NewLinkController {
         } else {
             link_name = linkFromName.getText() + " -> " + linkToName.getText();
         }
-        if ((!myLink.get_segment().get_scenario().is_valid_link_name(link_name)) ||
-            (!myLink.get_segment().get_scenario().is_valid_segment_name(link_name))) {
-            int count = 1;
-            String corrected_name = link_name + "(" + count + ")";
-            while ((!myLink.get_segment().get_scenario().is_valid_link_name(corrected_name)) ||
-                   (!myLink.get_segment().get_scenario().is_valid_segment_name(corrected_name))) {
-                count++;
-                corrected_name = link_name + "(" + count + ")";
-            }
-            link_name = corrected_name;
-        }
+        link_name = opt.utils.Misc.validateAndCorrectLinkName(link_name, myLink.get_segment().get_scenario());
         
         // Link length
         String unitsLength = appMainController.getUserSettings().getUnitsLength();
