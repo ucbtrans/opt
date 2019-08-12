@@ -268,11 +268,11 @@
                                                       <Font size="14.0" />
                                                    </font>
                                                 </Label>
+                                                <ListView id="listOnramps" fx:id="listOnramps" onKeyPressed="#onrampsKeyPressed" onMouseClicked="#onrampsOnClick" prefHeight="136.0" prefWidth="123.0" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
                                                 <Button id="addOnRamp" fx:id="addOnRamp" alignment="CENTER_RIGHT" defaultButton="true" mnemonicParsing="false" onAction="#onAddOnRamp" text="Add On-Ramp" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                                                <Button id="addOffRamp" fx:id="addOffRamp" alignment="CENTER_RIGHT" defaultButton="true" mnemonicParsing="false" onAction="#onAddOffRamp" text="Add Off-Ramp" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                                                <ListView prefHeight="136.0" prefWidth="123.0" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
-                                                <ListView prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
                                                 <Button id="deleteOnRamps" fx:id="deleteOnRamps" alignment="CENTER_RIGHT" cancelButton="true" mnemonicParsing="false" onAction="#onDeleteOnRamp" text="Delete On-Ramp" GridPane.rowIndex="5" />
+                                                <ListView id="listOfframps" fx:id="listOfframps" onKeyPressed="#offrampsKeyPressed" onMouseClicked="#offrampsOnClick" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
+                                                <Button id="addOffRamp" fx:id="addOffRamp" alignment="CENTER_RIGHT" defaultButton="true" mnemonicParsing="false" onAction="#onAddOffRamp" text="Add Off-Ramp" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
                                                 <Button id="deleteOffRamps" fx:id="deleteOffRamps" cancelButton="true" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onDeleteOffRamp" text="Delete Off-Ramp" GridPane.columnIndex="2" GridPane.rowIndex="5" />
                                              </children>
                                              <padding>
@@ -282,7 +282,7 @@
                                        </children></AnchorPane>
                               </content>
                             </TitledPane>
-                              <TitledPane id="trafficDemand" fx:id="trafficDemand1" animated="false" disable="true" expanded="false" layoutX="10.0" layoutY="35.0" prefHeight="198.0" prefWidth="514.0" text="Traffic Demand">
+                              <TitledPane id="trafficDemand" fx:id="trafficDemand1" animated="false" disable="true" expanded="false" layoutX="10.0" layoutY="35.0" prefHeight="476.0" prefWidth="898.0" text="Traffic Demand">
                                  <content>
                                     <AnchorPane prefHeight="300.0" prefWidth="512.0">
                                        <children>

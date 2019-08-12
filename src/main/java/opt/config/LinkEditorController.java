@@ -25,19 +25,18 @@
  **/
 package opt.config;
 
-import java.io.IOException;
-import javafx.collections.FXCollections;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SplitPane;
@@ -45,8 +44,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
@@ -57,7 +58,10 @@ import opt.utils.Misc;
 
 
 /**
- *
+ * Link Editor UI control.
+ * Link Editor is located in Configuration tab of the Action Pane when a link
+ * is selected in the navigation tree.
+ * 
  * @author Alex Kurzhanskiy
  */
 public class LinkEditorController {
@@ -66,7 +70,11 @@ public class LinkEditorController {
     private NewLinkController newLinkController = null;
     private Scene newLinkScene = null;
     private AbstractLink myLink = null;
-    private boolean ignoreChange  = true;
+    private boolean ignoreChange = true;
+    //TitledPane focusTitledPane = null;
+    
+    private List<AbstractLink> onramps = new ArrayList<AbstractLink>();
+    private List<AbstractLink> offramps = new ArrayList<AbstractLink>();
     
     private SpinnerValueFactory<Double> lengthSpinnerValueFactory = null;
     
@@ -212,6 +220,12 @@ public class LinkEditorController {
 
     @FXML // fx:id="rampsPane"
     private TitledPane rampsPane; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="listOnramps"
+    private ListView<String> listOnramps; // Value injected by FXMLLoader
+
+    @FXML // fx:id="listOfframps"
+    private ListView<String> listOfframps; // Value injected by FXMLLoader
 
     @FXML // fx:id="addOnRamp"
     private Button addOnRamp; // Value injected by FXMLLoader
@@ -266,14 +280,82 @@ public class LinkEditorController {
 
     @FXML
     void onAddOffRamp(ActionEvent event) {
-
+        
+        
     }
 
+    
+    
     @FXML
     void onAddOnRamp(ActionEvent event) {
-
+        
+        
+    }
+    
+    
+    @FXML
+    void onDeleteOffRamp(ActionEvent event) {
+        
     }
 
+    
+    
+    @FXML
+    void onDeleteOnRamp(ActionEvent event) {
+        
+    }
+    
+    
+    
+    @FXML
+    void onrampsOnClick(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            int idx = listOnramps.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= onramps.size()))
+                return;
+            appMainController.selectLink(onramps.get(idx));
+        }
+    }
+    
+    
+    
+    @FXML
+    void offrampsOnClick(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            int idx = listOfframps.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= offramps.size()))
+                return;
+            appMainController.selectLink(offramps.get(idx));
+        }
+    }
+
+    
+    @FXML
+    void onrampsKeyPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            int idx = listOnramps.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= onramps.size()))
+                return;
+            appMainController.selectLink(onramps.get(idx));
+        }
+    }
+
+    
+    
+    @FXML
+    void offrampsKeyPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            int idx = listOfframps.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= offramps.size()))
+                return;
+            appMainController.selectLink(offramps.get(idx));
+        }
+    }
+
+    
+    
+    
+    
     @FXML
     void onAddSectionDownstreamAction(ActionEvent event) {
         Stage inputStage = new Stage();
@@ -312,15 +394,7 @@ public class LinkEditorController {
         opt.utils.Dialogs.ErrorDialog("Connection function is not yet implemented...", "Please, be patient!");
     }
 
-    @FXML
-    void onDeleteOffRamp(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onDeleteOnRamp(ActionEvent event) {
-
-    }
+    
 
     @FXML
     void onDeleteSection(ActionEvent event) {
@@ -334,14 +408,7 @@ public class LinkEditorController {
         if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
             return;
         
-        Object objectToOpen = myLink.get_dn_link();
-        if (objectToOpen == null) {
-            objectToOpen = myLink.get_up_link(); // still can be null if myLink is orphan
-            if (objectToOpen == null)
-                objectToOpen = myLink.get_segment().get_scenario();
-        }
-        
-        appMainController.deleteLink(myLink, objectToOpen);
+        appMainController.deleteLink(myLink);
     }
     
     
@@ -457,6 +524,7 @@ public class LinkEditorController {
         });
         
 
+       
         
         
         linkEditorCanvas.widthProperty().bind(canvasParent.widthProperty());
@@ -495,7 +563,8 @@ public class LinkEditorController {
         
         ignoreChange = true;
         
-        laneProperties.setExpanded(true);
+        if (lnk.get_type() != AbstractLink.Type.freeway)
+            laneProperties.setExpanded(true);
                 
         myLink = lnk;
         String link_name = myLink.name;
@@ -612,6 +681,37 @@ public class LinkEditorController {
         }
         
         
+        // Populate onramp list
+        listOnramps.getItems().clear();
+        onramps.clear();
+        int num_ramps = myLink.get_segment().num_out_ors();
+        for (int i = 0; i < num_ramps; i++) {
+            AbstractLink or = myLink.get_segment().out_ors(i);
+            listOnramps.getItems().add(or.name + " (outer)");
+            onramps.add(or);
+        }
+        num_ramps = myLink.get_segment().num_in_ors();
+        for (int i = 0; i < num_ramps; i++) {
+            AbstractLink or = myLink.get_segment().in_ors(i);
+            listOnramps.getItems().add(or.name + " (inner)");
+            onramps.add(or);
+        }
+               
+        // Populate offramp list
+        listOfframps.getItems().clear();
+        offramps.clear();
+        num_ramps = myLink.get_segment().num_out_frs();
+        for (int i = 0; i < num_ramps; i++) {
+            AbstractLink fr = myLink.get_segment().out_frs(i);
+            listOfframps.getItems().add(fr.name + " (outer)");
+            offramps.add(fr);
+        }
+        num_ramps = myLink.get_segment().num_in_frs();
+        for (int i = 0; i < num_ramps; i++) {
+            AbstractLink fr = myLink.get_segment().in_frs(i);
+            listOfframps.getItems().add(fr.name + " (inner)");
+            offramps.add(fr);
+        }
         
         
         
@@ -661,7 +761,8 @@ public class LinkEditorController {
         try {
             myLink.set_managed_lanes(managed_lanes);
             myLink.set_gp_lanes(gp_lanes);
-            myLink.set_aux_lanes(aux_lanes);
+            if (myLink.get_type() == AbstractLink.Type.freeway)
+                myLink.set_aux_lanes(aux_lanes);
         } catch(Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not change number of lanes...", e);
         }

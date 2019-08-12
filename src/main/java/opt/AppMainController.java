@@ -36,6 +36,7 @@ import java.util.prefs.Preferences;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.control.MenuItem;
@@ -463,17 +464,30 @@ public class AppMainController {
     
     
     
-    public void deleteLink(AbstractLink lnk, Object toDisplay) {
+    public void deleteLink(AbstractLink lnk) {
         if (lnk == null) 
             return;
         
         FreewayScenario scenario = lnk.get_segment().get_scenario();
+        AbstractLink up_link = lnk.get_up_link();
+        AbstractLink dn_link = lnk.get_dn_link();
         try {
             scenario.delete_segment(lnk.get_segment());
         } catch (Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not delete road section...", e);
             return;
         }
+        
+        if ((up_link != null) && (dn_link != null) &&
+            (dn_link.get_type() == AbstractLink.Type.freeway)) {
+            dn_link.connect_to_upstream(up_link);
+        }
+        
+        Object toDisplay = scenario;
+        if (dn_link != null)
+            toDisplay = dn_link;
+        else if (up_link != null)
+            toDisplay = up_link;
         
         if (projectTree.getRoot() != null)
             projectTree.getRoot().getChildren().clear();
