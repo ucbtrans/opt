@@ -201,8 +201,8 @@ public class FreewayScenario {
                 .collect(Collectors.toList());
     }
 
-    public Collection<Node> get_nodes(){
-        return scenario.nodes.values();
+    public Map<Long,Node> get_nodes(){
+        return scenario.nodes;
     }
 
     /////////////////////////////////////

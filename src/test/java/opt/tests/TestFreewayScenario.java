@@ -101,9 +101,7 @@ public class TestFreewayScenario extends AbstractTest {
                     .map(link->link.name)
                     .collect(Collectors.toSet());
 
-            Set<Long> node_ids = X.scenario.get_nodes().stream()
-                    .map(node->node.get_id())
-                    .collect(Collectors.toSet());
+            Set<Long> node_ids = X.scenario.get_nodes().keySet();
 
             assertTrue(link_names.contains("lA3"));
             assertTrue(link_names.contains("lA8"));
@@ -121,9 +119,7 @@ public class TestFreewayScenario extends AbstractTest {
                     .map(link->link.name)
                     .collect(Collectors.toSet());
 
-            node_ids = X.scenario.get_nodes().stream()
-                    .map(node->node.get_id())
-                    .collect(Collectors.toSet());
+            node_ids = X.scenario.get_nodes().keySet();
 
             assertFalse(link_names.contains("lA3"));
             assertFalse(link_names.contains("lA8"));

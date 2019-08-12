@@ -246,16 +246,24 @@ public abstract class AbstractLink implements Comparable {
         if(!is_permitted_uplink(conn_up_link))
             return false;
 
+        FreewayScenario fwy_scenario = mysegment.fwy_scenario;
+        Node my_start_node = fwy_scenario.scenario.nodes.get(start_node_id);
+        Node their_end_node = fwy_scenario.scenario.nodes.get(conn_up_link.end_node_id);
+
+        // assumptions
+        assert(my_start_node.out_links.size()==1 && my_start_node.out_links.iterator().next()==this.id);
+        assert(their_end_node.in_links.size()==1 && their_end_node.in_links.iterator().next()==conn_up_link.id);
+
+        // connect link references
         up_link = conn_up_link;
         conn_up_link.dn_link = this;
 
-        // delete my start node
-        mysegment.fwy_scenario.scenario.nodes.remove(start_node_id);
+        // remove my start node
+        fwy_scenario.scenario.nodes.remove(my_start_node.id);
 
-        // connect to upstream node
-        Node node = mysegment.fwy_scenario.scenario.nodes.remove(up_link.end_node_id);
-        start_node_id = node.id;
-        node.out_links.add(this.id);
+        // move to new startnode
+        this.start_node_id = their_end_node.id;
+        their_end_node.out_links.add(this.id);
 
         // delete demands
         demands = new HashMap<>();
