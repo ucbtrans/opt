@@ -205,7 +205,7 @@ public final class Segment implements Comparable {
 
     public boolean delete_in_or(LinkOnramp link){
         if( in_ors.contains(link) ){
-            fwy_scenario.delete_link(link);
+            delete_ramp(link);
             in_ors.remove(link);
             return true;
         } else
@@ -214,7 +214,7 @@ public final class Segment implements Comparable {
 
     public boolean delete_out_or(LinkOnramp link){
         if( out_ors.contains(link) ){
-            fwy_scenario.delete_link(link);
+            delete_ramp(link);
             out_ors.remove(link);
             return true;
         } else
@@ -223,7 +223,7 @@ public final class Segment implements Comparable {
 
     public boolean delete_in_fr(LinkOfframp link){
         if( in_frs.contains(link) ){
-            fwy_scenario.delete_link(link);
+            delete_ramp(link);
             in_frs.remove(link);
             return true;
         } else
@@ -232,7 +232,7 @@ public final class Segment implements Comparable {
 
     public boolean delete_out_fr(LinkOfframp link){
         if( out_frs.contains(link) ){
-            fwy_scenario.delete_link(link);
+            delete_ramp(link);
             out_frs.remove(link);
             return true;
         } else
@@ -284,6 +284,32 @@ public final class Segment implements Comparable {
     /////////////////////////////////////
     // protected and private
     /////////////////////////////////////
+
+    private void delete_ramp(AbstractLink link){
+
+        if(!(link instanceof LinkOfframp) && !(link instanceof LinkOnramp))
+            return;
+
+        Scenario scenario = fwy_scenario.scenario;
+
+        // disconnect from start and end nodes
+        Node start_node = scenario.nodes.get(link.start_node_id);
+        start_node.out_links.remove(link.id);
+
+        Node end_node = scenario.nodes.get(link.end_node_id);
+        end_node.in_links.remove(link.id);
+
+        // case onramp with upstream connector
+        if(link.up_link!=null && link.up_link.dn_link==link)
+            link.up_link.dn_link=null;
+
+        // case offramp with dnstream connector
+        if(link.dn_link!=null && link.dn_link.up_link==link)
+            link.dn_link.up_link=null;
+
+        // remove the link from the scenario
+        scenario.links.remove(link.id);
+    }
 
     private LinkOnramp create_onramp(String linkname,LinkParameters params,int gp_lanes,int managed_lanes, float length){
 

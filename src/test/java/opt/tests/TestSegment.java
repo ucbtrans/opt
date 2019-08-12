@@ -1,6 +1,8 @@
 package opt.tests;
 
 import opt.data.AbstractLink;
+import opt.data.LinkConnector;
+import opt.data.LinkOfframp;
 import opt.data.Segment;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -180,14 +182,18 @@ public class TestSegment extends AbstractTest {
     @Ignore
     @Test
     public void test_delete_out_fr(){
-//
-//        TestData X = new TestData();
-//
-//        // try to delete an non-existing offramp
-//        assertFalse(X.scenario.get_segment_by_name("sA2").delete_offramp());
-//
-//        // delete an existing offramp
-//        assertTrue(X.scenario.get_segment_by_name("sA4").delete_offramp());
+
+        TestData X = new TestData();
+        Segment sA1 = X.scenario.get_segment_by_name("sA1");
+        LinkOfframp lA7 = sA1.out_frs(0);
+
+        Segment sA7 = X.scenario.get_segment_by_name("sA7");
+        LinkConnector lA12 = (LinkConnector) sA7.fwy();
+
+        System.out.println(lA12.get_up_link());
+        boolean xxx = sA1.delete_out_fr(lA7);
+        System.out.println(lA12.get_up_link());
+
 
     }
 
