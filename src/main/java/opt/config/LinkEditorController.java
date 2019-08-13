@@ -859,6 +859,7 @@ public class LinkEditorController {
         if (rightSideRoads) { // right-side driving road
             double base_y = 0.75*height;
             double ramp_length = height - base_y;
+            double r_lane_width = lane_width;
             double y1 = base_y;
             double y0 = y1;
             
@@ -873,7 +874,9 @@ public class LinkEditorController {
                     int or_gp = myLink.get_segment().out_ors(i).get_gp_lanes();
                     int or_managed = myLink.get_segment().out_ors(i).get_managed_lanes();
                     double or_lanes = or_gp + or_managed;
-                    double or_width = or_lanes * lane_width;
+                    double or_width = or_lanes * r_lane_width;
+                    if (i > 0)
+                        delta += 0.5*or_width;
                     double rotationCenterX = x0 + delta;
                     double rotationCenterY = base_y;
                     g.save();
@@ -883,13 +886,13 @@ public class LinkEditorController {
                     g.fillRect(x0+delta-ramp_length/2, base_y-or_width/2, ramp_length, or_width);
                     g.setStroke(Color.WHITE);
                     for (int j = 1; j < or_lanes; j++) {
-                        y0 = base_y+or_width/2 - j*lane_width;
-                        g.setLineDashes(lane_width/3, lane_width/2);
+                        y0 = base_y+or_width/2 - j*r_lane_width;
+                        g.setLineDashes(r_lane_width/3, r_lane_width/2);
                         g.setLineWidth(1);
                         g.strokeLine(x0+delta-ramp_length/2, y0, x0+delta+ramp_length/2, y0);
                     }
                     g.restore();
-                    delta += or_width + lane_width;
+                    delta += 0.5*ramp_length + 0.5*or_width + r_lane_width;
                 }
 
 
@@ -904,7 +907,9 @@ public class LinkEditorController {
                     int fr_gp = myLink.get_segment().out_frs(i).get_gp_lanes();
                     int fr_managed = myLink.get_segment().out_frs(i).get_managed_lanes();
                     double fr_lanes = fr_gp + fr_managed;
-                    double fr_width = fr_lanes * lane_width;
+                    double fr_width = fr_lanes * r_lane_width;
+                    if (i > 0)
+                        delta += 0.5*fr_width;
                     double rotationCenterX = x1 - delta;
                     double rotationCenterY = base_y;
                     g.save();
@@ -914,13 +919,13 @@ public class LinkEditorController {
                     g.fillRect(x1-delta-ramp_length/2, base_y-fr_width/2, ramp_length, fr_width);
                     g.setStroke(Color.WHITE);
                     for (int j = 1; j < fr_lanes; j++) {
-                        y0 = base_y+fr_width/2 - j*lane_width;
-                        g.setLineDashes(lane_width/3, lane_width/2);
+                        y0 = base_y+fr_width/2 - j*r_lane_width;
+                        g.setLineDashes(r_lane_width/3, r_lane_width/2);
                         g.setLineWidth(1);
                         g.strokeLine(x1-delta-ramp_length/2, y0, x1-delta+ramp_length/2, y0);
                     }
                     g.restore();
-                    delta += fr_width + lane_width;
+                    delta += 0.5*ramp_length + 0.5*fr_width + r_lane_width;
                 }
 
                
