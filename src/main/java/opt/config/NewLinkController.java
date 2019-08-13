@@ -112,11 +112,13 @@ public class NewLinkController {
         upstreamLink = upLink;
         downstreamLink = downLink;
         
-        String unitsLength = appMainController.getUserSettings().getUnitsLength();
         if (upstreamLink != null)
             myLink = upstreamLink;
         else
             myLink = downstreamLink;
+        
+        if (myLink == null)
+            return;
         
         String link_name = myLink.name;
         String[] name_subs = link_name.split(" -> ");
@@ -134,7 +136,7 @@ public class NewLinkController {
             else
                 linkFromName.setText(from_name);
             linkToName.setText("");
-        } else if (myLink.get_type() == AbstractLink.Type.onramp) {
+        } else if (myLink.get_type() == AbstractLink.Type.offramp) {
             if (to_name.equals(""))
                 linkToName.setText(from_name);
             else
@@ -152,11 +154,9 @@ public class NewLinkController {
         from_name = linkFromName.getText();
         to_name = linkToName.getText();
         
-        
-        
-        
+        String unitsLength = appMainController.getUserSettings().unitsLength;
         double length = myLink.get_length_meters();
-        length = appMainController.getUserSettings().convertFlow(length, "meters", unitsLength);
+        length = appMainController.getUserSettings().convertLength(length, "meters", unitsLength);
         labelLength.setText("Length (" + unitsLength + "):");
         lengthSpinnerValueFactory.setValue(length);
     }
@@ -195,9 +195,9 @@ public class NewLinkController {
         link_name = opt.utils.Misc.validateAndCorrectLinkName(link_name, myLink.get_segment().get_scenario());
         
         // Link length
-        String unitsLength = appMainController.getUserSettings().getUnitsLength();
+        String unitsLength = appMainController.getUserSettings().unitsLength;
         double length = lengthSpinnerValueFactory.getValue();
-        length = appMainController.getUserSettings().convertFlow(length, unitsLength, "meters");
+        length = appMainController.getUserSettings().convertLength(length, unitsLength, "meters");
         length = Math.max(length, 0.001);
         
         Segment new_segment;
@@ -216,10 +216,6 @@ public class NewLinkController {
             opt.utils.Dialogs.ExceptionDialog("Could not set new section length...", e);
         }
         appMainController.linkNameUpdate(new_link);
-        
-        /*System.err.println("Newly created link ID: " + new_link.id +
-                "\t Its up_link ID: " + new_link.get_up_link().id +
-                "\t Its dn_link ID: " + new_link.get_dn_link().id);*/
 
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();

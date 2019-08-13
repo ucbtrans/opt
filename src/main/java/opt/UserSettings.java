@@ -28,6 +28,7 @@ package opt;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import opt.data.LinkParameters;
 
 
 
@@ -38,9 +39,45 @@ import java.util.Map;
  * @author Alex Kurzhanskiy
  */
 public class UserSettings {
-    private boolean rightSideRoads = true;
+    public boolean rightSideRoads = true;
     private String[] unitsLengthOptions = {"meters", "feet", "kilometers", "miles"};
-    private String unitsLength = "miles";
+    public String unitsLength = "miles";
+    
+    
+    
+    public double defaultRampLengthMeters = 322; // meters
+    
+    public int defaultOnrampGPLanes = 1;
+    public int defaultOfframpGPLanes = 1;
+    public int defaultConnectorGPLanes = 2;
+    public int defaultFreewayGPLanes = 3;
+    
+    public int defaultOnrampManagedLanes = 1;
+    public int defaultOfframpManagedLanes = 0;
+    public int defaultConnectorManagedLanes = 1;
+    public int defaultFreewayManagedLanes = 1;
+    
+    public int defaultOnrampAuxLanes = 0;
+    public int defaultOfframpAuxLanes = 0;
+    public int defaultConnectorAuxLanes = 0;
+    public int defaultFreewayAuxLanes = 0;
+    
+    public double defaultGPLaneCapacityVph = 1900;
+    public double defaultManagedLaneCapacityVph = 1800;
+    public double defaultAuxLaneCapacityVph = 950;
+    
+    public double defaultGPLaneFreeFlowSpeedKph = 105;
+    public double defaultManagedLaneFreeFlowSpeedKph = 115;
+    public double defaultAuxLaneFreeFlowSpeedKph = 90;
+    
+    public double defaultGPLaneJamDensityVpk = 110;
+    public double defaultManagedLaneJamDensityVpk = 110;
+    public double defaultAuxLaneJamDensityVpk = 110;
+    
+    
+    
+    
+    
     private Map<String, Double> lengthConversionMap = new HashMap<String, Double>();
     
     
@@ -65,29 +102,19 @@ public class UserSettings {
     }
     
     
-    public boolean rightSideDrivingRoads() {
-        return rightSideRoads;
+    
+    
+    public LinkParameters getDefaultLinkParams() {
+        return new LinkParameters((float)defaultGPLaneCapacityVph, (float)defaultGPLaneJamDensityVpk, (float)defaultGPLaneFreeFlowSpeedKph);
     }
     
-    public String getUnitsLength() {
-        return unitsLength;
-    }
     
-    public void setUnitsLength(String units) {
-        boolean flag = false;
-        for (String s : unitsLengthOptions) {
-            if (s.equals(units)) {
-                flag = true;
-                break;
-            }
-        }
-        
-        if (flag) {
-            unitsLength = units;
-        }
-    }
     
-    public double convertFlow(double value, String fromUnits, String toUnits) {
+    
+    
+    
+    
+    public double convertLength(double value, String fromUnits, String toUnits) {
         Double res = lengthConversionMap.get(fromUnits + toUnits);
         if (res == null)
             res = new Double(1);

@@ -54,6 +54,7 @@ import javafx.stage.FileChooser;
 import opt.config.LinkEditorController;
 import opt.config.LinkInfoController;
 import opt.config.NewLinkController;
+import opt.config.NewRampController;
 import opt.data.AbstractLink;
 import opt.data.FreewayScenario;
 import opt.data.ProjectFactory;
@@ -88,6 +89,8 @@ public class AppMainController {
     private LinkInfoController linkInfoController = null;
     private GridPane newLinkPane = null;
     private NewLinkController newLinkController = null;
+    private GridPane newRampPane = null;
+    private NewRampController newRampController = null;
     
     
     
@@ -321,6 +324,12 @@ public class AppMainController {
             newLinkController = loader.getController();
             newLinkController.setAppMainController(this);
             linkEditorController.setNewLinkControllerAndScene(newLinkController, new Scene(newLinkPane));
+            
+            loader = new FXMLLoader(getClass().getResource("/new_ramp.fxml"));
+            newRampPane = loader.load();
+            newRampController = loader.getController();
+            newRampController.setAppMainController(this);
+            linkEditorController.setNewRampControllerAndScene(newRampController, new Scene(newRampPane));
             
             
         } catch (IOException e) {

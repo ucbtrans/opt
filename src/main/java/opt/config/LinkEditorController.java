@@ -71,6 +71,8 @@ public class LinkEditorController {
     private AppMainController appMainController = null;
     private NewLinkController newLinkController = null;
     private Scene newLinkScene = null;
+    private NewRampController newRampController = null;
+    private Scene newRampScene = null;
     private AbstractLink myLink = null;
     private boolean ignoreChange = true;
     //TitledPane focusTitledPane = null;
@@ -278,20 +280,54 @@ public class LinkEditorController {
         newLinkScene = scn;
     }
     
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the new link controller that is used to set up
+     *               new on- and off-ramps.
+     */
+    public void setNewRampControllerAndScene(NewRampController ctrl, Scene scn) {
+        newRampController = ctrl;
+        newRampScene = scn;
+    }
+    
     
 
     @FXML
     void onAddOnRamp(ActionEvent event) {
-        
-        
+        int num_in_ors = myLink.get_segment().num_in_ors();
+        int num_out_ors = myLink.get_segment().num_out_ors();
+        if ((num_in_ors >= 3) && (num_out_ors >= 3)) {
+            opt.utils.Dialogs.ErrorDialog("Cannot add an on-ramp to this freeway section...",
+                                          "The on-ramp limit is reached!");
+            return;
+        }
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(newRampScene);
+        newRampController.initWithLinkAndType(myLink, AbstractLink.Type.onramp);
+        inputStage.setTitle("Adding New On-Ramp");
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.showAndWait();
     }
-    
-    
     
     @FXML
     void onAddOffRamp(ActionEvent event) {
-        
-        
+        int num_in_frs = myLink.get_segment().num_in_frs();
+        int num_out_frs = myLink.get_segment().num_out_frs();
+        if ((num_in_frs >= 3) && (num_out_frs >= 3)) {
+            opt.utils.Dialogs.ErrorDialog("Cannot add an off-ramp to this freeway section...",
+                                          "The off-ramp limit is reached!");
+            return;
+        }
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(newRampScene);
+        newRampController.initWithLinkAndType(myLink, AbstractLink.Type.offramp);
+        inputStage.setTitle("Adding New Off-Ramp");
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.showAndWait();
     }
 
     
@@ -317,8 +353,6 @@ public class LinkEditorController {
         
         appMainController.linkNameUpdate(myLink);
     }
-    
-    
     
     @FXML
     void onDeleteOffRamp(ActionEvent event) {
@@ -355,6 +389,19 @@ public class LinkEditorController {
         }
     }
     
+    @FXML
+    void onrampsKeyPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            int idx = listOnramps.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= onramps.size()))
+                return;
+            appMainController.selectLink(onramps.get(idx));
+        }
+        if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
+            onDeleteOnRamp(null);
+        }
+    }
+    
     
     
     @FXML
@@ -367,19 +414,6 @@ public class LinkEditorController {
         }
     }
 
-    
-    @FXML
-    void onrampsKeyPressed(KeyEvent event) {
-        if (event.getCode() == KeyCode.ENTER) {
-            int idx = listOnramps.getSelectionModel().getSelectedIndex();
-            if ((idx < 0) || (idx >= onramps.size()))
-                return;
-            appMainController.selectLink(onramps.get(idx));
-        }
-    }
-
-    
-    
     @FXML
     void offrampsKeyPressed(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
@@ -388,10 +422,11 @@ public class LinkEditorController {
                 return;
             appMainController.selectLink(offramps.get(idx));
         }
+        if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
+            onDeleteOffRamp(null);
+        }
     }
 
-    
-    
     
     
     @FXML
@@ -685,9 +720,9 @@ public class LinkEditorController {
         
 
         
-        String unitsLength = appMainController.getUserSettings().getUnitsLength();
+        String unitsLength = appMainController.getUserSettings().unitsLength;
         double length = myLink.get_length_meters();
-        length = appMainController.getUserSettings().convertFlow(length, "meters", unitsLength);
+        length = appMainController.getUserSettings().convertLength(length, "meters", unitsLength);
         labelLength.setText("Length (" + unitsLength + "):");
         lengthSpinnerValueFactory.setValue(length);
         
@@ -774,7 +809,7 @@ public class LinkEditorController {
         int ramp_angle = 30;
         double width = linkEditorCanvas.getWidth();
         double height = linkEditorCanvas.getHeight();
-        boolean rightSideRoads = appMainController.getUserSettings().rightSideDrivingRoads();
+        boolean rightSideRoads = appMainController.getUserSettings().rightSideRoads;
         
         int managed_lanes = numLanesManagedSpinnerValueFactory.getValue();
         int gp_lanes = numLanesGPSpinnerValueFactory.getValue();
@@ -975,9 +1010,9 @@ public class LinkEditorController {
     
     @FXML
     private void onLinkLengthChange() {
-        String unitsLength = appMainController.getUserSettings().getUnitsLength();
+        String unitsLength = appMainController.getUserSettings().unitsLength;
         double length = lengthSpinnerValueFactory.getValue();
-        length = appMainController.getUserSettings().convertFlow(length, unitsLength, "meters");
+        length = appMainController.getUserSettings().convertLength(length, unitsLength, "meters");
         length = Math.max(length, 0.001);
         try {
             myLink.set_length_meters((float)length);

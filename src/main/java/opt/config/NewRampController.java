@@ -28,6 +28,7 @@ package opt.config;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
@@ -38,6 +39,7 @@ import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.data.AbstractLink;
 import opt.data.LinkFreewayOrConnector;
+import opt.data.LinkParameters;
 import opt.data.Segment;
 
 
@@ -48,13 +50,14 @@ import opt.data.Segment;
  */
 public class NewRampController {
     private AppMainController appMainController = null;
-    private AbstractLink upstreamLink = null;
-    private AbstractLink downstreamLink = null;
     private AbstractLink myLink = null;
+    boolean is_onramp;
     private String from_name;
     private String to_name;
     
     private SpinnerValueFactory<Double> lengthSpinnerValueFactory = null;
+    private SpinnerValueFactory<Integer> numLanesGPSpinnerValueFactory = null;
+    private SpinnerValueFactory<Integer> numLanesManagedSpinnerValueFactory = null;
     
     
     @FXML
@@ -84,6 +87,15 @@ public class NewRampController {
     @FXML // fx:id="labelLength"
     private Label labelLength; // Value injected by FXMLLoader
     
+    @FXML // fx:id="cbInnerRamp"
+    private CheckBox cbInnerRamp; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="numManagedLanes"
+    private Spinner<Integer> numManagedLanes; // Value injected by FXMLLoader
+
+    @FXML // fx:id="numGPLanes"
+    private Spinner<Integer> numGPLanes; // Value injected by FXMLLoader
+    
     
     
     /**
@@ -101,19 +113,28 @@ public class NewRampController {
     private void initialize() {
         lengthSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
         linkLength.setValueFactory(lengthSpinnerValueFactory);
+     
+        numLanesGPSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1, 1);
+        numGPLanes.setValueFactory(numLanesGPSpinnerValueFactory);
         
+        numLanesManagedSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0, 1);
+        numManagedLanes.setValueFactory(numLanesManagedSpinnerValueFactory);
     }
     
     
-    public void initWithTwoLinks(AbstractLink upLink, AbstractLink downLink) {
-        upstreamLink = upLink;
-        downstreamLink = downLink;
+    
+    public void initWithLinkAndType(AbstractLink lnk, AbstractLink.Type rampType) {
+        int maxRamps = 3;
+        myLink = lnk;
         
-        String unitsLength = appMainController.getUserSettings().getUnitsLength();
-        if (upstreamLink != null)
-            myLink = upstreamLink;
+        if (myLink == null)
+            return;
+        
+        if (rampType == AbstractLink.Type.onramp)
+            is_onramp = true;
         else
-            myLink = downstreamLink;
+            is_onramp = false;
+                    
         
         String link_name = myLink.name;
         String[] name_subs = link_name.split(" -> ");
@@ -125,37 +146,59 @@ public class NewRampController {
             if (i < sz - 1)
                 to_name += " -> ";
         }
-        if (myLink.get_type() == AbstractLink.Type.onramp) {
+        
+        cbInnerRamp.setSelected(false);
+        
+        if (is_onramp) {
             if (from_name.equals(""))
                 linkFromName.setText(to_name);
             else
                 linkFromName.setText(from_name);
+            labelFromName.setVisible(true);
+            labelToName.setVisible(false);
+            linkFromName.setVisible(true);
+            linkToName.setVisible(false);
             linkToName.setText("");
-        } else if (myLink.get_type() == AbstractLink.Type.onramp) {
+            int in_ors = myLink.get_segment().num_in_ors();
+            int out_ors = myLink.get_segment().num_out_ors();
+            if ((in_ors >= maxRamps) || (out_ors >= maxRamps)) {
+                if (out_ors >= maxRamps)
+                    cbInnerRamp.setSelected(true);
+                cbInnerRamp.setDisable(true);
+            }   
+            to_name = "";
+            numLanesManagedSpinnerValueFactory.setValue(appMainController.getUserSettings().defaultOnrampManagedLanes);
+            numLanesGPSpinnerValueFactory.setValue(appMainController.getUserSettings().defaultOnrampGPLanes);
+        } else {
             if (to_name.equals(""))
                 linkToName.setText(from_name);
             else
                 linkToName.setText(to_name);
+            labelFromName.setVisible(false);
+            labelToName.setVisible(true);
+            linkFromName.setVisible(false);
+            linkToName.setVisible(true);
             linkFromName.setText("");
-        } else {
-            if (upstreamLink != null) {
-                linkFromName.setText(to_name);
-                linkToName.setText("");
-            } else {
-                linkToName.setText(from_name);
-                linkFromName.setText("");
-            }     
-        }
+            int in_frs = myLink.get_segment().num_in_frs();
+            int out_frs = myLink.get_segment().num_out_frs();
+            if ((in_frs >= maxRamps) || (out_frs >= maxRamps)) {
+                if (out_frs >= maxRamps)
+                    cbInnerRamp.setSelected(true);
+                cbInnerRamp.setDisable(true);
+            }
+            from_name = "";
+            numLanesManagedSpinnerValueFactory.setValue(appMainController.getUserSettings().defaultOfframpManagedLanes);
+            numLanesGPSpinnerValueFactory.setValue(appMainController.getUserSettings().defaultOfframpGPLanes);
+        } 
         from_name = linkFromName.getText();
         to_name = linkToName.getText();
         
-        
-        
-        
-        double length = myLink.get_length_meters();
-        length = appMainController.getUserSettings().convertFlow(length, "meters", unitsLength);
+        String unitsLength = appMainController.getUserSettings().unitsLength;
+        double length = appMainController.getUserSettings().defaultRampLengthMeters;
+        length = appMainController.getUserSettings().convertLength(length, "meters", unitsLength);
         labelLength.setText("Length (" + unitsLength + "):");
         lengthSpinnerValueFactory.setValue(length);
+        
     }
     
     
@@ -178,55 +221,44 @@ public class NewRampController {
 
     @FXML
     void onOK(ActionEvent event) {
-        // Link name
-        String link_name = linkFromName.getText() + linkToName.getText();
-        if (link_name.equals("")) {
-            if (from_name.equals(""))
-                from_name = "A";
-            if (to_name.equals(""))
-                to_name = "B";
-            link_name = from_name + " -> " + to_name;
+        // Ramp name
+        String ramp_name = linkFromName.getText() + linkToName.getText();
+        if (ramp_name.equals("")) {
+            if (is_onramp)
+                from_name = "On-Ramp A";
+            else
+                to_name = "Off-Ramp B";
+            ramp_name = from_name + " -> " + to_name;
         } else {
-            link_name = linkFromName.getText() + " -> " + linkToName.getText();
+            ramp_name = linkFromName.getText() + " -> " + linkToName.getText();
         }
-        if ((!myLink.get_segment().get_scenario().is_valid_link_name(link_name)) ||
-            (!myLink.get_segment().get_scenario().is_valid_segment_name(link_name))) {
-            int count = 1;
-            String corrected_name = link_name + "(" + count + ")";
-            while ((!myLink.get_segment().get_scenario().is_valid_link_name(corrected_name)) ||
-                   (!myLink.get_segment().get_scenario().is_valid_segment_name(corrected_name))) {
-                count++;
-                corrected_name = link_name + "(" + count + ")";
-            }
-            link_name = corrected_name;
-        }
+        ramp_name = opt.utils.Misc.validateAndCorrectLinkName(ramp_name, myLink.get_segment().get_scenario());
         
         // Link length
-        String unitsLength = appMainController.getUserSettings().getUnitsLength();
+        String unitsLength = appMainController.getUserSettings().unitsLength;
         double length = lengthSpinnerValueFactory.getValue();
-        length = appMainController.getUserSettings().convertFlow(length, unitsLength, "meters");
+        length = appMainController.getUserSettings().convertLength(length, unitsLength, "meters");
         length = Math.max(length, 0.001);
         
-        Segment new_segment;
-        String segment_name = link_name;
-        if (downstreamLink != null) {
-            new_segment = downstreamLink.insert_up_segment(segment_name,link_name);
-        } else {
-            new_segment = upstreamLink.insert_dn_segment(segment_name,link_name);
-        }
-        LinkFreewayOrConnector new_link = new_segment.fwy();
+        boolean is_inner = cbInnerRamp.isSelected();
+        int managed_lanes = numLanesManagedSpinnerValueFactory.getValue();
+        int gp_lanes = numLanesGPSpinnerValueFactory.getValue();
 
-        
-        try {
-            new_link.set_length_meters((float)length);
-        } catch(Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Could not set new section length...", e);
+        LinkParameters params = appMainController.getUserSettings().getDefaultLinkParams();
+        if (is_onramp) {
+            if (is_inner)
+                myLink.get_segment().add_in_or(ramp_name, params, gp_lanes, managed_lanes, (float)length);
+            else
+                myLink.get_segment().add_out_or(ramp_name, params, gp_lanes, managed_lanes, (float)length);
         }
-        appMainController.linkNameUpdate(new_link);
+        else {
+            if (is_inner)
+                myLink.get_segment().add_in_fr(ramp_name, params, gp_lanes, managed_lanes, (float)length);
+            else
+                myLink.get_segment().add_out_fr(ramp_name, params, gp_lanes, managed_lanes, (float)length);
+        }
         
-        /*System.err.println("Newly created link ID: " + new_link.id +
-                "\t Its up_link ID: " + new_link.get_up_link().id +
-                "\t Its dn_link ID: " + new_link.get_dn_link().id);*/
+        appMainController.linkNameUpdate(myLink);
 
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
