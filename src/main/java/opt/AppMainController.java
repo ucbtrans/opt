@@ -57,6 +57,7 @@ import opt.config.NewLinkController;
 import opt.config.NewRampController;
 import opt.data.AbstractLink;
 import opt.data.FreewayScenario;
+import opt.data.LinkParameters;
 import opt.data.ProjectFactory;
 import opt.data.Project;
 
@@ -205,7 +206,11 @@ public class AppMainController {
         }
         reset();
         
-        opt.utils.Dialogs.ErrorDialog("Cannot create new OPT project...", "The code is not written. You must be patient!");
+        LinkParameters params = userSettings.getDefaultLinkParams();
+        project = new Project(params, "Scenario A", "A -> B", "A -> B");
+        menuFileSave.setDisable(false);
+        menuFileSaveAs.setDisable(false);
+        populateProjectTree();
         
         projectModified = true;
     }
@@ -462,6 +467,7 @@ public class AppMainController {
         tree2object = new HashMap<TreeItem, Object>();
         object2tree = new HashMap<Object, TreeItem>();
         
+        projectModified = true;
         populateProjectTree();
         
         TreeItem item = object2tree.get(lnk);
@@ -491,6 +497,8 @@ public class AppMainController {
             (dn_link.get_type() == AbstractLink.Type.freeway)) {
             dn_link.connect_to_upstream(up_link);
         }
+        
+        projectModified = true;
         
         Object toDisplay = scenario;
         if (dn_link != null)

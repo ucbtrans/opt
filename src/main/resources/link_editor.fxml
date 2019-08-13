@@ -118,6 +118,7 @@
                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                             </rowConstraints>
@@ -142,21 +143,21 @@
                                                 <Spinner id="numManagedLanes" fx:id="numManagedLanes" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
                                                 <Spinner id="numGPLanes" fx:id="numGPLanes" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
                                                 <Spinner id="numAuxLanes" fx:id="numAuxLanes" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-                                                <Spinner id="capacityManagedLane" fx:id="capacityManagedLane" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
-                                                <Spinner id="capacityGPLane" fx:id="capacityGPLane" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
-                                                <Spinner id="capacityAuxLane" fx:id="capacityAuxLane" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
-                                                <Spinner id="ffSpeedManaged" fx:id="ffSpeedManaged" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
-                                                <Spinner id="ffSpeedGP" fx:id="ffSpeedGP" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
-                                                <Spinner id="ffSpeedAux" fx:id="ffSpeedAux" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
-                                                <Spinner id="jamDensityManagedLane" fx:id="jamDensityManagedLane" GridPane.halignment="CENTER" GridPane.rowIndex="9" />
-                                                <Spinner id="jamDensityGPLane" fx:id="jamDensityGPLane" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="9" />
-                                                <Spinner id="jamDensityAuxLane" fx:id="jamDensityAuxLane" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="9" />
-                                                <CheckBox id="cbBarrier" fx:id="cbBarrier" disable="true" mnemonicParsing="false" onAction="#drawRoadSection" text="Barrier" GridPane.halignment="CENTER" GridPane.rowIndex="11" GridPane.valignment="BASELINE">
+                                                <Spinner id="capacityManagedLane" fx:id="capacityManagedLane" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+                                                <Spinner id="capacityGPLane" fx:id="capacityGPLane" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+                                                <Spinner id="capacityAuxLane" fx:id="capacityAuxLane" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+                                                <Spinner id="ffSpeedManaged" fx:id="ffSpeedManaged" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
+                                                <Spinner id="ffSpeedGP" fx:id="ffSpeedGP" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
+                                                <Spinner id="ffSpeedAux" fx:id="ffSpeedAux" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
+                                                <Spinner id="jamDensityManagedLane" fx:id="jamDensityManagedLane" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
+                                                <Spinner id="jamDensityGPLane" fx:id="jamDensityGPLane" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
+                                                <Spinner id="jamDensityAuxLane" fx:id="jamDensityAuxLane" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
+                                                <CheckBox id="cbBarrier" fx:id="cbBarrier" disable="true" mnemonicParsing="false" onAction="#drawRoadSection" text="Barrier" GridPane.halignment="CENTER" GridPane.rowIndex="12" GridPane.valignment="BASELINE">
                                                    <GridPane.margin>
                                                       <Insets />
                                                    </GridPane.margin>
                                                 </CheckBox>
-                                                <CheckBox id="cbSeparated" fx:id="cbSeparated" disable="true" mnemonicParsing="false" onAction="#drawRoadSection" text="Separated" GridPane.halignment="CENTER" GridPane.rowIndex="12" GridPane.valignment="BASELINE">
+                                                <CheckBox id="cbSeparated" fx:id="cbSeparated" disable="true" mnemonicParsing="false" onAction="#drawRoadSection" text="Separated" GridPane.halignment="CENTER" GridPane.rowIndex="13" GridPane.valignment="BASELINE">
                                                    <GridPane.margin>
                                                       <Insets left="20.0" />
                                                    </GridPane.margin>
@@ -179,51 +180,54 @@
                                                       <Insets left="20.0" />
                                                    </GridPane.margin>
                                                 </Label>
-                                                <Label id="labelManagedLaneCapacity" fx:id="labelManagedLaneCapacity" text="Managed Lane Capacity (vph):" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
+                                                <Label id="labelManagedLaneCapacity" fx:id="labelManagedLaneCapacity" text="Managed Lane Capacity (vph):" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
                                                    <GridPane.margin>
                                                       <Insets left="20.0" />
                                                    </GridPane.margin>
                                                 </Label>
-                                                <Label id="labelGPLaneCapacity" fx:id="labelGPLaneCapacity" text="General Purpose Lane Capacity (vph):" GridPane.columnIndex="2" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
+                                                <Label id="labelGPLaneCapacity" fx:id="labelGPLaneCapacity" text="General Purpose Lane Capacity (vph):" GridPane.columnIndex="2" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
                                                    <GridPane.margin>
                                                       <Insets left="20.0" />
                                                    </GridPane.margin>
                                                 </Label>
-                                                <Label id="labelAuxLaneCapacity" fx:id="labelAuxLaneCapacity" text="Auxiliary Lane Capacity (vph):" GridPane.columnIndex="4" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
+                                                <Label id="labelAuxLaneCapacity" fx:id="labelAuxLaneCapacity" text="Auxiliary Lane Capacity (vph):" GridPane.columnIndex="4" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
                                                    <GridPane.margin>
                                                       <Insets left="20.0" />
                                                    </GridPane.margin>
                                                 </Label>
-                                                <Label id="labelFreeFlowSpeedManaged" fx:id="labelFreeFlowSpeedManaged" text="Free Flow Speed (mph):" GridPane.rowIndex="6" GridPane.valignment="BOTTOM">
+                                                <Label id="labelFreeFlowSpeedManaged" fx:id="labelFreeFlowSpeedManaged" text="Free Flow Speed (mph):" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
                                                    <GridPane.margin>
                                                       <Insets left="20.0" />
                                                    </GridPane.margin>
                                                 </Label>
-                                                <Label id="labelFreeFlowSpeedGP" fx:id="labelFreeFlowSpeedGP" text="Free Flow Speed (mph):" GridPane.columnIndex="2" GridPane.rowIndex="6" GridPane.valignment="BOTTOM">
+                                                <Label id="labelFreeFlowSpeedGP" fx:id="labelFreeFlowSpeedGP" text="Free Flow Speed (mph):" GridPane.columnIndex="2" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
                                                    <GridPane.margin>
                                                       <Insets left="20.0" />
                                                    </GridPane.margin>
                                                 </Label>
-                                                <Label id="labelFreeFlowSpeedAux" fx:id="labelFreeFlowSpeedAux" text="Free Flow Speed (mph):" GridPane.columnIndex="4" GridPane.rowIndex="6" GridPane.valignment="BOTTOM">
+                                                <Label id="labelFreeFlowSpeedAux" fx:id="labelFreeFlowSpeedAux" text="Free Flow Speed (mph):" GridPane.columnIndex="4" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
                                                    <GridPane.margin>
                                                       <Insets left="20.0" />
                                                    </GridPane.margin>
                                                 </Label>
-                                                <Label id="labelJamDensityManaged" fx:id="labelJamDensityManaged" text="Managed Lane Jam Density (vpm):" GridPane.rowIndex="8" GridPane.valignment="BOTTOM">
+                                                <Label id="labelJamDensityManaged" fx:id="labelJamDensityManaged" text="Managed Lane Jam Density (vpm):" GridPane.rowIndex="9" GridPane.valignment="BOTTOM">
                                                    <GridPane.margin>
                                                       <Insets left="20.0" />
                                                    </GridPane.margin>
                                                 </Label>
-                                                <Label id="labelJamDensityGP" fx:id="labelJamDensityGP" text="General Purpose Lane Jam Density (vpm):" GridPane.columnIndex="2" GridPane.rowIndex="8" GridPane.valignment="BOTTOM">
+                                                <Label id="labelJamDensityGP" fx:id="labelJamDensityGP" text="General Purpose Lane Jam Density (vpm):" GridPane.columnIndex="2" GridPane.rowIndex="9" GridPane.valignment="BOTTOM">
                                                    <GridPane.margin>
                                                       <Insets left="20.0" />
                                                    </GridPane.margin>
                                                 </Label>
-                                                <Label id="labelJamDensityAux" fx:id="labelJamDensityAux" text="Auxiliary Lane Jam Density (vpm):" GridPane.columnIndex="4" GridPane.rowIndex="8" GridPane.valignment="BOTTOM">
+                                                <Label id="labelJamDensityAux" fx:id="labelJamDensityAux" text="Auxiliary Lane Jam Density (vpm):" GridPane.columnIndex="4" GridPane.rowIndex="9" GridPane.valignment="BOTTOM">
                                                    <GridPane.margin>
                                                       <Insets left="20.0" />
                                                    </GridPane.margin>
                                                 </Label>
+                                                <Separator prefWidth="200.0" GridPane.rowIndex="4" />
+                                                <Separator prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                <Separator prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                                              </children>
                                              <padding>
                                                 <Insets bottom="10.0" left="5.0" right="5.0" />

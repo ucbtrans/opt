@@ -993,9 +993,6 @@ public class LinkEditorController {
         } else {
             ;//TODO AK left-side driving road
         }
-        
-        
-        
     }
 
 
@@ -1016,6 +1013,7 @@ public class LinkEditorController {
         length = Math.max(length, 0.001);
         try {
             myLink.set_length_meters((float)length);
+            appMainController.setProjectModified(true);
         } catch(Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not change section length...", e);
         }
@@ -1025,12 +1023,8 @@ public class LinkEditorController {
     
     
     private void onNumLanesChange() {    
-        
-    
-        
-        
-        System.err.println("Lane number change!");
         drawRoadSection();
+        appMainController.setProjectModified(true);
     }
     
     
