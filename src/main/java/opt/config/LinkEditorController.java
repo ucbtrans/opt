@@ -806,7 +806,7 @@ public class LinkEditorController {
      */
     @FXML
     private void drawRoadSection() {
-        int ramp_angle = 30;
+        int ramp_angle = 45;
         double width = linkEditorCanvas.getWidth();
         double height = linkEditorCanvas.getHeight();
         boolean rightSideRoads = appMainController.getUserSettings().rightSideRoads;
@@ -849,23 +849,54 @@ public class LinkEditorController {
         double lane_length = 2*width/3;
         double lane_width = height/16;
         if (total_lanes > 8) { // we want the road segment to take about half of the canvas 
-            lane_width = height/(2 * total_lanes);
+            lane_width = Math.sqrt(2)*(height/(2 * total_lanes));
         }
         
         double x0 = width/6;
         double x1 = x0 + lane_length;
         
+        int total_ramp_lanes = 0;
+        int num_ramps = myLink.get_segment().num_out_ors();
+        for (int i = 0; i < num_ramps; i++) {
+            int l_count = myLink.get_segment().out_ors(i).get_gp_lanes() +
+                          myLink.get_segment().out_ors(i).get_managed_lanes();
+            if (l_count > total_ramp_lanes)
+                total_ramp_lanes = l_count;
+        }
+        num_ramps = myLink.get_segment().num_in_ors();
+        for (int i = 0; i < num_ramps; i++) {
+            int l_count = myLink.get_segment().in_ors(i).get_gp_lanes() +
+                          myLink.get_segment().in_ors(i).get_managed_lanes();
+            if (l_count > total_ramp_lanes)
+                total_ramp_lanes = l_count;
+        }
+        num_ramps = myLink.get_segment().num_out_frs();
+        for (int i = 0; i < num_ramps; i++) {
+            int l_count = myLink.get_segment().out_frs(i).get_gp_lanes() +
+                          myLink.get_segment().out_frs(i).get_managed_lanes();
+            if (l_count > total_ramp_lanes)
+                total_ramp_lanes = l_count;
+        }
+        num_ramps = myLink.get_segment().num_in_frs();
+        for (int i = 0; i < num_ramps; i++) {
+            int l_count = myLink.get_segment().in_frs(i).get_gp_lanes() +
+                          myLink.get_segment().in_frs(i).get_managed_lanes();
+            if (l_count > total_ramp_lanes)
+                total_ramp_lanes = l_count;
+        }
+        double coeff = Math.min(1.0, (double)total_lanes/(double)total_ramp_lanes);
+        
         
         if (rightSideRoads) { // right-side driving road
             double base_y = 0.75*height;
             double ramp_length = height - base_y;
-            double r_lane_width = lane_width;
+            double r_lane_width = coeff*lane_width;
             double y1 = base_y;
             double y0 = y1;
             
             if (myLink.get_type() == AbstractLink.Type.freeway) {
                 // Draw outer on-ramps
-                int num_ramps = myLink.get_segment().num_out_ors();
+                num_ramps = myLink.get_segment().num_out_ors();
                 double delta = 0.0;
                 g.setFill(Color.DARKGREY);
                 if (aux_lanes > 0)
@@ -908,7 +939,7 @@ public class LinkEditorController {
                     int fr_managed = myLink.get_segment().out_frs(i).get_managed_lanes();
                     double fr_lanes = fr_gp + fr_managed;
                     double fr_width = fr_lanes * r_lane_width;
-                    if (i > 0)
+                    if (i < num_ramps-1)
                         delta += 0.5*fr_width;
                     double rotationCenterX = x1 - delta;
                     double rotationCenterY = base_y;
