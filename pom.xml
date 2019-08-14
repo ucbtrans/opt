@@ -118,6 +118,28 @@
                 <version>2.10.4</version>
             </plugin>
 
+
+	    <!--plugin>
+          <groupId>net.jsign</groupId>
+          <artifactId>jsign-maven-plugin</artifactId>
+          <version>2.1</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>sign</goal>
+              </goals>
+              <phase>package</phase>
+              <configuration>
+		      <file>opt_dev.exe</file>
+                <name>OPT Dev</name>
+                <keystore>keystore.jks</keystore>
+                <alias>opt.ucbtrans.org</alias>
+                <storepass>optdev</storepass>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin-->
+
         </plugins>
     </build>
 
@@ -144,6 +166,12 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>net.jsign</groupId>
+            <artifactId>jsign-core</artifactId>
+            <version>2.1</version>
+       </dependency>
 
     </dependencies>
 
