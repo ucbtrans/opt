@@ -179,7 +179,6 @@ public class TestSegment extends AbstractTest {
     public void test_delete_in_fr(){
     }
 
-    @Ignore
     @Test
     public void test_delete_out_fr(){
 

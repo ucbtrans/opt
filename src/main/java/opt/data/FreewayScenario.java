@@ -32,6 +32,7 @@ public class FreewayScenario {
         max_seg_id = -1l;
         scenario = new Scenario();
         create_isolated_segment(segmentname,linkname,params, AbstractLink.Type.freeway);
+        scenario.commodities.put(0l,new Commodity(0l,"Unnamed commodity",1f));
     }
 
     public FreewayScenario(String name,jaxbopt.Lnks jaxb_lnks,jaxbopt.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
