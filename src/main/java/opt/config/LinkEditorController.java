@@ -436,7 +436,7 @@ public class LinkEditorController {
         inputStage.setScene(newLinkScene);
         newLinkController.initWithTwoLinks(myLink, null);
         inputStage.setTitle("Adding New Freeway Section");
-        if (myLink.get_type() != AbstractLink.Type.freeway)
+        if ((myLink.get_type() == AbstractLink.Type.onramp) || (myLink.get_type() == AbstractLink.Type.offramp))
             inputStage.setTitle("Adding New Connector");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
@@ -450,7 +450,7 @@ public class LinkEditorController {
         inputStage.setScene(newLinkScene);
         newLinkController.initWithTwoLinks(null, myLink);
         inputStage.setTitle("Adding New Freeway Section");
-        if (myLink.get_type() != AbstractLink.Type.freeway)
+        if ((myLink.get_type() == AbstractLink.Type.onramp) || (myLink.get_type() == AbstractLink.Type.offramp))
             inputStage.setTitle("Adding New Connector");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);

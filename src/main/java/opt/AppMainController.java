@@ -210,6 +210,18 @@ public class AppMainController {
         project = new Project(params, "Scenario A", "A -> B", "A -> B");
         menuFileSave.setDisable(false);
         menuFileSaveAs.setDisable(false);
+        Collection<FreewayScenario> scenarios = project.get_scenarios();
+        for (FreewayScenario scenario : scenarios) {
+             for (AbstractLink link : scenario.get_links()) {
+                if (link == null)
+                    continue;
+                try {
+                    link.set_gp_lanes(userSettings.defaultFreewayGPLanes);
+                } catch (Exception e) {
+                    ;
+                }
+             }
+        }
         populateProjectTree();
         
         projectModified = true;
