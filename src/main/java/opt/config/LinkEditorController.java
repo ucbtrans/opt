@@ -664,11 +664,14 @@ public class LinkEditorController {
             deleteSection.setVisible(false);
             addSectionDownstream.setVisible(false);
             connectSectionDownstream.setVisible(false);
-            if (myLink.is_source()) {
+            if (myLink.get_up_link() == null) {
                 addSectionUpstream.setVisible(true);
+                connectSectionUpstream.setVisible(true);
             }
-            else
+            else {
                 addSectionUpstream.setVisible(false);
+                connectSectionUpstream.setVisible(false);
+            }
         } else if (myLink.get_type() == AbstractLink.Type.offramp) {
             if (to_name.equals(""))
                 linkToName.setText(from_name);
@@ -682,11 +685,14 @@ public class LinkEditorController {
             deleteSection.setVisible(false);
             addSectionUpstream.setVisible(false);
             connectSectionUpstream.setVisible(false);
-            if (myLink.is_sink()) {
+            if (myLink.get_dn_link() == null) {
                 addSectionDownstream.setVisible(true);
+                connectSectionDownstream.setVisible(true);
             }
-            else
+            else {
                 addSectionDownstream.setVisible(false);
+                connectSectionDownstream.setVisible(false);
+            }
         } else {
             linkFromName.setText(from_name);
             linkToName.setText(to_name);
@@ -697,14 +703,14 @@ public class LinkEditorController {
             deleteSection.setVisible(true);
             addSectionUpstream.setVisible(true);
             addSectionDownstream.setVisible(true);
-            if (myLink.is_source()) {
+            if (myLink.get_up_link() == null) {
                 connectSectionUpstream.setVisible(true);
             } else {
                 connectSectionUpstream.setVisible(false);
                 if (myLink.get_type() == AbstractLink.Type.connector)
                     addSectionUpstream.setVisible(false);
             }
-            if (myLink.is_sink()) {
+            if (myLink.get_dn_link() == null) {
                 connectSectionDownstream.setVisible(true);
             } else {
                 connectSectionDownstream.setVisible(false);
@@ -889,6 +895,7 @@ public class LinkEditorController {
         
         if (rightSideRoads) { // right-side driving road
             double base_y = 0.75*height;
+            double base_y_1 = base_y - total_lanes*lane_width;
             double ramp_length = height - base_y;
             double r_lane_width = coeff*lane_width;
             double y1 = base_y;
@@ -898,32 +905,96 @@ public class LinkEditorController {
                 // Draw outer on-ramps
                 num_ramps = myLink.get_segment().num_out_ors();
                 double delta = 0.0;
-                g.setFill(Color.DARKGREY);
-                if (aux_lanes > 0)
-                    g.setFill(Color.LIGHTGREY);
                 for (int i = 0; i < num_ramps; i++) {
                     int or_gp = myLink.get_segment().out_ors(i).get_gp_lanes();
                     int or_managed = myLink.get_segment().out_ors(i).get_managed_lanes();
+                    boolean or_barrier = barrier; // FIXME
+                    boolean or_separated = separated; // FIXME
                     double or_lanes = or_gp + or_managed;
                     double or_width = or_lanes * r_lane_width;
+                    double or_gp_width = or_gp * r_lane_width;
+                    double or_managed_width = or_managed * r_lane_width;
                     if (i > 0)
                         delta += 0.5*or_width;
                     double rotationCenterX = x0 + delta;
+                    y0 = base_y + 0.5*or_width - 0.5*or_gp_width;
                     double rotationCenterY = base_y;
+                    g.setFill(Color.DARKGREY);
                     g.save();
                     g.translate(rotationCenterX, rotationCenterY);
                     g.rotate(-ramp_angle);
                     g.translate(-rotationCenterX, -rotationCenterY);
-                    g.fillRect(x0+delta-ramp_length/2, base_y-or_width/2, ramp_length, or_width);
+                    g.fillRect(x0+delta-ramp_length/2, y0-or_gp_width/2, ramp_length, or_gp_width);
+
+                    y0 -= 0.5*or_width;
+                    g.setFill(Color.BLACK);
+                    g.fillRect(x0+delta-ramp_length/2, y0-or_managed_width/2, ramp_length, or_managed_width);
+                    
                     g.setStroke(Color.WHITE);
                     for (int j = 1; j < or_lanes; j++) {
                         y0 = base_y+or_width/2 - j*r_lane_width;
-                        g.setLineDashes(r_lane_width/3, r_lane_width/2);
-                        g.setLineWidth(1);
+                        if (or_barrier && (j == or_gp)) {
+                            g.setLineDashes();
+                            g.setLineWidth(2);
+                        } else if (or_separated && (j > or_gp)) {
+                            g.setLineDashes();
+                            g.setLineWidth(1);
+                        } else {
+                            g.setLineDashes(r_lane_width/3, r_lane_width/2);
+                            g.setLineWidth(1);
+                        }
                         g.strokeLine(x0+delta-ramp_length/2, y0, x0+delta+ramp_length/2, y0);
                     }
                     g.restore();
-                    delta += 0.5*ramp_length + 0.5*or_width + r_lane_width;
+                    delta += 0.5*ramp_length + 0.5*or_width;
+                }
+                
+                // Draw inner on-ramps
+                num_ramps = myLink.get_segment().num_in_ors();
+                delta = 0.0;
+                for (int i = 0; i < num_ramps; i++) {
+                    int or_gp = myLink.get_segment().in_ors(i).get_gp_lanes();
+                    int or_managed = myLink.get_segment().in_ors(i).get_managed_lanes();
+                    boolean or_barrier = barrier; // FIXME
+                    boolean or_separated = separated; // FIXME
+                    double or_lanes = or_gp + or_managed;
+                    double or_width = or_lanes * r_lane_width;
+                    double or_gp_width = or_gp * r_lane_width;
+                    double or_managed_width = or_managed * r_lane_width;
+                    if (i > 0)
+                        delta += 0.5*or_width;
+                    
+                    double rotationCenterX = x0 + delta;
+                    y0 = base_y_1 + 0.5*or_width - 0.5*or_gp_width;
+                    double rotationCenterY = base_y_1;
+                    g.setFill(Color.DARKGREY);
+                    g.save();
+                    g.translate(rotationCenterX, rotationCenterY);
+                    g.rotate(ramp_angle);
+                    g.translate(-rotationCenterX, -rotationCenterY);
+                    g.fillRect(x0+delta-ramp_length/2, y0-or_gp_width/2, ramp_length, or_gp_width);
+
+                    y0 -= 0.5*or_width;
+                    g.setFill(Color.BLACK);
+                    g.fillRect(x0+delta-ramp_length/2, y0-or_managed_width/2, ramp_length, or_managed_width);
+                    
+                    g.setStroke(Color.WHITE);
+                    for (int j = 1; j < or_lanes; j++) {
+                        y0 = base_y_1 + or_width/2 - j*r_lane_width;
+                        if (or_barrier && (j == or_gp)) {
+                            g.setLineDashes();
+                            g.setLineWidth(2);
+                        } else if (or_separated && (j > or_gp)) {
+                            g.setLineDashes();
+                            g.setLineWidth(1);
+                        } else {
+                            g.setLineDashes(r_lane_width/3, r_lane_width/2);
+                            g.setLineWidth(1);
+                        }
+                        g.strokeLine(x0+delta-ramp_length/2, y0, x0+delta+ramp_length/2, y0);
+                    }
+                    g.restore();
+                    delta += 0.5*ramp_length + 0.5*or_width;
                 }
 
 
@@ -931,32 +1002,95 @@ public class LinkEditorController {
                 // Draw outer off-ramps
                 num_ramps = myLink.get_segment().num_out_frs();
                 delta = 0.0;
-                g.setFill(Color.DARKGREY);
-                if (aux_lanes > 0)
-                    g.setFill(Color.LIGHTGREY);
                 for (int i = num_ramps-1; i >= 0; i--) {
                     int fr_gp = myLink.get_segment().out_frs(i).get_gp_lanes();
                     int fr_managed = myLink.get_segment().out_frs(i).get_managed_lanes();
+                    boolean fr_barrier = barrier; // FIXME
+                    boolean fr_separated = separated; // FIXME
                     double fr_lanes = fr_gp + fr_managed;
                     double fr_width = fr_lanes * r_lane_width;
+                    double fr_gp_width = fr_gp * r_lane_width;
+                    double fr_managed_width = fr_managed * r_lane_width;
                     if (i < num_ramps-1)
                         delta += 0.5*fr_width;
                     double rotationCenterX = x1 - delta;
+                    y0 = base_y + 0.5*fr_width - 0.5*fr_gp_width;
                     double rotationCenterY = base_y;
+                    g.setFill(Color.DARKGREY);
                     g.save();
                     g.translate(rotationCenterX, rotationCenterY);
                     g.rotate(ramp_angle);
                     g.translate(-rotationCenterX, -rotationCenterY);
-                    g.fillRect(x1-delta-ramp_length/2, base_y-fr_width/2, ramp_length, fr_width);
+                    g.fillRect(x1-delta-ramp_length/2, y0-fr_gp_width/2, ramp_length, fr_gp_width);
+                    
+                    y0 -= 0.5*fr_width;
+                    g.setFill(Color.BLACK);
+                    g.fillRect(x1-delta-ramp_length/2, y0-fr_managed_width/2, ramp_length, fr_managed_width);
+                    
                     g.setStroke(Color.WHITE);
                     for (int j = 1; j < fr_lanes; j++) {
-                        y0 = base_y+fr_width/2 - j*r_lane_width;
-                        g.setLineDashes(r_lane_width/3, r_lane_width/2);
-                        g.setLineWidth(1);
+                        y0 = base_y + fr_width/2 - j*r_lane_width;
+                        if (fr_barrier && (j == fr_gp)) {
+                            g.setLineDashes();
+                            g.setLineWidth(2);
+                        } else if (fr_separated && (j > fr_gp)) {
+                            g.setLineDashes();
+                            g.setLineWidth(1);
+                        } else {
+                            g.setLineDashes(r_lane_width/3, r_lane_width/2);
+                            g.setLineWidth(1);
+                        }
                         g.strokeLine(x1-delta-ramp_length/2, y0, x1-delta+ramp_length/2, y0);
                     }
                     g.restore();
-                    delta += 0.5*ramp_length + 0.5*fr_width + r_lane_width;
+                    delta += 0.5*ramp_length + 0.5*fr_width;
+                }
+                
+                // Draw inner off-ramps
+                num_ramps = myLink.get_segment().num_in_frs();
+                delta = 0.0;
+                for (int i = num_ramps-1; i >= 0; i--) {
+                    int fr_gp = myLink.get_segment().in_frs(i).get_gp_lanes();
+                    int fr_managed = myLink.get_segment().in_frs(i).get_managed_lanes();
+                    boolean fr_barrier = barrier; // FIXME
+                    boolean fr_separated = separated; // FIXME
+                    double fr_lanes = fr_gp + fr_managed;
+                    double fr_width = fr_lanes * r_lane_width;
+                    double fr_gp_width = fr_gp * r_lane_width;
+                    double fr_managed_width = fr_managed * r_lane_width;
+                    if (i < num_ramps-1)
+                        delta += 0.5*fr_width;
+                    double rotationCenterX = x1 - delta;
+                    y0 = base_y_1 + 0.5*fr_width - 0.5*fr_gp_width;
+                    double rotationCenterY = base_y_1;
+                    g.setFill(Color.DARKGREY);
+                    g.save();
+                    g.translate(rotationCenterX, rotationCenterY);
+                    g.rotate(-ramp_angle);
+                    g.translate(-rotationCenterX, -rotationCenterY);
+                    g.fillRect(x1-delta-ramp_length/2, y0-fr_gp_width/2, ramp_length, fr_gp_width);
+                    
+                    y0 -= 0.5*fr_width;
+                    g.setFill(Color.BLACK);
+                    g.fillRect(x1-delta-ramp_length/2, y0-fr_managed_width/2, ramp_length, fr_managed_width);
+                    
+                    g.setStroke(Color.WHITE);
+                    for (int j = 1; j < fr_lanes; j++) {
+                        y0 = base_y_1 + fr_width/2 - j*r_lane_width;
+                        if (fr_barrier && (j == fr_gp)) {
+                            g.setLineDashes();
+                            g.setLineWidth(2);
+                        } else if (fr_separated && (j > fr_gp)) {
+                            g.setLineDashes();
+                            g.setLineWidth(1);
+                        } else {
+                            g.setLineDashes(r_lane_width/3, r_lane_width/2);
+                            g.setLineWidth(1);
+                        }
+                        g.strokeLine(x1-delta-ramp_length/2, y0, x1-delta+ramp_length/2, y0);
+                    }
+                    g.restore();
+                    delta += 0.5*ramp_length + 0.5*fr_width;
                 }
 
                
