@@ -1,9 +1,6 @@
 package opt.tests;
 
-import opt.data.AbstractLink;
-import opt.data.LinkConnector;
-import opt.data.LinkOfframp;
-import opt.data.Segment;
+import opt.data.*;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -119,25 +116,35 @@ public class TestSegment extends AbstractTest {
     // add / delete ramps
     ////////////////////////////////////////
 
-    @Ignore
     @Test
     public void test_add_in_or(){
+
     }
 
-    @Ignore
     @Test
     public void test_add_out_or(){
-//        TestData X = new TestData();
-//        Segment segment = X.scenario.get_segment_by_name("sA1");
-//        assertFalse(segment.has_onramp());
-//        LinkParameters params = new LinkParameters(100,200,300);
-//        segment.add_onramp(params);
-//        assertTrue(segment.has_onramp());
+        TestData X = new TestData();
+        Segment segment = X.scenario.get_segment_by_name("sA1");
+        assertTrue(segment.num_out_ors()==0);
+        LinkParameters params = new LinkParameters(100,200,300);
+        LinkOnramp or = segment.add_out_or("new or name",params,2,1,100f);
+        assertTrue(or.is_ramp());
+        assertTrue(or.is_source());
+        assertTrue(segment.out_ors(0)==or);
+        assertTrue(segment.num_out_ors()==1);
     }
 
-    @Ignore
     @Test
     public void test_add_in_fr(){
+        TestData X = new TestData();
+        Segment segment = X.scenario.get_segment_by_name("sA1");
+        assertTrue(segment.num_in_frs()==0);
+        LinkParameters params = new LinkParameters(100,200,300);
+        LinkOfframp fr = segment.add_in_fr("new fr name",params,2,1,100f);
+        assertTrue(fr.is_ramp());
+        assertTrue(fr.is_sink());
+        assertTrue(segment.in_frs(0)==fr);
+        assertTrue(segment.num_in_frs()==1);
     }
 
     @Ignore

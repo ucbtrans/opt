@@ -314,13 +314,14 @@ public final class Segment implements Comparable {
     private LinkOnramp create_onramp(String linkname,LinkParameters params,int gp_lanes,int managed_lanes, float length){
 
         Long link_id = fwy_scenario.new_link_id();
-        Node start_node = new Node(fwy_scenario.new_node_id());
-        long end_node_id = this.fwy.start_node_id;
+        Node or_start_node = new Node(fwy_scenario.new_node_id());
+        fwy_scenario.scenario.nodes.put(or_start_node.id,or_start_node);
+        Node or_end_node = fwy_scenario.scenario.nodes.get(fwy.start_node_id);
 
-        LinkOnramp link = new LinkOnramp(link_id,
+        LinkOnramp or = new LinkOnramp(link_id,
                 linkname,
-                start_node.id,
-                end_node_id,
+                or_start_node.id,
+                or_end_node.id,
                 gp_lanes,
                 managed_lanes,
                 0,
@@ -329,25 +330,25 @@ public final class Segment implements Comparable {
                 params.jam_density_vpkpl,
                 params.ff_speed_kph,
                 this);
+        fwy_scenario.scenario.links.put(or.id,or);
 
-        link.dn_link = fwy;
-        start_node.in_links.add(link.id);
-        fwy_scenario.scenario.nodes.put(start_node.id,start_node);
-        fwy_scenario.scenario.links.put(link.id,link);
+        or.dn_link = fwy;
+        or_start_node.out_links.add(or.id);
 
-        return link;
+        return or;
     }
 
     private LinkOfframp create_offramp(String linkname,LinkParameters params,int gp_lanes,int managed_lanes, float length){
 
         Long link_id = fwy_scenario.new_link_id();
-        Node end_node = new Node(fwy_scenario.new_node_id());
-        long start_node_id = this.fwy.end_node_id;
+        Node fr_start_node = fwy_scenario.scenario.nodes.get(fwy.end_node_id);
+        Node fr_end_node = new Node(fwy_scenario.new_node_id());
+        fwy_scenario.scenario.nodes.put(fr_end_node.id,fr_end_node);
 
-        LinkOfframp link = new LinkOfframp(link_id,
+        LinkOfframp fr = new LinkOfframp(link_id,
                 linkname,
-                start_node_id,
-                end_node.id,
+                fr_start_node.id,
+                fr_end_node.id,
                 gp_lanes,
                 managed_lanes,
                 0,
@@ -356,13 +357,12 @@ public final class Segment implements Comparable {
                 params.jam_density_vpkpl,
                 params.ff_speed_kph,
                 this);
+        fwy_scenario.scenario.links.put(fr.id,fr);
 
-        link.up_link = fwy;
-        end_node.out_links.add(link.id);
-        fwy_scenario.scenario.nodes.put(end_node.id,end_node);
-        fwy_scenario.scenario.links.put(link.id,link);
+        fr.up_link = fwy;
+        fr_end_node.in_links.add(fr.id);
 
-        return link;
+        return fr;
     }
 
     private String get_type(){
