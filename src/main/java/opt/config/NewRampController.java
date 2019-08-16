@@ -267,7 +267,7 @@ public class NewRampController {
                 myLink.get_segment().add_out_fr(params);
         }
         
-        appMainController.linkNameUpdate(myLink);
+        appMainController.objectNameUpdate(myLink);
 
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();

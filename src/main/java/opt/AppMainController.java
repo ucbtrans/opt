@@ -55,6 +55,7 @@ import opt.config.LinkEditorController;
 import opt.config.LinkInfoController;
 import opt.config.NewLinkController;
 import opt.config.NewRampController;
+import opt.config.ScenarioEditorController;
 import opt.data.AbstractLink;
 import opt.data.FreewayScenario;
 import opt.data.LinkParameters;
@@ -84,6 +85,8 @@ public class AppMainController {
     private Map<TreeItem, Object> tree2object = new HashMap<TreeItem, Object>();
     private Map<Object, TreeItem> object2tree = new HashMap<Object, TreeItem>();
     
+    private SplitPane scenarioEditorPane = null;
+    private ScenarioEditorController scenarioEditorController = null;
     private SplitPane linkEditorPane = null;
     private LinkEditorController linkEditorController = null;
     private GridPane linkInfoPane = null;
@@ -207,7 +210,7 @@ public class AppMainController {
         reset();
         
         LinkParameters params = userSettings.getDefaultFreewayParams("A -> B",null);
-        project = new Project("Scenario A", "A -> B",params);
+        project = new Project("A", "A -> B",params);
         menuFileSave.setDisable(false);
         menuFileSaveAs.setDisable(false);
         Collection<FreewayScenario> scenarios = project.get_scenarios();
@@ -323,8 +326,13 @@ public class AppMainController {
         
         // Initialize link editor
         try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenario_editor.fxml"));
+            scenarioEditorPane = loader.load();
+            scenarioEditorController = loader.getController();
+            scenarioEditorController.setPrimaryStage(primaryStage);
+            scenarioEditorController.setAppMainController(this);
             
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/link_editor.fxml"));
+            loader = new FXMLLoader(getClass().getResource("/link_editor.fxml"));
             linkEditorPane = loader.load();
             linkEditorController = loader.getController();
             linkEditorController.setPrimaryStage(primaryStage);
@@ -374,7 +382,8 @@ public class AppMainController {
         TreeItem<String> root = new TreeItem<String>("Project");
         Collection<FreewayScenario> scenarios = project.get_scenarios();
         for (FreewayScenario scenario : scenarios) {
-            TreeItem<String> scenario_node = new TreeItem<String>(scenario.name);
+            String s_nm = "Scenario: " + scenario.name;
+            TreeItem<String> scenario_node = new TreeItem<String>(s_nm);
             tree2object.put(scenario_node, scenario);
             object2tree.put(scenario, scenario_node);
             
@@ -416,6 +425,8 @@ public class AppMainController {
     private void processTreeSelection(TreeItem<String> treeItem) {
         if (treeItem == null)
             return;
+        if (treeItem.equals(projectTree.getRoot()))
+            return;
         
         if (treeItem.isLeaf()) {
             if (treeItem.getParent().getValue() == roadLinksTreeItem) { //a link was selected
@@ -442,7 +453,17 @@ public class AppMainController {
         } else {
             configAnchorPane.getChildren().clear();
             infoAnchorPane.getChildren().clear();
-            ; //TODO AK
+            
+            Object scenario = (FreewayScenario)tree2object.get(treeItem);
+            if (scenario != null) {
+                configAnchorPane.getChildren().clear();
+                configAnchorPane.getChildren().setAll(scenarioEditorPane);
+                configAnchorPane.setTopAnchor(scenarioEditorPane, 0.0);
+                configAnchorPane.setBottomAnchor(scenarioEditorPane, 0.0);
+                configAnchorPane.setLeftAnchor(scenarioEditorPane, 0.0);
+                configAnchorPane.setRightAnchor(scenarioEditorPane, 0.0);
+                scenarioEditorController.initWithScenarioData((FreewayScenario)scenario);
+            }
         }
         
     }
@@ -469,8 +490,8 @@ public class AppMainController {
     
     
     
-    public void linkNameUpdate(AbstractLink lnk) {
-        if (lnk == null) 
+    public void objectNameUpdate(Object obj) {
+        if (obj == null) 
             return;
         
         if (projectTree.getRoot() != null)
@@ -482,11 +503,25 @@ public class AppMainController {
         projectModified = true;
         populateProjectTree();
         
-        TreeItem item = object2tree.get(lnk);
+        TreeItem item = object2tree.get(obj);
         if (item == null) 
             return;
         
         projectTree.getSelectionModel().select(item);  
+    }
+    
+    
+    public void changeScenarioName(FreewayScenario s, String new_name) {
+        if (s == null)
+            return;
+        
+        try {
+            project.set_scenario_name(s.name, new_name);
+        } catch (Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot change scenario name...", e);
+        }
+        
+        objectNameUpdate(s);
     }
     
     

@@ -351,7 +351,7 @@ public class LinkEditorController {
         else
             myLink.get_segment().delete_in_or((LinkOnramp)onramps.get(idx));
         
-        appMainController.linkNameUpdate(myLink);
+        appMainController.objectNameUpdate(myLink);
     }
     
     @FXML
@@ -373,7 +373,7 @@ public class LinkEditorController {
         else
             myLink.get_segment().delete_in_fr((LinkOfframp)offramps.get(idx));
         
-        appMainController.linkNameUpdate(myLink);
+        appMainController.objectNameUpdate(myLink);
     }
 
     
@@ -498,7 +498,7 @@ public class LinkEditorController {
         if ((myLink.get_type() == AbstractLink.Type.freeway) || (myLink.get_type() == AbstractLink.Type.connector))
             myLink.get_segment().name = link_name;
         
-        appMainController.linkNameUpdate(myLink);
+        appMainController.objectNameUpdate(myLink);
     }
     
     
