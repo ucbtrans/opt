@@ -12,12 +12,19 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <SplitPane id="scenarioEditorMainPane" fx:id="scenarioEditorMainPane" dividerPositions="0.33985330073349634" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="600.0" orientation="VERTICAL" prefHeight="820.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.config.ScenarioEditorController">
   <items>
       <AnchorPane id="canvasParent" fx:id="canvasParent" minHeight="270.0" minWidth="600.0" prefHeight="301.0" prefWidth="898.0">
          <children>
             <Canvas id="scenarioEditorCanvas" fx:id="scenarioEditorCanvas" height="275.0" width="898.0" />
+            <Text layoutX="59.0" layoutY="140.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Later, this area will be used to display the road network">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Text>
          </children>
       </AnchorPane>
       <AnchorPane prefHeight="605.0" prefWidth="898.0">
