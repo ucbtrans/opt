@@ -51,6 +51,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import opt.config.ConnectController;
 import opt.config.LinkEditorController;
 import opt.config.LinkInfoController;
 import opt.config.NewLinkController;
@@ -95,6 +96,8 @@ public class AppMainController {
     private NewLinkController newLinkController = null;
     private GridPane newRampPane = null;
     private NewRampController newRampController = null;
+    private GridPane connectPane = null;
+    private ConnectController connectController = null;
     
     
     
@@ -355,6 +358,12 @@ public class AppMainController {
             newRampController = loader.getController();
             newRampController.setAppMainController(this);
             linkEditorController.setNewRampControllerAndScene(newRampController, new Scene(newRampPane));
+            
+            loader = new FXMLLoader(getClass().getResource("/connect_link.fxml"));
+            connectPane = loader.load();
+            connectController = loader.getController();
+            connectController.setAppMainController(this);
+            linkEditorController.setConnectControllerAndScene(connectController, new Scene(connectPane));
             
             
         } catch (IOException e) {
