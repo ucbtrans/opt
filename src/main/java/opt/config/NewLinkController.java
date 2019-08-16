@@ -36,6 +36,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.AppMainController;
+import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.LinkFreewayOrConnector;
 import opt.data.Segment;
@@ -202,19 +203,38 @@ public class NewLinkController {
         
         Segment new_segment;
         String segment_name = link_name;
+        UserSettings user_settings = appMainController.getUserSettings();
+
+        // TODO AK
+        // insert_XXX_segment takes parameters for a freeway link and a potential
+        // ramp link. A ramp link is only created if the calling link is a connector.
+        // Otherwise you can pass ramp_params=null.
+
+        // To obtain default parameters, use e.g.
+        // user_settings.getDefaultFreewayParams(fwy_name,fwy_length)
+
         if (downstreamLink != null) {
-            new_segment = downstreamLink.insert_up_segment(segment_name,link_name);
+//            new_segment = downstreamLink.insert_up_segment(segment_name,link_name);
+            new_segment = downstreamLink.insert_up_segment(segment_name,
+                    XXX,
+                    XXX);
         } else {
-            new_segment = upstreamLink.insert_dn_segment(segment_name,link_name);
+//            new_segment = upstreamLink.insert_dn_segment(segment_name,link_name);
+            new_segment = upstreamLink.insert_dn_segment(segment_name,
+                    XXX,
+                    XXX);
         }
         LinkFreewayOrConnector new_link = new_segment.fwy();
 
-        
+        // TODO AK : THIS IS NO LONGER NECESSARY
         try {
             new_link.set_length_meters((float)length);
         } catch(Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not set new section length...", e);
         }
+
+
+
         appMainController.linkNameUpdate(new_link);
 
         Stage stage = (Stage) topPane.getScene().getWindow();

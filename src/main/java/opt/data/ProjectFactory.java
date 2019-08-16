@@ -39,8 +39,8 @@ public class ProjectFactory {
      * Create an empty project.
      * @return Project object
      */
-    public static Project create_empty_project(LinkParameters params,String scn_name,String sgmt_name,String link_name) {
-        return new Project(params,scn_name,sgmt_name,link_name);
+    public static Project create_empty_project(String scn_name,String sgmt_name,LinkParameters link_params) {
+        return new Project(scn_name,sgmt_name,link_params);
     }
 
     /**

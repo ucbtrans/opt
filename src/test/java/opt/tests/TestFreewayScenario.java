@@ -82,8 +82,8 @@ public class TestFreewayScenario extends AbstractTest {
     @Test
     public void test_create_isolated_segment() {
         TestData X = new TestData();
-        LinkParameters params = new LinkParameters(100,200,300);
-        Segment new_segment =  X.scenario.create_isolated_segment("Lonely segment","Lonely link",params,AbstractLink.Type.freeway);
+        LinkParameters params = new LinkParameters(100f,200f,300f);
+        Segment new_segment =  X.scenario.create_isolated_segment("Lonely segment",params,AbstractLink.Type.freeway);
         assertNotNull(new_segment);
     }
 
@@ -98,7 +98,7 @@ public class TestFreewayScenario extends AbstractTest {
             // delete internal segement
 
             Set<String> link_names = X.scenario.get_links().stream()
-                    .map(link->link.name)
+                    .map(link->link.get_name())
                     .collect(Collectors.toSet());
 
             Set<Long> node_ids = X.scenario.get_nodes().keySet();
@@ -116,7 +116,7 @@ public class TestFreewayScenario extends AbstractTest {
             assertTrue( sA4.get_upstrm_segments().isEmpty() );
 
             link_names = X.scenario.get_links().stream()
-                    .map(link->link.name)
+                    .map(link->link.get_name())
                     .collect(Collectors.toSet());
 
             node_ids = X.scenario.get_nodes().keySet();

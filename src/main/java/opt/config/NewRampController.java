@@ -136,7 +136,7 @@ public class NewRampController {
             is_onramp = false;
                     
         
-        String link_name = myLink.name;
+        String link_name = myLink.get_name();
         String[] name_subs = link_name.split(" -> ");
         int sz = name_subs.length;
         from_name = name_subs[0];
@@ -244,18 +244,27 @@ public class NewRampController {
         int managed_lanes = numLanesManagedSpinnerValueFactory.getValue();
         int gp_lanes = numLanesGPSpinnerValueFactory.getValue();
 
-        LinkParameters params = appMainController.getUserSettings().getDefaultLinkParams();
         if (is_onramp) {
+
+            LinkParameters params = appMainController.getUserSettings().getDefaultOnrampParams(ramp_name,(float)length);
+            params.managed_lanes = managed_lanes;
+            params.gp_lanes = gp_lanes;
+
             if (is_inner)
-                myLink.get_segment().add_in_or(ramp_name, params, gp_lanes, managed_lanes, (float)length);
+                myLink.get_segment().add_in_or(params);
             else
-                myLink.get_segment().add_out_or(ramp_name, params, gp_lanes, managed_lanes, (float)length);
+                myLink.get_segment().add_out_or(params);
         }
         else {
+
+            LinkParameters params = appMainController.getUserSettings().getDefaultOfframpParams(ramp_name,(float)length);
+            params.managed_lanes = managed_lanes;
+            params.gp_lanes = gp_lanes;
+
             if (is_inner)
-                myLink.get_segment().add_in_fr(ramp_name, params, gp_lanes, managed_lanes, (float)length);
+                myLink.get_segment().add_in_fr(params);
             else
-                myLink.get_segment().add_out_fr(ramp_name, params, gp_lanes, managed_lanes, (float)length);
+                myLink.get_segment().add_out_fr(params);
         }
         
         appMainController.linkNameUpdate(myLink);

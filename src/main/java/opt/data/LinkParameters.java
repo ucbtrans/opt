@@ -4,14 +4,14 @@ import java.util.Objects;
 
 public class LinkParameters {
 
-    protected String name;
-    protected Integer gp_lanes;
-    protected Integer managed_lanes;
-    protected Integer aux_lanes;
-    protected Float length;
-    protected Float capacity_vphpl;
-    protected Float jam_density_vpkpl;
-    protected Float ff_speed_kph;
+    public String name;
+    public Integer gp_lanes;
+    public Integer managed_lanes;
+    public Integer aux_lanes;
+    public Float length;
+    public Float capacity_vphpl;
+    public Float jam_density_vpkpl;
+    public Float ff_speed_kph;
 
     /////////////////////////////////////
     // construction

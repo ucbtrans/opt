@@ -25,13 +25,13 @@ public class FreewayScenario {
     public FreewayScenario() {
     }
 
-    public FreewayScenario(String scnname,String segmentname,String linkname,LinkParameters params){
+    public FreewayScenario(String scnname,String segmentname,LinkParameters params){
         this.name = scnname;
         max_link_id = -1l;
         max_node_id = -1l;
         max_seg_id = -1l;
         scenario = new Scenario();
-        create_isolated_segment(segmentname,linkname,params, AbstractLink.Type.freeway);
+        create_isolated_segment(segmentname,params, AbstractLink.Type.freeway);
         scenario.commodities.put(0l,new Commodity(0l,"Unnamed commodity",1f));
     }
 
@@ -305,7 +305,7 @@ public class FreewayScenario {
      * Create an isolated segment
      * @return A new segment
      */
-    public Segment create_isolated_segment(String segment_name,String linkname,LinkParameters params,AbstractLink.Type linktype){
+    public Segment create_isolated_segment(String segment_name,LinkParameters params,AbstractLink.Type linktype){
 
         if(linktype!=AbstractLink.Type.freeway && linktype!= AbstractLink.Type.connector)
             return null;

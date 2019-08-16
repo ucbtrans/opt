@@ -138,10 +138,10 @@ public class LinkInfoController {
         }
         
         for (int i = 0; i < predecessors.size(); i++) {
-            listUpstreamSections.getItems().add(predecessors.get(i).name + " (" + predecessors.get(i).get_type() + ")");
+            listUpstreamSections.getItems().add(predecessors.get(i).get_name() + " (" + predecessors.get(i).get_type() + ")");
         }
         for (int i = 0; i < successors.size(); i++) {
-            listDownstreamSections.getItems().add(successors.get(i).name + " (" + successors.get(i).get_type() + ")");
+            listDownstreamSections.getItems().add(successors.get(i).get_name() + " (" + successors.get(i).get_type() + ")");
         }
     }
     

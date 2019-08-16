@@ -14,7 +14,7 @@ public class TestSnippet {
         HashSet <LinkParameters> newset = new HashSet<>();
 
         // populate hash set
-        LinkParameters a = new LinkParameters(100,200,300);
+        LinkParameters a = new LinkParameters(100f,200f,300f);
         newset.add(a);
 
         // clone the hash set

@@ -14,8 +14,8 @@ public class Project {
     // construction
     /////////////////////////////////////
 
-    public Project(LinkParameters params,String scn_name,String sgmt_name,String link_name){
-        scenarios.put(scn_name,new FreewayScenario(scn_name,sgmt_name, link_name,params));
+    public Project(String scn_name,String sgmt_name,LinkParameters params){
+        scenarios.put(scn_name,new FreewayScenario(scn_name,sgmt_name,params));
     }
 
     public Project(jaxbopt.Prj project,String folder,boolean validate) throws Exception {

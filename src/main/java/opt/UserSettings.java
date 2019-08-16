@@ -102,50 +102,50 @@ public class UserSettings {
     }
 
 
-    public LinkParameters getDefaultOfframpParams(String name) {
+    public LinkParameters getDefaultOfframpParams(String name,Float length) {
         return new LinkParameters(
                 name,
                 defaultOfframpGPLanes,
                 defaultOfframpManagedLanes,
                 defaultOfframpAuxLanes,
-                100f,
+                length!=null ? length : 100f,
                 (float)defaultGPLaneCapacityVph,
                 (float)defaultGPLaneJamDensityVpk,
                 (float)defaultGPLaneFreeFlowSpeedKph);
     }
 
 
-    public LinkParameters getDefaultOnrampParams(String name) {
+    public LinkParameters getDefaultOnrampParams(String name,Float length) {
         return new LinkParameters(
                 name,
                 defaultOnrampGPLanes,
                 defaultOnrampManagedLanes,
                 defaultOnrampAuxLanes,
-                100f,
+                length!=null ? length : 100f,
                 (float)defaultGPLaneCapacityVph,
                 (float)defaultGPLaneJamDensityVpk,
                 (float)defaultGPLaneFreeFlowSpeedKph);
     }
 
-    public LinkParameters getDefaultConnectorParams(String name) {
+    public LinkParameters getDefaultConnectorParams(String name,Float length) {
         return new LinkParameters(
                 name,
                 defaultConnectorGPLanes,
                 defaultConnectorManagedLanes,
                 defaultConnectorAuxLanes,
-                100f,
+                length!=null ? length : 100f,
                 (float)defaultGPLaneCapacityVph,
                 (float)defaultGPLaneJamDensityVpk,
                 (float)defaultGPLaneFreeFlowSpeedKph);
     }
 
-    public LinkParameters getDefaultFreewayParams(String name) {
+    public LinkParameters getDefaultFreewayParams(String name,Float length) {
         return new LinkParameters(
                 name,
                 defaultFreewayGPLanes,
                 defaultFreewayManagedLanes,
                 defaultFreewayAuxLanes,
-                100f,
+                length!=null ? length : 100f,
                 (float)defaultGPLaneCapacityVph,
                 (float)defaultGPLaneJamDensityVpk,
                 (float)defaultGPLaneFreeFlowSpeedKph);
