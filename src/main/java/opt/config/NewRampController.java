@@ -258,7 +258,7 @@ public class NewRampController {
                 myLink.get_segment().add_out_fr(ramp_name, params, gp_lanes, managed_lanes, (float)length);
         }
         
-        appMainController.linkNameUpdate(myLink);
+        appMainController.objectNameUpdate(myLink);
 
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();

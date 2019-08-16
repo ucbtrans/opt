@@ -215,7 +215,7 @@ public class NewLinkController {
         } catch(Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not set new section length...", e);
         }
-        appMainController.linkNameUpdate(new_link);
+        appMainController.objectNameUpdate(new_link);
 
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
