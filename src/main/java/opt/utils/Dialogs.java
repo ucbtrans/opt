@@ -49,6 +49,17 @@ import javafx.stage.Stage;
  */
 public class Dialogs {
     
+    public static void WarningDialog(String header, String content) {
+        Alert alert = new Alert(AlertType.WARNING);
+        alert.setTitle("Attention!");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(Dialogs.class.getResourceAsStream("/OPT_icon.png")));
+        alert.showAndWait();
+    }
+    
+    
     
     public static void ErrorDialog(String header, String content) {
         Alert alert = new Alert(AlertType.ERROR);

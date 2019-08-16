@@ -109,7 +109,6 @@ public class ConnectController {
         for (AbstractLink l : candidates) {
             linkList.getItems().add(l.get_name());
         }
-
     }
     
     
@@ -132,8 +131,26 @@ public class ConnectController {
 
     @FXML
     void onOK(ActionEvent event) {
+        int idx = linkList.getSelectionModel().getSelectedIndex();
+        
+        if (idx < 0) {
+            opt.utils.Dialogs.WarningDialog("No road section selected!", "Please, choose a road section from the list...");
+            return;
+        }
+        
+        if (idx >= candidates.size()) {
+            opt.utils.Dialogs.ErrorDialog("Unknown error...", "Please, report this problem!");
+            return;
+        }
+        
+        AbstractLink lnk = candidates.get(idx);
+        if (dnConnect)
+            lnk.connect_to_upstream(myLink);
+        else
+            myLink.connect_to_upstream(lnk);
 
-
+        appMainController.selectLink(myLink);
+        
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
     }
