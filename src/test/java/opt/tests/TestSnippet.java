@@ -1,12 +1,14 @@
 package opt.tests;
 
 import opt.data.LinkParameters;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashSet;
 
 public class TestSnippet {
 
+    @Ignore
     @Test
     public void test_snippet(){
 

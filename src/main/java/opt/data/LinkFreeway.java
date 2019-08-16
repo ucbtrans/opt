@@ -22,6 +22,11 @@ public class LinkFreeway extends LinkFreewayOrConnector {
         super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, name, gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 
+    // used by clone
+    public LinkFreeway(long id,Long start_node_id,Long end_node_id,LinkParameters params){
+        super(id,start_node_id,end_node_id,params);
+    }
+
     @Override
     public Type get_type() {
         return Type.freeway;

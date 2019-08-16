@@ -53,6 +53,17 @@ public abstract class AbstractLink implements Comparable {
                 Float.NaN );
     }
 
+    // used by clone
+    public AbstractLink(long id,Long start_node_id,Long end_node_id,LinkParameters params){
+        this.id = id;
+        this.mysegment = null;
+        this.up_link = null;
+        this.dn_link = null;
+        this.start_node_id = start_node_id;
+        this.end_node_id = end_node_id;
+        this.params = params;
+    }
+
     public AbstractLink(long id,Segment mysegment,AbstractLink up_link,AbstractLink dn_link,Long start_node_id,Long end_node_id,LinkParameters params){
         this.id = id;
         this.mysegment = mysegment;
@@ -73,56 +84,34 @@ public abstract class AbstractLink implements Comparable {
         this.params = new LinkParameters(name, gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 
-//    public AbstractLink(Long id, Segment mysegment, Long start_node_id, Long end_node_id, ) {
-//        this.id = id;
-//        this.name = name;
-//        this.start_node_id = start_node_id;
-//        this.end_node_id = end_node_id;
-//        this.full_lanes = full_lanes;
-//        this.managed_lanes = managed_lanes;
-//        this.aux_lanes = aux_lanes;
-//        this.length_meters = length;
-//        this.param = new LinkParameters(capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
-//        this.mysegment = mysegment;
-//    }
+    @Override
+    public AbstractLink clone(){
+        AbstractLink new_link = null;
+        try {
+            new_link = this.getClass()
+                    .getConstructor(long.class,Long.class,Long.class,LinkParameters.class)
+                    .newInstance(
+                            id,
+                            start_node_id,
+                            end_node_id,
+                            params.clone());
 
-//    @Override
-//    public AbstractLink clone(){
-//        AbstractLink new_link = null;
-//        try {
-//            new_link = this.getClass()
-//                    .getConstructor(Long.class,String.class,Long.class,Long.class,Integer.class,Integer.class,Integer.class,Float.class,Float.class,Float.class,Float.class,Segment.class)
-//                    .newInstance(
-//                            id,
-//                            params.name,
-//                            start_node_id,
-//                            end_node_id,
-//                            full_lanes,
-//                            managed_lanes,
-//                            aux_lanes,
-//                            length_meters,
-//                            param.capacity_vphpl,
-//                            param.jam_density_vpkpl,
-//                            param.ff_speed_kph,
-//                            null);
-//            new_link.name = name;
-//
-//            for(Map.Entry<Long, Profile1D> e : demands.entrySet())
-//                new_link.demands.put(e.getKey(),e.getValue().clone());
-//            for(Map.Entry<Long, Profile1D> e : splits.entrySet())
-//                new_link.splits.put(e.getKey(),e.getValue().clone());
-//
-//        } catch (NoSuchMethodException e) {
-//            e.printStackTrace();
-//        } catch (IllegalAccessException e) {
-//            e.printStackTrace();
-//        } catch (InstantiationException e) {
-//            e.printStackTrace();
-//        } catch (InvocationTargetException e) {
-//            e.printStackTrace();
-//        }
-//        return new_link;
-//    }
+            for(Map.Entry<Long, Profile1D> e : demands.entrySet())
+                new_link.demands.put(e.getKey(),e.getValue().clone());
+            for(Map.Entry<Long, Profile1D> e : splits.entrySet())
+                new_link.splits.put(e.getKey(),e.getValue().clone());
+
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return new_link;
+    }
 
     /////////////////////////////////////
     // basic getters

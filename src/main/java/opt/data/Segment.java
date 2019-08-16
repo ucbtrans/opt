@@ -59,19 +59,18 @@ public final class Segment implements Comparable {
         new_seg.id = id;
         new_seg.name = name;
 
-        // TODO RESTORE THIS!!
-//        new_seg.fwy = (LinkFreewayOrConnector) fwy.clone();
-//        for(LinkOnramp x : in_ors)
-//            new_seg.in_ors.add((LinkOnramp) x.clone());
-//
-//        for(LinkOnramp x : out_ors)
-//            new_seg.out_ors.add((LinkOnramp) x.clone());
-//
-//        for(LinkOfframp x : in_frs)
-//            new_seg.in_frs.add((LinkOfframp) x.clone());
-//
-//        for(LinkOfframp x : out_frs)
-//            new_seg.out_frs.add((LinkOfframp) x.clone());
+        new_seg.fwy = (LinkFreewayOrConnector) fwy.clone();
+        for(LinkOnramp x : in_ors)
+            new_seg.in_ors.add((LinkOnramp) x.clone());
+
+        for(LinkOnramp x : out_ors)
+            new_seg.out_ors.add((LinkOnramp) x.clone());
+
+        for(LinkOfframp x : in_frs)
+            new_seg.in_frs.add((LinkOfframp) x.clone());
+
+        for(LinkOfframp x : out_frs)
+            new_seg.out_frs.add((LinkOfframp) x.clone());
 
         return new_seg;
     }

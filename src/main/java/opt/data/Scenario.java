@@ -73,9 +73,8 @@ public class Scenario {
         for (Map.Entry<Long, Node> e : nodes.entrySet())
             jscn_cpy.nodes.put(e.getKey(), e.getValue().clone());
 
-        // TODO RESTORE THIS!!
-//        for (Map.Entry<Long, AbstractLink> e : links.entrySet())
-//            jscn_cpy.links.put(e.getKey(), e.getValue().clone());
+        for (Map.Entry<Long, AbstractLink> e : links.entrySet())
+            jscn_cpy.links.put(e.getKey(), e.getValue().clone());
 
         for (Map.Entry<Long,Commodity> e : commodities.entrySet())
             jscn_cpy.commodities.put(e.getKey(),e.getValue().clone());

@@ -22,16 +22,10 @@ public class LinkOnramp extends AbstractLink {
         super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, name, gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 
-
-//    @Override
-//    protected void delete(){
-//        if(up_link!=null)
-//            up_link.dn_link = null;
-//        if(dn_link!=null)
-//            dn_link.up_link = null;
-//        demands = null;
-//        splits = null;
-//    }
+    // used by clone
+    public LinkOnramp(long id,Long start_node_id,Long end_node_id,LinkParameters params){
+        super(id,start_node_id,end_node_id,params);
+    }
 
     @Override
     public Type get_type() {
