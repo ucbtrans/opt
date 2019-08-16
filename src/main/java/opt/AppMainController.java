@@ -72,7 +72,7 @@ import opt.data.Project;
 public class AppMainController {
     private Stage primaryStage = null;
     private Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
-    private UserSettings userSettings = new UserSettings();
+//    private UserSettings userSettings = new UserSettings();
     private boolean projectModified = false;
     private String projectFilePath = null;
     private String optProjectFileDir_String = "optProjectFileDir_String";
@@ -171,9 +171,9 @@ public class AppMainController {
     
     
     
-    public UserSettings getUserSettings() {
-        return userSettings;
-    }
+//    public UserSettings getUserSettings() {
+//        return userSettings;
+//    }
     
     
     
@@ -212,7 +212,7 @@ public class AppMainController {
         }
         reset();
         
-        LinkParameters params = userSettings.getDefaultFreewayParams("A -> B",null);
+        LinkParameters params = UserSettings.getDefaultFreewayParams("A -> B",null);
         project = new Project("A", "A -> B",params);
         menuFileSave.setDisable(false);
         menuFileSaveAs.setDisable(false);
@@ -222,7 +222,7 @@ public class AppMainController {
                 if (link == null)
                     continue;
                 try {
-                    link.set_gp_lanes(userSettings.defaultFreewayGPLanes);
+                    link.set_gp_lanes(UserSettings.defaultFreewayGPLanes);
                 } catch (Exception e) {
                     ;
                 }

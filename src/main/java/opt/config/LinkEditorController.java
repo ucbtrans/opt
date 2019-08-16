@@ -53,6 +53,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import opt.AppMainController;
+import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.LinkOfframp;
 import opt.data.LinkOnramp;
@@ -740,9 +741,9 @@ public class LinkEditorController {
         
 
         
-        String unitsLength = appMainController.getUserSettings().unitsLength;
+        String unitsLength = UserSettings.unitsLength;
         double length = myLink.get_length_meters();
-        length = appMainController.getUserSettings().convertLength(length, "meters", unitsLength);
+        length = UserSettings.convertLength(length, "meters", unitsLength);
         labelLength.setText("Length (" + unitsLength + "):");
         lengthSpinnerValueFactory.setValue(length);
         
@@ -829,7 +830,7 @@ public class LinkEditorController {
         int ramp_angle = 45;
         double width = linkEditorCanvas.getWidth();
         double height = linkEditorCanvas.getHeight();
-        boolean rightSideRoads = appMainController.getUserSettings().rightSideRoads;
+        boolean rightSideRoads = UserSettings.rightSideRoads;
         
         int managed_lanes = numLanesManagedSpinnerValueFactory.getValue();
         int gp_lanes = numLanesGPSpinnerValueFactory.getValue();
@@ -1191,9 +1192,9 @@ public class LinkEditorController {
     
     @FXML
     private void onLinkLengthChange() {
-        String unitsLength = appMainController.getUserSettings().unitsLength;
+        String unitsLength = UserSettings.unitsLength;
         double length = lengthSpinnerValueFactory.getValue();
-        length = appMainController.getUserSettings().convertLength(length, unitsLength, "meters");
+        length = UserSettings.convertLength(length, unitsLength, "meters");
         length = Math.max(length, 0.001);
         try {
             myLink.set_length_meters((float)length);

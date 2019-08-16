@@ -165,9 +165,9 @@ public class NewLinkController {
         else
             cbInner.setVisible(false);
         
-        String unitsLength = appMainController.getUserSettings().unitsLength;
+        String unitsLength = UserSettings.unitsLength;
         double length = myLink.get_length_meters();
-        length = appMainController.getUserSettings().convertLength(length, "meters", unitsLength);
+        length = UserSettings.convertLength(length, "meters", unitsLength);
         labelLength.setText("Length (" + unitsLength + "):");
         lengthSpinnerValueFactory.setValue(length);
     }
@@ -206,14 +206,13 @@ public class NewLinkController {
         link_name = opt.utils.Misc.validateAndCorrectLinkName(link_name, myLink.get_segment().get_scenario());
         
         // Link length
-        String unitsLength = appMainController.getUserSettings().unitsLength;
+        String unitsLength = UserSettings.unitsLength;
         double length = lengthSpinnerValueFactory.getValue();
-        length = appMainController.getUserSettings().convertLength(length, unitsLength, "meters");
+        length = UserSettings.convertLength(length, unitsLength, "meters");
         length = Math.max(length, 0.001);
         
         Segment new_segment;
         String segment_name = link_name;
-        UserSettings user_settings = appMainController.getUserSettings();
 
         // TODO AK
         // insert_XXX_segment takes parameters for a freeway link and a potential

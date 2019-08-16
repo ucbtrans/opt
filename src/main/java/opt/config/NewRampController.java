@@ -37,6 +37,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.AppMainController;
+import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.LinkFreewayOrConnector;
 import opt.data.LinkParameters;
@@ -167,8 +168,8 @@ public class NewRampController {
                 cbInnerRamp.setDisable(true);
             }   
             to_name = "";
-            numLanesManagedSpinnerValueFactory.setValue(appMainController.getUserSettings().defaultOnrampManagedLanes);
-            numLanesGPSpinnerValueFactory.setValue(appMainController.getUserSettings().defaultOnrampGPLanes);
+            numLanesManagedSpinnerValueFactory.setValue(UserSettings.defaultOnrampManagedLanes);
+            numLanesGPSpinnerValueFactory.setValue(UserSettings.defaultOnrampGPLanes);
         } else {
             if (to_name.equals(""))
                 linkToName.setText(from_name);
@@ -187,15 +188,15 @@ public class NewRampController {
                 cbInnerRamp.setDisable(true);
             }
             from_name = "";
-            numLanesManagedSpinnerValueFactory.setValue(appMainController.getUserSettings().defaultOfframpManagedLanes);
-            numLanesGPSpinnerValueFactory.setValue(appMainController.getUserSettings().defaultOfframpGPLanes);
+            numLanesManagedSpinnerValueFactory.setValue(UserSettings.defaultOfframpManagedLanes);
+            numLanesGPSpinnerValueFactory.setValue(UserSettings.defaultOfframpGPLanes);
         } 
         from_name = linkFromName.getText();
         to_name = linkToName.getText();
         
-        String unitsLength = appMainController.getUserSettings().unitsLength;
-        double length = appMainController.getUserSettings().defaultRampLengthMeters;
-        length = appMainController.getUserSettings().convertLength(length, "meters", unitsLength);
+        String unitsLength = UserSettings.unitsLength;
+        double length = UserSettings.defaultRampLengthMeters;
+        length = UserSettings.convertLength(length, "meters", unitsLength);
         labelLength.setText("Length (" + unitsLength + "):");
         lengthSpinnerValueFactory.setValue(length);
         
@@ -235,9 +236,9 @@ public class NewRampController {
         ramp_name = opt.utils.Misc.validateAndCorrectLinkName(ramp_name, myLink.get_segment().get_scenario());
         
         // Link length
-        String unitsLength = appMainController.getUserSettings().unitsLength;
+        String unitsLength = UserSettings.unitsLength;
         double length = lengthSpinnerValueFactory.getValue();
-        length = appMainController.getUserSettings().convertLength(length, unitsLength, "meters");
+        length = UserSettings.convertLength(length, unitsLength, "meters");
         length = Math.max(length, 0.001);
         
         boolean is_inner = cbInnerRamp.isSelected();
@@ -246,7 +247,7 @@ public class NewRampController {
 
         if (is_onramp) {
 
-            LinkParameters params = appMainController.getUserSettings().getDefaultOnrampParams(ramp_name,(float)length);
+            LinkParameters params = UserSettings.getDefaultOnrampParams(ramp_name,(float)length);
             params.managed_lanes = managed_lanes;
             params.gp_lanes = gp_lanes;
 
@@ -257,7 +258,7 @@ public class NewRampController {
         }
         else {
 
-            LinkParameters params = appMainController.getUserSettings().getDefaultOfframpParams(ramp_name,(float)length);
+            LinkParameters params = UserSettings.getDefaultOfframpParams(ramp_name,(float)length);
             params.managed_lanes = managed_lanes;
             params.gp_lanes = gp_lanes;
 

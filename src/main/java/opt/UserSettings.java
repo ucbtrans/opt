@@ -39,49 +39,50 @@ import opt.data.LinkParameters;
  * @author Alex Kurzhanskiy
  */
 public class UserSettings {
-    public boolean rightSideRoads = true;
-    private String[] unitsLengthOptions = {"meters", "feet", "kilometers", "miles"};
-    public String unitsLength = "miles";
+
+    public static boolean rightSideRoads = true;
+    private static String[] unitsLengthOptions = {"meters", "feet", "kilometers", "miles"};
+    public static String unitsLength = "miles";
     
     
     
-    public double defaultRampLengthMeters = 322; // meters
+    public static double defaultRampLengthMeters = 322; // meters
     
-    public int defaultOnrampGPLanes = 1;
-    public int defaultOfframpGPLanes = 1;
-    public int defaultConnectorGPLanes = 2;
-    public int defaultFreewayGPLanes = 3;
+    public static int defaultOnrampGPLanes = 1;
+    public static int defaultOfframpGPLanes = 1;
+    public static int defaultConnectorGPLanes = 2;
+    public static int defaultFreewayGPLanes = 3;
     
-    public int defaultOnrampManagedLanes = 1;
-    public int defaultOfframpManagedLanes = 0;
-    public int defaultConnectorManagedLanes = 1;
-    public int defaultFreewayManagedLanes = 1;
+    public static int defaultOnrampManagedLanes = 1;
+    public static int defaultOfframpManagedLanes = 0;
+    public static int defaultConnectorManagedLanes = 1;
+    public static int defaultFreewayManagedLanes = 1;
     
-    public int defaultOnrampAuxLanes = 0;
-    public int defaultOfframpAuxLanes = 0;
-    public int defaultConnectorAuxLanes = 0;
-    public int defaultFreewayAuxLanes = 0;
+    public static int defaultOnrampAuxLanes = 0;
+    public static int defaultOfframpAuxLanes = 0;
+    public static int defaultConnectorAuxLanes = 0;
+    public static int defaultFreewayAuxLanes = 0;
     
-    public double defaultGPLaneCapacityVph = 1900;
-    public double defaultManagedLaneCapacityVph = 1800;
-    public double defaultAuxLaneCapacityVph = 950;
+    public static double defaultGPLaneCapacityVph = 1900;
+    public static double defaultManagedLaneCapacityVph = 1800;
+    public static double defaultAuxLaneCapacityVph = 950;
     
-    public double defaultGPLaneFreeFlowSpeedKph = 105;
-    public double defaultManagedLaneFreeFlowSpeedKph = 115;
-    public double defaultAuxLaneFreeFlowSpeedKph = 90;
+    public static double defaultGPLaneFreeFlowSpeedKph = 105;
+    public static double defaultManagedLaneFreeFlowSpeedKph = 115;
+    public static double defaultAuxLaneFreeFlowSpeedKph = 90;
     
-    public double defaultGPLaneJamDensityVpk = 110;
-    public double defaultManagedLaneJamDensityVpk = 110;
-    public double defaultAuxLaneJamDensityVpk = 110;
-    
-    
+    public static double defaultGPLaneJamDensityVpk = 110;
+    public static double defaultManagedLaneJamDensityVpk = 110;
+    public static double defaultAuxLaneJamDensityVpk = 110;
     
     
     
-    private Map<String, Double> lengthConversionMap = new HashMap<String, Double>();
     
     
-    public UserSettings() {
+    private static Map<String, Double> lengthConversionMap = new HashMap<String, Double>();
+    
+    
+    static {
         lengthConversionMap.put("metersmeters", new Double(1));
         lengthConversionMap.put("metersfeet", new Double(3.28084));
         lengthConversionMap.put("meterskilometers", new Double(0.001));
@@ -102,7 +103,7 @@ public class UserSettings {
     }
 
 
-    public LinkParameters getDefaultOfframpParams(String name,Float length) {
+    public static LinkParameters getDefaultOfframpParams(String name,Float length) {
         return new LinkParameters(
                 name,
                 defaultOfframpGPLanes,
@@ -115,7 +116,7 @@ public class UserSettings {
     }
 
 
-    public LinkParameters getDefaultOnrampParams(String name,Float length) {
+    public static LinkParameters getDefaultOnrampParams(String name,Float length) {
         return new LinkParameters(
                 name,
                 defaultOnrampGPLanes,
@@ -127,7 +128,7 @@ public class UserSettings {
                 (float)defaultGPLaneFreeFlowSpeedKph);
     }
 
-    public LinkParameters getDefaultConnectorParams(String name,Float length) {
+    public static LinkParameters getDefaultConnectorParams(String name,Float length) {
         return new LinkParameters(
                 name,
                 defaultConnectorGPLanes,
@@ -139,7 +140,7 @@ public class UserSettings {
                 (float)defaultGPLaneFreeFlowSpeedKph);
     }
 
-    public LinkParameters getDefaultFreewayParams(String name,Float length) {
+    public static LinkParameters getDefaultFreewayParams(String name,Float length) {
         return new LinkParameters(
                 name,
                 defaultFreewayGPLanes,
@@ -151,13 +152,9 @@ public class UserSettings {
                 (float)defaultGPLaneFreeFlowSpeedKph);
     }
     
+
     
-    
-    
-    
-    
-    
-    public double convertLength(double value, String fromUnits, String toUnits) {
+    public static double convertLength(double value, String fromUnits, String toUnits) {
         Double res = lengthConversionMap.get(fromUnits + toUnits);
         if (res == null)
             res = new Double(1);
