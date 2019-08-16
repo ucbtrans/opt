@@ -13,8 +13,12 @@ public class LinkConnector extends LinkFreewayOrConnector {
         super(link, rp);
     }
 
-    public LinkConnector(Long id, String name, Long start_node_id, Long end_node_id, Integer full_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
-        super(id, name, start_node_id, end_node_id, full_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
+    public LinkConnector(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, LinkParameters params) {
+        super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, params);
+    }
+
+    public LinkConnector(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, String name, Integer gp_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
+        super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, name, gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 
     @Override
@@ -41,27 +45,25 @@ public class LinkConnector extends LinkFreewayOrConnector {
     /////////////////////////////////////
 
     @Override
-    public Segment insert_up_segment(String seg_name,String fwy_name) {
+    public Segment insert_up_segment(String seg_name,LinkParameters fwy_params,LinkParameters ramp_params) {
         if(up_link!=null)
             return null;
+        assert(fwy_params!=null && ramp_params!=null);
 
-        Segment segment = create_isolated_segment(seg_name,fwy_name);
+        Segment segment = create_isolated_segment(seg_name,fwy_params);
         LinkFreeway fwy = (LinkFreeway) segment.fwy;
 
         // create the offramp
         Node conn_start_node = mysegment.fwy_scenario.scenario.nodes.get(this.start_node_id);
-        LinkOfframp fr = new LinkOfframp(mysegment.fwy_scenario.new_link_id(),
-                "Unnamed offramp",
-                fwy.end_node_id,      // start_node_id
+
+        LinkOfframp fr = new LinkOfframp(
+                mysegment.fwy_scenario.new_link_id(), // id,
+                segment,// mysegment,
+                null,       // up_link
+                null,       // dn_link
+                fwy.end_node_id,   // start_node_id
                 conn_start_node.id,   // end_node_id
-                1,
-                0,
-                0,
-                100f,
-                param.capacity_vphpl,
-                param.jam_density_vpkpl,
-                param.ff_speed_kph,
-                segment);
+                ramp_params );
 
         mysegment.fwy_scenario.scenario.links.put(fr.id,fr);
         conn_start_node.in_links.add(fr.id);
@@ -76,28 +78,26 @@ public class LinkConnector extends LinkFreewayOrConnector {
     }
 
     @Override
-    public Segment insert_dn_segment(String seg_name,String fwy_name) {
+    public Segment insert_dn_segment(String seg_name,LinkParameters fwy_params,LinkParameters ramp_params) {
 
         if(dn_link!=null)
             return null;
+        assert(fwy_params!=null && ramp_params!=null);
 
-        Segment segment = create_isolated_segment(seg_name,fwy_name);
+        Segment segment = create_isolated_segment(seg_name,fwy_params);
         LinkFreeway fwy = (LinkFreeway) segment.fwy;
 
         // create the onramp
         Node conn_end_node = mysegment.fwy_scenario.scenario.nodes.get(this.end_node_id);
-        LinkOnramp or = new LinkOnramp(mysegment.fwy_scenario.new_link_id(),
-                "Unnamed onramp",
+
+        LinkOnramp or = new LinkOnramp(
+                mysegment.fwy_scenario.new_link_id(), // id,
+                segment, // mysegment,
+                null, // up_link,
+                null, // dn_link,
                 conn_end_node.id,      // start_node_id
                 fwy.start_node_id,      // end_node_id
-                1,
-                0,
-                0,
-                100f,
-                param.capacity_vphpl,
-                param.jam_density_vpkpl,
-                param.ff_speed_kph,
-                segment);
+                ramp_params);
 
         mysegment.fwy_scenario.scenario.links.put(or.id,or);
         conn_end_node.out_links.add(or.id);
@@ -121,7 +121,7 @@ public class LinkConnector extends LinkFreewayOrConnector {
         return link instanceof LinkOnramp;
     }
 
-    private Segment create_isolated_segment(String seg_name,String fwy_name) {
+    private Segment create_isolated_segment(String seg_name,LinkParameters fwy_params) {
 
         FreewayScenario fwy_scenario = this.mysegment.fwy_scenario;
 
@@ -140,18 +140,13 @@ public class LinkConnector extends LinkFreewayOrConnector {
         fwy_scenario.scenario.nodes.put(fwy_end_node.id,fwy_end_node);
 
         LinkFreeway fwy = new LinkFreeway(
-                fwy_scenario.new_link_id(),
-                fwy_name,
+                fwy_scenario.new_link_id(), // id,
+                segment, // mysegment,
+                null, // up_link,
+                null, // dn_link,
                 fwy_start_node.id,
                 fwy_end_node.id,
-                1,
-                0,
-                0,
-                500f,
-                param.capacity_vphpl,
-                param.jam_density_vpkpl,
-                param.ff_speed_kph,
-                segment);
+                fwy_params);
 
         fwy_scenario.scenario.links.put(fwy.id,fwy);
         fwy_start_node.out_links.add(fwy.id);

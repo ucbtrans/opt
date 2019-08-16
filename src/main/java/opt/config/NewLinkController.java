@@ -120,7 +120,7 @@ public class NewLinkController {
         if (myLink == null)
             return;
         
-        String link_name = myLink.name;
+        String link_name = myLink.get_name();
         String[] name_subs = link_name.split(" -> ");
         int sz = name_subs.length;
         from_name = name_subs[0];

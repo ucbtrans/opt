@@ -100,12 +100,55 @@ public class UserSettings {
         lengthConversionMap.put("milesmiles", new Double(1));
         
     }
-    
-    
-    
-    
-    public LinkParameters getDefaultLinkParams() {
-        return new LinkParameters((float)defaultGPLaneCapacityVph, (float)defaultGPLaneJamDensityVpk, (float)defaultGPLaneFreeFlowSpeedKph);
+
+
+    public LinkParameters getDefaultOfframpParams(String name) {
+        return new LinkParameters(
+                name,
+                defaultOfframpGPLanes,
+                defaultOfframpManagedLanes,
+                defaultOfframpAuxLanes,
+                100f,
+                (float)defaultGPLaneCapacityVph,
+                (float)defaultGPLaneJamDensityVpk,
+                (float)defaultGPLaneFreeFlowSpeedKph);
+    }
+
+
+    public LinkParameters getDefaultOnrampParams(String name) {
+        return new LinkParameters(
+                name,
+                defaultOnrampGPLanes,
+                defaultOnrampManagedLanes,
+                defaultOnrampAuxLanes,
+                100f,
+                (float)defaultGPLaneCapacityVph,
+                (float)defaultGPLaneJamDensityVpk,
+                (float)defaultGPLaneFreeFlowSpeedKph);
+    }
+
+    public LinkParameters getDefaultConnectorParams(String name) {
+        return new LinkParameters(
+                name,
+                defaultConnectorGPLanes,
+                defaultConnectorManagedLanes,
+                defaultConnectorAuxLanes,
+                100f,
+                (float)defaultGPLaneCapacityVph,
+                (float)defaultGPLaneJamDensityVpk,
+                (float)defaultGPLaneFreeFlowSpeedKph);
+    }
+
+    public LinkParameters getDefaultFreewayParams(String name) {
+        return new LinkParameters(
+                name,
+                defaultFreewayGPLanes,
+                defaultFreewayManagedLanes,
+                defaultFreewayAuxLanes,
+                100f,
+                (float)defaultGPLaneCapacityVph,
+                (float)defaultGPLaneJamDensityVpk,
+                (float)defaultGPLaneFreeFlowSpeedKph);
     }
     
     

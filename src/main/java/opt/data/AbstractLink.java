@@ -9,7 +9,8 @@ public abstract class AbstractLink implements Comparable {
 
     public enum Type {freeway,offramp,onramp,connector}
 
-    // refs
+    public final long id;
+
     protected Segment mysegment;
     protected AbstractLink up_link;
     protected AbstractLink dn_link;
@@ -17,15 +18,8 @@ public abstract class AbstractLink implements Comparable {
     protected long start_node_id;
     protected long end_node_id;
 
-    protected int managed_lanes;
-    protected int aux_lanes;
+    protected LinkParameters params;
 
-    public final long id;
-
-    public String name;
-    public int full_lanes;
-    public float length_meters;
-    public LinkParameters param;
     protected Map<Long, Profile1D> demands = new HashMap<>();    // commodity -> Profile1D
     protected Map<Long, Profile1D> splits = new HashMap<>();     // commodity -> Profile1D
 
@@ -35,8 +29,8 @@ public abstract class AbstractLink implements Comparable {
 
     abstract public AbstractLink.Type get_type();
     abstract public boolean is_ramp();
-    abstract public Segment insert_up_segment(String seg_name,String link_name);
-    abstract public Segment insert_dn_segment(String seg_name,String link_name);
+    abstract public Segment insert_up_segment(String seg_name,LinkParameters fwy_params,LinkParameters ramp_params);
+    abstract public Segment insert_dn_segment(String seg_name,LinkParameters fwy_params,LinkParameters ramp_params);
     abstract protected boolean is_permitted_uplink(AbstractLink link);
     abstract protected boolean is_permitted_dnlink(AbstractLink link);
 
@@ -48,70 +42,92 @@ public abstract class AbstractLink implements Comparable {
         this.id = link.getId();
         this.start_node_id = link.getStartNodeId();
         this.end_node_id = link.getEndNodeId();
-        this.full_lanes = link.getFullLanes();
-        this.length_meters = link.getLength();
-        this.param = new LinkParameters(rp);
-
-        // TODO GG : IMPLEMENT MANAGED LANES AND AUX LANES IN XML
-        this.managed_lanes = 0;
-        this.aux_lanes = 0;
+        this.params = new LinkParameters(
+                "",
+                link.getFullLanes(),
+                0,
+                0,
+                link.getLength(),
+                Float.NaN,
+                Float.NaN,
+                Float.NaN );
     }
 
-    public AbstractLink(Long id, String name, Long start_node_id, Long end_node_id, Integer full_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
+    public AbstractLink(long id,Segment mysegment,AbstractLink up_link,AbstractLink dn_link,Long start_node_id,Long end_node_id,LinkParameters params){
         this.id = id;
-        this.name = name;
+        this.mysegment = mysegment;
+        this.up_link = up_link;
+        this.dn_link = dn_link;
         this.start_node_id = start_node_id;
         this.end_node_id = end_node_id;
-        this.full_lanes = full_lanes;
-        this.managed_lanes = managed_lanes;
-        this.aux_lanes = aux_lanes;
-        this.length_meters = length;
-        this.param = new LinkParameters(capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
+        this.params = params;
+    }
+
+    public AbstractLink(long id,Segment mysegment,AbstractLink up_link,AbstractLink dn_link,Long start_node_id,Long end_node_id,String name,Integer gp_lanes,Integer managed_lanes,Integer aux_lanes,Float length,Float capacity_vphpl,Float jam_density_vpkpl,Float ff_speed_kph){
+        this.id = id;
         this.mysegment = mysegment;
+        this.up_link = up_link;
+        this.dn_link = dn_link;
+        this.start_node_id = start_node_id;
+        this.end_node_id = end_node_id;
+        this.params = new LinkParameters(name, gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 
-    @Override
-    public AbstractLink clone(){
-        AbstractLink new_link = null;
-        try {
-            new_link = this.getClass()
-                    .getConstructor(Long.class,String.class,Long.class,Long.class,Integer.class,Integer.class,Integer.class,Float.class,Float.class,Float.class,Float.class,Segment.class)
-                    .newInstance(
-                            id,
-                            name,
-                            start_node_id,
-                            end_node_id,
-                            full_lanes,
-                            managed_lanes,
-                            aux_lanes,
-                            length_meters,
-                            param.capacity_vphpl,
-                            param.jam_density_vpkpl,
-                            param.ff_speed_kph,
-                            null);
-            new_link.name = name;
+//    public AbstractLink(Long id, Segment mysegment, Long start_node_id, Long end_node_id, ) {
+//        this.id = id;
+//        this.name = name;
+//        this.start_node_id = start_node_id;
+//        this.end_node_id = end_node_id;
+//        this.full_lanes = full_lanes;
+//        this.managed_lanes = managed_lanes;
+//        this.aux_lanes = aux_lanes;
+//        this.length_meters = length;
+//        this.param = new LinkParameters(capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
+//        this.mysegment = mysegment;
+//    }
 
-            for(Map.Entry<Long, Profile1D> e : demands.entrySet())
-                new_link.demands.put(e.getKey(),e.getValue().clone());
-            for(Map.Entry<Long, Profile1D> e : splits.entrySet())
-                new_link.splits.put(e.getKey(),e.getValue().clone());
-
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return new_link;
-    }
+//    @Override
+//    public AbstractLink clone(){
+//        AbstractLink new_link = null;
+//        try {
+//            new_link = this.getClass()
+//                    .getConstructor(Long.class,String.class,Long.class,Long.class,Integer.class,Integer.class,Integer.class,Float.class,Float.class,Float.class,Float.class,Segment.class)
+//                    .newInstance(
+//                            id,
+//                            params.name,
+//                            start_node_id,
+//                            end_node_id,
+//                            full_lanes,
+//                            managed_lanes,
+//                            aux_lanes,
+//                            length_meters,
+//                            param.capacity_vphpl,
+//                            param.jam_density_vpkpl,
+//                            param.ff_speed_kph,
+//                            null);
+//            new_link.name = name;
+//
+//            for(Map.Entry<Long, Profile1D> e : demands.entrySet())
+//                new_link.demands.put(e.getKey(),e.getValue().clone());
+//            for(Map.Entry<Long, Profile1D> e : splits.entrySet())
+//                new_link.splits.put(e.getKey(),e.getValue().clone());
+//
+//        } catch (NoSuchMethodException e) {
+//            e.printStackTrace();
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        } catch (InstantiationException e) {
+//            e.printStackTrace();
+//        } catch (InvocationTargetException e) {
+//            e.printStackTrace();
+//        }
+//        return new_link;
+//    }
 
     /////////////////////////////////////
     // basic getters
     /////////////////////////////////////
-    
+
     public final AbstractLink get_up_link() {
         return up_link;
     }
@@ -119,15 +135,23 @@ public abstract class AbstractLink implements Comparable {
     public final AbstractLink get_dn_link() {
         return dn_link;
     }
-    
-    public final double get_length_meters() {
-        return length_meters;
+
+    public final String get_name(){
+        return params.name;
+    }
+
+    public final void set_name(String name){
+        params.name = name;
+    }
+
+    public final float get_length_meters() {
+        return params.length;
     }
     
     public final void set_length_meters(float newlength) throws Exception {
         if (newlength<=0.0001)
             throw new Exception("Attempted to set a non-positive segment length");
-        length_meters = newlength;
+        params.length = newlength;
     }
 
     public final boolean is_source(){
@@ -147,33 +171,33 @@ public abstract class AbstractLink implements Comparable {
     /////////////////////////////////////
 
     public int get_gp_lanes(){
-        return full_lanes;
+        return params.gp_lanes;
     }
 
     public void set_gp_lanes(int x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive number of lanes");
-        full_lanes = x;
+        params.gp_lanes = x;
     }
 
     public int get_managed_lanes() {
-        return managed_lanes;
+        return params.managed_lanes;
     }
 
     public void set_managed_lanes(int x) throws Exception {
         if(x<0)
             throw new Exception("Attempted to set negative number of lanes");
-        managed_lanes = x;
+        params.managed_lanes = x;
     }
 
     public int get_aux_lanes(){
-        return aux_lanes;
+        return params.aux_lanes;
     }
 
     public void set_aux_lanes(int x) throws Exception{
         if(x<0)
             throw new Exception("Attempted to set negative number of lanes");
-        aux_lanes = x;
+        params.aux_lanes = x;
     }
 
     /////////////////////////////////////
@@ -193,33 +217,33 @@ public abstract class AbstractLink implements Comparable {
     /////////////////////////////////////
 
     public float get_capacity_vphpl(){
-        return param.capacity_vphpl;
+        return params.capacity_vphpl;
     }
 
     public float get_jam_density_vpkpl(){
-        return param.jam_density_vpkpl;
+        return params.jam_density_vpkpl;
     }
 
     public float get_freespeed_kph(){
-        return param.ff_speed_kph;
+        return params.ff_speed_kph;
     }
 
     public void set_capacity_vphpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive capacity");
-        param.capacity_vphpl = x;
+        params.capacity_vphpl = x;
     }
 
     public void set_jam_density_vpkpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive jam density");
-        param.jam_density_vpkpl = x;
+        params.jam_density_vpkpl = x;
     }
 
     public void set_freespeed_kph(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive free speed");
-        param.ff_speed_kph = x;
+        params.ff_speed_kph = x;
     }
 
     /////////////////////////////////////
@@ -277,18 +301,7 @@ public abstract class AbstractLink implements Comparable {
 
     @Override
     public String toString() {
-        String str = String.format(
-                "\tid\t%d\n" +
-                        "\tname\t%s\n" +
-                        "\tstart_node_id\t%d\n" +
-                        "\tend_node_id\t%d\n" +
-                        "\tfull_lanes\t%d\n" +
-                        "\tlength_meters\t%f\n" +
-                        "\tcapacity_vphpl\t%f\n" +
-                        "\tjam_density_vpkpl\t%f\n" +
-                        "\tff_speed_kph\t%f",
-                id,name,start_node_id,end_node_id,full_lanes, length_meters,param.capacity_vphpl,param.jam_density_vpkpl,param.ff_speed_kph);
-        return str;
+        return String.format("%d",id);
     }
 
     @Override
@@ -301,29 +314,23 @@ public abstract class AbstractLink implements Comparable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AbstractLink that = (AbstractLink) o;
-        return start_node_id == that.start_node_id &&
+        return id == that.id &&
+                start_node_id == that.start_node_id &&
                 end_node_id == that.end_node_id &&
-                id == that.id &&
-                full_lanes == that.full_lanes &&
-                managed_lanes == that.managed_lanes &&
-                aux_lanes == that.aux_lanes &&
-                Float.compare(that.length_meters, length_meters) == 0 &&
-                Objects.equals(name, that.name) &&
-                param.equals(that.param) &&
+                Objects.equals(params, that.params) &&
                 demands.equals(that.demands) &&
                 splits.equals(that.splits);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(start_node_id, end_node_id, id, name, full_lanes, managed_lanes, aux_lanes, length_meters, param, demands, splits);
+        return Objects.hash(id, start_node_id, end_node_id, params, demands, splits);
     }
-
     /////////////////////////////////////
     // protected and private
     /////////////////////////////////////
 
-    protected LinkFreewayOrConnector create_up_FwyOrConnLink(Type linktype,String linkname){
+    protected LinkFreewayOrConnector create_up_FwyOrConnLink(Type linktype,LinkParameters link_params){
 
         FreewayScenario fwy_scenario = mysegment.fwy_scenario;
 
@@ -336,34 +343,28 @@ public abstract class AbstractLink implements Comparable {
         LinkFreewayOrConnector new_link=null;
         switch(linktype){
             case freeway:
+
                 new_link = new LinkFreeway(
-                        fwy_scenario.new_link_id(),
-                        linkname,
-                        new_node.id,
-                        existing_node.id,
-                        full_lanes,
-                        managed_lanes,
-                        0,
-                        length_meters,
-                        get_capacity_vphpl(),
-                        get_jam_density_vpkpl(),
-                        get_freespeed_kph(),
-                        null);
+                        fwy_scenario.new_link_id(), // id,
+                        null, // mysegment,
+                        null,       // up_link
+                        null,       // dn_link
+                        new_node.id,    // start_node_id
+                        existing_node.id, // end_node_id
+                        link_params );
+
                 break;
             case connector:
+
                 new_link = new LinkConnector(
-                        fwy_scenario.new_link_id(),
-                        linkname,
-                        new_node.id,
-                        existing_node.id,
-                        full_lanes,
-                        managed_lanes,
-                        0,
-                        length_meters,
-                        get_capacity_vphpl(),
-                        get_jam_density_vpkpl(),
-                        get_freespeed_kph(),
-                        null);
+                        fwy_scenario.new_link_id(), // id,
+                        null,// mysegment,
+                        null,       // up_link
+                        null,       // dn_link
+                        new_node.id,   // start_node_id
+                        existing_node.id,   // end_node_id
+                        link_params );
+
                 break;
             default:
                 System.err.println("3409gj");
@@ -380,7 +381,7 @@ public abstract class AbstractLink implements Comparable {
         return new_link;
     }
 
-    protected LinkFreewayOrConnector create_dn_FwyOrConnLink(Type linktype, String linkname){
+    protected LinkFreewayOrConnector create_dn_FwyOrConnLink(Type linktype,LinkParameters link_params){
 
         FreewayScenario fwy_scenario = mysegment.fwy_scenario;
 
@@ -393,34 +394,28 @@ public abstract class AbstractLink implements Comparable {
         LinkFreewayOrConnector new_link=null;
         switch(linktype){
             case freeway:
+
                 new_link = new LinkFreeway(
-                        fwy_scenario.new_link_id(),
-                        linkname,
-                        existing_node.id,
-                        new_node.id,
-                        full_lanes,
-                        managed_lanes,
-                        0,
-                        length_meters,
-                        get_capacity_vphpl(),
-                        get_jam_density_vpkpl(),
-                        get_freespeed_kph(),
-                        null);
+                        fwy_scenario.new_link_id(),   // id,
+                        null, // mysegment,
+                        null, // up_link,
+                        null, // dn_link,
+                        existing_node.id, // start_node_id,
+                        new_node.id, // end_node_id,
+                        link_params) ; // params
+
                 break;
             case connector:
+
                 new_link = new LinkConnector(
-                        fwy_scenario.new_link_id(),
-                        linkname,
-                        existing_node.id,
-                        new_node.id,
-                        full_lanes,
-                        managed_lanes,
-                        0,
-                        length_meters,
-                        get_capacity_vphpl(),
-                        get_jam_density_vpkpl(),
-                        get_freespeed_kph(),
-                        null);
+                    fwy_scenario.new_link_id(), // id,
+                    null, // mysegment,
+                    null, // up_link,
+                    null, // dn_link,
+                    existing_node.id,// start_node_id,
+                    new_node.id,// end_node_id,
+                    link_params ); // params
+
                 break;
             default:
                 System.err.println("3409gj");

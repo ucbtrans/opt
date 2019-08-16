@@ -387,7 +387,7 @@ public class AppMainController {
             for (AbstractLink link : scenario.get_links()) {
                 if (link == null)
                     continue;
-                TreeItem<String> link_node = new TreeItem<String>(link.name);
+                TreeItem<String> link_node = new TreeItem<String>(link.get_name());
                 tree2object.put(link_node, link);
                 object2tree.put(link, link_node);
                 links_node.getChildren().add(link_node);

@@ -14,9 +14,14 @@ public class LinkOnramp extends AbstractLink {
         super(link, rp);
     }
 
-    public LinkOnramp(Long id, String name, Long start_node_id, Long end_node_id, Integer full_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph, Segment mysegment) {
-        super(id, name, start_node_id, end_node_id, full_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph, mysegment);
+    public LinkOnramp(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, LinkParameters params) {
+        super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, params);
     }
+
+    public LinkOnramp(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, String name, Integer gp_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
+        super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, name, gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+    }
+
 
 //    @Override
 //    protected void delete(){
@@ -66,15 +71,16 @@ public class LinkOnramp extends AbstractLink {
     /////////////////////////////////////
 
     @Override
-    public Segment insert_up_segment(String seg_name,String link_name) {
+    public Segment insert_up_segment(String seg_name,LinkParameters fwy_params,LinkParameters ramp_params) {
 
         if(up_link!=null)
             return null;
+        assert(ramp_params==null);
 
         Segment up_segment = get_up_segment();
 
         // create new upstream link
-        LinkConnector new_link = (LinkConnector) create_up_FwyOrConnLink(Type.connector,link_name);
+        LinkConnector new_link = (LinkConnector) create_up_FwyOrConnLink(Type.connector,fwy_params);
 
         // wrap in a segment
         Segment new_segment = create_segment(new_link,seg_name);
@@ -90,7 +96,7 @@ public class LinkOnramp extends AbstractLink {
     }
 
     @Override
-    public Segment insert_dn_segment(String seg_name,String link_name) {
+    public Segment insert_dn_segment(String seg_name,LinkParameters fwy_params,LinkParameters ramp_params) {
         return null;
     }
 

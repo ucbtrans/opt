@@ -73,8 +73,9 @@ public class Scenario {
         for (Map.Entry<Long, Node> e : nodes.entrySet())
             jscn_cpy.nodes.put(e.getKey(), e.getValue().clone());
 
-        for (Map.Entry<Long, AbstractLink> e : links.entrySet())
-            jscn_cpy.links.put(e.getKey(), e.getValue().clone());
+        // TODO RESTORE THIS!!
+//        for (Map.Entry<Long, AbstractLink> e : links.entrySet())
+//            jscn_cpy.links.put(e.getKey(), e.getValue().clone());
 
         for (Map.Entry<Long,Commodity> e : commodities.entrySet())
             jscn_cpy.commodities.put(e.getKey(),e.getValue().clone());
@@ -151,15 +152,15 @@ public class Scenario {
             jLinks.getLink().add(jaxbLink);
 
             jaxbLink.setId(link.id);
-            jaxbLink.setLength(link.length_meters);
-            jaxbLink.setFullLanes(link.full_lanes);
+            jaxbLink.setLength((float) link.get_length_meters());
+            jaxbLink.setFullLanes(link.get_gp_lanes());
             jaxbLink.setEndNodeId(link.end_node_id);
             jaxbLink.setStartNodeId(link.start_node_id);
             jaxbLink.setRoadType(link.get_type().toString());
 
             // road params
             Set<Long> param_ids = link_params.entrySet().stream()
-                    .filter(e->e.getValue().equals(link.param))
+                    .filter(e->e.getValue().equals(link.params))
                     .map(e->e.getKey())
                     .collect(Collectors.toSet());
             jaxbLink.setRoadparam(param_ids.iterator().next());
@@ -260,7 +261,7 @@ public class Scenario {
 
     private Map<Long,LinkParameters> get_link_params(){
         Set<LinkParameters> link_params_set = links.values().stream()
-                .map(link->link.param)
+                .map(link->link.params)
                 .collect(Collectors.toSet());
 
         // set ids

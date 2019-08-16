@@ -46,7 +46,7 @@ public class FreewayScenario {
         if (jaxb_lnks!=null)
             for(jaxbopt.Lnk lnk : jaxb_lnks.getLnk())
                 if (scenario.links.containsKey(lnk.getId()))
-                    scenario.links.get(lnk.getId()).name = lnk.getName();
+                    scenario.links.get(lnk.getId()).set_name(lnk.getName());
 
         // create segments
         long max_sgmt_id = 0;
@@ -327,33 +327,31 @@ public class FreewayScenario {
             case freeway:
 
                 link = new LinkFreeway(
-                        ++max_link_id,
-                        linkname,
-                        start_node.id,end_node.id,
-                        1,
-                        0,
-                        0,
-                        500f,
-                        params.capacity_vphpl,params.jam_density_vpkpl,params.ff_speed_kph,
-                        segment);
+                        ++max_link_id,   // id,
+                        segment,// mysegment,
+                        null,// up_link,
+                        null,// dn_link,
+                        start_node.id,// start_node_id,
+                        end_node.id,// end_node_id,
+                        params);
+
                 break;
             case connector:
+
                 link = new LinkConnector(
-                        ++max_link_id,
-                        linkname,
-                        start_node.id,end_node.id,
-                        1,
-                        0,
-                        0,
-                        500f,
-                        params.capacity_vphpl,params.jam_density_vpkpl,params.ff_speed_kph,
-                        segment);
+                        ++max_link_id,// id,
+                        segment,// mysegment,
+                        null,// up_link,
+                        null,// dn_link,
+                        start_node.id,// start_node_id,
+                        end_node.id,// end_node_id,
+                        params);
+
                 break;
         }
 
         start_node.out_links.add(link.id);
         end_node.in_links.add(link.id);
-
         segment.fwy = link;
 
         // add to the scenario
@@ -473,7 +471,7 @@ public class FreewayScenario {
 
     public boolean is_valid_link_name(String name){
         return !scenario.links.values().stream()
-                .anyMatch(link->link.name!=null && link.name.equals(name));
+                .anyMatch(link->link.get_name()!=null && link.get_name().equals(name));
     }
 
     /////////////////////////////////////
@@ -506,7 +504,7 @@ public class FreewayScenario {
                 continue;
             jaxbopt.Lnk lnk = new jaxbopt.Lnk();
             lnk.setId(link.id);
-            lnk.setName(link.name);
+            lnk.setName(link.get_name());
             lnks.getLnk().add(lnk);
         }
         return scn;

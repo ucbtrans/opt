@@ -58,18 +58,20 @@ public final class Segment implements Comparable {
         Segment new_seg = new Segment();
         new_seg.id = id;
         new_seg.name = name;
-        new_seg.fwy = (LinkFreewayOrConnector) fwy.clone();
-        for(LinkOnramp x : in_ors)
-            new_seg.in_ors.add((LinkOnramp) x.clone());
 
-        for(LinkOnramp x : out_ors)
-            new_seg.out_ors.add((LinkOnramp) x.clone());
-
-        for(LinkOfframp x : in_frs)
-            new_seg.in_frs.add((LinkOfframp) x.clone());
-
-        for(LinkOfframp x : out_frs)
-            new_seg.out_frs.add((LinkOfframp) x.clone());
+        // TODO RESTORE THIS!!
+//        new_seg.fwy = (LinkFreewayOrConnector) fwy.clone();
+//        for(LinkOnramp x : in_ors)
+//            new_seg.in_ors.add((LinkOnramp) x.clone());
+//
+//        for(LinkOnramp x : out_ors)
+//            new_seg.out_ors.add((LinkOnramp) x.clone());
+//
+//        for(LinkOfframp x : in_frs)
+//            new_seg.in_frs.add((LinkOfframp) x.clone());
+//
+//        for(LinkOfframp x : out_frs)
+//            new_seg.out_frs.add((LinkOfframp) x.clone());
 
         return new_seg;
     }
@@ -90,7 +92,7 @@ public final class Segment implements Comparable {
      * @return float
      */
     public float get_length_meters(){
-        return fwy.length_meters;
+        return fwy.get_length_meters();
     }
 
     /**
@@ -100,7 +102,7 @@ public final class Segment implements Comparable {
     public void set_length_meters(float newlength) throws Exception {
         if (newlength<=0.0001)
             throw new Exception("Attempted to set a non-positive segment length");
-        fwy.length_meters = newlength;
+        fwy.set_length_meters( newlength );
     }
 
     public List<AbstractLink> get_links(){
@@ -167,38 +169,38 @@ public final class Segment implements Comparable {
     // insert / delete segments
     ////////////////////////////////////////
 
-    public Segment insert_up_segment(String seg_name,String link_name){
-        return fwy.insert_up_segment(seg_name,link_name);
+    public Segment insert_up_segment(String seg_name,LinkParameters params){
+        return fwy.insert_up_segment(seg_name,params,null);
     }
 
-    public Segment insert_dn_segment(String seg_name,String link_name){
-        return fwy.insert_dn_segment(seg_name,link_name);
+    public Segment insert_dn_segment(String seg_name,LinkParameters params){
+        return fwy.insert_dn_segment(seg_name,params,null);
     }
 
     ////////////////////////////////////////
     // add / delete ramps
     ////////////////////////////////////////
 
-    public LinkOnramp add_in_or(String or_name,LinkParameters params,int gp_lanes,int managed_lanes,float length){
-        LinkOnramp link = create_onramp(or_name,params,gp_lanes,managed_lanes,length);
+    public LinkOnramp add_in_or(LinkParameters params){
+        LinkOnramp link = create_onramp(params);
         in_ors.add(link);
         return link;
     }
 
-    public LinkOnramp add_out_or(String or_name,LinkParameters params,int gp_lanes,int managed_lanes,float length){
-        LinkOnramp link = create_onramp(or_name,params,gp_lanes,managed_lanes,length);
+    public LinkOnramp add_out_or(LinkParameters params){
+        LinkOnramp link = create_onramp(params);
         out_ors.add(link);
         return link;
     }
 
-    public LinkOfframp add_in_fr(String fr_name,LinkParameters params,int gp_lanes,int managed_lanes,float length){
-        LinkOfframp link = create_offramp(fr_name,params,gp_lanes,managed_lanes,length);
+    public LinkOfframp add_in_fr(LinkParameters params){
+        LinkOfframp link = create_offramp(params);
         in_frs.add(link);
         return link;
     }
 
-    public LinkOfframp add_out_fr(String fr_name,LinkParameters params,int gp_lanes,int managed_lanes,float length){
-        LinkOfframp link = create_offramp(fr_name,params,gp_lanes,managed_lanes,length);
+    public LinkOfframp add_out_fr(LinkParameters params){
+        LinkOfframp link = create_offramp(params);
         out_frs.add(link);
         return link;
     }
@@ -319,54 +321,46 @@ public final class Segment implements Comparable {
         scenario.links.remove(link.id);
     }
 
-    private LinkOnramp create_onramp(String linkname,LinkParameters params,int gp_lanes,int managed_lanes, float length){
+    private LinkOnramp create_onramp(LinkParameters params){
 
         Long link_id = fwy_scenario.new_link_id();
         Node or_start_node = new Node(fwy_scenario.new_node_id());
         fwy_scenario.scenario.nodes.put(or_start_node.id,or_start_node);
         Node or_end_node = fwy_scenario.scenario.nodes.get(fwy.start_node_id);
 
-        LinkOnramp or = new LinkOnramp(link_id,
-                linkname,
-                or_start_node.id,
-                or_end_node.id,
-                gp_lanes,
-                managed_lanes,
-                0,
-                length,
-                params.capacity_vphpl,
-                params.jam_density_vpkpl,
-                params.ff_speed_kph,
-                this);
-        fwy_scenario.scenario.links.put(or.id,or);
+        LinkOnramp or = new LinkOnramp(
+                link_id, // id,
+                this, // mysegment,
+                null, // up_link,
+                null, // dn_link,
+                or_start_node.id,// start_node_id,
+                or_end_node.id,// end_node_id,
+                params); // params)
 
+        fwy_scenario.scenario.links.put(or.id,or);
         or.dn_link = fwy;
         or_start_node.out_links.add(or.id);
 
         return or;
     }
 
-    private LinkOfframp create_offramp(String linkname,LinkParameters params,int gp_lanes,int managed_lanes, float length){
+    private LinkOfframp create_offramp(LinkParameters params){
 
         Long link_id = fwy_scenario.new_link_id();
         Node fr_start_node = fwy_scenario.scenario.nodes.get(fwy.end_node_id);
         Node fr_end_node = new Node(fwy_scenario.new_node_id());
         fwy_scenario.scenario.nodes.put(fr_end_node.id,fr_end_node);
 
-        LinkOfframp fr = new LinkOfframp(link_id,
-                linkname,
-                fr_start_node.id,
-                fr_end_node.id,
-                gp_lanes,
-                managed_lanes,
-                0,
-                length,
-                params.capacity_vphpl,
-                params.jam_density_vpkpl,
-                params.ff_speed_kph,
-                this);
-        fwy_scenario.scenario.links.put(fr.id,fr);
+        LinkOfframp fr = new LinkOfframp(
+                link_id, // id,
+                this, // mysegment,
+                null, // up_link,
+                null, // dn_link,
+                fr_start_node.id,// start_node_id,
+                fr_end_node.id,// end_node_id,
+                params); // params)
 
+        fwy_scenario.scenario.links.put(fr.id,fr);
         fr.up_link = fwy;
         fr_end_node.in_links.add(fr.id);
 

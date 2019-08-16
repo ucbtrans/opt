@@ -174,7 +174,6 @@ public class TestSegment extends AbstractTest {
         TestData X = new TestData();
 
         Segment sA7 = X.scenario.get_segment_by_name("sA7");
-
         Segment sA8 = X.scenario.get_segment_by_name("sA8");
         LinkConnector lA12 = (LinkConnector) sA7.fwy();
         LinkOnramp lA13 = sA8.get_ors().get(0);

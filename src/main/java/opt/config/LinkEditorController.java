@@ -341,7 +341,7 @@ public class LinkEditorController {
             if ((idx < 0) || (idx >= onramps.size()))
                 return;
         
-        String header = "You are deleting on-ramp '" + onramps.get(idx).name + "'...";
+        String header = "You are deleting on-ramp '" + onramps.get(idx).get_name() + "'...";
                 
         if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
             return;
@@ -363,7 +363,7 @@ public class LinkEditorController {
             if ((idx < 0) || (idx >= offramps.size()))
                 return;
             
-        String header = "You are deleting off-ramp '" + offramps.get(idx).name + "'...";
+        String header = "You are deleting off-ramp '" + offramps.get(idx).get_name() + "'...";
                 
         if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
             return;
@@ -476,7 +476,7 @@ public class LinkEditorController {
         
         String header = "You are deleting " +
                 opt.utils.Misc.linkType2String(myLink.get_type()).toLowerCase() +
-                " section '" + myLink.name + "'...";
+                " section '" + myLink.get_name() + "'...";
                 
         if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
             return;
@@ -494,7 +494,7 @@ public class LinkEditorController {
         String link_name = linkFromName.getText() + " -> " + linkToName.getText();
         link_name = opt.utils.Misc.validateAndCorrectLinkName(link_name, myLink.get_segment().get_scenario());
         
-        myLink.name = link_name;
+        myLink.set_name(link_name);
         if ((myLink.get_type() == AbstractLink.Type.freeway) || (myLink.get_type() == AbstractLink.Type.connector))
             myLink.get_segment().name = link_name;
         
@@ -641,7 +641,7 @@ public class LinkEditorController {
             laneProperties.setExpanded(true);
                 
         myLink = lnk;
-        String link_name = myLink.name;
+        String link_name = myLink.get_name();
         String[] name_subs = link_name.split(" -> ");
         int sz = name_subs.length;
         String from_name = name_subs[0];
@@ -767,13 +767,13 @@ public class LinkEditorController {
         int num_ramps = myLink.get_segment().num_out_ors();
         for (int i = 0; i < num_ramps; i++) {
             AbstractLink or = myLink.get_segment().out_ors(i);
-            listOnramps.getItems().add(or.name + " (outer)");
+            listOnramps.getItems().add(or.get_name() + " (outer)");
             onramps.add(or);
         }
         num_ramps = myLink.get_segment().num_in_ors();
         for (int i = 0; i < num_ramps; i++) {
             AbstractLink or = myLink.get_segment().in_ors(i);
-            listOnramps.getItems().add(or.name + " (inner)");
+            listOnramps.getItems().add(or.get_name() + " (inner)");
             onramps.add(or);
         }
                
@@ -783,13 +783,13 @@ public class LinkEditorController {
         num_ramps = myLink.get_segment().num_out_frs();
         for (int i = 0; i < num_ramps; i++) {
             AbstractLink fr = myLink.get_segment().out_frs(i);
-            listOfframps.getItems().add(fr.name + " (outer)");
+            listOfframps.getItems().add(fr.get_name() + " (outer)");
             offramps.add(fr);
         }
         num_ramps = myLink.get_segment().num_in_frs();
         for (int i = 0; i < num_ramps; i++) {
             AbstractLink fr = myLink.get_segment().in_frs(i);
-            listOfframps.getItems().add(fr.name + " (inner)");
+            listOfframps.getItems().add(fr.get_name() + " (inner)");
             offramps.add(fr);
         }
         
