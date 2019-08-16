@@ -493,7 +493,7 @@ public class LinkEditorController {
         } else if (myLink.get_type() == AbstractLink.Type.connector) {
             title = "Connect to an On-Ramp Downstream";
             label = "Choose an On-Ramp:";
-        } else {
+        } else if (myLink.get_type() == AbstractLink.Type.onramp) {
             opt.utils.Dialogs.ErrorDialog("On-ramps cannot connect to downstream sections...", "Please, report this problem!");
             return;
         }
@@ -521,7 +521,7 @@ public class LinkEditorController {
         } else if (myLink.get_type() == AbstractLink.Type.connector) {
             title = "Connect to an Off-Ramp Upstream";
             label = "Choose an Off-Ramp:";
-        } else {
+        } else if (myLink.get_type() == AbstractLink.Type.offramp) {
             opt.utils.Dialogs.ErrorDialog("Off-ramps cannot connect to upstream sections...", "Please, report this problem!");
             return;
         }

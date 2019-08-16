@@ -97,6 +97,7 @@ public class ConnectController {
     
     
     public void initWithLinkAndCandidates(AbstractLink lnk, List<AbstractLink> candidates, String label, boolean downstream) {
+        linkList.getItems().clear();
         dnConnect = downstream;
         labelConnect.setText(label);
         if ((lnk == null) || (candidates == null))
