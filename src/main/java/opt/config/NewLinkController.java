@@ -28,6 +28,7 @@ package opt.config;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
@@ -69,6 +70,9 @@ public class NewLinkController {
 
     @FXML // fx:id="createOption"
     private ChoiceBox<String> createOption; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="cbInner"
+    private CheckBox cbInner; // Value injected by FXMLLoader
 
     @FXML // fx:id="linkLength"
     private Spinner<Double> linkLength; // Value injected by FXMLLoader
@@ -154,6 +158,12 @@ public class NewLinkController {
         }
         from_name = linkFromName.getText();
         to_name = linkToName.getText();
+        
+        cbInner.setSelected(false);
+        if (myLink.get_type() == AbstractLink.Type.connector)
+            cbInner.setVisible(true);
+        else
+            cbInner.setVisible(false);
         
         String unitsLength = appMainController.getUserSettings().unitsLength;
         double length = myLink.get_length_meters();

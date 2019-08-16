@@ -73,6 +73,8 @@ public class LinkEditorController {
     private Scene newLinkScene = null;
     private NewRampController newRampController = null;
     private Scene newRampScene = null;
+    private ConnectController connectController = null;
+    private Scene connectScene = null;
     private AbstractLink myLink = null;
     private boolean ignoreChange = true;
     //TitledPane focusTitledPane = null;
@@ -282,12 +284,22 @@ public class LinkEditorController {
     
     /**
      * This function should be called once: during the initialization.
-     * @param ctrl - pointer to the new link controller that is used to set up
+     * @param ctrl - pointer to the new ramp controller that is used to set up
      *               new on- and off-ramps.
      */
     public void setNewRampControllerAndScene(NewRampController ctrl, Scene scn) {
         newRampController = ctrl;
         newRampScene = scn;
+    }
+    
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the connect controller that is used to connect
+     *               two open-ended links.
+     */
+    public void setConnectControllerAndScene(ConnectController ctrl, Scene scn) {
+        connectController = ctrl;
+        connectScene = scn;
     }
     
     
@@ -456,6 +468,8 @@ public class LinkEditorController {
         inputStage.initModality(Modality.APPLICATION_MODAL);
         inputStage.showAndWait();
     }
+    
+    
     
     @FXML
     void onConnectSectionDownstreamAction(ActionEvent event) {
