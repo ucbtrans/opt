@@ -25,6 +25,7 @@
  **/
 package opt.config;
 
+import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -52,6 +53,8 @@ import opt.data.Segment;
 public class ConnectController {
     private AppMainController appMainController = null;
     private AbstractLink myLink = null;
+    private List<AbstractLink> candidates = null;
+    private boolean dnConnect = true;
     
     
 
@@ -93,9 +96,19 @@ public class ConnectController {
     
     
     
-    public void initWithLinkAndType(AbstractLink lnk, AbstractLink.Type rampType) {
-
+    public void initWithLinkAndCandidates(AbstractLink lnk, List<AbstractLink> candidates, String label, boolean downstream) {
+        dnConnect = downstream;
+        labelConnect.setText(label);
+        if ((lnk == null) || (candidates == null))
+            return;
         
+        myLink = lnk;
+        this.candidates = candidates;
+        
+        for (AbstractLink l : candidates) {
+            linkList.getItems().add(l.get_name());
+        }
+
     }
     
     

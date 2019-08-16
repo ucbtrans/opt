@@ -55,6 +55,7 @@ import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.AbstractLink;
+import opt.data.FreewayScenario;
 import opt.data.LinkOfframp;
 import opt.data.LinkOnramp;
 import opt.utils.Misc;
@@ -82,6 +83,9 @@ public class LinkEditorController {
     
     private List<AbstractLink> onramps = new ArrayList<AbstractLink>();
     private List<AbstractLink> offramps = new ArrayList<AbstractLink>();
+    
+    private List<AbstractLink> upConnectCandidates = new ArrayList<AbstractLink>();
+    private List<AbstractLink> dnConnectCandidates = new ArrayList<AbstractLink>();
     
     private SpinnerValueFactory<Double> lengthSpinnerValueFactory = null;
     
@@ -474,12 +478,58 @@ public class LinkEditorController {
     
     @FXML
     void onConnectSectionDownstreamAction(ActionEvent event) {
-        opt.utils.Dialogs.ErrorDialog("Connection function is not yet implemented...", "Please, be patient!");
+        if (dnConnectCandidates.isEmpty()) {
+            opt.utils.Dialogs.ErrorDialog("There are no sections to connect to...", "No compatibe origin sections are found!");
+            return;
+        }
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(connectScene);
+        String title = "Connect to a Freeway Section Downstream";
+        String label = "Choose an Origin Freeway Section:";
+        if (myLink.get_type() == AbstractLink.Type.offramp) {
+            title = "Connect to a Connector Downstream";
+            label = "Choose a Connector:";
+        } else if (myLink.get_type() == AbstractLink.Type.connector) {
+            title = "Connect to an On-Ramp Downstream";
+            label = "Choose an On-Ramp:";
+        } else {
+            opt.utils.Dialogs.ErrorDialog("On-ramps cannot connect to downstream sections...", "Please, report this problem!");
+            return;
+        }
+        connectController.initWithLinkAndCandidates(myLink, dnConnectCandidates, label, true);
+        inputStage.setTitle(title);
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.showAndWait();
     }
 
     @FXML
     void onConnectSectionUpstreamAction(ActionEvent event) {
-        opt.utils.Dialogs.ErrorDialog("Connection function is not yet implemented...", "Please, be patient!");
+        if (upConnectCandidates.isEmpty()) {
+            opt.utils.Dialogs.ErrorDialog("There are no sections to connect to...", "No compatibe destination sections are found!");
+            return;
+        }
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(connectScene);
+        String title = "Connect to a Freeway Section Upstream";
+        String label = "Choose a Destination Freeway Section:";
+        if (myLink.get_type() == AbstractLink.Type.onramp) {
+            title = "Connect to a Connector Upstream";
+            label = "Choose a Connector:";
+        } else if (myLink.get_type() == AbstractLink.Type.connector) {
+            title = "Connect to an Off-Ramp Upstream";
+            label = "Choose an Off-Ramp:";
+        } else {
+            opt.utils.Dialogs.ErrorDialog("Off-ramps cannot connect to upstream sections...", "Please, report this problem!");
+            return;
+        }
+        connectController.initWithLinkAndCandidates(myLink, upConnectCandidates, label, false);
+        inputStage.setTitle(title);
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.showAndWait();
     }
 
     
@@ -681,11 +731,9 @@ public class LinkEditorController {
             connectSectionDownstream.setVisible(false);
             if (myLink.get_up_link() == null) {
                 addSectionUpstream.setVisible(true);
-                connectSectionUpstream.setVisible(true);
             }
             else {
                 addSectionUpstream.setVisible(false);
-                connectSectionUpstream.setVisible(false);
             }
         } else if (myLink.get_type() == AbstractLink.Type.offramp) {
             if (to_name.equals(""))
@@ -702,11 +750,9 @@ public class LinkEditorController {
             connectSectionUpstream.setVisible(false);
             if (myLink.get_dn_link() == null) {
                 addSectionDownstream.setVisible(true);
-                connectSectionDownstream.setVisible(true);
             }
             else {
                 addSectionDownstream.setVisible(false);
-                connectSectionDownstream.setVisible(false);
             }
         } else {
             linkFromName.setText(from_name);
@@ -718,28 +764,15 @@ public class LinkEditorController {
             deleteSection.setVisible(true);
             addSectionUpstream.setVisible(true);
             addSectionDownstream.setVisible(true);
-            if (myLink.get_up_link() == null) {
-                connectSectionUpstream.setVisible(true);
-            } else {
-                connectSectionUpstream.setVisible(false);
-                if (myLink.get_type() == AbstractLink.Type.connector)
+            
+            if (myLink.get_type() == AbstractLink.Type.connector) {
+                if (myLink.get_up_link() != null)
                     addSectionUpstream.setVisible(false);
-            }
-            if (myLink.get_dn_link() == null) {
-                connectSectionDownstream.setVisible(true);
-            } else {
-                connectSectionDownstream.setVisible(false);
-                if (myLink.get_type() == AbstractLink.Type.connector)
-                    addSectionDownstream.setVisible(false);
+                if (myLink.get_dn_link() != null)
+                    addSectionDownstream.setVisible(false);   
             }
         }
         
-        
-        
-        
-        
-        
-
         
         String unitsLength = UserSettings.unitsLength;
         double length = myLink.get_length_meters();
@@ -775,39 +808,90 @@ public class LinkEditorController {
             jamDensityAuxLane.setDisable(flag);
         }
         
-        
-        // Populate onramp list
         listOnramps.getItems().clear();
         onramps.clear();
-        int num_ramps = myLink.get_segment().num_out_ors();
-        for (int i = 0; i < num_ramps; i++) {
-            AbstractLink or = myLink.get_segment().out_ors(i);
-            listOnramps.getItems().add(or.get_name() + " (outer)");
-            onramps.add(or);
-        }
-        num_ramps = myLink.get_segment().num_in_ors();
-        for (int i = 0; i < num_ramps; i++) {
-            AbstractLink or = myLink.get_segment().in_ors(i);
-            listOnramps.getItems().add(or.get_name() + " (inner)");
-            onramps.add(or);
-        }
-               
-        // Populate offramp list
         listOfframps.getItems().clear();
         offramps.clear();
-        num_ramps = myLink.get_segment().num_out_frs();
-        for (int i = 0; i < num_ramps; i++) {
-            AbstractLink fr = myLink.get_segment().out_frs(i);
-            listOfframps.getItems().add(fr.get_name() + " (outer)");
-            offramps.add(fr);
-        }
-        num_ramps = myLink.get_segment().num_in_frs();
-        for (int i = 0; i < num_ramps; i++) {
-            AbstractLink fr = myLink.get_segment().in_frs(i);
-            listOfframps.getItems().add(fr.get_name() + " (inner)");
-            offramps.add(fr);
+        
+        if (myLink.get_type() == AbstractLink.Type.freeway) {
+            // Populate onramp list
+            int num_ramps = myLink.get_segment().num_out_ors();
+            for (int i = 0; i < num_ramps; i++) {
+                AbstractLink or = myLink.get_segment().out_ors(i);
+                listOnramps.getItems().add(or.get_name() + " (outer)");
+                onramps.add(or);
+            }
+            num_ramps = myLink.get_segment().num_in_ors();
+            for (int i = 0; i < num_ramps; i++) {
+                AbstractLink or = myLink.get_segment().in_ors(i);
+                listOnramps.getItems().add(or.get_name() + " (inner)");
+                onramps.add(or);
+            }
+        
+            // Populate offramp list
+            num_ramps = myLink.get_segment().num_out_frs();
+            for (int i = 0; i < num_ramps; i++) {
+                AbstractLink fr = myLink.get_segment().out_frs(i);
+                listOfframps.getItems().add(fr.get_name() + " (outer)");
+                offramps.add(fr);
+            }
+            num_ramps = myLink.get_segment().num_in_frs();
+            for (int i = 0; i < num_ramps; i++) {
+                AbstractLink fr = myLink.get_segment().in_frs(i);
+                listOfframps.getItems().add(fr.get_name() + " (inner)");
+                offramps.add(fr);
+            }
         }
         
+        upConnectCandidates.clear();
+        dnConnectCandidates.clear();
+        FreewayScenario scenario = myLink.get_segment().get_scenario();
+        List<AbstractLink> allLinks = scenario.get_links();
+        for (AbstractLink l : allLinks) {
+            if (myLink.get_type() == AbstractLink.Type.freeway) {
+                if (l.get_type() == AbstractLink.Type.freeway) {
+                    if ((myLink.get_up_link() == null) && 
+                        (l.get_dn_link() == null) &&
+                        (!myLink.equals(l)))
+                        upConnectCandidates.add(l);
+                    if ((myLink.get_dn_link() == null) && 
+                        (l.get_up_link() == null) &&
+                        (!myLink.equals(l)))
+                        dnConnectCandidates.add(l);
+                }
+            } else if (myLink.get_type() == AbstractLink.Type.connector) {
+                if (l.get_type() == AbstractLink.Type.onramp) {
+                    if ((myLink.get_dn_link() == null) && 
+                        (l.get_up_link() == null))
+                        dnConnectCandidates.add(l);
+                }
+                if (l.get_type() == AbstractLink.Type.offramp) {
+                    if ((myLink.get_up_link() == null) && 
+                        (l.get_dn_link() == null))
+                        upConnectCandidates.add(l);
+                }
+            } else if (myLink.get_type() == AbstractLink.Type.onramp) {
+                if (myLink.get_up_link() == null)
+                    break;
+                if ((l.get_type() == AbstractLink.Type.connector) && (l.get_dn_link() == null))
+                    upConnectCandidates.add(l);
+            } else { // offramp
+                if (myLink.get_dn_link() == null)
+                    break;
+                if ((l.get_type() == AbstractLink.Type.connector) && (l.get_up_link() == null))
+                    dnConnectCandidates.add(l);
+            }
+        }
+        
+        if (upConnectCandidates.isEmpty())
+            connectSectionUpstream.setVisible(false);
+        else
+            connectSectionUpstream.setVisible(true);
+            
+        if (dnConnectCandidates.isEmpty())
+            connectSectionDownstream.setVisible(false);
+        else
+            connectSectionDownstream.setVisible(true);
         
         
         drawRoadSection();

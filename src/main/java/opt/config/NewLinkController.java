@@ -40,6 +40,7 @@ import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.LinkFreewayOrConnector;
+import opt.data.LinkParameters;
 import opt.data.Segment;
 
 
@@ -147,6 +148,14 @@ public class NewLinkController {
             else
                 linkToName.setText(to_name);
             linkFromName.setText("");
+        } else if (myLink.get_type() == AbstractLink.Type.connector) {
+            if (upstreamLink != null) {
+                linkFromName.setText(from_name);
+                linkToName.setText("");
+            } else {
+                linkToName.setText(to_name);
+                linkFromName.setText("");
+            }     
         } else {
             if (upstreamLink != null) {
                 linkFromName.setText(to_name);
@@ -221,26 +230,42 @@ public class NewLinkController {
 
         // To obtain default parameters, use e.g.
         // user_settings.getDefaultFreewayParams(fwy_name,fwy_length)
+        
+        LinkParameters fwyParams = null;
+        LinkParameters rmpParams = null;
+        
+        if ((myLink.get_type() == AbstractLink.Type.connector) ||
+            (myLink.get_type() == AbstractLink.Type.freeway)) {
+            // We're creating a freeway section
+            fwyParams = opt.UserSettings.getDefaultFreewayParams(link_name, (float)length);
+        } else {
+            // We're creating a connector section
+            fwyParams = opt.UserSettings.getDefaultConnectorParams(link_name, (float)length);
+        }
+
 
         if (downstreamLink != null) {
-//            new_segment = downstreamLink.insert_up_segment(segment_name,link_name);
-            new_segment = downstreamLink.insert_up_segment(segment_name,
-                    XXX,
-                    XXX);
+            if (downstreamLink.get_type() == AbstractLink.Type.connector) {
+                String fr_name = to_name;
+                if (fr_name.equals(""))
+                    fr_name = "B";
+                fr_name = " -> " + fr_name;
+                fr_name = opt.utils.Misc.validateAndCorrectLinkName(fr_name, myLink.get_segment().get_scenario());
+                rmpParams = opt.UserSettings.getDefaultOfframpParams(fr_name, (float)opt.UserSettings.defaultRampLengthMeters);
+            }
+            new_segment = downstreamLink.insert_up_segment(segment_name, fwyParams, rmpParams);
         } else {
-//            new_segment = upstreamLink.insert_dn_segment(segment_name,link_name);
-            new_segment = upstreamLink.insert_dn_segment(segment_name,
-                    XXX,
-                    XXX);
+            if (upstreamLink.get_type() == AbstractLink.Type.connector) {
+                String or_name = to_name;
+                if (or_name.equals(""))
+                    or_name = "A";
+                or_name += " -> ";
+                or_name = opt.utils.Misc.validateAndCorrectLinkName(or_name, myLink.get_segment().get_scenario());
+                rmpParams = opt.UserSettings.getDefaultOnrampParams(or_name, (float)opt.UserSettings.defaultRampLengthMeters);
+            }
+            new_segment = upstreamLink.insert_dn_segment(segment_name, fwyParams, rmpParams);
         }
         LinkFreewayOrConnector new_link = new_segment.fwy();
-
-        // TODO AK : THIS IS NO LONGER NECESSARY
-        try {
-            new_link.set_length_meters((float)length);
-        } catch(Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Could not set new section length...", e);
-        }
         appMainController.objectNameUpdate(new_link);
 
         Stage stage = (Stage) topPane.getScene().getWindow();

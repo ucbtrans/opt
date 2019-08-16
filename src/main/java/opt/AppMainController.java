@@ -490,9 +490,19 @@ public class AppMainController {
         if (lnk == null) 
             return;
         
+        if (projectTree.getRoot() != null)
+            projectTree.getRoot().getChildren().clear();
+        
+        tree2object = new HashMap<TreeItem, Object>();
+        object2tree = new HashMap<Object, TreeItem>();
+        
+        projectModified = true;
+        populateProjectTree();
+        
         TreeItem item = object2tree.get(lnk);
-        if (item == null) 
+        if (item == null) { 
             return;
+        }
         
         projectTree.getSelectionModel().select(item);  
     }

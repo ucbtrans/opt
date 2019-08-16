@@ -246,7 +246,6 @@ public class NewRampController {
         int gp_lanes = numLanesGPSpinnerValueFactory.getValue();
 
         if (is_onramp) {
-
             LinkParameters params = UserSettings.getDefaultOnrampParams(ramp_name,(float)length);
             params.managed_lanes = managed_lanes;
             params.gp_lanes = gp_lanes;
@@ -257,7 +256,6 @@ public class NewRampController {
                 myLink.get_segment().add_out_or(params);
         }
         else {
-
             LinkParameters params = UserSettings.getDefaultOfframpParams(ramp_name,(float)length);
             params.managed_lanes = managed_lanes;
             params.gp_lanes = gp_lanes;
