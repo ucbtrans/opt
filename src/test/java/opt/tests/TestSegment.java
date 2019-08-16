@@ -165,20 +165,29 @@ public class TestSegment extends AbstractTest {
     @Ignore
     @Test
     public void test_delete_in_or(){
+
     }
 
     @Ignore
     @Test
     public void test_delete_out_or(){
-//        TestData X = new TestData();
-//
-//        // delete an existing onramp
-//        Segment segment2 = X.scenario.get_segment_by_name("sA3");
-//        assertTrue(segment2.delete_onramp());
-//
-//        // try to delete an non-existing onramp
-//        Segment segment4 = X.scenario.get_segment_by_name("sA4");
-//        assertFalse(segment4.delete_onramp());
+        TestData X = new TestData();
+
+        Segment sA7 = X.scenario.get_segment_by_name("sA7");
+
+        Segment sA8 = X.scenario.get_segment_by_name("sA8");
+        LinkConnector lA12 = (LinkConnector) sA7.fwy();
+        LinkOnramp lA13 = sA8.get_ors().get(0);
+        LinkFreeway lA15 = (LinkFreeway) sA8.fwy();
+
+        assertTrue( lA12.get_dn_link()!=null && lA12.get_dn_link()==lA13 );
+        assertTrue( lA13.get_up_link()!=null && lA13.get_up_link()==lA12 );
+        assertTrue( lA13.get_dn_link()!=null && lA13.get_dn_link()==lA15 );
+
+        sA8.delete_out_or(lA13);
+
+        assertTrue( lA12.get_dn_link()==null );
+
     }
 
     @Ignore

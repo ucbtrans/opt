@@ -225,6 +225,8 @@ public final class Segment implements Comparable {
         if( in_frs.contains(link) ){
             delete_ramp(link);
             in_frs.remove(link);
+
+            // TODO UPDATE SPLITS
             return true;
         } else
             return false;
@@ -234,6 +236,8 @@ public final class Segment implements Comparable {
         if( out_frs.contains(link) ){
             delete_ramp(link);
             out_frs.remove(link);
+
+            // TODO UPDATE SPLITS
             return true;
         } else
             return false;
@@ -299,13 +303,17 @@ public final class Segment implements Comparable {
         Node end_node = scenario.nodes.get(link.end_node_id);
         end_node.in_links.remove(link.id);
 
-        // case onramp with upstream connector
-        if(link.up_link!=null && link.up_link.dn_link==link)
-            link.up_link.dn_link=null;
+        // disconnect from adjacent links
 
-        // case offramp with dnstream connector
-        if(link.dn_link!=null && link.dn_link.up_link==link)
-            link.dn_link.up_link=null;
+        // link is onramp => up_link is a connector, dn_link is a freeway
+        if( link instanceof LinkOnramp )
+            if(link.up_link!=null)
+                link.up_link.dn_link = null;
+
+        // link is offramp => up_link is a freeway, dn_link is a connector
+        if( link instanceof LinkOfframp )
+            if(link.dn_link!=null)
+                link.dn_link.up_link = null;
 
         // remove the link from the scenario
         scenario.links.remove(link.id);
