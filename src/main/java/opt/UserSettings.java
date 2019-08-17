@@ -108,7 +108,6 @@ public class UserSettings {
                 false,
                 defaultOfframpGPLanes,
                 defaultOfframpManagedLanes,
-                defaultOfframpAuxLanes,
                 length!=null ? length : 100f,
                 (float)defaultGPLaneCapacityVph,
                 (float)defaultGPLaneJamDensityVpk,
@@ -122,7 +121,6 @@ public class UserSettings {
                 false,
                 defaultOnrampGPLanes,
                 defaultOnrampManagedLanes,
-                defaultOnrampAuxLanes,
                 length!=null ? length : 100f,
                 (float)defaultGPLaneCapacityVph,
                 (float)defaultGPLaneJamDensityVpk,
@@ -132,7 +130,6 @@ public class UserSettings {
     public static AbstractParameters getDefaultConnectorParams(String name, Float length) {
         return new ParametersFreeway(
                 name,
-                false,
                 defaultConnectorGPLanes,
                 defaultConnectorManagedLanes,
                 defaultConnectorAuxLanes,
@@ -145,7 +142,6 @@ public class UserSettings {
     public static AbstractParameters getDefaultFreewayParams(String name, Float length) {
         return new ParametersFreeway(
                 name,
-                false,
                 defaultFreewayGPLanes,
                 defaultFreewayManagedLanes,
                 defaultFreewayAuxLanes,

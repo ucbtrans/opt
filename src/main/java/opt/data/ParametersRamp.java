@@ -4,9 +4,11 @@ import jaxb.Roadparam;
 
 public class ParametersRamp extends AbstractParameters {
 
+    public Boolean is_inner;
 
-    public ParametersRamp(String name, Boolean is_inner, Integer gp_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
-        super(name, is_inner, gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+    public ParametersRamp(String name, Boolean is_inner, Integer gp_lanes, Integer managed_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
+        super(name, gp_lanes, managed_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+        this.is_inner = is_inner;
     }
 
     public ParametersRamp(Roadparam rp) {
@@ -15,6 +17,26 @@ public class ParametersRamp extends AbstractParameters {
 
     public ParametersRamp(Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
         super(capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+    }
+
+    @Override
+    public boolean get_is_inner(){
+        return is_inner;
+    }
+
+    @Override
+    public void set_is_inner(boolean x) {
+        is_inner = x;
+    }
+
+    @Override
+    public int get_aux_lanes(){
+        return 0;
+    }
+
+    @Override
+    public void set_aux_lanes(int x) throws Exception {
+        //
     }
 
     @Override

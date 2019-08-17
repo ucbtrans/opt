@@ -37,15 +37,6 @@ public class LinkConnector extends LinkFreewayOrConnector {
     }
 
     /////////////////////////////////////
-    // lanes
-    /////////////////////////////////////
-
-    @Override
-    public void set_aux_lanes(int x) throws Exception {
-        throw new Exception("Attempted to set aux lanes on an connector");
-    }
-
-    /////////////////////////////////////
     // insert
     /////////////////////////////////////
 

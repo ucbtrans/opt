@@ -47,15 +47,6 @@ public class LinkOfframp extends AbstractLink {
     }
 
     /////////////////////////////////////
-    // lanes
-    /////////////////////////////////////
-
-    @Override
-    public void set_aux_lanes(int x) throws Exception {
-        throw new Exception("Attempted to set aux lanes on an offramp");
-    }
-
-    /////////////////////////////////////
     // demands and splits
     /////////////////////////////////////
 

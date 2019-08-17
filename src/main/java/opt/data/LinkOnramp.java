@@ -46,14 +46,6 @@ public class LinkOnramp extends AbstractLink {
         return dn_link.get_dn_segment();
     }
 
-    /////////////////////////////////////
-    // lanes
-    /////////////////////////////////////
-
-    @Override
-    public void set_aux_lanes(int x) throws Exception {
-        throw new Exception("Attempted to set aux lanes on an onramp");
-    }
 
     @Override
     public void set_demand_vph(Long comm_id, Profile1D profile) throws Exception {

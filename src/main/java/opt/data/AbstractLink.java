@@ -18,7 +18,7 @@ public abstract class AbstractLink implements Comparable {
     protected long start_node_id;
     protected long end_node_id;
 
-    protected AbstractParameters params;
+    public AbstractParameters params;
 
     protected Map<Long, Profile1D> demands = new HashMap<>();    // commodity -> Profile1D
     protected Map<Long, Profile1D> splits = new HashMap<>();     // commodity -> Profile1D
@@ -182,16 +182,6 @@ public abstract class AbstractLink implements Comparable {
         if(x<0)
             throw new Exception("Attempted to set negative number of lanes");
         params.managed_lanes = x;
-    }
-
-    public int get_aux_lanes(){
-        return params.aux_lanes;
-    }
-
-    public void set_aux_lanes(int x) throws Exception{
-        if(x<0)
-            throw new Exception("Attempted to set negative number of lanes");
-        params.aux_lanes = x;
     }
 
     /////////////////////////////////////

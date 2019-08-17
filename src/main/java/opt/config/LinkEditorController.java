@@ -788,7 +788,7 @@ public class LinkEditorController {
         
         int managed_lanes = myLink.get_managed_lanes();
         int gp_lanes = myLink.get_gp_lanes();
-        int aux_lanes = myLink.get_aux_lanes();
+        int aux_lanes = myLink.params.get_aux_lanes();
         
         numLanesManagedSpinnerValueFactory.setValue(managed_lanes);
         numLanesGPSpinnerValueFactory.setValue(gp_lanes);
@@ -941,7 +941,7 @@ public class LinkEditorController {
             myLink.set_managed_lanes(managed_lanes);
             myLink.set_gp_lanes(gp_lanes);
             if (myLink.get_type() == AbstractLink.Type.freeway)
-                myLink.set_aux_lanes(aux_lanes);
+                myLink.params.set_aux_lanes(aux_lanes);
         } catch(Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not change number of lanes...", e);
         }
