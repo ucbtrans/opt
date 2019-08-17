@@ -56,11 +56,7 @@ import opt.config.LinkInfoController;
 import opt.config.NewLinkController;
 import opt.config.NewRampController;
 import opt.config.ScenarioEditorController;
-import opt.data.AbstractLink;
-import opt.data.FreewayScenario;
-import opt.data.AbstractParameters;
-import opt.data.ProjectFactory;
-import opt.data.Project;
+import opt.data.*;
 
 
 /**
@@ -211,7 +207,7 @@ public class AppMainController {
         }
         reset();
         
-        AbstractParameters params = UserSettings.getDefaultFreewayParams("A -> B",null);
+        ParametersFreeway params = UserSettings.getDefaultFreewayParams("A -> B",null);
         project = new Project("A", "A -> B",params);
         menuFileSave.setDisable(false);
         menuFileSaveAs.setDisable(false);

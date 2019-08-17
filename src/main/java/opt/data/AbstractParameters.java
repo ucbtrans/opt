@@ -32,11 +32,6 @@ public abstract class AbstractParameters {
         this(null,0,0,0f,rp.getCapacity(),rp.getJamDensity(),rp.getSpeed());
     }
 
-    // UI LEGACY, TRY TO REMOVE
-    public AbstractParameters(Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
-        this("",0,0,0f,capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
-    }
-
     public AbstractParameters clone() {
 
         AbstractParameters new_params = null;
@@ -61,7 +56,7 @@ public abstract class AbstractParameters {
     abstract public boolean get_is_inner();
     abstract public void set_is_inner(boolean x);
     abstract public int get_aux_lanes();
-    abstract public void set_aux_lanes(int x) throws Exception;
+    abstract public void set_aux_lanes(int x);
 
     /////////////////////////////////////
     // override

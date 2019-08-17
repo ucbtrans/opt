@@ -16,7 +16,7 @@ public class ParametersFreeway extends AbstractParameters  {
     }
 
     public ParametersFreeway(Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
-        super(capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+        super("", 0, 0, 0f, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 
     // used by clone
@@ -40,9 +40,7 @@ public class ParametersFreeway extends AbstractParameters  {
     }
 
     @Override
-    public void set_aux_lanes(int x) throws Exception{
-        if(x<0)
-            throw new Exception("Attempted to set negative number of lanes");
+    public void set_aux_lanes(int x){
         aux_lanes = x;
     }
 

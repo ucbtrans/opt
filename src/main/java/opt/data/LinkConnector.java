@@ -13,7 +13,7 @@ public class LinkConnector extends LinkFreewayOrConnector {
         super(link, rp);
     }
 
-    public LinkConnector(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, AbstractParameters params) {
+    public LinkConnector(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, ParametersFreeway params) {
         super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, params);
     }
 
@@ -117,7 +117,7 @@ public class LinkConnector extends LinkFreewayOrConnector {
         return link instanceof LinkOnramp;
     }
 
-    private Segment create_isolated_segment(String seg_name, AbstractParameters fwy_params) {
+    private Segment create_isolated_segment(String seg_name, ParametersFreeway fwy_params) {
 
         FreewayScenario fwy_scenario = this.mysegment.fwy_scenario;
 

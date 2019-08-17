@@ -27,7 +27,6 @@ package opt;
 
 import java.util.HashMap;
 import java.util.Map;
-import opt.data.AbstractParameters;
 import opt.data.ParametersFreeway;
 import opt.data.ParametersRamp;
 

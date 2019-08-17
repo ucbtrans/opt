@@ -16,7 +16,7 @@ public class ParametersRamp extends AbstractParameters {
     }
 
     public ParametersRamp(Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
-        super(capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+        super("", 0, 0, 0f, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 
     // used by clone
@@ -40,7 +40,7 @@ public class ParametersRamp extends AbstractParameters {
     }
 
     @Override
-    public void set_aux_lanes(int x) throws Exception {
+    public void set_aux_lanes(int x) {
         //
     }
 

@@ -35,7 +35,7 @@ public class TestProjectFactory extends AbstractTest {
 
     @Test
     public void test_create_empty_project(){
-        AbstractParameters params = new ParametersFreeway(100f,200f,300f);
+        ParametersFreeway params = new ParametersFreeway(100f,200f,300f);
         Project project = ProjectFactory.create_empty_project(
                 "Unnamed scenario",
                 "Unnamed segment",

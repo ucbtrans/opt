@@ -23,7 +23,7 @@ public class LinkOfframp extends AbstractLink {
                 Float.NaN );
     }
 
-    public LinkOfframp(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, AbstractParameters params) {
+    public LinkOfframp(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, ParametersRamp params) {
         super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, params);
     }
 
@@ -35,6 +35,7 @@ public class LinkOfframp extends AbstractLink {
     // used by clone
     public LinkOfframp(long id, Long start_node_id, Long end_node_id, AbstractParameters params){
         super(id,start_node_id,end_node_id,params);
+        this.params.set_is_inner(((ParametersRamp)params).is_inner);
     }
 
     @Override

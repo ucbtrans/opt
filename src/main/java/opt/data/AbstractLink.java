@@ -299,7 +299,7 @@ public abstract class AbstractLink implements Comparable {
     // protected and private
     /////////////////////////////////////
 
-    protected LinkFreewayOrConnector create_up_FwyOrConnLink(Type linktype, AbstractParameters link_params){
+    protected LinkFreewayOrConnector create_up_FwyOrConnLink(Type linktype, ParametersFreeway link_params){
 
         FreewayScenario fwy_scenario = mysegment.fwy_scenario;
 
@@ -350,7 +350,7 @@ public abstract class AbstractLink implements Comparable {
         return new_link;
     }
 
-    protected LinkFreewayOrConnector create_dn_FwyOrConnLink(Type linktype, AbstractParameters link_params){
+    protected LinkFreewayOrConnector create_dn_FwyOrConnLink(Type linktype, ParametersFreeway link_params){
 
         FreewayScenario fwy_scenario = mysegment.fwy_scenario;
 

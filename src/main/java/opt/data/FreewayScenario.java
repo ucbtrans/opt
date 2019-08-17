@@ -25,7 +25,7 @@ public class FreewayScenario {
     public FreewayScenario() {
     }
 
-    public FreewayScenario(String scnname, String segmentname, AbstractParameters params){
+    public FreewayScenario(String scnname, String segmentname, ParametersFreeway params){
         this.name = scnname;
         max_link_id = -1l;
         max_node_id = -1l;
@@ -305,7 +305,7 @@ public class FreewayScenario {
      * Create an isolated segment
      * @return A new segment
      */
-    public Segment create_isolated_segment(String segment_name, AbstractParameters params, AbstractLink.Type linktype){
+    public Segment create_isolated_segment(String segment_name, ParametersFreeway params, AbstractLink.Type linktype){
 
         if(linktype!=AbstractLink.Type.freeway && linktype!= AbstractLink.Type.connector)
             return null;

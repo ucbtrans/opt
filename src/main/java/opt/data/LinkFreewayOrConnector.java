@@ -24,7 +24,7 @@ public abstract class LinkFreewayOrConnector extends AbstractLink {
                 Float.NaN );
     }
 
-    public LinkFreewayOrConnector(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, AbstractParameters params) {
+    public LinkFreewayOrConnector(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, ParametersFreeway params) {
         super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, params);
     }
 
@@ -36,6 +36,7 @@ public abstract class LinkFreewayOrConnector extends AbstractLink {
     // used by clone
     public LinkFreewayOrConnector(long id, Long start_node_id, Long end_node_id, AbstractParameters params){
         super(id,start_node_id,end_node_id,params);
+        this.params.set_aux_lanes(((ParametersFreeway)params).aux_lanes);
     }
 
     /////////////////////////////////////

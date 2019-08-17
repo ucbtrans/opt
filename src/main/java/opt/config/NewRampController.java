@@ -38,7 +38,7 @@ import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.AbstractLink;
-import opt.data.AbstractParameters;
+import opt.data.ParametersRamp;
 
 
 /**
@@ -242,7 +242,7 @@ public class NewRampController {
         int gp_lanes = numLanesGPSpinnerValueFactory.getValue();
 
         if (is_onramp) {
-            AbstractParameters params = UserSettings.getDefaultOnrampParams(ramp_name,(float)length);
+            ParametersRamp params = UserSettings.getDefaultOnrampParams(ramp_name,(float)length);
             params.managed_lanes = managed_lanes;
             params.gp_lanes = gp_lanes;
 
@@ -252,7 +252,7 @@ public class NewRampController {
                 myLink.get_segment().add_out_or(params);
         }
         else {
-            AbstractParameters params = UserSettings.getDefaultOfframpParams(ramp_name,(float)length);
+            ParametersRamp params = UserSettings.getDefaultOfframpParams(ramp_name,(float)length);
             params.managed_lanes = managed_lanes;
             params.gp_lanes = gp_lanes;
 

@@ -14,7 +14,7 @@ public class Project {
     // construction
     /////////////////////////////////////
 
-    public Project(String scn_name, String sgmt_name, AbstractParameters params){
+    public Project(String scn_name, String sgmt_name,ParametersFreeway params){
         scenarios.put(scn_name,new FreewayScenario(scn_name,sgmt_name,params));
     }
 
