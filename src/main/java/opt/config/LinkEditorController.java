@@ -300,6 +300,7 @@ public class LinkEditorController {
     public void setNewLinkControllerAndScene(NewLinkController ctrl, Scene scn) {
         newLinkController = ctrl;
         newLinkScene = scn;
+        newLinkScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
     
     /**
@@ -310,6 +311,7 @@ public class LinkEditorController {
     public void setNewRampControllerAndScene(NewRampController ctrl, Scene scn) {
         newRampController = ctrl;
         newRampScene = scn;
+        newRampScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
     
     /**
@@ -320,6 +322,7 @@ public class LinkEditorController {
     public void setConnectControllerAndScene(ConnectController ctrl, Scene scn) {
         connectController = ctrl;
         connectScene = scn;
+        connectScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
     
     
