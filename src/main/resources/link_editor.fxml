@@ -13,6 +13,7 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -42,24 +43,39 @@
                                     <Button id="addSeectionUpstream" fx:id="addSectionUpstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionUpstreamAction" prefWidth="130.0" text="&lt;&lt; Add Section">
                                        <HBox.margin>
                                           <Insets left="10.0" />
-                                       </HBox.margin></Button>
-                                    <Button id="connectSectionUpstream" fx:id="connectSectionUpstream" defaultButton="true" mnemonicParsing="false" onAction="#onConnectSectionUpstreamAction" prefWidth="130.0" text="&lt;&lt; Connect Section" visible="false" />
+                                       </HBox.margin>
+                                       <tooltip>
+                                          <Tooltip id="ttAddSectionUpstream" fx:id="ttAddSectionUpstream" text="Attach new freeway section upstream" />
+                                       </tooltip></Button>
+                                    <Button id="connectSectionUpstream" fx:id="connectSectionUpstream" defaultButton="true" mnemonicParsing="false" onAction="#onConnectSectionUpstreamAction" prefWidth="130.0" text="&lt;&lt; Connect Section" visible="false">
+                                       <tooltip>
+                                          <Tooltip id="ttConnectUpstream" fx:id="ttConnectUpstream" text="Empty Tooltip" />
+                                       </tooltip></Button>
                                  </children>
                               </HBox>
                            </left>
                            <right>
                               <HBox alignment="TOP_RIGHT" prefHeight="30.0" prefWidth="257.0" BorderPane.alignment="CENTER">
                                  <children>
-                                    <Button id="connectSectionDownstream" fx:id="connectSectionDownstream" defaultButton="true" mnemonicParsing="false" onAction="#onConnectSectionDownstreamAction" prefWidth="130.0" text="Connect Section &gt;&gt;" visible="false" />
+                                    <Button id="connectSectionDownstream" fx:id="connectSectionDownstream" defaultButton="true" mnemonicParsing="false" onAction="#onConnectSectionDownstreamAction" prefWidth="130.0" text="Connect Section &gt;&gt;" visible="false">
+                                       <tooltip>
+                                          <Tooltip id="ttConnectDownstream" fx:id="ttConnectDownstream" text="Empty Tooltip" />
+                                       </tooltip></Button>
                                     <Button id="addSectionDownstream" fx:id="addSectionDownstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionDownstreamAction" prefWidth="130.0" text="Add Section &gt;&gt;">
                                        <HBox.margin>
                                           <Insets right="10.0" />
-                                       </HBox.margin></Button>
+                                       </HBox.margin>
+                                       <tooltip>
+                                          <Tooltip id="ttAddSectionDownstream" fx:id="ttAddSectionDownstream" text="Attach new freeway section downstream" />
+                                       </tooltip></Button>
                                  </children>
                               </HBox>
                            </right>
                            <center>
-                              <Button id="deleteSection" fx:id="deleteSection" cancelButton="true" mnemonicParsing="false" onAction="#onDeleteSection" prefWidth="130.0" text="Delete Section" BorderPane.alignment="CENTER" />
+                              <Button id="deleteSection" fx:id="deleteSection" cancelButton="true" mnemonicParsing="false" onAction="#onDeleteSection" prefWidth="130.0" text="Delete Section" BorderPane.alignment="CENTER">
+                                 <tooltip>
+                                    <Tooltip id="ttDeleteSection" fx:id="ttDeleteSection" text="Empty Tooltip" />
+                                 </tooltip></Button>
                            </center>
                         </BorderPane>
                      </children>
@@ -156,11 +172,17 @@
                                                    <GridPane.margin>
                                                       <Insets />
                                                    </GridPane.margin>
+                                                   <tooltip>
+                                                      <Tooltip text="Set a barrier between managed and general purpose lanes" />
+                                                   </tooltip>
                                                 </CheckBox>
                                                 <CheckBox id="cbSeparated" fx:id="cbSeparated" disable="true" mnemonicParsing="false" onAction="#drawRoadSection" text="Separated" GridPane.halignment="CENTER" GridPane.rowIndex="13" GridPane.valignment="BASELINE">
                                                    <GridPane.margin>
                                                       <Insets left="20.0" />
                                                    </GridPane.margin>
+                                                   <tooltip>
+                                                      <Tooltip text="Set barrier between managed lanes if there are more than one" />
+                                                   </tooltip>
                                                 </CheckBox>
                                                 <Separator prefWidth="200.0" GridPane.rowIndex="1" />
                                                 <Separator prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
