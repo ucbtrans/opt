@@ -1,6 +1,7 @@
 package opt.tests;
 
 import opt.data.AbstractParameters;
+import opt.data.ParametersFreeway;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -16,7 +17,7 @@ public class TestSnippet {
         HashSet <AbstractParameters> newset = new HashSet<>();
 
         // populate hash set
-        AbstractParameters a = new AbstractParameters(100f,200f,300f);
+        AbstractParameters a = new ParametersFreeway(100f,200f,300f);
         newset.add(a);
 
         // clone the hash set

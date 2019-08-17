@@ -307,7 +307,8 @@ public class TestLink extends AbstractTest {
 
         TestData X = new TestData();
 
-        AbstractParameters params = new AbstractParameters(100f,200f,300f);
+        // TODO GG REMOVE THE FD CONSTRUCTOR FOR PARAMETERS
+        AbstractParameters params = new ParametersFreeway(100f,200f,300f);
         Segment conn = X.scenario.create_isolated_segment("new segment",params, AbstractLink.Type.connector);
 
         Segment sA3 = X.scenario.get_segment_by_name("sA3");

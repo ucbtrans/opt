@@ -28,8 +28,8 @@ package opt;
 import java.util.HashMap;
 import java.util.Map;
 import opt.data.AbstractParameters;
-
-
+import opt.data.ParametersFreeway;
+import opt.data.ParametersRamp;
 
 
 /**
@@ -103,7 +103,7 @@ public class UserSettings {
 
 
     public static AbstractParameters getDefaultOfframpParams(String name, Float length) {
-        return new AbstractParameters(
+        return new ParametersRamp(
                 name,
                 false,
                 defaultOfframpGPLanes,
@@ -117,7 +117,7 @@ public class UserSettings {
 
 
     public static AbstractParameters getDefaultOnrampParams(String name, Float length) {
-        return new AbstractParameters(
+        return new ParametersRamp(
                 name,
                 false,
                 defaultOnrampGPLanes,
@@ -130,7 +130,7 @@ public class UserSettings {
     }
 
     public static AbstractParameters getDefaultConnectorParams(String name, Float length) {
-        return new AbstractParameters(
+        return new ParametersFreeway(
                 name,
                 false,
                 defaultConnectorGPLanes,
@@ -143,7 +143,7 @@ public class UserSettings {
     }
 
     public static AbstractParameters getDefaultFreewayParams(String name, Float length) {
-        return new AbstractParameters(
+        return new ParametersFreeway(
                 name,
                 false,
                 defaultFreewayGPLanes,

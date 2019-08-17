@@ -1,8 +1,12 @@
 package opt.data;
 
+import profiles.Profile1D;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 import java.util.Objects;
 
-public class AbstractParameters {
+public abstract class AbstractParameters {
 
     public String name;
     public Boolean is_inner;
@@ -40,7 +44,22 @@ public class AbstractParameters {
     }
 
     public AbstractParameters clone() {
-        return new AbstractParameters(name,is_inner,gp_lanes,managed_lanes,aux_lanes,length,capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
+
+        AbstractParameters new_params = null;
+        try {
+            new_params = this.getClass()
+                    .getConstructor(String.class, Boolean.class, Integer.class, Integer.class, Integer.class, Float.class, Float.class, Float.class, Float.class)
+                    .newInstance( name, is_inner, gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return new_params;
     }
 
     /////////////////////////////////////
