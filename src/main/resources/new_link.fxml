@@ -8,6 +8,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -66,6 +67,9 @@
          <GridPane.margin>
             <Insets left="20.0" right="20.0" />
          </GridPane.margin>
+         <tooltip>
+            <Tooltip text="Attaches the ramp on the inner side of the new freeway section" />
+         </tooltip>
       </CheckBox>
       <ButtonBar prefHeight="40.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="6">
         <buttons>

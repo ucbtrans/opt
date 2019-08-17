@@ -261,6 +261,21 @@ public class LinkEditorController {
     
     @FXML // fx:id="linkEventPane"
     private TitledPane linkEventPane; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="ttAddSectionUpstream"
+    private Tooltip ttAddSectionUpstream; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="ttAddSectionDownstream"
+    private Tooltip ttAddSectionDownstream; // Value injected by FXMLLoader
+    
+     @FXML // fx:id="ttConnectUpstream"
+    private Tooltip ttConnectUpstream; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="ttConnectDownstream"
+    private Tooltip ttConnectDownstream; // Value injected by FXMLLoader
+    
+     @FXML // fx:id="ttDeleteSection"
+    private Tooltip ttDeleteSection; // Value injected by FXMLLoader
 
 
 
@@ -285,6 +300,7 @@ public class LinkEditorController {
     public void setNewLinkControllerAndScene(NewLinkController ctrl, Scene scn) {
         newLinkController = ctrl;
         newLinkScene = scn;
+        newLinkScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
     
     /**
@@ -295,6 +311,7 @@ public class LinkEditorController {
     public void setNewRampControllerAndScene(NewRampController ctrl, Scene scn) {
         newRampController = ctrl;
         newRampScene = scn;
+        newRampScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
     
     /**
@@ -305,6 +322,7 @@ public class LinkEditorController {
     public void setConnectControllerAndScene(ConnectController ctrl, Scene scn) {
         connectController = ctrl;
         connectScene = scn;
+        connectScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
     
     
@@ -325,6 +343,7 @@ public class LinkEditorController {
         inputStage.setTitle("Adding New On-Ramp");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
         inputStage.showAndWait();
     }
     
@@ -344,6 +363,7 @@ public class LinkEditorController {
         inputStage.setTitle("Adding New Off-Ramp");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
         inputStage.showAndWait();
     }
 
@@ -457,6 +477,7 @@ public class LinkEditorController {
             inputStage.setTitle("Adding New Connector");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
         inputStage.showAndWait();
     }
 
@@ -471,6 +492,7 @@ public class LinkEditorController {
             inputStage.setTitle("Adding New Connector");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
         inputStage.showAndWait();
     }
     
@@ -501,6 +523,7 @@ public class LinkEditorController {
         inputStage.setTitle(title);
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
         inputStage.showAndWait();
     }
 
@@ -529,6 +552,7 @@ public class LinkEditorController {
         inputStage.setTitle(title);
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
         inputStage.showAndWait();
     }
 
@@ -678,9 +702,6 @@ public class LinkEditorController {
         linkEditorCanvas.heightProperty().addListener((observable, oldValue, newValue) -> {
            drawRoadSection(); 
         });
-        
-        
-        cbBarrier.setTooltip(new Tooltip("Sets barrier between managed and GP lanes"));
         
     }
     
@@ -892,6 +913,31 @@ public class LinkEditorController {
             connectSectionDownstream.setVisible(false);
         else
             connectSectionDownstream.setVisible(true);
+        
+        if (myLink.get_type() == AbstractLink.Type.freeway) {
+             ttDeleteSection.setText("Delete the entire freeway section with all its ramps (if it has any)");
+             ttAddSectionDownstream.setText("Create and attach a new freeway section downstream");
+             if (myLink.get_dn_link() != null) 
+                 ttAddSectionDownstream.setText("Create and insert a new freeway section downstream");
+             ttAddSectionUpstream.setText("Create and attach a new freeway section upstream");
+             if (myLink.get_up_link() != null) 
+                 ttAddSectionDownstream.setText("Create and insert a new freeway section upstream");
+             ttConnectDownstream.setText("Connect to an origin (source) freeway section downstream");
+             ttConnectUpstream.setText("Connect to a destination (sink) freeway section upstream");
+        } else if (myLink.get_type() == AbstractLink.Type.connector) {
+             ttDeleteSection.setText("Delete the connector");
+             ttAddSectionDownstream.setText("Create and attach a new freeway section with an on-ramp downstream");
+             ttAddSectionUpstream.setText("Create and attach a new freeway with an off-ramp section upstream");
+             ttConnectDownstream.setText("Connect to an origin (source) on-ramp downstream");
+             ttConnectUpstream.setText("Connect to a destination (sink) off-ramp section upstream");
+        } else if (myLink.get_type() == AbstractLink.Type.onramp) {
+             ttAddSectionUpstream.setText("Create and attach a new connector upstream");
+             ttConnectUpstream.setText("Connect to a destination (sink) connector upstream");
+        } else { // off-ramp
+             ttAddSectionDownstream.setText("Create and attach a new connector downstream");
+             ttConnectDownstream.setText("Connect to an origin (source) connector downstream");
+        }
+        
         
         
         drawRoadSection();

@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -46,6 +47,9 @@
          <GridPane.margin>
             <Insets left="20.0" right="20.0" />
          </GridPane.margin>
+         <tooltip>
+            <Tooltip text="Attaches the ramp to the inner side of the freeway section" />
+         </tooltip>
       </CheckBox>
       <Spinner id="numManagedLanes" fx:id="numManagedLanes" prefWidth="200.0" GridPane.halignment="CENTER" GridPane.rowIndex="5">
          <GridPane.margin>
