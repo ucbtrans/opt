@@ -340,6 +340,7 @@ public class LinkEditorController {
         inputStage.setTitle("Adding New On-Ramp");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
         inputStage.showAndWait();
     }
     
@@ -359,6 +360,7 @@ public class LinkEditorController {
         inputStage.setTitle("Adding New Off-Ramp");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
         inputStage.showAndWait();
     }
 
@@ -472,6 +474,7 @@ public class LinkEditorController {
             inputStage.setTitle("Adding New Connector");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
         inputStage.showAndWait();
     }
 
@@ -486,6 +489,7 @@ public class LinkEditorController {
             inputStage.setTitle("Adding New Connector");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
         inputStage.showAndWait();
     }
     
@@ -516,6 +520,7 @@ public class LinkEditorController {
         inputStage.setTitle(title);
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
         inputStage.showAndWait();
     }
 
@@ -544,6 +549,7 @@ public class LinkEditorController {
         inputStage.setTitle(title);
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
         inputStage.showAndWait();
     }
 
