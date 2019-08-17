@@ -3,6 +3,7 @@ package opt.data;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,8 +46,13 @@ public class FreewayScenario {
         // attach link names
         if (jaxb_lnks!=null)
             for(jaxbopt.Lnk lnk : jaxb_lnks.getLnk())
-                if (scenario.links.containsKey(lnk.getId()))
-                    scenario.links.get(lnk.getId()).set_name(lnk.getName());
+                if (scenario.links.containsKey(lnk.getId())) {
+                    AbstractLink link = scenario.links.get(lnk.getId());
+                    link.set_name(lnk.getName());
+                    link.set_aux_lanes(lnk.getAuxLanes()==null ? 0 : lnk.getAuxLanes().intValue());
+                    link.set_managed_lanes(lnk.getManagedLanes()==null ? 0 : lnk.getManagedLanes().intValue());
+                    link.set_is_inner(lnk.isIsInner()==null ? false : lnk.isIsInner());
+                }
 
         // create segments
         long max_sgmt_id = 0;
@@ -505,6 +511,9 @@ public class FreewayScenario {
             jaxbopt.Lnk lnk = new jaxbopt.Lnk();
             lnk.setId(link.id);
             lnk.setName(link.get_name());
+            lnk.setAuxLanes(BigInteger.valueOf(link.get_aux_lanes()));
+            lnk.setManagedLanes(BigInteger.valueOf(link.get_managed_lanes()));
+            lnk.setIsInner(link.get_is_inner());
             lnks.getLnk().add(lnk);
         }
         return scn;

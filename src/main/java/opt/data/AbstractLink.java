@@ -38,7 +38,7 @@ public abstract class AbstractLink implements Comparable {
     // construction
     /////////////////////////////////////
 
-    public AbstractLink(jaxb.Link link, jaxb.Roadparam rp){
+    public AbstractLink(jaxb.Link link){
         this.id = link.getId();
         this.start_node_id = link.getStartNodeId();
         this.end_node_id = link.getEndNodeId();
@@ -153,9 +153,7 @@ public abstract class AbstractLink implements Comparable {
         return params.gp_lanes;
     }
 
-    public void set_gp_lanes(int x) throws Exception {
-        if(x<=0)
-            throw new Exception("Non-positive number of lanes");
+    public void set_gp_lanes(int x) {
         params.gp_lanes = x;
     }
 
@@ -163,11 +161,31 @@ public abstract class AbstractLink implements Comparable {
         return params.managed_lanes;
     }
 
-    public void set_managed_lanes(int x) throws Exception {
-        if(x<0)
-            throw new Exception("Attempted to set negative number of lanes");
+    public void set_managed_lanes(int x) {
         params.managed_lanes = x;
     }
+
+    public int get_aux_lanes() {
+        return (this.params instanceof ParametersFreeway) ? params.get_aux_lanes() : 0;
+    }
+
+    public void set_aux_lanes(int x) {
+        if(this.params instanceof ParametersFreeway)
+            params.set_aux_lanes(x);
+    }
+
+
+    public boolean get_is_inner () {
+        return (this.params instanceof ParametersRamp) ? params.get_is_inner() : false;
+
+    }
+
+    public void set_is_inner(boolean x) {
+        if(this.params instanceof ParametersRamp)
+            params.set_is_inner(x);
+    }
+
+
 
     /////////////////////////////////////
     // segment getters
