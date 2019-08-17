@@ -17,6 +17,8 @@ public class LinkOnramp extends AbstractLink {
                 false,
                 link.getFullLanes(),
                 0,
+                false,
+                false,
                 link.getLength(),
                 rp.getCapacity(),
                 rp.getJamDensity(),

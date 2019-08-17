@@ -6,8 +6,8 @@ public class ParametersFreeway extends AbstractParameters  {
 
     public Integer aux_lanes;
 
-    public ParametersFreeway(String name, Integer gp_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
-        super(name, gp_lanes, managed_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+    public ParametersFreeway(String name, Integer gp_lanes, Integer managed_lanes,Boolean managed_lanes_barrier, Boolean managed_lanes_separated,Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
+        super(name, gp_lanes, managed_lanes, managed_lanes_barrier, managed_lanes_separated,length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
         this.aux_lanes = aux_lanes;
     }
 
@@ -16,12 +16,12 @@ public class ParametersFreeway extends AbstractParameters  {
     }
 
     public ParametersFreeway(Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
-        super("", 0, 0, 0f, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+        super("", 0, 0, false,false,0f, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 
     // used by clone
-    public ParametersFreeway(String name, Integer gp_lanes, Integer managed_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
-        super(name,gp_lanes,managed_lanes,length,capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
+    public ParametersFreeway(String name, Integer gp_lanes, Integer managed_lanes, Boolean managed_lanes_barrier, Boolean managed_lanes_separated,Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
+        super(name,gp_lanes,managed_lanes, managed_lanes_barrier, managed_lanes_separated,length,capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
     }
 
     @Override

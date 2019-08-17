@@ -16,6 +16,8 @@ public abstract class LinkFreewayOrConnector extends AbstractLink {
                 "",
                 link.getFullLanes(),
                 0,
+                false,
+                false,
                 0,
                 link.getLength(),
                 rp.getCapacity(),

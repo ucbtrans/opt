@@ -115,24 +115,6 @@ public abstract class AbstractLink implements Comparable {
         return dn_link;
     }
 
-    public final String get_name(){
-        return params.name;
-    }
-
-    public final void set_name(String name){
-        params.name = name;
-    }
-
-    public final float get_length_meters() {
-        return params.length;
-    }
-    
-    public final void set_length_meters(float newlength) throws Exception {
-        if (newlength<=0.0001)
-            throw new Exception("Attempted to set a non-positive segment length");
-        params.length = newlength;
-    }
-
     public final boolean is_source(){
         return mysegment.fwy_scenario.scenario.nodes.get(start_node_id).in_links.isEmpty();
     }
@@ -146,8 +128,28 @@ public abstract class AbstractLink implements Comparable {
     }
 
     /////////////////////////////////////
-    // lanes
+    // segment getters
     /////////////////////////////////////
+
+    public Segment get_up_segment(){
+        return up_link==null ? null : up_link.mysegment;
+    }
+
+    public Segment get_dn_segment(){
+        return dn_link==null ? null : dn_link.mysegment;
+    }
+
+    /////////////////////////////////////
+    // link parameters
+    /////////////////////////////////////
+
+    public final String get_name(){
+        return params.name;
+    }
+
+    public final void set_name(String name){
+        params.name = name;
+    }
 
     public int get_gp_lanes(){
         return params.gp_lanes;
@@ -163,6 +165,22 @@ public abstract class AbstractLink implements Comparable {
 
     public void set_managed_lanes(int x) {
         params.managed_lanes = x;
+    }
+
+    public boolean get_barrier(){
+        return params.managed_lanes_barrier;
+    }
+
+    public void set_barrier(boolean x){
+        params.managed_lanes_barrier = x;
+    }
+
+    public boolean get_separated(){
+        return params.managed_lanes_separated;
+    }
+
+    public void set_separated(boolean x){
+        params.managed_lanes_separated = x;
     }
 
     public int get_aux_lanes() {
@@ -185,23 +203,15 @@ public abstract class AbstractLink implements Comparable {
             params.set_is_inner(x);
     }
 
-
-
-    /////////////////////////////////////
-    // segment getters
-    /////////////////////////////////////
-
-    public Segment get_up_segment(){
-        return up_link==null ? null : up_link.mysegment;
+    public final float get_length_meters() {
+        return params.length;
     }
 
-    public Segment get_dn_segment(){
-        return dn_link==null ? null : dn_link.mysegment;
+    public final void set_length_meters(float newlength) throws Exception {
+        if (newlength<=0.0001)
+            throw new Exception("Attempted to set a non-positive segment length");
+        params.length = newlength;
     }
-
-    /////////////////////////////////////
-    // link parameters
-    /////////////////////////////////////
 
     public float get_capacity_vphpl(){
         return params.capacity_vphpl;
@@ -313,6 +323,7 @@ public abstract class AbstractLink implements Comparable {
     public int hashCode() {
         return Objects.hash(id, start_node_id, end_node_id, params, demands, splits);
     }
+
     /////////////////////////////////////
     // protected and private
     /////////////////////////////////////
