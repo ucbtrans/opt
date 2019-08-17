@@ -19,6 +19,11 @@ public class ParametersRamp extends AbstractParameters {
         super(capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 
+    // used by clone
+    public ParametersRamp(String name, Integer gp_lanes, Integer managed_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
+        super(name,gp_lanes,managed_lanes,length,capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
+    }
+
     @Override
     public boolean get_is_inner(){
         return is_inner;
@@ -39,9 +44,11 @@ public class ParametersRamp extends AbstractParameters {
         //
     }
 
+
     @Override
     public AbstractParameters clone() {
-        return null;
+        AbstractParameters new_params = super.clone();
+        ((ParametersRamp) new_params).is_inner = this.is_inner;
+        return new_params;
     }
-
 }

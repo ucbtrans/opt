@@ -42,18 +42,6 @@ public abstract class AbstractLink implements Comparable {
         this.id = link.getId();
         this.start_node_id = link.getStartNodeId();
         this.end_node_id = link.getEndNodeId();
-
-        // TODO GG
-//        this.params = new AbstractParameters(
-//                "",
-//                false,
-//                link.getFullLanes(),
-//                0,
-//                0,
-//                link.getLength(),
-//                Float.NaN,
-//                Float.NaN,
-//                Float.NaN );
     }
 
     // used by clone
@@ -84,9 +72,6 @@ public abstract class AbstractLink implements Comparable {
         this.dn_link = dn_link;
         this.start_node_id = start_node_id;
         this.end_node_id = end_node_id;
-
-        // TODO GG
-//        this.params = new AbstractParameters(name, is_inner,gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 
     @Override

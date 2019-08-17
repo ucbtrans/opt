@@ -19,6 +19,11 @@ public class ParametersFreeway extends AbstractParameters  {
         super(capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 
+    // used by clone
+    public ParametersFreeway(String name, Integer gp_lanes, Integer managed_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
+        super(name,gp_lanes,managed_lanes,length,capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
+    }
+
     @Override
     public boolean get_is_inner() {
         return false;
@@ -43,7 +48,8 @@ public class ParametersFreeway extends AbstractParameters  {
 
     @Override
     public AbstractParameters clone() {
-        return null;
+        AbstractParameters new_params = super.clone();
+        ((ParametersFreeway) new_params).aux_lanes = this.aux_lanes;
+        return new_params;
     }
-
 }
