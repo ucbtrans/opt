@@ -18,7 +18,7 @@ public abstract class AbstractLink implements Comparable {
     protected long start_node_id;
     protected long end_node_id;
 
-    protected LinkParameters params;
+    protected AbstractParameters params;
 
     protected Map<Long, Profile1D> demands = new HashMap<>();    // commodity -> Profile1D
     protected Map<Long, Profile1D> splits = new HashMap<>();     // commodity -> Profile1D
@@ -29,8 +29,8 @@ public abstract class AbstractLink implements Comparable {
 
     abstract public AbstractLink.Type get_type();
     abstract public boolean is_ramp();
-    abstract public Segment insert_up_segment(String seg_name,LinkParameters fwy_params,LinkParameters ramp_params);
-    abstract public Segment insert_dn_segment(String seg_name,LinkParameters fwy_params,LinkParameters ramp_params);
+    abstract public Segment insert_up_segment(String seg_name, AbstractParameters fwy_params, AbstractParameters ramp_params);
+    abstract public Segment insert_dn_segment(String seg_name, AbstractParameters fwy_params, AbstractParameters ramp_params);
     abstract protected boolean is_permitted_uplink(AbstractLink link);
     abstract protected boolean is_permitted_dnlink(AbstractLink link);
 
@@ -42,8 +42,9 @@ public abstract class AbstractLink implements Comparable {
         this.id = link.getId();
         this.start_node_id = link.getStartNodeId();
         this.end_node_id = link.getEndNodeId();
-        this.params = new LinkParameters(
+        this.params = new AbstractParameters(
                 "",
+                false,
                 link.getFullLanes(),
                 0,
                 0,
@@ -54,7 +55,7 @@ public abstract class AbstractLink implements Comparable {
     }
 
     // used by clone
-    public AbstractLink(long id,Long start_node_id,Long end_node_id,LinkParameters params){
+    public AbstractLink(long id, Long start_node_id, Long end_node_id, AbstractParameters params){
         this.id = id;
         this.mysegment = null;
         this.up_link = null;
@@ -64,7 +65,7 @@ public abstract class AbstractLink implements Comparable {
         this.params = params;
     }
 
-    public AbstractLink(long id,Segment mysegment,AbstractLink up_link,AbstractLink dn_link,Long start_node_id,Long end_node_id,LinkParameters params){
+    public AbstractLink(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, AbstractParameters params){
         this.id = id;
         this.mysegment = mysegment;
         this.up_link = up_link;
@@ -74,14 +75,14 @@ public abstract class AbstractLink implements Comparable {
         this.params = params;
     }
 
-    public AbstractLink(long id,Segment mysegment,AbstractLink up_link,AbstractLink dn_link,Long start_node_id,Long end_node_id,String name,Integer gp_lanes,Integer managed_lanes,Integer aux_lanes,Float length,Float capacity_vphpl,Float jam_density_vpkpl,Float ff_speed_kph){
+    public AbstractLink(long id,Segment mysegment,AbstractLink up_link,AbstractLink dn_link,Long start_node_id,Long end_node_id,String name,Boolean is_inner,Integer gp_lanes,Integer managed_lanes,Integer aux_lanes,Float length,Float capacity_vphpl,Float jam_density_vpkpl,Float ff_speed_kph){
         this.id = id;
         this.mysegment = mysegment;
         this.up_link = up_link;
         this.dn_link = dn_link;
         this.start_node_id = start_node_id;
         this.end_node_id = end_node_id;
-        this.params = new LinkParameters(name, gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+        this.params = new AbstractParameters(name, is_inner,gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 
     @Override
@@ -89,7 +90,7 @@ public abstract class AbstractLink implements Comparable {
         AbstractLink new_link = null;
         try {
             new_link = this.getClass()
-                    .getConstructor(long.class,Long.class,Long.class,LinkParameters.class)
+                    .getConstructor(long.class,Long.class,Long.class, AbstractParameters.class)
                     .newInstance(
                             id,
                             start_node_id,
@@ -319,7 +320,7 @@ public abstract class AbstractLink implements Comparable {
     // protected and private
     /////////////////////////////////////
 
-    protected LinkFreewayOrConnector create_up_FwyOrConnLink(Type linktype,LinkParameters link_params){
+    protected LinkFreewayOrConnector create_up_FwyOrConnLink(Type linktype, AbstractParameters link_params){
 
         FreewayScenario fwy_scenario = mysegment.fwy_scenario;
 
@@ -370,7 +371,7 @@ public abstract class AbstractLink implements Comparable {
         return new_link;
     }
 
-    protected LinkFreewayOrConnector create_dn_FwyOrConnLink(Type linktype,LinkParameters link_params){
+    protected LinkFreewayOrConnector create_dn_FwyOrConnLink(Type linktype, AbstractParameters link_params){
 
         FreewayScenario fwy_scenario = mysegment.fwy_scenario;
 

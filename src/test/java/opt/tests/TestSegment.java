@@ -126,7 +126,7 @@ public class TestSegment extends AbstractTest {
         TestData X = new TestData();
         Segment segment = X.scenario.get_segment_by_name("sA1");
         assertTrue(segment.num_out_ors()==0);
-        LinkParameters params = new LinkParameters(100f,200f,300f);
+        AbstractParameters params = new AbstractParameters(100f,200f,300f);
         LinkOnramp or = segment.add_out_or(params);
         assertTrue(or.is_ramp());
         assertTrue(or.is_source());
@@ -139,7 +139,7 @@ public class TestSegment extends AbstractTest {
         TestData X = new TestData();
         Segment segment = X.scenario.get_segment_by_name("sA1");
         assertTrue(segment.num_in_frs()==0);
-        LinkParameters params = new LinkParameters(100f,200f,300f);
+        AbstractParameters params = new AbstractParameters(100f,200f,300f);
         LinkOfframp fr = segment.add_in_fr(params);
         assertTrue(fr.is_ramp());
         assertTrue(fr.is_sink());

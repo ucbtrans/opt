@@ -131,10 +131,10 @@ public class Scenario {
 
         jaxb.Roadparams jRoadParams = new jaxb.Roadparams();
         jNet.setRoadparams(jRoadParams);
-        Map<Long,LinkParameters> link_params = get_link_params();
-        for(Map.Entry<Long,LinkParameters> e : link_params.entrySet()){
+        Map<Long, AbstractParameters> link_params = get_link_params();
+        for(Map.Entry<Long, AbstractParameters> e : link_params.entrySet()){
             Long id = e.getKey();
-            LinkParameters param = e.getValue();
+            AbstractParameters param = e.getValue();
             jaxb.Roadparam jaxbrp = new jaxb.Roadparam();
             jaxbrp.setId(id);
             jaxbrp.setCapacity(param.capacity_vphpl);
@@ -258,15 +258,15 @@ public class Scenario {
         return jScn;
     }
 
-    private Map<Long,LinkParameters> get_link_params(){
-        Set<LinkParameters> link_params_set = links.values().stream()
+    private Map<Long, AbstractParameters> get_link_params(){
+        Set<AbstractParameters> link_params_set = links.values().stream()
                 .map(link->link.params)
                 .collect(Collectors.toSet());
 
         // set ids
-        Map<Long,LinkParameters> link_params_map = new HashMap<>();
+        Map<Long, AbstractParameters> link_params_map = new HashMap<>();
         long id = 0;
-        for(LinkParameters link_param : link_params_set)
+        for(AbstractParameters link_param : link_params_set)
             link_params_map.put(id++,link_param);
         return link_params_map;
     }

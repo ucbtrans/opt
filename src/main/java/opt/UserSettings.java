@@ -26,9 +26,8 @@
 package opt;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import opt.data.LinkParameters;
+import opt.data.AbstractParameters;
 
 
 
@@ -103,9 +102,10 @@ public class UserSettings {
     }
 
 
-    public static LinkParameters getDefaultOfframpParams(String name,Float length) {
-        return new LinkParameters(
+    public static AbstractParameters getDefaultOfframpParams(String name, Float length) {
+        return new AbstractParameters(
                 name,
+                false,
                 defaultOfframpGPLanes,
                 defaultOfframpManagedLanes,
                 defaultOfframpAuxLanes,
@@ -116,9 +116,10 @@ public class UserSettings {
     }
 
 
-    public static LinkParameters getDefaultOnrampParams(String name,Float length) {
-        return new LinkParameters(
+    public static AbstractParameters getDefaultOnrampParams(String name, Float length) {
+        return new AbstractParameters(
                 name,
+                false,
                 defaultOnrampGPLanes,
                 defaultOnrampManagedLanes,
                 defaultOnrampAuxLanes,
@@ -128,9 +129,10 @@ public class UserSettings {
                 (float)defaultGPLaneFreeFlowSpeedKph);
     }
 
-    public static LinkParameters getDefaultConnectorParams(String name,Float length) {
-        return new LinkParameters(
+    public static AbstractParameters getDefaultConnectorParams(String name, Float length) {
+        return new AbstractParameters(
                 name,
+                false,
                 defaultConnectorGPLanes,
                 defaultConnectorManagedLanes,
                 defaultConnectorAuxLanes,
@@ -140,9 +142,10 @@ public class UserSettings {
                 (float)defaultGPLaneFreeFlowSpeedKph);
     }
 
-    public static LinkParameters getDefaultFreewayParams(String name,Float length) {
-        return new LinkParameters(
+    public static AbstractParameters getDefaultFreewayParams(String name, Float length) {
+        return new AbstractParameters(
                 name,
+                false,
                 defaultFreewayGPLanes,
                 defaultFreewayManagedLanes,
                 defaultFreewayAuxLanes,

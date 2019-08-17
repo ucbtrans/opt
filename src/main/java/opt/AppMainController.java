@@ -36,7 +36,6 @@ import java.util.prefs.Preferences;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.control.MenuItem;
@@ -59,7 +58,7 @@ import opt.config.NewRampController;
 import opt.config.ScenarioEditorController;
 import opt.data.AbstractLink;
 import opt.data.FreewayScenario;
-import opt.data.LinkParameters;
+import opt.data.AbstractParameters;
 import opt.data.ProjectFactory;
 import opt.data.Project;
 
@@ -212,7 +211,7 @@ public class AppMainController {
         }
         reset();
         
-        LinkParameters params = UserSettings.getDefaultFreewayParams("A -> B",null);
+        AbstractParameters params = UserSettings.getDefaultFreewayParams("A -> B",null);
         project = new Project("A", "A -> B",params);
         menuFileSave.setDisable(false);
         menuFileSaveAs.setDisable(false);

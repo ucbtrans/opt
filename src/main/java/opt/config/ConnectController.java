@@ -29,20 +29,12 @@ import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.data.AbstractLink;
-import opt.data.LinkFreewayOrConnector;
-import opt.data.LinkParameters;
-import opt.data.Segment;
-
 
 
 /**

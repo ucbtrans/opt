@@ -82,7 +82,7 @@ public class TestFreewayScenario extends AbstractTest {
     @Test
     public void test_create_isolated_segment() {
         TestData X = new TestData();
-        LinkParameters params = new LinkParameters(100f,200f,300f);
+        AbstractParameters params = new AbstractParameters(100f,200f,300f);
         Segment new_segment =  X.scenario.create_isolated_segment("Lonely segment",params,AbstractLink.Type.freeway);
         assertNotNull(new_segment);
     }

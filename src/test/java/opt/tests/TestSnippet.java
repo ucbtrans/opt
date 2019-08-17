@@ -1,6 +1,6 @@
 package opt.tests;
 
-import opt.data.LinkParameters;
+import opt.data.AbstractParameters;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -13,16 +13,16 @@ public class TestSnippet {
     public void test_snippet(){
 
         // create two hash sets
-        HashSet <LinkParameters> newset = new HashSet<>();
+        HashSet <AbstractParameters> newset = new HashSet<>();
 
         // populate hash set
-        LinkParameters a = new LinkParameters(100f,200f,300f);
+        AbstractParameters a = new AbstractParameters(100f,200f,300f);
         newset.add(a);
 
         // clone the hash set
-        HashSet <LinkParameters>  cloneset = new HashSet<>();
+        HashSet <AbstractParameters>  cloneset = new HashSet<>();
         newset.forEach(x->cloneset.add(x.clone()));
-        LinkParameters b = cloneset.iterator().next();
+        AbstractParameters b = cloneset.iterator().next();
 
         System.out.println(newset==cloneset);
         System.out.println(newset.equals(cloneset));

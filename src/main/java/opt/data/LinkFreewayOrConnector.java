@@ -14,16 +14,16 @@ public abstract class LinkFreewayOrConnector extends AbstractLink {
         super(link, rp);
     }
 
-    public LinkFreewayOrConnector(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, LinkParameters params) {
+    public LinkFreewayOrConnector(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, AbstractParameters params) {
         super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, params);
     }
 
-    public LinkFreewayOrConnector(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, String name, Integer gp_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
-        super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, name, gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+    public LinkFreewayOrConnector(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, String name, Boolean is_inner, Integer gp_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
+        super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, name, is_inner, gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
     }
 
     // used by clone
-    public LinkFreewayOrConnector(long id,Long start_node_id,Long end_node_id,LinkParameters params){
+    public LinkFreewayOrConnector(long id, Long start_node_id, Long end_node_id, AbstractParameters params){
         super(id,start_node_id,end_node_id,params);
     }
 

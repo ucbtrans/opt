@@ -40,7 +40,7 @@ import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.LinkFreewayOrConnector;
-import opt.data.LinkParameters;
+import opt.data.AbstractParameters;
 import opt.data.Segment;
 
 
@@ -231,8 +231,8 @@ public class NewLinkController {
         // To obtain default parameters, use e.g.
         // user_settings.getDefaultFreewayParams(fwy_name,fwy_length)
         
-        LinkParameters fwyParams = null;
-        LinkParameters rmpParams = null;
+        AbstractParameters fwyParams = null;
+        AbstractParameters rmpParams = null;
         
         if ((myLink.get_type() == AbstractLink.Type.connector) ||
             (myLink.get_type() == AbstractLink.Type.freeway)) {

@@ -168,11 +168,11 @@ public final class Segment implements Comparable {
     // insert / delete segments
     ////////////////////////////////////////
 
-    public Segment insert_up_segment(String seg_name,LinkParameters params){
+    public Segment insert_up_segment(String seg_name, AbstractParameters params){
         return fwy.insert_up_segment(seg_name,params,null);
     }
 
-    public Segment insert_dn_segment(String seg_name,LinkParameters params){
+    public Segment insert_dn_segment(String seg_name, AbstractParameters params){
         return fwy.insert_dn_segment(seg_name,params,null);
     }
 
@@ -180,25 +180,25 @@ public final class Segment implements Comparable {
     // add / delete ramps
     ////////////////////////////////////////
 
-    public LinkOnramp add_in_or(LinkParameters params){
+    public LinkOnramp add_in_or(AbstractParameters params){
         LinkOnramp link = create_onramp(params);
         in_ors.add(link);
         return link;
     }
 
-    public LinkOnramp add_out_or(LinkParameters params){
+    public LinkOnramp add_out_or(AbstractParameters params){
         LinkOnramp link = create_onramp(params);
         out_ors.add(link);
         return link;
     }
 
-    public LinkOfframp add_in_fr(LinkParameters params){
+    public LinkOfframp add_in_fr(AbstractParameters params){
         LinkOfframp link = create_offramp(params);
         in_frs.add(link);
         return link;
     }
 
-    public LinkOfframp add_out_fr(LinkParameters params){
+    public LinkOfframp add_out_fr(AbstractParameters params){
         LinkOfframp link = create_offramp(params);
         out_frs.add(link);
         return link;
@@ -320,7 +320,7 @@ public final class Segment implements Comparable {
         scenario.links.remove(link.id);
     }
 
-    private LinkOnramp create_onramp(LinkParameters params){
+    private LinkOnramp create_onramp(AbstractParameters params){
 
         Long link_id = fwy_scenario.new_link_id();
         Node or_start_node = new Node(fwy_scenario.new_node_id());
@@ -343,7 +343,7 @@ public final class Segment implements Comparable {
         return or;
     }
 
-    private LinkOfframp create_offramp(LinkParameters params){
+    private LinkOfframp create_offramp(AbstractParameters params){
 
         Long link_id = fwy_scenario.new_link_id();
         Node fr_start_node = fwy_scenario.scenario.nodes.get(fwy.end_node_id);

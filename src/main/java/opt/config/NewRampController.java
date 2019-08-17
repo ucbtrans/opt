@@ -29,7 +29,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
@@ -39,10 +38,7 @@ import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.AbstractLink;
-import opt.data.LinkFreewayOrConnector;
-import opt.data.LinkParameters;
-import opt.data.Segment;
-
+import opt.data.AbstractParameters;
 
 
 /**
@@ -246,7 +242,7 @@ public class NewRampController {
         int gp_lanes = numLanesGPSpinnerValueFactory.getValue();
 
         if (is_onramp) {
-            LinkParameters params = UserSettings.getDefaultOnrampParams(ramp_name,(float)length);
+            AbstractParameters params = UserSettings.getDefaultOnrampParams(ramp_name,(float)length);
             params.managed_lanes = managed_lanes;
             params.gp_lanes = gp_lanes;
 
@@ -256,7 +252,7 @@ public class NewRampController {
                 myLink.get_segment().add_out_or(params);
         }
         else {
-            LinkParameters params = UserSettings.getDefaultOfframpParams(ramp_name,(float)length);
+            AbstractParameters params = UserSettings.getDefaultOfframpParams(ramp_name,(float)length);
             params.managed_lanes = managed_lanes;
             params.gp_lanes = gp_lanes;
 
