@@ -102,7 +102,7 @@ public class UserSettings {
     }
 
 
-    public static AbstractParameters getDefaultOfframpParams(String name, Float length) {
+    public static ParametersRamp getDefaultOfframpParams(String name, Float length) {
         return new ParametersRamp(
                 name,
                 false,
@@ -115,7 +115,7 @@ public class UserSettings {
     }
 
 
-    public static AbstractParameters getDefaultOnrampParams(String name, Float length) {
+    public static ParametersRamp getDefaultOnrampParams(String name, Float length) {
         return new ParametersRamp(
                 name,
                 false,
@@ -127,7 +127,7 @@ public class UserSettings {
                 (float)defaultGPLaneFreeFlowSpeedKph);
     }
 
-    public static AbstractParameters getDefaultConnectorParams(String name, Float length) {
+    public static ParametersFreeway getDefaultConnectorParams(String name, Float length) {
         return new ParametersFreeway(
                 name,
                 defaultConnectorGPLanes,
@@ -139,7 +139,7 @@ public class UserSettings {
                 (float)defaultGPLaneFreeFlowSpeedKph);
     }
 
-    public static AbstractParameters getDefaultFreewayParams(String name, Float length) {
+    public static ParametersFreeway getDefaultFreewayParams(String name, Float length) {
         return new ParametersFreeway(
                 name,
                 defaultFreewayGPLanes,

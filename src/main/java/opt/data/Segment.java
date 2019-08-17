@@ -168,11 +168,11 @@ public final class Segment implements Comparable {
     // insert / delete segments
     ////////////////////////////////////////
 
-    public Segment insert_up_segment(String seg_name, AbstractParameters params){
+    public Segment insert_up_segment(String seg_name, ParametersFreeway params){
         return fwy.insert_up_segment(seg_name,params,null);
     }
 
-    public Segment insert_dn_segment(String seg_name, AbstractParameters params){
+    public Segment insert_dn_segment(String seg_name, ParametersFreeway params){
         return fwy.insert_dn_segment(seg_name,params,null);
     }
 

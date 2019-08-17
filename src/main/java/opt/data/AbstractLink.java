@@ -29,8 +29,8 @@ public abstract class AbstractLink implements Comparable {
 
     abstract public AbstractLink.Type get_type();
     abstract public boolean is_ramp();
-    abstract public Segment insert_up_segment(String seg_name, AbstractParameters fwy_params, AbstractParameters ramp_params);
-    abstract public Segment insert_dn_segment(String seg_name, AbstractParameters fwy_params, AbstractParameters ramp_params);
+    abstract public Segment insert_up_segment(String seg_name, ParametersFreeway fwy_params, ParametersRamp ramp_params);
+    abstract public Segment insert_dn_segment(String seg_name, ParametersFreeway fwy_params, ParametersRamp ramp_params);
     abstract protected boolean is_permitted_uplink(AbstractLink link);
     abstract protected boolean is_permitted_dnlink(AbstractLink link);
 

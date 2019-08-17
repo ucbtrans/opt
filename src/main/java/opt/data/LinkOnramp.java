@@ -27,10 +27,10 @@ public class LinkOnramp extends AbstractLink {
         super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, params);
     }
 
-    public LinkOnramp(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, String name, Boolean is_inner,Integer gp_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
-        super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, name, is_inner, gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
-        this.params = new ParametersRamp(name, is_inner,gp_lanes, managed_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
-    }
+//    public LinkOnramp(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, String name, Boolean is_inner,Integer gp_lanes, Integer managed_lanes, Integer aux_lanes, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
+//        super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, name, is_inner, gp_lanes, managed_lanes, aux_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+//        this.params = new ParametersRamp(name, is_inner,gp_lanes, managed_lanes, length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+//    }
 
     // used by clone
     public LinkOnramp(long id, Long start_node_id, Long end_node_id, AbstractParameters params){
@@ -67,7 +67,7 @@ public class LinkOnramp extends AbstractLink {
     /////////////////////////////////////
 
     @Override
-    public Segment insert_up_segment(String seg_name, AbstractParameters fwy_params, AbstractParameters ramp_params) {
+    public Segment insert_up_segment(String seg_name, ParametersFreeway fwy_params, ParametersRamp ramp_params) {
 
         if(up_link!=null)
             return null;
@@ -92,7 +92,7 @@ public class LinkOnramp extends AbstractLink {
     }
 
     @Override
-    public Segment insert_dn_segment(String seg_name, AbstractParameters fwy_params, AbstractParameters ramp_params) {
+    public Segment insert_dn_segment(String seg_name, ParametersFreeway fwy_params, ParametersRamp ramp_params) {
         return null;
     }
 
