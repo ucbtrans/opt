@@ -54,6 +54,9 @@ public class Scenario {
                         default:
                             throw new Exception("Bad road type");
                     }
+
+                    System.out.println(jlink.getId());
+
                     links.put(jlink.getId(),link);
                     nodes.get(jlink.getEndNodeId()).in_links.add(link.id);
                     nodes.get(jlink.getStartNodeId()).out_links.add(link.id);
@@ -205,6 +208,9 @@ public class Scenario {
 
             if(in_links.size()>1)
                 System.err.println("90443j2f");
+
+            if(in_links.isEmpty())
+                continue;
 
             LinkFreeway in_link = in_links.iterator().next();
 
