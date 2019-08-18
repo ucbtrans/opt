@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<prj xmlns="https://github.com/ucbtrans/opt">
+    <scns>
+        <scn name="I-580 E + I-80 W mini network" file="EndResult_I-580 E + I-80 W mini network.xml">
+            <lnks>
+                <lnk id="0" name="Richmond -&gt; Buchanan St." managed_lanes="1" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="1" name="Buchanan St. -&gt; Gilman St." managed_lanes="1" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="1" is_inner="false"/>
+                <lnk id="2" name="I-580 E -&gt; " managed_lanes="0" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="3" name="Buchanan St. -&gt; " managed_lanes="1" managed_lanes_barrier="true" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="4" name=" -&gt; Gilman St." managed_lanes="0" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="5" name="Gilman St. -&gt; Gilman St." managed_lanes="1" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="6" name="Gilman St. -&gt; University Ave." managed_lanes="1" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="7" name="Gilman St. -&gt; " managed_lanes="0" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="8" name=" -&gt; University Ave." managed_lanes="0" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="9" name="University Ave. -&gt; University Ave." managed_lanes="1" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="13" name="University Ave. -&gt; Emeryville" managed_lanes="1" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="14" name="University Ave. -&gt; " managed_lanes="0" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="15" name="I-580 E -&gt; I-80 W" managed_lanes="0" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="16" name="Central Ave. -&gt; I-80 W" managed_lanes="0" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="17" name=" -&gt; I-80 W" managed_lanes="0" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
+                <lnk id="19" name=" -&gt; Buchanan St." managed_lanes="0" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="true"/>
+            </lnks>
+            <sgmts>
+                <sgmt type="fwy" name="Richmond -&gt; Buchanan St." fwy="0"/>
+                <sgmt type="fwy" name="Buchanan St. -&gt; Gilman St." fwy="1" out_ors="2,3" out_frs="4"/>
+                <sgmt type="fwy" name="Gilman St. -&gt; Gilman St." fwy="5"/>
+                <sgmt type="fwy" name="Gilman St. -&gt; University Ave." fwy="6" out_ors="7" out_frs="8"/>
+                <sgmt type="fwy" name="University Ave. -&gt; University Ave." fwy="9"/>
+                <sgmt type="fwy" name="University Ave. -&gt; Emeryville" fwy="13" out_ors="14"/>
+                <sgmt type="con" name="I-580 E -&gt; I-80 W" fwy="15"/>
+                <sgmt type="fwy" name="Central Ave. -&gt; I-80 W" fwy="16" in_frs="19" out_frs="17"/>
+            </sgmts>
+        </scn>
+    </scns>
+</prj>

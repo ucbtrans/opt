@@ -67,7 +67,6 @@ import opt.data.*;
 public class AppMainController {
     private Stage primaryStage = null;
     private Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
-//    private UserSettings userSettings = new UserSettings();
     private boolean projectModified = false;
     private String projectFilePath = null;
     private String optProjectFileDir_String = "optProjectFileDir_String";
@@ -174,6 +173,16 @@ public class AppMainController {
     
     public void setProjectModified(boolean val) {
         projectModified = val;
+        
+        String title = "OPT: ";
+        if (projectFilePath == null) {
+            title += "New Project";
+        } else {
+            title += projectFilePath;
+            if (projectModified)
+                title += "*";
+        }
+        primaryStage.setTitle(title);
     }
     
     
@@ -225,7 +234,7 @@ public class AppMainController {
         }
         populateProjectTree();
         
-        projectModified = true;
+        setProjectModified(true);
     }
     
     
@@ -257,6 +266,7 @@ public class AppMainController {
             menuFileSave.setDisable(false);
             menuFileSaveAs.setDisable(false);
             populateProjectTree();
+            setProjectModified(false);
         } catch (Exception ex) {
             opt.utils.Dialogs.ExceptionDialog("Error loading OPT project", ex);
         }
@@ -270,7 +280,7 @@ public class AppMainController {
             onClickMenuFileSaveAs(event);
         try {
             ProjectFactory.save_project(project, projectFilePath);
-            projectModified = false;
+            setProjectModified(false);
         } catch (Exception ex) {
             opt.utils.Dialogs.ExceptionDialog("Error saving OPT project", ex);
         }
@@ -298,7 +308,7 @@ public class AppMainController {
             projectFileDir = file.getParentFile();
             prefs.put(this.optProjectFileDir_String, projectFileDir.getAbsolutePath());
             ProjectFactory.save_project(project, projectFilePath);
-            projectModified = false;
+            setProjectModified(false);
         } catch (Exception ex) {
             opt.utils.Dialogs.ExceptionDialog("Error saving OPT project", ex);
         }
@@ -491,7 +501,7 @@ public class AppMainController {
         tree2object = new HashMap<TreeItem, Object>();
         object2tree = new HashMap<Object, TreeItem>();
         
-        projectModified = true;
+        setProjectModified(true);
         populateProjectTree();
         
         TreeItem item = object2tree.get(lnk);
@@ -514,7 +524,7 @@ public class AppMainController {
         tree2object = new HashMap<TreeItem, Object>();
         object2tree = new HashMap<Object, TreeItem>();
         
-        projectModified = true;
+        setProjectModified(true);
         populateProjectTree();
         
         TreeItem item = object2tree.get(obj);
@@ -559,7 +569,7 @@ public class AppMainController {
             dn_link.connect_to_upstream(up_link);
         }
         
-        projectModified = true;
+        setProjectModified(true);
         
         Object toDisplay = scenario;
         if (dn_link != null)
@@ -589,7 +599,7 @@ public class AppMainController {
     
     
     private void reset() {
-        projectModified = false;
+        setProjectModified(false);
         projectFilePath = null;
         tree2object = new HashMap<TreeItem, Object>();
         object2tree = new HashMap<Object, TreeItem>();
