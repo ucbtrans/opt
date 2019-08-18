@@ -89,6 +89,9 @@ public class NewLinkController {
     @FXML // fx:id="labelLength"
     private Label labelLength; // Value injected by FXMLLoader
     
+    @FXML // fx:id="labelCreateOption"
+    private Label labelCreateOption; // Value injected by FXMLLoader
+    
     
     
     /**
@@ -107,6 +110,9 @@ public class NewLinkController {
         lengthSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
         linkLength.setValueFactory(lengthSpinnerValueFactory);
         
+        createOption.getItems().clear();
+        createOption.getItems().add("Copy from Current Section");
+        createOption.getItems().add("Use Default Settings");
     }
     
     
@@ -175,6 +181,17 @@ public class NewLinkController {
         length = UserSettings.convertLength(length, "meters", unitsLength);
         labelLength.setText("Length (" + unitsLength + "):");
         lengthSpinnerValueFactory.setValue(length);
+        
+        if (myLink.get_type() == AbstractLink.Type.freeway) {
+            createOption.setVisible(true);
+            createOption.getSelectionModel().select(0);
+            labelCreateOption.setVisible(true);
+        } else {
+            createOption.setVisible(false);
+            labelCreateOption.setVisible(false);
+        }
+            
+        
     }
     
     
@@ -216,16 +233,10 @@ public class NewLinkController {
         length = UserSettings.convertLength(length, unitsLength, "meters");
         length = Math.max(length, 0.001);
         
+        boolean is_inner = cbInner.isSelected();
+        
         Segment new_segment;
         String segment_name = link_name;
-
-        // TODO AK
-        // insert_XXX_segment takes parameters for a freeway link and a potential
-        // ramp link. A ramp link is only created if the calling link is a connector.
-        // Otherwise you can pass ramp_params=null.
-
-        // To obtain default parameters, use e.g.
-        // user_settings.getDefaultFreewayParams(fwy_name,fwy_length)
         
         ParametersFreeway fwyParams = null;
         ParametersRamp rmpParams = null;
@@ -239,7 +250,6 @@ public class NewLinkController {
             fwyParams = opt.UserSettings.getDefaultConnectorParams(link_name, (float)length);
         }
 
-
         if (downstreamLink != null) {
             if (downstreamLink.get_type() == AbstractLink.Type.connector) {
                 String fr_name = to_name;
@@ -248,6 +258,8 @@ public class NewLinkController {
                 fr_name = " -> " + fr_name;
                 fr_name = opt.utils.Misc.validateAndCorrectLinkName(fr_name, myLink.get_segment().get_scenario());
                 rmpParams = opt.UserSettings.getDefaultOfframpParams(fr_name, (float)opt.UserSettings.defaultRampLengthMeters);
+                System.err.println("INNER: " + is_inner);
+                rmpParams.set_is_inner(is_inner);
             }
             new_segment = downstreamLink.insert_up_segment(segment_name, fwyParams, rmpParams);
         } else {
@@ -258,10 +270,21 @@ public class NewLinkController {
                 or_name += " -> ";
                 or_name = opt.utils.Misc.validateAndCorrectLinkName(or_name, myLink.get_segment().get_scenario());
                 rmpParams = opt.UserSettings.getDefaultOnrampParams(or_name, (float)opt.UserSettings.defaultRampLengthMeters);
+                System.err.println("INNER DN: " + is_inner);
+                rmpParams.set_is_inner(is_inner);
             }
             new_segment = upstreamLink.insert_dn_segment(segment_name, fwyParams, rmpParams);
         }
         LinkFreewayOrConnector new_link = new_segment.fwy();
+        if (myLink.get_type() == AbstractLink.Type.freeway) {
+            int crOpt = createOption.getSelectionModel().getSelectedIndex();
+            if (crOpt == 0) {
+                new_link.set_gp_lanes(myLink.get_gp_lanes());
+                new_link.set_managed_lanes(myLink.get_managed_lanes());
+                new_link.set_barrier(myLink.get_barrier());
+                new_link.set_separated(myLink.get_separated());
+            }
+        }
         appMainController.objectNameUpdate(new_link);
 
         Stage stage = (Stage) topPane.getScene().getWindow();

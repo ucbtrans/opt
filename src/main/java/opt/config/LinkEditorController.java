@@ -914,6 +914,9 @@ public class LinkEditorController {
         else
             connectSectionDownstream.setVisible(true);
         
+        cbBarrier.setSelected(myLink.get_barrier());
+        cbSeparated.setSelected(myLink.get_separated());
+        
         if (myLink.get_type() == AbstractLink.Type.freeway) {
              ttDeleteSection.setText("Delete the entire freeway section with all its ramps (if it has any)");
              ttAddSectionDownstream.setText("Create and attach a new freeway section downstream");
@@ -939,9 +942,7 @@ public class LinkEditorController {
         }
         
         
-        
         drawRoadSection();
-        
         
         ignoreChange = false;
     }
@@ -988,8 +989,10 @@ public class LinkEditorController {
             myLink.set_gp_lanes(gp_lanes);
             if (myLink.get_type() == AbstractLink.Type.freeway)
                 myLink.params.set_aux_lanes(aux_lanes);
+            myLink.set_barrier(barrier);
+            myLink.set_separated(separated);
         } catch(Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Could not change number of lanes...", e);
+            opt.utils.Dialogs.ExceptionDialog("Could not change lane configuration...", e);
         }
         
         
@@ -1053,8 +1056,8 @@ public class LinkEditorController {
                 for (int i = 0; i < num_ramps; i++) {
                     int or_gp = myLink.get_segment().out_ors(i).get_gp_lanes();
                     int or_managed = myLink.get_segment().out_ors(i).get_managed_lanes();
-                    boolean or_barrier = barrier; // FIXME
-                    boolean or_separated = separated; // FIXME
+                    boolean or_barrier = myLink.get_segment().out_ors(i).get_barrier();
+                    boolean or_separated = myLink.get_segment().out_ors(i).get_separated();
                     double or_lanes = or_gp + or_managed;
                     double or_width = or_lanes * r_lane_width;
                     double or_gp_width = or_gp * r_lane_width;
@@ -1100,8 +1103,8 @@ public class LinkEditorController {
                 for (int i = 0; i < num_ramps; i++) {
                     int or_gp = myLink.get_segment().in_ors(i).get_gp_lanes();
                     int or_managed = myLink.get_segment().in_ors(i).get_managed_lanes();
-                    boolean or_barrier = barrier; // FIXME
-                    boolean or_separated = separated; // FIXME
+                    boolean or_barrier = myLink.get_segment().in_ors(i).get_barrier();
+                    boolean or_separated = myLink.get_segment().in_ors(i).get_separated();
                     double or_lanes = or_gp + or_managed;
                     double or_width = or_lanes * r_lane_width;
                     double or_gp_width = or_gp * r_lane_width;
@@ -1150,8 +1153,8 @@ public class LinkEditorController {
                 for (int i = num_ramps-1; i >= 0; i--) {
                     int fr_gp = myLink.get_segment().out_frs(i).get_gp_lanes();
                     int fr_managed = myLink.get_segment().out_frs(i).get_managed_lanes();
-                    boolean fr_barrier = barrier; // FIXME
-                    boolean fr_separated = separated; // FIXME
+                    boolean fr_barrier = myLink.get_segment().out_frs(i).get_barrier();
+                    boolean fr_separated = myLink.get_segment().out_frs(i).get_separated();
                     double fr_lanes = fr_gp + fr_managed;
                     double fr_width = fr_lanes * r_lane_width;
                     double fr_gp_width = fr_gp * r_lane_width;
@@ -1197,8 +1200,8 @@ public class LinkEditorController {
                 for (int i = num_ramps-1; i >= 0; i--) {
                     int fr_gp = myLink.get_segment().in_frs(i).get_gp_lanes();
                     int fr_managed = myLink.get_segment().in_frs(i).get_managed_lanes();
-                    boolean fr_barrier = barrier; // FIXME
-                    boolean fr_separated = separated; // FIXME
+                    boolean fr_barrier = myLink.get_segment().in_frs(i).get_barrier();
+                    boolean fr_separated = myLink.get_segment().in_frs(i).get_separated();
                     double fr_lanes = fr_gp + fr_managed;
                     double fr_width = fr_lanes * r_lane_width;
                     double fr_gp_width = fr_gp * r_lane_width;
