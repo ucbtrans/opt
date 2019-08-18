@@ -55,7 +55,6 @@ public class Scenario {
                             throw new Exception("Bad road type");
                     }
 
-                    System.out.println(jlink.getId());
 
                     links.put(jlink.getId(),link);
                     nodes.get(jlink.getEndNodeId()).in_links.add(link.id);

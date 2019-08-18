@@ -983,7 +983,7 @@ public class LinkEditorController {
         boolean separated = cbSeparated.isSelected();
         
         
-        // TODO AK: set lane properties to link
+        // Set lane properties to link
         try {
             myLink.set_managed_lanes(managed_lanes);
             myLink.set_gp_lanes(gp_lanes);
@@ -991,6 +991,8 @@ public class LinkEditorController {
                 myLink.params.set_aux_lanes(aux_lanes);
             myLink.set_barrier(barrier);
             myLink.set_separated(separated);
+            if (!ignoreChange)
+                appMainController.setProjectModified(true);
         } catch(Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not change lane configuration...", e);
         }
