@@ -262,6 +262,17 @@ public class NewLinkController {
                 rmpParams.set_is_inner(is_inner);
             }
             new_segment = downstreamLink.insert_up_segment(segment_name, fwyParams, rmpParams);
+            if (downstreamLink.get_type() == AbstractLink.Type.connector) {
+                AbstractLink fr;
+                if (is_inner)
+                    fr = new_segment.in_frs(0);
+                else
+                    fr = new_segment.out_frs(0);
+                fr.set_gp_lanes(myLink.get_gp_lanes());
+                fr.set_managed_lanes(myLink.get_managed_lanes());
+                fr.set_barrier(myLink.get_barrier());
+                fr.set_separated(myLink.get_separated());
+            }
         } else {
             if (upstreamLink.get_type() == AbstractLink.Type.connector) {
                 String or_name = to_name;
@@ -274,6 +285,17 @@ public class NewLinkController {
                 rmpParams.set_is_inner(is_inner);
             }
             new_segment = upstreamLink.insert_dn_segment(segment_name, fwyParams, rmpParams);
+            if (upstreamLink.get_type() == AbstractLink.Type.connector) {
+                AbstractLink or = null;
+                if (is_inner)
+                    or = new_segment.in_ors(0);
+                else
+                    or = new_segment.out_ors(0);
+                or.set_gp_lanes(myLink.get_gp_lanes());
+                or.set_managed_lanes(myLink.get_managed_lanes());
+                or.set_barrier(myLink.get_barrier());
+                or.set_separated(myLink.get_separated());
+            }
         }
         LinkFreewayOrConnector new_link = new_segment.fwy();
         if (myLink.get_type() == AbstractLink.Type.freeway) {
@@ -284,11 +306,16 @@ public class NewLinkController {
                 new_link.set_barrier(myLink.get_barrier());
                 new_link.set_separated(myLink.get_separated());
             }
+        } else if ((myLink.get_type() == AbstractLink.Type.onramp) || (myLink.get_type() == AbstractLink.Type.offramp)) {
+            new_link.set_gp_lanes(myLink.get_gp_lanes());
+            new_link.set_managed_lanes(myLink.get_managed_lanes());
+            new_link.set_barrier(myLink.get_barrier());
+            new_link.set_separated(myLink.get_separated());
         }
         appMainController.objectNameUpdate(new_link);
 
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
-    }
+    } 
 
 }
