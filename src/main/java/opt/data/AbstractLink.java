@@ -192,7 +192,6 @@ public abstract class AbstractLink implements Comparable {
             params.set_aux_lanes(x);
     }
 
-
     public boolean get_is_inner () {
         return (this.params instanceof ParametersRamp) ? params.get_is_inner() : false;
 
@@ -201,6 +200,22 @@ public abstract class AbstractLink implements Comparable {
     public void set_is_inner(boolean x) {
         if(this.params instanceof ParametersRamp)
             params.set_is_inner(x);
+    }
+
+    public boolean get_managed_lane_barrier() {
+        return params.managed_lanes_barrier;
+    }
+
+    public void set_get_managed_lane_barrier(boolean x) {
+        params.managed_lanes_barrier = x;
+    }
+
+    public boolean get_managed_lane_separated() {
+        return params.managed_lanes_separated;
+    }
+
+    public void set_get_managed_lane_separated(boolean x) {
+        params.managed_lanes_separated = x;
     }
 
     public final float get_length_meters() {

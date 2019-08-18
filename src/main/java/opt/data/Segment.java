@@ -180,43 +180,49 @@ public final class Segment implements Comparable {
     // add / delete ramps
     ////////////////////////////////////////
 
-    public LinkOnramp add_in_or(ParametersRamp params){
-        LinkOnramp link = create_onramp(params);
-        in_ors.add(link);
-        return link;
+//    public LinkOnramp add_in_or(ParametersRamp params){
+//        LinkOnramp link = create_onramp(params);
+//        in_ors.add(link);
+//        return link;
+//    }
+
+    public LinkOnramp add_or(ParametersRamp params){
+        LinkOnramp or = create_onramp(params);
+        if(params.is_inner)
+            in_ors.add(or);
+        else
+            out_ors.add(or);
+        return or;
     }
 
-    public LinkOnramp add_out_or(ParametersRamp params){
-        LinkOnramp link = create_onramp(params);
-        out_ors.add(link);
-        return link;
+//    public LinkOfframp add_in_fr(ParametersRamp params){
+//        LinkOfframp link = create_offramp(params);
+//        in_frs.add(link);
+//        return link;
+//    }
+
+    public LinkOfframp add_fr(ParametersRamp params){
+        LinkOfframp fr = create_offramp(params);
+        if(params.is_inner)
+            in_frs.add(fr);
+        else
+            out_frs.add(fr);
+        return fr;
     }
 
-    public LinkOfframp add_in_fr(ParametersRamp params){
-        LinkOfframp link = create_offramp(params);
-        in_frs.add(link);
-        return link;
-    }
-
-    public LinkOfframp add_out_fr(ParametersRamp params){
-        LinkOfframp link = create_offramp(params);
-        out_frs.add(link);
-        return link;
-    }
-
-    public boolean delete_in_or(LinkOnramp link){
-        if( in_ors.contains(link) ){
-            delete_ramp(link);
-            in_ors.remove(link);
+    public boolean delete_in_or(LinkOnramp or){
+        if( in_ors.contains(or) ){
+            delete_ramp(or);
+            in_ors.remove(or);
             return true;
         } else
             return false;
     }
 
-    public boolean delete_out_or(LinkOnramp link){
-        if( out_ors.contains(link) ){
-            delete_ramp(link);
-            out_ors.remove(link);
+    public boolean delete_out_or(LinkOnramp or){
+        if( out_ors.contains(or) ){
+            delete_ramp(or);
+            out_ors.remove(or);
             return true;
         } else
             return false;

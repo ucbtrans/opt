@@ -236,32 +236,18 @@ public class NewRampController {
         double length = lengthSpinnerValueFactory.getValue();
         length = UserSettings.convertLength(length, unitsLength, "meters");
         length = Math.max(length, 0.001);
-        
-        boolean is_inner = cbInnerRamp.isSelected();
-        int managed_lanes = numLanesManagedSpinnerValueFactory.getValue();
-        int gp_lanes = numLanesGPSpinnerValueFactory.getValue();
 
-        if (is_onramp) {
-            ParametersRamp params = UserSettings.getDefaultOnrampParams(ramp_name,(float)length);
-            params.managed_lanes = managed_lanes;
-            params.gp_lanes = gp_lanes;
+        ParametersRamp params = UserSettings.getDefaultOnrampParams(ramp_name,(float)length);
 
-            if (is_inner)
-                myLink.get_segment().add_in_or(params);
-            else
-                myLink.get_segment().add_out_or(params);
-        }
-        else {
-            ParametersRamp params = UserSettings.getDefaultOfframpParams(ramp_name,(float)length);
-            params.managed_lanes = managed_lanes;
-            params.gp_lanes = gp_lanes;
+        params.managed_lanes = numLanesManagedSpinnerValueFactory.getValue();
+        params.gp_lanes = numLanesGPSpinnerValueFactory.getValue();
+        params.is_inner = cbInnerRamp.isSelected();
 
-            if (is_inner)
-                myLink.get_segment().add_in_fr(params);
-            else
-                myLink.get_segment().add_out_fr(params);
-        }
-        
+        if (is_onramp)
+            myLink.get_segment().add_or(params);
+        else
+            myLink.get_segment().add_fr(params);
+
         appMainController.objectNameUpdate(myLink);
 
         Stage stage = (Stage) topPane.getScene().getWindow();

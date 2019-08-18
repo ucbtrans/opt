@@ -52,6 +52,8 @@ public class FreewayScenario {
                     link.set_aux_lanes(lnk.getAuxLanes()==null ? 0 : lnk.getAuxLanes().intValue());
                     link.set_managed_lanes(lnk.getManagedLanes()==null ? 0 : lnk.getManagedLanes().intValue());
                     link.set_is_inner(lnk.isIsInner()==null ? false : lnk.isIsInner());
+                    link.set_get_managed_lane_barrier(lnk.isManagedLanesBarrier()==null ? false : lnk.isManagedLanesBarrier());
+                    link.set_get_managed_lane_separated(lnk.isManagedLanesSeparated()==null ? false : lnk.isManagedLanesSeparated());
                 }
 
         // create segments
