@@ -60,7 +60,12 @@ public class LinkConnector extends LinkFreewayOrConnector {
         mysegment.fwy_scenario.scenario.links.put(fr.id,fr);
         conn_start_node.in_links.add(fr.id);
         mysegment.fwy_scenario.scenario.nodes.get(fwy.end_node_id).out_links.add(fr.id);
-        segment.out_frs.add(fr);
+
+        if(ramp_params.is_inner)
+            segment.in_frs.add(fr);
+        else
+            segment.out_frs.add(fr);
+
 
         fr.up_link = fwy;
         fr.dn_link = this;
@@ -94,7 +99,11 @@ public class LinkConnector extends LinkFreewayOrConnector {
         mysegment.fwy_scenario.scenario.links.put(or.id,or);
         conn_end_node.out_links.add(or.id);
         mysegment.fwy_scenario.scenario.nodes.get(fwy.start_node_id).in_links.add(or.id);
-        segment.out_ors.add(or);
+
+        if(ramp_params.is_inner)
+            segment.in_ors.add(or);
+        else
+            segment.out_ors.add(or);
 
         or.dn_link = fwy;
         or.up_link = this;
