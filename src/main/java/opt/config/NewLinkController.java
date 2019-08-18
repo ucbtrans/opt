@@ -258,7 +258,6 @@ public class NewLinkController {
                 fr_name = " -> " + fr_name;
                 fr_name = opt.utils.Misc.validateAndCorrectLinkName(fr_name, myLink.get_segment().get_scenario());
                 rmpParams = opt.UserSettings.getDefaultOfframpParams(fr_name, (float)opt.UserSettings.defaultRampLengthMeters);
-                System.err.println("INNER: " + is_inner);
                 rmpParams.set_is_inner(is_inner);
             }
             new_segment = downstreamLink.insert_up_segment(segment_name, fwyParams, rmpParams);
@@ -281,7 +280,6 @@ public class NewLinkController {
                 or_name += " -> ";
                 or_name = opt.utils.Misc.validateAndCorrectLinkName(or_name, myLink.get_segment().get_scenario());
                 rmpParams = opt.UserSettings.getDefaultOnrampParams(or_name, (float)opt.UserSettings.defaultRampLengthMeters);
-                System.err.println("INNER DN: " + is_inner);
                 rmpParams.set_is_inner(is_inner);
             }
             new_segment = upstreamLink.insert_dn_segment(segment_name, fwyParams, rmpParams);
