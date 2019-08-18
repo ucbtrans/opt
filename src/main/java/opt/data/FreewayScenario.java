@@ -513,8 +513,10 @@ public class FreewayScenario {
             jaxbopt.Lnk lnk = new jaxbopt.Lnk();
             lnk.setId(link.id);
             lnk.setName(link.get_name());
-            lnk.setAuxLanes(BigInteger.valueOf(link.get_aux_lanes()));
             lnk.setManagedLanes(BigInteger.valueOf(link.get_managed_lanes()));
+            lnk.setManagedLanesBarrier(Boolean.valueOf(link.get_managed_lane_barrier()));
+            lnk.setManagedLanesSeparated(Boolean.valueOf(link.get_managed_lane_separated()));
+            lnk.setAuxLanes(BigInteger.valueOf(link.get_aux_lanes()));
             lnk.setIsInner(link.get_is_inner());
             lnks.getLnk().add(lnk);
         }
