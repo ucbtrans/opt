@@ -892,12 +892,12 @@ public class LinkEditorController {
                         upConnectCandidates.add(l);
                 }
             } else if (myLink.get_type() == AbstractLink.Type.onramp) {
-                if (myLink.get_up_link() == null)
+                if (myLink.get_up_link() != null)
                     break;
                 if ((l.get_type() == AbstractLink.Type.connector) && (l.get_dn_link() == null))
                     upConnectCandidates.add(l);
             } else { // offramp
-                if (myLink.get_dn_link() == null)
+                if (myLink.get_dn_link() != null)
                     break;
                 if ((l.get_type() == AbstractLink.Type.connector) && (l.get_up_link() == null))
                     dnConnectCandidates.add(l);

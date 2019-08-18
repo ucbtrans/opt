@@ -267,7 +267,7 @@ public class AppMainController {
     @FXML
     private void onClickMenuFileSave(ActionEvent event) {
         if (projectFilePath == null)
-            return;
+            onClickMenuFileSaveAs(event);
         try {
             ProjectFactory.save_project(project, projectFilePath);
             projectModified = false;
