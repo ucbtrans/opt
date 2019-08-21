@@ -715,16 +715,11 @@ public class LinkEditorController {
      * configuration module.
      * @param lnk 
      */
-    public void initWithLinkData(AbstractLink lnk) {
-        laneProperties.setExpanded(false);
-        
+    public void initWithLinkData(AbstractLink lnk) {        
         if (lnk == null)
             return;
         
         ignoreChange = true;
-        
-        if (lnk.get_type() != AbstractLink.Type.freeway)
-            laneProperties.setExpanded(true);
                 
         myLink = lnk;
         String link_name = myLink.get_name();
