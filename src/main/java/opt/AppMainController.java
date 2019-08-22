@@ -550,7 +550,7 @@ public class AppMainController {
     
     
     
-    public void deleteLink(AbstractLink lnk) {
+    public void deleteLink(AbstractLink lnk, boolean reconnect) {
         if (lnk == null) 
             return;
         
@@ -565,7 +565,8 @@ public class AppMainController {
         }
         
         if ((up_link != null) && (dn_link != null) &&
-            (dn_link.get_type() == AbstractLink.Type.freeway)) {
+            (dn_link.get_type() == AbstractLink.Type.freeway) &&
+             reconnect) {
             dn_link.connect_to_upstream(up_link);
         }
         

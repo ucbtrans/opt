@@ -127,5 +127,26 @@ public class Dialogs {
     
     
     
+    public static int Confirmation3ButtonDialog(String h, String c, String bt1, String bt2, String bt3) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation");
+        alert.setHeaderText(h);
+        alert.setContentText(c);
+        ButtonType buttonTypeOne = new ButtonType(bt1);
+        ButtonType buttonTypeTwo = new ButtonType(bt2);
+        ButtonType buttonTypeCancel = new ButtonType(bt3, ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeCancel);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(Dialogs.class.getResourceAsStream("/OPT_icon.png")));
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == buttonTypeCancel)
+            return -1;
+        if (result.get() == buttonTypeTwo)
+            return 1;
+        return 0;
+    }
+    
+    
+    
     
 }

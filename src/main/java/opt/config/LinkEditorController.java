@@ -567,10 +567,12 @@ public class LinkEditorController {
                 opt.utils.Misc.linkType2String(myLink.get_type()).toLowerCase() +
                 " section '" + myLink.get_name() + "'...";
                 
-        if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
+        int res = opt.utils.Dialogs.Confirmation3ButtonDialog(header, "Are you sure?",
+                  "Yes, Disconnect Freeway", "Yes, Reconnect Freeway", "No");
+        if (res < 0)
             return;
         
-        appMainController.deleteLink(myLink);
+        appMainController.deleteLink(myLink, (res > 0));
     }
     
     
