@@ -566,9 +566,20 @@ public class LinkEditorController {
         String header = "You are deleting " +
                 opt.utils.Misc.linkType2String(myLink.get_type()).toLowerCase() +
                 " section '" + myLink.get_name() + "'...";
-                
-        int res = opt.utils.Dialogs.Confirmation3ButtonDialog(header, "Are you sure?",
-                  "Yes, Disconnect Freeway", "Yes, Reconnect Freeway", "No");
+        String content = "Are you sure?";
+        String bt1 = "Yes, Disconnect Freeway";
+        String bt2 = "Yes, Reconnect Freeway";
+        String bt3 = "No";
+        
+        if (myLink.get_type() == AbstractLink.Type.connector) {
+            if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, content))
+                return;
+           
+            appMainController.deleteLink(myLink, false);
+            return;
+        }
+        
+        int res = opt.utils.Dialogs.Confirmation3ButtonDialog(header, content, bt1, bt2, bt3);
         if (res < 0)
             return;
         

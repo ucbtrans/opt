@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <prj xmlns="https://github.com/ucbtrans/opt">
     <scns>
-        <scn name="I-580 E + I-80 W mini corridor" file="EndResult_I-580 E + I-80 W mini corridor.xml">
+        <scn name="I-580 E + I-80 W mini network" file="EndResult_I-580 E + I-80 W mini network.xml">
             <lnks>
                 <lnk id="0" name="Richmond -&gt; Buchanan St." managed_lanes="1" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
                 <lnk id="1" name="Buchanan St. -&gt; Gilman St." managed_lanes="1" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="1" is_inner="false"/>
