@@ -79,6 +79,10 @@ public final class Segment implements Comparable {
     // getters / setters
     /////////////////////////////////////
 
+    public Long get_id(){
+        return id;
+    }
+
     public String get_name(){
         return name;
     }

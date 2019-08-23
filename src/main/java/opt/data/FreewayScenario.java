@@ -221,22 +221,36 @@ public class FreewayScenario {
 
     public List<List<Segment>> get_freeways(){
 
-        List<Segment> source_segments = segments.values().stream()
-                .filter(sgmt->sgmt.fwy.is_source())
-                .sorted(Comparator.comparing(Segment::get_name))
+        List<List<Segment>> result = new ArrayList<>();
+
+        // collect all freeway segments (ignore connectors)
+        List<Segment> all_segments = segments.values().stream()
+                .filter(sgmt->sgmt.fwy instanceof LinkFreeway )
                 .collect(toList());
 
-        List<List<Segment>> result = new ArrayList<>();
+        // first extract linear freeways
+        List<Segment> source_segments = segments.values().stream()
+                .filter(sgmt->sgmt.fwy.is_source())
+                .collect(toList());
+
         for(Segment source_segment : source_segments){
-            List<Segment> this_fwy = new ArrayList<>();
-            Segment curr_segment = source_segment;
-            this_fwy.add(curr_segment);
-            while(curr_segment.fwy.dn_link!=null && !this_fwy.contains(curr_segment.fwy.dn_link.mysegment) ){
-                curr_segment = curr_segment.fwy.dn_link.mysegment;
-                this_fwy.add(curr_segment);
-            }
+            List<Segment> this_fwy = build_freeway_from_segment(source_segment);
             result.add(this_fwy);
+            all_segments.removeAll(this_fwy);
         }
+
+        // the remaining segments should all be circular
+
+        // sort all remaining segments by id
+        Collections.sort(all_segments,Comparator.comparing(Segment::get_id));
+        while(!all_segments.isEmpty()){
+            List<Segment> this_fwy = build_freeway_from_segment(all_segments.get(0));
+            result.add(this_fwy);
+            all_segments.removeAll(this_fwy);
+        }
+
+        // sort all freeways by the id of their first segment
+        result.sort((List<Segment> o1,List<Segment> o2)->(int) (o1.get(0).get_id()-o2.get(0).get_id()));
 
         return result;
     }
@@ -523,6 +537,17 @@ public class FreewayScenario {
 
     protected long new_seg_id(){
         return ++max_seg_id;
+    }
+
+    private List<Segment> build_freeway_from_segment(Segment first){
+        List<Segment> this_fwy = new ArrayList<>();
+        Segment curr_segment = first;
+        this_fwy.add(first);
+        while(curr_segment.fwy.dn_link!=null && !this_fwy.contains(curr_segment.fwy.dn_link.mysegment) ){
+            curr_segment = curr_segment.fwy.dn_link.mysegment;
+            this_fwy.add(curr_segment);
+        }
+        return this_fwy;
     }
 
     /////////////////////////////////////
