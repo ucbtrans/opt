@@ -29,23 +29,12 @@ public class TestFreewayScenario extends AbstractTest {
     // segment getters
     /////////////////////////////////////
 
-    @Ignore
     @Test
-    public void test_get_segments_tree(){
+    public void test_get_freeways(){
         TestData X = new TestData();
-        List<List<Segment>> segments = X.scenario.get_segments_tree();
-        assertNotNull(segments);
-        assertEquals(4,segments.get(0).size());
-        assertEquals(7,segments.get(1).size());
-    }
-
-    @Ignore
-    @Test
-    public void test_get_links_tree(){
-        TestData X = new TestData();
-        List<List<AbstractLink>> links = X.scenario.get_links_tree();
-        assertEquals(6,links.get(0).size());
-        assertEquals(12,links.get(1).size());
+        List<List<Segment>> fwys = X.scenario.get_freeways();
+        assertEquals(6,fwys.get(0).size());
+        assertEquals(2,fwys.get(1).size());
     }
 
     @Test

@@ -116,11 +116,13 @@ public abstract class AbstractLink implements Comparable {
     }
 
     public final boolean is_source(){
-        return mysegment.fwy_scenario.scenario.nodes.get(start_node_id).in_links.isEmpty();
+//        return mysegment.fwy_scenario.scenario.nodes.get(start_node_id).in_links.isEmpty();
+        return up_link==null;
     }
 
     public final boolean is_sink(){
-        return mysegment.fwy_scenario.scenario.nodes.get(end_node_id).out_links.isEmpty();
+//        return mysegment.fwy_scenario.scenario.nodes.get(end_node_id).out_links.isEmpty();
+        return dn_link==null;
     }
 
     public final Segment get_segment(){

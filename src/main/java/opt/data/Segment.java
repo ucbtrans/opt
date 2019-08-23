@@ -78,7 +78,11 @@ public final class Segment implements Comparable {
     /////////////////////////////////////
     // getters / setters
     /////////////////////////////////////
-    
+
+    public String get_name(){
+        return name;
+    }
+
     /**
      * Get scenario, to which this segment belongs.
      */

@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 public class FreewayScenario {
@@ -207,7 +208,7 @@ public class FreewayScenario {
     public List<AbstractLink> get_links(){
         return segments.values().stream()
                 .flatMap(sgmt->sgmt.get_links().stream())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     public Map<Long,Node> get_nodes(){
@@ -218,59 +219,25 @@ public class FreewayScenario {
     // segment getters
     /////////////////////////////////////
 
-    /**
-     * get all segments in this scenario
-     * @return Collection of segments
-     */
-    public List<List <Segment>> get_segments_tree(){
-        List<List <Segment>> result = new ArrayList<>();
+    public List<List<Segment>> get_freeways(){
 
-//        Set<Segment> source_segments = this.segments.values().stream()
-//                .map(s->s.fwy)
-//                .filter(link->link.is_source())
-//                .map(link->link.mysegment)
-//                .collect(toSet());
-//
-//        Set<Long> all_segment_ids = new HashSet<>();
-//        all_segment_ids.addAll(segments.keySet());
-//
-//        for(Segment source_segment : source_segments){
-//            List<Segment> thisfreeway = new ArrayList<>();
-//            Segment curr_segment = source_segment;
-//            thisfreeway.add(curr_segment);
-//            all_segment_ids.remove(curr_segment.id);
-//            if (curr_segment.segment_fr_dn_id!=null){
-//                thisfreeway.add(segments.get(curr_segment.segment_fr_dn_id));
-//                all_segment_ids.remove(curr_segment.segment_fr_dn_id);
-//            }
-//            while(curr_segment.segment_fwy_dn_id!=null){
-//                curr_segment = segments.get(curr_segment.segment_fwy_dn_id);
-//                thisfreeway.add(curr_segment);
-//                all_segment_ids.remove(curr_segment.id);
-//                if (curr_segment.segment_fr_dn_id!=null){
-//                    thisfreeway.add(segments.get(curr_segment.segment_fr_dn_id));
-//                    all_segment_ids.remove(curr_segment.segment_fr_dn_id);
-//                }
-//            }
-//            result.add(thisfreeway);
-//        }
-//
-//        assert(all_segment_ids.isEmpty());
-//
-//        result.sort(Comparator.comparing(List::size));
+        List<Segment> source_segments = segments.values().stream()
+                .filter(sgmt->sgmt.fwy.is_source())
+                .sorted(Comparator.comparing(Segment::get_name))
+                .collect(toList());
 
-        return result;
-    }
-
-    public List<List<AbstractLink>> get_links_tree(){
-        List<List <Segment>> segments_tree = get_segments_tree();
-        List<List<AbstractLink>> result = new ArrayList<>();
-        for(List<Segment> seg_list : segments_tree){
-            List<AbstractLink> fwy_links = new ArrayList<>();
-            result.add(fwy_links);
-            for(Segment segment : seg_list)
-                fwy_links.addAll(segment.get_links().stream().filter(x->x!=null).collect(Collectors.toList()));
+        List<List<Segment>> result = new ArrayList<>();
+        for(Segment source_segment : source_segments){
+            List<Segment> this_fwy = new ArrayList<>();
+            Segment curr_segment = source_segment;
+            this_fwy.add(curr_segment);
+            while(curr_segment.fwy.dn_link!=null && !this_fwy.contains(curr_segment.fwy.dn_link.mysegment) ){
+                curr_segment = curr_segment.fwy.dn_link.mysegment;
+                this_fwy.add(curr_segment);
+            }
+            result.add(this_fwy);
         }
+
         return result;
     }
 
