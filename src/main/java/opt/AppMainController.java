@@ -28,8 +28,10 @@ package opt;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -407,14 +409,48 @@ public class AppMainController {
             
             TreeItem<String> links_node = new TreeItem<String>(roadLinksTreeItem);
             scenario_node.getChildren().add(links_node);
-            for (AbstractLink link : scenario.get_links()) {
-                if (link == null)
+            for (List<Segment> seg_list : scenario.get_freeways()) {
+                for (Segment segment : seg_list) {
+                    if (segment == null)
+                        continue;
+                    
+                    ArrayList<AbstractLink> link_list = new ArrayList<AbstractLink>();
+                    link_list.add(segment.fwy());
+                    int num_ramps = segment.num_out_ors();
+                    for (int i = 0; i < num_ramps; i++)
+                        link_list.add(segment.out_ors(i));
+                    num_ramps = segment.num_in_ors();
+                    for (int i = 0; i < num_ramps; i++)
+                        link_list.add(segment.in_ors(i));
+                    num_ramps = segment.num_out_frs();
+                    for (int i = 0; i < num_ramps; i++)
+                        link_list.add(segment.out_frs(i));
+                    num_ramps = segment.num_in_frs();
+                    for (int i = 0; i < num_ramps; i++)
+                        link_list.add(segment.in_frs(i));
+                    
+                    for (AbstractLink link : link_list) {
+                        if ((link == null) || (object2tree.containsKey(link))) {
+                            continue;
+                        }
+                        TreeItem<String> link_node = new TreeItem<String>(link.get_name());
+                        tree2object.put(link_node, link);
+                        object2tree.put(link, link_node);
+                        links_node.getChildren().add(link_node);
+                    }
+                }
+            }
+            
+            /*for (AbstractLink link : scenario.get_links()) {
+                if ((link == null) || (object2tree.containsKey(link))) {
                     continue;
+                }
+
                 TreeItem<String> link_node = new TreeItem<String>(link.get_name());
                 tree2object.put(link_node, link);
                 object2tree.put(link, link_node);
                 links_node.getChildren().add(link_node);
-            }
+            }*/
             
             TreeItem<String> routes_node = new TreeItem<String>(routesTreeItem);    
             scenario_node.getChildren().add(routes_node);

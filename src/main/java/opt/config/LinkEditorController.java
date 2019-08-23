@@ -571,7 +571,8 @@ public class LinkEditorController {
         String bt2 = "Yes, Reconnect Freeway";
         String bt3 = "No";
         
-        if (myLink.get_type() == AbstractLink.Type.connector) {
+        if ((myLink.get_type() == AbstractLink.Type.connector) ||
+            (myLink.get_up_link() == null) || (myLink.get_dn_link() == null)) {
             if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, content))
                 return;
            
