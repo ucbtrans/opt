@@ -14,7 +14,7 @@ public class TestProjectFactory extends AbstractTest {
     @Test
     public void test_load_scenario_from_file(){
         try {
-            String scn_file = get_test_fullpath("two_fwy.xml");
+            String scn_file = get_test_fullpath("two_fwy_hov.xml");
             assertNotNull(JaxbLoader.load_scenario(scn_file,true));
         } catch (OTMException e) {
             e.printStackTrace();
