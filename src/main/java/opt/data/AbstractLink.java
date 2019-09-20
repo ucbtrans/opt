@@ -230,34 +230,34 @@ public abstract class AbstractLink implements Comparable {
         params.length = newlength;
     }
 
-    public float get_capacity_vphpl(){
-        return params.capacity_vphpl;
+    public float get_gp_capacity_vphpl(){
+        return params.gp_fd.capacity_vphpl;
     }
 
-    public float get_jam_density_vpkpl(){
-        return params.jam_density_vpkpl;
+    public float get_gp_jam_density_vpkpl(){
+        return params.gp_fd.jam_density_vpkpl;
     }
 
-    public float get_freespeed_kph(){
-        return params.ff_speed_kph;
+    public float get_gp_freespeed_kph(){
+        return params.gp_fd.ff_speed_kph;
     }
 
-    public void set_capacity_vphpl(float x) throws Exception {
+    public void set_gp_capacity_vphpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive capacity");
-        params.capacity_vphpl = x;
+        params.gp_fd.capacity_vphpl = x;
     }
 
-    public void set_jam_density_vpkpl(float x) throws Exception {
+    public void set_gp_jam_density_vpkpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive jam density");
-        params.jam_density_vpkpl = x;
+        params.gp_fd.jam_density_vpkpl = x;
     }
 
-    public void set_freespeed_kph(float x) throws Exception {
+    public void set_gp_freespeed_kph(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive free speed");
-        params.ff_speed_kph = x;
+        params.gp_fd.ff_speed_kph = x;
     }
 
     /////////////////////////////////////

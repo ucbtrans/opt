@@ -139,9 +139,9 @@ public class Scenario {
             AbstractParameters param = e.getValue();
             jaxb.Roadparam jaxbrp = new jaxb.Roadparam();
             jaxbrp.setId(id);
-            jaxbrp.setCapacity(param.capacity_vphpl);
-            jaxbrp.setSpeed(param.ff_speed_kph);
-            jaxbrp.setJamDensity(param.jam_density_vpkpl);
+            jaxbrp.setCapacity(param.gp_fd.capacity_vphpl);
+            jaxbrp.setSpeed(param.gp_fd.ff_speed_kph);
+            jaxbrp.setJamDensity(param.gp_fd.jam_density_vpkpl);
             jRoadParams.getRoadparam().add(jaxbrp);
         }
 

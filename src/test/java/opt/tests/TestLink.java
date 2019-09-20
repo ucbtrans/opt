@@ -248,8 +248,8 @@ public class TestLink extends AbstractTest {
         Segment sA2 = X.scenario.get_segment_by_name("sA2");
         try {
             float ml_capacity = 3498.2356f;
-            sA2.fwy().set_capacity_vphpl(ml_capacity);
-            assertEquals(ml_capacity,sA2.fwy().get_capacity_vphpl(),0.001);
+            sA2.fwy().set_gp_capacity_vphpl(ml_capacity);
+            assertEquals(ml_capacity,sA2.fwy().get_gp_capacity_vphpl(),0.001);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -261,8 +261,8 @@ public class TestLink extends AbstractTest {
         Segment sA2 = X.scenario.get_segment_by_name("sA2");
         try {
             float ml_jam_density = 245.234f;
-            sA2.fwy().set_jam_density_vpkpl(ml_jam_density);
-            assertEquals(ml_jam_density,sA2.fwy().get_jam_density_vpkpl(),0.001);
+            sA2.fwy().set_gp_jam_density_vpkpl(ml_jam_density);
+            assertEquals(ml_jam_density,sA2.fwy().get_gp_jam_density_vpkpl(),0.001);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -274,8 +274,8 @@ public class TestLink extends AbstractTest {
         Segment sA2 = X.scenario.get_segment_by_name("sA2");
         try {
             float ml_speed = 348934.435f;
-            sA2.fwy().set_freespeed_kph(ml_speed);
-            assertEquals(ml_speed,sA2.fwy().get_freespeed_kph(),0.001);
+            sA2.fwy().set_gp_freespeed_kph(ml_speed);
+            assertEquals(ml_speed,sA2.fwy().get_gp_freespeed_kph(),0.001);
         } catch (Exception e) {
             fail(e.getMessage());
         }

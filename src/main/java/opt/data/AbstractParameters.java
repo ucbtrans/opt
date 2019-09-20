@@ -12,9 +12,7 @@ public abstract class AbstractParameters {
     public Boolean managed_lanes_barrier;
     public Boolean managed_lanes_separated;
     public Float length;
-    public Float capacity_vphpl;
-    public Float jam_density_vpkpl;
-    public Float ff_speed_kph;
+    public FDparams gp_fd;
 
     /////////////////////////////////////
     // construction
@@ -27,9 +25,7 @@ public abstract class AbstractParameters {
         this.managed_lanes_barrier = managed_lanes_barrier;
         this.managed_lanes_separated = managed_lanes_separated;
         this.length = length;
-        this.capacity_vphpl = capacity_vphpl;
-        this.jam_density_vpkpl = jam_density_vpkpl;
-        this.ff_speed_kph = ff_speed_kph;
+        this.gp_fd = new FDparams(capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
     }
 
     public AbstractParameters(jaxb.Roadparam rp) {
@@ -42,7 +38,8 @@ public abstract class AbstractParameters {
         try {
             new_params = this.getClass()
                     .getConstructor(String.class,Integer.class,Integer.class,Boolean.class,Boolean.class,Float.class,Float.class,Float.class,Float.class)
-                    .newInstance( name, gp_lanes, managed_lanes, managed_lanes_barrier,managed_lanes_separated,length, capacity_vphpl, jam_density_vpkpl, ff_speed_kph);
+                    .newInstance( name, gp_lanes, managed_lanes, managed_lanes_barrier,managed_lanes_separated,length,
+                            gp_fd.capacity_vphpl, gp_fd.jam_density_vpkpl, gp_fd.ff_speed_kph);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -77,13 +74,13 @@ public abstract class AbstractParameters {
                 managed_lanes_barrier==that.managed_lanes_barrier &&
                 managed_lanes_separated==that.managed_lanes_separated &&
                 Objects.equals(length, that.length) &&
-                Objects.equals(capacity_vphpl, that.capacity_vphpl) &&
-                Objects.equals(jam_density_vpkpl, that.jam_density_vpkpl) &&
-                Objects.equals(ff_speed_kph, that.ff_speed_kph);
+                Objects.equals(gp_fd.capacity_vphpl, that.gp_fd.capacity_vphpl) &&
+                Objects.equals(gp_fd.jam_density_vpkpl, that.gp_fd.jam_density_vpkpl) &&
+                Objects.equals(gp_fd.ff_speed_kph, that.gp_fd.ff_speed_kph);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name,gp_lanes, managed_lanes,managed_lanes_barrier,managed_lanes_separated,length,capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
+        return Objects.hash(name,gp_lanes, managed_lanes,managed_lanes_barrier,managed_lanes_separated,length,gp_fd.capacity_vphpl,gp_fd.jam_density_vpkpl,gp_fd.ff_speed_kph);
     }
 }
