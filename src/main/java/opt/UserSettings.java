@@ -112,7 +112,10 @@ public class UserSettings {
                 length!=null ? length : 100f,
                 (float)defaultGPLaneCapacityVph,
                 (float)defaultGPLaneJamDensityVpk,
-                (float)defaultGPLaneFreeFlowSpeedKph);
+                (float)defaultGPLaneFreeFlowSpeedKph,
+                (float)defaultManagedLaneCapacityVph,
+                (float)defaultManagedLaneJamDensityVpk,
+                (float)defaultManagedLaneFreeFlowSpeedKph);
     }
 
 
@@ -127,7 +130,10 @@ public class UserSettings {
                 length!=null ? length : 100f,
                 (float)defaultGPLaneCapacityVph,
                 (float)defaultGPLaneJamDensityVpk,
-                (float)defaultGPLaneFreeFlowSpeedKph);
+                (float)defaultGPLaneFreeFlowSpeedKph,
+                (float)defaultManagedLaneCapacityVph,
+                (float)defaultManagedLaneJamDensityVpk,
+                (float)defaultManagedLaneFreeFlowSpeedKph);
     }
 
     public static ParametersFreeway getDefaultConnectorParams(String name, Float length) {
@@ -141,7 +147,10 @@ public class UserSettings {
                 length!=null ? length : 100f,
                 (float)defaultGPLaneCapacityVph,
                 (float)defaultGPLaneJamDensityVpk,
-                (float)defaultGPLaneFreeFlowSpeedKph);
+                (float)defaultGPLaneFreeFlowSpeedKph,
+                (float)defaultManagedLaneCapacityVph,
+                (float)defaultManagedLaneJamDensityVpk,
+                (float)defaultManagedLaneFreeFlowSpeedKph);
     }
 
     public static ParametersFreeway getDefaultFreewayParams(String name, Float length) {
@@ -155,7 +164,10 @@ public class UserSettings {
                 length!=null ? length : 100f,
                 (float)defaultGPLaneCapacityVph,
                 (float)defaultGPLaneJamDensityVpk,
-                (float)defaultGPLaneFreeFlowSpeedKph);
+                (float)defaultGPLaneFreeFlowSpeedKph,
+                (float)defaultManagedLaneCapacityVph,
+                (float)defaultManagedLaneJamDensityVpk,
+                (float)defaultManagedLaneFreeFlowSpeedKph);
     }
     
 

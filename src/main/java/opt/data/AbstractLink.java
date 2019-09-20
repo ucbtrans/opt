@@ -260,6 +260,36 @@ public abstract class AbstractLink implements Comparable {
         params.gp_fd.ff_speed_kph = x;
     }
 
+    public float get_mng_capacity_vphpl(){
+        return params.mng_fd.capacity_vphpl;
+    }
+
+    public float get_mng_jam_density_vpkpl(){
+        return params.mng_fd.jam_density_vpkpl;
+    }
+
+    public float get_mng_freespeed_kph(){
+        return params.mng_fd.ff_speed_kph;
+    }
+
+    public void set_mng_capacity_vphpl(float x) throws Exception {
+        if(x<=0)
+            throw new Exception("Non-positive capacity");
+        params.mng_fd.capacity_vphpl = x;
+    }
+
+    public void set_mng_jam_density_vpkpl(float x) throws Exception {
+        if(x<=0)
+            throw new Exception("Non-positive jam density");
+        params.mng_fd.jam_density_vpkpl = x;
+    }
+
+    public void set_mng_freespeed_kph(float x) throws Exception {
+        if(x<=0)
+            throw new Exception("Non-positive free speed");
+        params.mng_fd.ff_speed_kph = x;
+    }
+
     /////////////////////////////////////
     // demands and splits
     /////////////////////////////////////

@@ -22,7 +22,8 @@ public class LinkOnramp extends AbstractLink {
                 link.getLength(),
                 rp.getCapacity(),
                 rp.getJamDensity(),
-                rp.getSpeed() );
+                rp.getSpeed() ,
+                null,null,null);
     }
 
     public LinkOnramp(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, ParametersRamp params) {

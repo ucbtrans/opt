@@ -12,24 +12,29 @@ public abstract class AbstractParameters {
     public Boolean managed_lanes_barrier;
     public Boolean managed_lanes_separated;
     public Float length;
+
     public FDparams gp_fd;
+    public FDparams mng_fd;
 
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
 
-    public AbstractParameters(String name, Integer gp_lanes, Integer managed_lanes, Boolean managed_lanes_barrier,Boolean managed_lanes_separated, Float length, Float capacity_vphpl, Float jam_density_vpkpl, Float ff_speed_kph) {
+    public AbstractParameters(String name, Integer gp_lanes, Integer managed_lanes, Boolean managed_lanes_barrier,Boolean managed_lanes_separated, Float length,
+                              Float gp_capacity_vphpl, Float gp_jam_density_vpkpl, Float gp_ff_speed_kph,
+                              Float mng_capacity_vphpl, Float mng_jam_density_vpkpl, Float mng_ff_speed_kph) {
         this.name = name;
         this.gp_lanes = gp_lanes;
         this.managed_lanes = managed_lanes;
         this.managed_lanes_barrier = managed_lanes_barrier;
         this.managed_lanes_separated = managed_lanes_separated;
         this.length = length;
-        this.gp_fd = new FDparams(capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
+        this.gp_fd = new FDparams(gp_capacity_vphpl,gp_jam_density_vpkpl,gp_ff_speed_kph);
+        this.mng_fd = new FDparams(mng_capacity_vphpl,mng_jam_density_vpkpl,mng_ff_speed_kph);
     }
 
     public AbstractParameters(jaxb.Roadparam rp) {
-        this(null,0,0,false,false,0f,rp.getCapacity(),rp.getJamDensity(),rp.getSpeed());
+        this(null,0,0,false,false,0f,rp.getCapacity(),rp.getJamDensity(),rp.getSpeed(),null,null,null);
     }
 
     public AbstractParameters clone() {
@@ -37,9 +42,10 @@ public abstract class AbstractParameters {
         AbstractParameters new_params = null;
         try {
             new_params = this.getClass()
-                    .getConstructor(String.class,Integer.class,Integer.class,Boolean.class,Boolean.class,Float.class,Float.class,Float.class,Float.class)
+                    .getConstructor(String.class,Integer.class,Integer.class,Boolean.class,Boolean.class,Float.class,Float.class,Float.class,Float.class,Float.class,Float.class,Float.class)
                     .newInstance( name, gp_lanes, managed_lanes, managed_lanes_barrier,managed_lanes_separated,length,
-                            gp_fd.capacity_vphpl, gp_fd.jam_density_vpkpl, gp_fd.ff_speed_kph);
+                            gp_fd.capacity_vphpl, gp_fd.jam_density_vpkpl, gp_fd.ff_speed_kph,
+                            mng_fd.capacity_vphpl, mng_fd.jam_density_vpkpl, mng_fd.ff_speed_kph);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -76,11 +82,16 @@ public abstract class AbstractParameters {
                 Objects.equals(length, that.length) &&
                 Objects.equals(gp_fd.capacity_vphpl, that.gp_fd.capacity_vphpl) &&
                 Objects.equals(gp_fd.jam_density_vpkpl, that.gp_fd.jam_density_vpkpl) &&
-                Objects.equals(gp_fd.ff_speed_kph, that.gp_fd.ff_speed_kph);
+                Objects.equals(gp_fd.ff_speed_kph, that.gp_fd.ff_speed_kph) &&
+                Objects.equals(mng_fd.capacity_vphpl, that.mng_fd.capacity_vphpl) &&
+                Objects.equals(mng_fd.jam_density_vpkpl, that.mng_fd.jam_density_vpkpl) &&
+                Objects.equals(mng_fd.ff_speed_kph, that.mng_fd.ff_speed_kph) ;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name,gp_lanes, managed_lanes,managed_lanes_barrier,managed_lanes_separated,length,gp_fd.capacity_vphpl,gp_fd.jam_density_vpkpl,gp_fd.ff_speed_kph);
+        return Objects.hash(name,gp_lanes, managed_lanes,managed_lanes_barrier,managed_lanes_separated,length,
+                gp_fd.capacity_vphpl, gp_fd.jam_density_vpkpl, gp_fd.ff_speed_kph,
+                mng_fd.capacity_vphpl, mng_fd.jam_density_vpkpl, mng_fd.ff_speed_kph);
     }
 }
