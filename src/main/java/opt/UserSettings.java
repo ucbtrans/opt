@@ -150,7 +150,10 @@ public class UserSettings {
                 (float)defaultGPLaneFreeFlowSpeedKph,
                 (float)defaultManagedLaneCapacityVph,
                 (float)defaultManagedLaneJamDensityVpk,
-                (float)defaultManagedLaneFreeFlowSpeedKph);
+                (float)defaultManagedLaneFreeFlowSpeedKph,
+                (float)defaultAuxLaneCapacityVph,
+                (float)defaultAuxLaneJamDensityVpk,
+                (float)defaultAuxLaneFreeFlowSpeedKph);
     }
 
     public static ParametersFreeway getDefaultFreewayParams(String name, Float length) {
@@ -167,7 +170,10 @@ public class UserSettings {
                 (float)defaultGPLaneFreeFlowSpeedKph,
                 (float)defaultManagedLaneCapacityVph,
                 (float)defaultManagedLaneJamDensityVpk,
-                (float)defaultManagedLaneFreeFlowSpeedKph);
+                (float)defaultManagedLaneFreeFlowSpeedKph,
+                (float)defaultAuxLaneCapacityVph,
+                (float)defaultAuxLaneJamDensityVpk,
+                (float)defaultAuxLaneFreeFlowSpeedKph);
     }
     
 

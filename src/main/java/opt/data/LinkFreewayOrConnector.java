@@ -23,6 +23,7 @@ public abstract class LinkFreewayOrConnector extends AbstractLink {
                 rp.getCapacity(),
                 rp.getJamDensity(),
                 rp.getSpeed() ,
+                null,null,null,
                 null,null,null);
     }
 
@@ -34,6 +35,36 @@ public abstract class LinkFreewayOrConnector extends AbstractLink {
     public LinkFreewayOrConnector(long id, Long start_node_id, Long end_node_id, AbstractParameters params){
         super(id,start_node_id,end_node_id,params);
         this.params.set_aux_lanes(((ParametersFreeway)params).aux_lanes);
+    }
+
+    public float get_aux_capacity_vphpl(){
+        return ((ParametersFreeway)params).aux_fd.capacity_vphpl;
+    }
+
+    public float get_aux_jam_density_vpkpl(){
+        return ((ParametersFreeway)params).aux_fd.jam_density_vpkpl;
+    }
+
+    public float get_aux_freespeed_kph(){
+        return ((ParametersFreeway)params).aux_fd.ff_speed_kph;
+    }
+
+    public void set_aux_capacity_vphpl(float x) throws Exception {
+        if(x<=0)
+            throw new Exception("Non-positive capacity");
+        ((ParametersFreeway)params).aux_fd.capacity_vphpl = x;
+    }
+
+    public void set_aux_jam_density_vpkpl(float x) throws Exception {
+        if(x<=0)
+            throw new Exception("Non-positive jam density");
+        ((ParametersFreeway)params).aux_fd.jam_density_vpkpl = x;
+    }
+
+    public void set_aux_freespeed_kph(float x) throws Exception {
+        if(x<=0)
+            throw new Exception("Non-positive free speed");
+        ((ParametersFreeway)params).aux_fd.ff_speed_kph = x;
     }
 
     /////////////////////////////////////
