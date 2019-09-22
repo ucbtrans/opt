@@ -39,6 +39,7 @@ import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.*;
+import opt.utils.ModifiedDoubleStringConverter;
 
 
 /**
@@ -111,6 +112,7 @@ public class NewLinkController {
         if (UserSettings.unitsLength.equals("kilometers") || UserSettings.unitsLength.equals("miles"))
             length_step = 0.1;
         lengthSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, length_step);
+        lengthSpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter());
         linkLength.setValueFactory(lengthSpinnerValueFactory);
         
         linkLength.focusedProperty().addListener((observable, oldValue, newValue) -> {
@@ -195,6 +197,7 @@ public class NewLinkController {
         length = UserSettings.convertLength(length, "meters", unitsLength);
         labelLength.setText("Length (" + unitsLength + "):");
         lengthSpinnerValueFactory.setValue(length);
+        ((ModifiedDoubleStringConverter)lengthSpinnerValueFactory.getConverter()).setDefaultValue(length);
         
         if (myLink.get_type() == AbstractLink.Type.freeway) {
             createOption.setVisible(true);

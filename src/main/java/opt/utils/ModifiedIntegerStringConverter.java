@@ -25,41 +25,35 @@
  **/
 package opt.utils;
 
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.util.StringConverter;
+import javafx.util.converter.IntegerStringConverter;
 
 /**
  *
  * @author Alex Kurzhanskiy
  */
-public class WidgetFunctionality {
+public class ModifiedIntegerStringConverter extends IntegerStringConverter {
+    public ModifiedIntegerStringConverter() {super();}
+    
+    public ModifiedIntegerStringConverter(int val) {
+        super();
+        dflt_val = val;
+    }
+    
+    private int dflt_val = 1;
     
     
-/**
- * Spinner commit: c&p from Spinner
- */
-public static <T> void commitEditorText(Spinner<T> spinner, T oldValue) {
-    if (!spinner.isEditable()) return;
-    String text = spinner.getEditor().getText();
-    SpinnerValueFactory<T> valueFactory = spinner.getValueFactory();
-    if (valueFactory != null) {
-        StringConverter<T> converter = valueFactory.getConverter();
-        if (converter != null) {
-            try {
-                T value = converter.fromString(text);
-                valueFactory.setValue(value);
-            } catch(Exception e) {
-                valueFactory.setValue(oldValue);
-            }
+    @Override 
+    public Integer fromString(String value) {
+        try {
+            Integer res = new Integer(super.fromString(value));
+            return res;
+        } catch(Exception e) {
+            return new Integer(dflt_val);
         }
     }
-}
-    
-    
-    
-    
-    
-    
+
+    public void setDefaultValue(int val) {
+        dflt_val = val;
+    }
     
 }

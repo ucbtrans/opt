@@ -53,6 +53,7 @@ public class UserSettings {
     public static String unitsDensity = unitsDensityOptions[2]; // Read from user settings file
     
     
+    public static double defaultMergePriority = 0.5; // ramp merge priority
     
     public static double defaultRampLengthMeters = 322; // meters
     

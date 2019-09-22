@@ -99,6 +99,7 @@
                               <TextField id="linkFromName" fx:id="linkFromName" GridPane.rowIndex="1" />
                               <TextField id="linkToName" fx:id="linkToName" prefHeight="12.0" prefWidth="209.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                               <Spinner id="linkLength" fx:id="linkLength" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                              <Spinner id="mergePriority" fx:id="mergePriority" prefHeight="25.0" prefWidth="135.0" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                            </children>
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -156,18 +157,18 @@
                                                 </Label>
                                                 <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowSpan="14" />
                                                 <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowSpan="14" />
-                                                <Spinner id="numManagedLanes" fx:id="numManagedLanes" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-                                                <Spinner id="numGPLanes" fx:id="numGPLanes" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-                                                <Spinner id="numAuxLanes" fx:id="numAuxLanes" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-                                                <Spinner id="capacityManagedLane" fx:id="capacityManagedLane" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
-                                                <Spinner id="capacityGPLane" fx:id="capacityGPLane" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
-                                                <Spinner id="capacityAuxLane" fx:id="capacityAuxLane" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
-                                                <Spinner id="ffSpeedManaged" fx:id="ffSpeedManaged" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
-                                                <Spinner id="ffSpeedGP" fx:id="ffSpeedGP" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
-                                                <Spinner id="ffSpeedAux" fx:id="ffSpeedAux" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
-                                                <Spinner id="jamDensityManagedLane" fx:id="jamDensityManagedLane" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
-                                                <Spinner id="jamDensityGPLane" fx:id="jamDensityGPLane" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
-                                                <Spinner id="jamDensityAuxLane" fx:id="jamDensityAuxLane" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
+                                                <Spinner id="numManagedLanes" fx:id="numManagedLanes" editable="true" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                                                <Spinner id="numGPLanes" fx:id="numGPLanes" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                                                <Spinner id="numAuxLanes" fx:id="numAuxLanes" editable="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                                                <Spinner id="capacityManagedLane" fx:id="capacityManagedLane" editable="true" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+                                                <Spinner id="capacityGPLane" fx:id="capacityGPLane" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+                                                <Spinner id="capacityAuxLane" fx:id="capacityAuxLane" editable="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+                                                <Spinner id="ffSpeedManaged" fx:id="ffSpeedManaged" editable="true" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
+                                                <Spinner id="ffSpeedGP" fx:id="ffSpeedGP" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
+                                                <Spinner id="ffSpeedAux" fx:id="ffSpeedAux" editable="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
+                                                <Spinner id="jamDensityManagedLane" fx:id="jamDensityManagedLane" editable="true" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
+                                                <Spinner id="jamDensityGPLane" fx:id="jamDensityGPLane" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
+                                                <Spinner id="jamDensityAuxLane" fx:id="jamDensityAuxLane" editable="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
                                                 <CheckBox id="cbBarrier" fx:id="cbBarrier" disable="true" mnemonicParsing="false" onAction="#drawRoadSection" text="Barrier" GridPane.halignment="CENTER" GridPane.rowIndex="12" GridPane.valignment="BASELINE">
                                                    <GridPane.margin>
                                                       <Insets />
