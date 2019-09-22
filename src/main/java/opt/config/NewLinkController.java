@@ -107,8 +107,22 @@ public class NewLinkController {
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
-        lengthSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
+        double length_step = 1;
+        if (UserSettings.unitsLength.equals("kilometers") || UserSettings.unitsLength.equals("miles"))
+            length_step = 0.1;
+        lengthSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, length_step);
         linkLength.setValueFactory(lengthSpinnerValueFactory);
+        
+        linkLength.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Double length = new Double(1);
+            if (myLink != null) {
+                length = new Double(myLink.get_length_meters());
+                length = UserSettings.convertLength(length, "meters", UserSettings.unitsLength);
+            }
+            opt.utils.WidgetFunctionality.commitEditorText(linkLength, length);
+        });
         
         createOption.getItems().clear();
         createOption.getItems().add("Copy from Current Section");

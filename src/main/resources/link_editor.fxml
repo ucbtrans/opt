@@ -96,8 +96,8 @@
                               <Label id="labelFromName" fx:id="labelFromName" text="FROM Name:" GridPane.valignment="BOTTOM" />
                               <Label id="labelToName" fx:id="labelToName" text="TO Name:" GridPane.columnIndex="1" GridPane.valignment="BOTTOM" />
                               <Label id="labelLength" fx:id="labelLength" text="Length (miles):" GridPane.columnIndex="2" GridPane.valignment="BOTTOM" />
-                              <TextField id="linkFromName" fx:id="linkFromName" onAction="#onLinkNameChanged" GridPane.rowIndex="1" />
-                              <TextField id="linkToName" fx:id="linkToName" onAction="#onLinkNameChanged" prefHeight="12.0" prefWidth="209.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <TextField id="linkFromName" fx:id="linkFromName" GridPane.rowIndex="1" />
+                              <TextField id="linkToName" fx:id="linkToName" prefHeight="12.0" prefWidth="209.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                               <Spinner id="linkLength" fx:id="linkLength" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                            </children>
                            <padding>
@@ -154,8 +154,8 @@
                                                       <Font size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowSpan="13" />
-                                                <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowSpan="13" />
+                                                <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowSpan="14" />
+                                                <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowSpan="14" />
                                                 <Spinner id="numManagedLanes" fx:id="numManagedLanes" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
                                                 <Spinner id="numGPLanes" fx:id="numGPLanes" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
                                                 <Spinner id="numAuxLanes" fx:id="numAuxLanes" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
@@ -178,7 +178,7 @@
                                                 </CheckBox>
                                                 <CheckBox id="cbSeparated" fx:id="cbSeparated" disable="true" mnemonicParsing="false" onAction="#drawRoadSection" text="Separated" GridPane.halignment="CENTER" GridPane.rowIndex="13" GridPane.valignment="BASELINE">
                                                    <GridPane.margin>
-                                                      <Insets left="20.0" />
+                                                      <Insets left="18.0" />
                                                    </GridPane.margin>
                                                    <tooltip>
                                                       <Tooltip text="Set barrier between managed lanes if there are more than one" />

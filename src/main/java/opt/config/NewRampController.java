@@ -108,14 +108,42 @@ public class NewRampController {
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
-        lengthSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
+        double length_step = 1;
+        if (UserSettings.unitsLength.equals("kilometers") || UserSettings.unitsLength.equals("miles"))
+            length_step = 0.1;
+        lengthSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, length_step);
         linkLength.setValueFactory(lengthSpinnerValueFactory);
+        
+        linkLength.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Double length = UserSettings.convertLength(UserSettings.defaultRampLengthMeters, "meters", UserSettings.unitsLength);
+            opt.utils.WidgetFunctionality.commitEditorText(linkLength, length);
+        });
      
         numLanesGPSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1, 1);
         numGPLanes.setValueFactory(numLanesGPSpinnerValueFactory);
         
+        numGPLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Integer num_lanes = new Integer(UserSettings.defaultOnrampGPLanes);
+            if (!is_onramp)
+                num_lanes = UserSettings.defaultOfframpGPLanes;
+            opt.utils.WidgetFunctionality.commitEditorText(numGPLanes, num_lanes);
+        });
+        
         numLanesManagedSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0, 1);
         numManagedLanes.setValueFactory(numLanesManagedSpinnerValueFactory);
+        
+        numManagedLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Integer num_lanes = new Integer(UserSettings.defaultOnrampManagedLanes);
+            if (!is_onramp)
+                num_lanes = UserSettings.defaultOfframpManagedLanes;
+            opt.utils.WidgetFunctionality.commitEditorText(numManagedLanes, num_lanes);
+        }); 
     }
     
     

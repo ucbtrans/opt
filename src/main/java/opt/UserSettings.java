@@ -38,9 +38,19 @@ import opt.data.ParametersRamp;
  */
 public class UserSettings {
 
-    public static boolean rightSideRoads = true;
-    private static String[] unitsLengthOptions = {"meters", "feet", "kilometers", "miles"};
-    public static String unitsLength = "miles";
+    public static boolean rightSideRoads = true; // Read from user settings file
+    
+    public static String[] unitsLengthOptions = {"meters", "feet", "kilometers", "miles"};
+    public static String unitsLength = unitsLengthOptions[3]; // Read from user settings file
+    
+    public static String[] unitsSpeedOptions = {"mps", "fps", "mph", "kph"};
+    public static String unitsSpeed = unitsSpeedOptions[2]; // Read from user settings file
+    
+    public static String[] unitsFlowOptions = {"vps", "vpm", "vp5m", "vp15m", "vph"};
+    public static String unitsFlow = unitsFlowOptions[4]; // Read from user settings file
+    
+    public static String[] unitsDensityOptions = {"vpmtr", "vpf", "vpm", "vpkm"};
+    public static String unitsDensity = unitsDensityOptions[2]; // Read from user settings file
     
     
     
@@ -76,10 +86,8 @@ public class UserSettings {
     
     
     
-    
+    // Length conversion
     private static Map<String, Double> lengthConversionMap = new HashMap<String, Double>();
-    
-    
     static {
         lengthConversionMap.put("metersmeters", new Double(1));
         lengthConversionMap.put("metersfeet", new Double(3.28084));
@@ -96,11 +104,86 @@ public class UserSettings {
         lengthConversionMap.put("milesmeters", new Double(1609.34));
         lengthConversionMap.put("milesfeet", new Double(5280));
         lengthConversionMap.put("mileskilometers", new Double(1.60934));
-        lengthConversionMap.put("milesmiles", new Double(1));
-        
+        lengthConversionMap.put("milesmiles", new Double(1));      
     }
 
 
+    // Speed conversion
+    private static Map<String, Double> speedConversionMap = new HashMap<String, Double>();
+    static {
+        speedConversionMap.put("mpsmps", new Double(1));
+        speedConversionMap.put("mpsfps", new Double(3.28084));
+        speedConversionMap.put("mpsmph", new Double(2.23694));
+        speedConversionMap.put("mpskph", new Double(3.6));
+        speedConversionMap.put("fpsmps", new Double(0.3048));
+        speedConversionMap.put("fpsfps", new Double(1));
+        speedConversionMap.put("fpsmph", new Double(0.681818));
+        speedConversionMap.put("fpskph", new Double(1.09728));
+        speedConversionMap.put("mphmps", new Double(0.44704));
+        speedConversionMap.put("mphfps", new Double(1.46667));
+        speedConversionMap.put("mphmph", new Double(1));
+        speedConversionMap.put("mphkph", new Double(1.60936));
+        speedConversionMap.put("kphmps", new Double(0.277778));
+        speedConversionMap.put("kphfps", new Double(0.911344));
+        speedConversionMap.put("kphmph", new Double(0.621371));
+        speedConversionMap.put("kphkph", new Double(1));
+    }
+    
+    
+    // Flow conversion (vehicles per <unit of time>: vps, vpm, vp5m, vp15m, vph)
+    private static Map<String, Double> flowConversionMap = new HashMap<String, Double>();
+    static {
+        flowConversionMap.put("vpsvps", new Double(1));
+        flowConversionMap.put("vpsvpm", new Double(60));
+        flowConversionMap.put("vpsvp5m", new Double(300));
+        flowConversionMap.put("vpsvp15m", new Double(900));
+        flowConversionMap.put("vpsvph", new Double(3600));
+        flowConversionMap.put("vpmvps", new Double(1.0/60.0));
+        flowConversionMap.put("vpmvpm", new Double(1));
+        flowConversionMap.put("vpmvp5m", new Double(5));
+        flowConversionMap.put("vpmvp15m", new Double(15));
+        flowConversionMap.put("vpmvph", new Double(60));
+        flowConversionMap.put("vp5mvps", new Double(1.0/300.0));
+        flowConversionMap.put("vp5mvpm", new Double(1.0/5.0));
+        flowConversionMap.put("vp5mvp5m", new Double(1));
+        flowConversionMap.put("vp5mvp15m", new Double(3));
+        flowConversionMap.put("vp5mvph", new Double(12));
+        flowConversionMap.put("vp15mvps", new Double(1.0/900.0));
+        flowConversionMap.put("vp15mvpm", new Double(1.0/15.0));
+        flowConversionMap.put("vp15mvp5m", new Double(1.0/3.0));
+        flowConversionMap.put("vp15mvp15m", new Double(1));
+        flowConversionMap.put("vp15mvph", new Double(4));
+        flowConversionMap.put("vphvps", new Double(1.0/3600.0));
+        flowConversionMap.put("vphvpm", new Double(1.0/60.0));
+        flowConversionMap.put("vphvp5m", new Double(1.0/12.0));
+        flowConversionMap.put("vphvp15m", new Double(1.0/4.0));
+        flowConversionMap.put("vphvph", new Double(1));
+    }
+    
+    
+    // Density conversion (vehicles per <unit of length>: vpmtr, vpf, vpm, vpkm)
+    private static Map<String, Double> densityConversionMap = new HashMap<String, Double>();
+    static {
+        densityConversionMap.put("vpmtrvpmtr", new Double(1)); // mtr = meter => vpmtr = vehicles per meter
+        densityConversionMap.put("vpmtrvpf", new Double(0.3048));
+        densityConversionMap.put("vpmtrvpm", new Double(1609.34));
+        densityConversionMap.put("vpmtrvpkm", new Double(1000));
+        densityConversionMap.put("vpfvpmtr", new Double(3.28084));
+        densityConversionMap.put("vpfvpf", new Double(1));
+        densityConversionMap.put("vpfvpm", new Double(5280));
+        densityConversionMap.put("vpfvpkm", new Double(3280.84));
+        densityConversionMap.put("vpmvpmtr", new Double(0.000621371));
+        densityConversionMap.put("vpmvpf", new Double(0.000189394));
+        densityConversionMap.put("vpmvpm", new Double(1));
+        densityConversionMap.put("vpmvpkm", new Double(0.621371));
+        densityConversionMap.put("vpkmvpmtr", new Double(0.001));
+        densityConversionMap.put("vpkmvpf", new Double(0.0003048));
+        densityConversionMap.put("vpkmvpm", new Double(1.60934));
+        densityConversionMap.put("vpkmvpkm", new Double(1));
+    }
+    
+    
+    
     public static ParametersRamp getDefaultOfframpParams(String name, Float length) {
         return new ParametersRamp(
                 name,
@@ -162,6 +245,27 @@ public class UserSettings {
     
     public static double convertLength(double value, String fromUnits, String toUnits) {
         Double res = lengthConversionMap.get(fromUnits + toUnits);
+        if (res == null)
+            res = new Double(1);
+        return res * value;
+    }
+    
+    public static double convertSpeed(double value, String fromUnits, String toUnits) {
+        Double res = speedConversionMap.get(fromUnits + toUnits);
+        if (res == null)
+            res = new Double(1);
+        return res * value;
+    }
+    
+    public static double convertFlow(double value, String fromUnits, String toUnits) {
+        Double res = flowConversionMap.get(fromUnits + toUnits);
+        if (res == null)
+            res = new Double(1);
+        return res * value;
+    }
+    
+    public static double convertDensity(double value, String fromUnits, String toUnits) {
+        Double res = densityConversionMap.get(fromUnits + toUnits);
         if (res == null)
             res = new Double(1);
         return res * value;

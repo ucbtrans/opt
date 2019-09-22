@@ -609,11 +609,34 @@ public class LinkEditorController {
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         
-        lengthSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
+        linkFromName.textProperty().addListener((observable, oldValue, newValue) -> {
+            onLinkNameChanged(null);
+        });
+        
+        linkToName.textProperty().addListener((observable, oldValue, newValue) -> {
+            onLinkNameChanged(null);
+        });
+        
+        double length_step = 1;
+        if (UserSettings.unitsLength.equals("kilometers") || UserSettings.unitsLength.equals("miles"))
+            length_step = 0.1;
+        lengthSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, length_step);
         linkLength.setValueFactory(lengthSpinnerValueFactory);
         linkLength.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (!ignoreChange && (oldValue != newValue))
+            if (!ignoreChange && (Math.abs(oldValue-newValue) > 0.00001)) {
                 onLinkLengthChange();
+            }
+        });
+        
+        linkLength.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Double length = new Double(1);
+            if (myLink != null) {
+                length = new Double(myLink.get_length_meters());
+                length = UserSettings.convertLength(length, "meters", UserSettings.unitsLength);
+            }
+            opt.utils.WidgetFunctionality.commitEditorText(linkLength, length);
         });
         
         numLanesGPSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1, 1);
@@ -623,11 +646,31 @@ public class LinkEditorController {
                 onNumLanesChange();
         });
         
+        numGPLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Integer num_lanes = new Integer(1);
+            if (myLink != null) {
+                num_lanes = new Integer(myLink.get_gp_lanes());
+            }
+            opt.utils.WidgetFunctionality.commitEditorText(numGPLanes, num_lanes);
+        });
+        
         numLanesAuxSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0, 1);
         numAuxLanes.setValueFactory(numLanesAuxSpinnerValueFactory);
         numAuxLanes.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
                 onNumLanesChange();
+        });
+        
+        numAuxLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Integer num_lanes = new Integer(0);
+            if (myLink != null) {
+                num_lanes = new Integer(myLink.get_aux_lanes());
+            }
+            opt.utils.WidgetFunctionality.commitEditorText(numAuxLanes, num_lanes);
         });
         
         numLanesManagedSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0, 1);
@@ -637,67 +680,77 @@ public class LinkEditorController {
                 onNumLanesChange();
         });
         
+        numManagedLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Integer num_lanes = new Integer(0);
+            if (myLink != null) {
+                num_lanes = new Integer(myLink.get_managed_lanes());
+            }
+            opt.utils.WidgetFunctionality.commitEditorText(numManagedLanes, num_lanes);
+        });
+        
         capacityGPSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
         capacityGPLane.setValueFactory(capacityGPSpinnerValueFactory);
         capacityGPLane.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
-                onCapacityChange();
+                onParamChange();
         });
         
         capacityAuxSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
         capacityAuxLane.setValueFactory(capacityAuxSpinnerValueFactory);
         capacityAuxLane.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
-                onCapacityChange();
+                onParamChange();
         });
         
         capacityManagedSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
         capacityManagedLane.setValueFactory(capacityManagedSpinnerValueFactory);
         capacityManagedLane.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
-                onCapacityChange();
+                onParamChange();
         });
         
         ffSpeedGPSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
         ffSpeedGP.setValueFactory(ffSpeedGPSpinnerValueFactory);
         ffSpeedGP.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
-                onFreeFlowSpeedChange();
+                onParamChange();
         });
         
         ffSpeedAuxSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
         ffSpeedAux.setValueFactory(ffSpeedAuxSpinnerValueFactory);
         ffSpeedAux.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
-                onFreeFlowSpeedChange();
+                onParamChange();
         });
         
         ffSpeedManagedSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
         ffSpeedManaged.setValueFactory(ffSpeedManagedSpinnerValueFactory);
         ffSpeedManaged.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
-                onFreeFlowSpeedChange();
+                onParamChange();
         });
         
         jamDensityGPSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
         jamDensityGPLane.setValueFactory(jamDensityGPSpinnerValueFactory);
         jamDensityGPLane.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
-                onJamDensityChange();
+                onParamChange();
         });
         
         jamDensityAuxSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
         jamDensityAuxLane.setValueFactory(jamDensityAuxSpinnerValueFactory);
         jamDensityAuxLane.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
-                onJamDensityChange();
+                onParamChange();
         });
         
         jamDensityManagedSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
         jamDensityManagedLane.setValueFactory(jamDensityManagedSpinnerValueFactory);
         jamDensityManagedLane.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
-                onJamDensityChange();
+                onParamChange();
         });
         
 
@@ -710,12 +763,17 @@ public class LinkEditorController {
         
         
         linkEditorCanvas.widthProperty().addListener((observable, oldValue, newValue) -> {
+           ignoreChange = true;
            drawRoadSection(); 
+           ignoreChange = false;
         });
         
         linkEditorCanvas.heightProperty().addListener((observable, oldValue, newValue) -> {
-           drawRoadSection(); 
+           ignoreChange = true;
+           drawRoadSection();
+           ignoreChange = false;
         });
+        
         
     }
     
@@ -837,6 +895,65 @@ public class LinkEditorController {
             ffSpeedAux.setDisable(flag);
             jamDensityAuxLane.setDisable(flag);
         }
+        
+        // Capacity per lane
+        String unitsFlow = UserSettings.unitsFlow;
+        labelGPLaneCapacity.setText("GP Lane Capacity (" + unitsFlow + "):");
+        double cap = myLink.get_capacity_vphpl();
+        cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
+        capacityGPSpinnerValueFactory.setValue(cap);
+        labelManagedLaneCapacity.setText("M Lane Capacity (" + unitsFlow + "):");
+        cap = myLink.get_capacity_vphpl(); // FIXME
+        cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
+        capacityManagedSpinnerValueFactory.setValue(cap);
+        labelAuxLaneCapacity.setText("Aux Lane Capacity (" + unitsFlow + "):");
+        cap = myLink.get_capacity_vphpl(); // FIXME
+        cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
+        capacityAuxSpinnerValueFactory.setValue(cap);
+
+        // Free flow speed
+        String unitsSpeed = UserSettings.unitsSpeed;
+        labelFreeFlowSpeedGP.setText("GP Lane Free Flow Speed (" + unitsSpeed + "):");
+        double ffspeed = myLink.get_freespeed_kph();
+        ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
+        ffSpeedGPSpinnerValueFactory.setValue(ffspeed);
+        labelFreeFlowSpeedManaged.setText("M Lane Free Flow Speed (" + unitsSpeed + "):");
+        ffspeed = myLink.get_freespeed_kph(); // FIXME
+        ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
+        ffSpeedManagedSpinnerValueFactory.setValue(ffspeed);
+        labelFreeFlowSpeedAux.setText("Aux Lane Free Flow Speed (" + unitsSpeed + "):");
+        ffspeed = myLink.get_freespeed_kph(); // FIXME
+        ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
+        ffSpeedAuxSpinnerValueFactory.setValue(ffspeed);
+        
+        // Jam density per lane
+        String unitsDensity = UserSettings.unitsDensity;
+        labelJamDensityGP.setText("GP Lane Jam Density (" + unitsDensity + "):");
+        double jamDensity = myLink.get_jam_density_vpkpl();
+        jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
+        jamDensityManagedSpinnerValueFactory.setValue(jamDensity);
+        labelJamDensityManaged.setText("M Lane Jam Density (" + unitsDensity + "):");
+        jamDensity = myLink.get_jam_density_vpkpl(); // FIXME
+        jamDensity = UserSettings.convertDensity(ffspeed, "vpkm", unitsDensity);
+        jamDensityGPSpinnerValueFactory.setValue(jamDensity);
+        labelJamDensityAux.setText("Aux Lane Jam Density (" + unitsDensity + "):");
+        jamDensity = myLink.get_jam_density_vpkpl(); // FIXME
+        jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
+        jamDensityAuxSpinnerValueFactory.setValue(jamDensity);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         listOnramps.getItems().clear();
         onramps.clear();
@@ -993,17 +1110,18 @@ public class LinkEditorController {
         
         
         // Set lane properties to link
-        try {
-            myLink.set_managed_lanes(managed_lanes);
-            myLink.set_gp_lanes(gp_lanes);
-            if (myLink.get_type() == AbstractLink.Type.freeway)
-                myLink.params.set_aux_lanes(aux_lanes);
-            myLink.set_barrier(barrier);
-            myLink.set_separated(separated);
-            if (!ignoreChange)
+        if (!ignoreChange) {
+            try {
+                myLink.set_managed_lanes(managed_lanes);
+                myLink.set_gp_lanes(gp_lanes);
+                if (myLink.get_type() == AbstractLink.Type.freeway)
+                    myLink.params.set_aux_lanes(aux_lanes);
+                myLink.set_barrier(barrier);
+                myLink.set_separated(separated);
                 appMainController.setProjectModified(true);
-        } catch(Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Could not change lane configuration...", e);
+            } catch(Exception e) {
+                opt.utils.Dialogs.ExceptionDialog("Could not change lane configuration...", e);
+            }
         }
         
         
@@ -1336,6 +1454,8 @@ public class LinkEditorController {
     
     @FXML
     private void onLinkLengthChange() {
+        if (ignoreChange)
+            return;
         String unitsLength = UserSettings.unitsLength;
         double length = lengthSpinnerValueFactory.getValue();
         length = UserSettings.convertLength(length, unitsLength, "meters");
@@ -1351,36 +1471,21 @@ public class LinkEditorController {
     
     
     
-    private void onNumLanesChange() {    
+    private void onNumLanesChange() { 
+        if (ignoreChange)
+            return;
         drawRoadSection();
-        appMainController.setProjectModified(true);
+        //appMainController.setProjectModified(true);
     }
     
     
     
-    private void onCapacityChange() {    
+    private void onParamChange() {    
         
         
-        System.err.println("Capacity change!");
+        System.err.println("Param change!");
     }
     
-    
-    
-    private void onFreeFlowSpeedChange() {    
-        
-        
-        System.err.println("Free flow change!");
-    }
-    
-    
-    private void onJamDensityChange() {    
-        
-        
-        System.err.println("Jam Density change!");
-    }
-    
-    
-
     
     
     
