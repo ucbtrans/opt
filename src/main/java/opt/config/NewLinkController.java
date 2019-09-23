@@ -285,9 +285,9 @@ public class NewLinkController {
                 else
                     fr = new_segment.out_frs(0);
                 fr.set_gp_lanes(myLink.get_gp_lanes());
-                fr.set_managed_lanes(myLink.get_managed_lanes());
-                fr.set_barrier(myLink.get_barrier());
-                fr.set_separated(myLink.get_separated());
+                fr.set_mng_lanes(myLink.get_mng_lanes());
+                fr.set_mng_barrier(myLink.get_mng_barrier());
+                fr.set_mng_separated(myLink.get_mng_separated());
             }
         } else {
             if (upstreamLink.get_type() == AbstractLink.Type.connector) {
@@ -307,9 +307,9 @@ public class NewLinkController {
                 else
                     or = new_segment.out_ors(0);
                 or.set_gp_lanes(myLink.get_gp_lanes());
-                or.set_managed_lanes(myLink.get_managed_lanes());
-                or.set_barrier(myLink.get_barrier());
-                or.set_separated(myLink.get_separated());
+                or.set_mng_lanes(myLink.get_mng_lanes());
+                or.set_mng_barrier(myLink.get_mng_barrier());
+                or.set_mng_separated(myLink.get_mng_separated());
             }
         }
         LinkFreewayOrConnector new_link = new_segment.fwy();
@@ -317,15 +317,15 @@ public class NewLinkController {
             int crOpt = createOption.getSelectionModel().getSelectedIndex();
             if (crOpt == 0) {
                 new_link.set_gp_lanes(myLink.get_gp_lanes());
-                new_link.set_managed_lanes(myLink.get_managed_lanes());
-                new_link.set_barrier(myLink.get_barrier());
-                new_link.set_separated(myLink.get_separated());
+                new_link.set_mng_lanes(myLink.get_mng_lanes());
+                new_link.set_mng_barrier(myLink.get_mng_barrier());
+                new_link.set_mng_separated(myLink.get_mng_separated());
             }
         } else if ((myLink.get_type() == AbstractLink.Type.onramp) || (myLink.get_type() == AbstractLink.Type.offramp)) {
             new_link.set_gp_lanes(myLink.get_gp_lanes());
-            new_link.set_managed_lanes(myLink.get_managed_lanes());
-            new_link.set_barrier(myLink.get_barrier());
-            new_link.set_separated(myLink.get_separated());
+            new_link.set_mng_lanes(myLink.get_mng_lanes());
+            new_link.set_mng_barrier(myLink.get_mng_barrier());
+            new_link.set_mng_separated(myLink.get_mng_separated());
         }
         appMainController.objectNameUpdate(new_link);
 

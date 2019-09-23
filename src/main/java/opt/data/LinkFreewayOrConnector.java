@@ -10,21 +10,26 @@ public abstract class LinkFreewayOrConnector extends AbstractLink {
     // construction
     /////////////////////////////////////
 
-    public LinkFreewayOrConnector(Link link, Roadparam rp) {
+    public LinkFreewayOrConnector(Link link, Roadparam rp,int mng_lanes,FDparams mng_fd,boolean mng_barrier,boolean mng_separated,int aux_lanes,FDparams aux_fd) {
         super(link);
+
         this.params = new ParametersFreeway(
                 "",
                 link.getFullLanes(),
-                0,
-                false,
-                false,
-                0,
+                mng_lanes,
+                mng_barrier,
+                mng_separated,
+                aux_lanes,
                 link.getLength(),
                 rp.getCapacity(),
                 rp.getJamDensity(),
                 rp.getSpeed() ,
-                null,null,null,
-                null,null,null);
+                mng_fd==null ? Float.NaN : mng_fd.capacity_vphpl,
+                mng_fd==null ? Float.NaN : mng_fd.jam_density_vpkpl,
+                mng_fd==null ? Float.NaN : mng_fd.ff_speed_kph,
+                aux_fd==null ? Float.NaN : aux_fd.capacity_vphpl,
+                aux_fd==null ? Float.NaN : aux_fd.jam_density_vpkpl,
+                aux_fd==null ? Float.NaN : aux_fd.ff_speed_kph);
     }
 
     public LinkFreewayOrConnector(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, ParametersFreeway params) {

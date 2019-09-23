@@ -50,11 +50,11 @@ public class FreewayScenario {
                 if (scenario.links.containsKey(lnk.getId())) {
                     AbstractLink link = scenario.links.get(lnk.getId());
                     link.set_name(lnk.getName());
-                    link.set_aux_lanes(lnk.getAuxLanes()==null ? 0 : lnk.getAuxLanes().intValue());
-                    link.set_managed_lanes(lnk.getManagedLanes()==null ? 0 : lnk.getManagedLanes().intValue());
+//                    link.set_aux_lanes(lnk.getAuxLanes()==null ? 0 : lnk.getAuxLanes().intValue());
+//                    link.set_mng_lanes(lnk.getManagedLanes()==null ? 0 : lnk.getManagedLanes().intValue());
                     link.set_is_inner(lnk.isIsInner()==null ? false : lnk.isIsInner());
-                    link.set_get_managed_lane_barrier(lnk.isManagedLanesBarrier()==null ? false : lnk.isManagedLanesBarrier());
-                    link.set_get_managed_lane_separated(lnk.isManagedLanesSeparated()==null ? false : lnk.isManagedLanesSeparated());
+//                    link.set_mng_barrier(lnk.isManagedLanesBarrier()==null ? false : lnk.isManagedLanesBarrier());
+//                    link.set_mng_separated(lnk.isManagedLanesSeparated()==null ? false : lnk.isManagedLanesSeparated());
                 }
 
         // create segments
@@ -494,10 +494,10 @@ public class FreewayScenario {
             jaxbopt.Lnk lnk = new jaxbopt.Lnk();
             lnk.setId(link.id);
             lnk.setName(link.get_name());
-            lnk.setManagedLanes(BigInteger.valueOf(link.get_managed_lanes()));
-            lnk.setManagedLanesBarrier(Boolean.valueOf(link.get_managed_lane_barrier()));
-            lnk.setManagedLanesSeparated(Boolean.valueOf(link.get_managed_lane_separated()));
-            lnk.setAuxLanes(BigInteger.valueOf(link.get_aux_lanes()));
+//            lnk.setManagedLanes(BigInteger.valueOf(link.get_mng_lanes()));
+//            lnk.setManagedLanesBarrier(Boolean.valueOf(link.get_mng_barrier()));
+//            lnk.setManagedLanesSeparated(Boolean.valueOf(link.get_mng_separated()));
+//            lnk.setAuxLanes(BigInteger.valueOf(link.get_aux_lanes()));
             lnk.setIsInner(link.get_is_inner());
             lnks.getLnk().add(lnk);
         }

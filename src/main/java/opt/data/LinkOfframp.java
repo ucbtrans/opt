@@ -10,20 +10,22 @@ public class LinkOfframp extends AbstractLink {
     // construction
     /////////////////////////////////////
 
-    public LinkOfframp(Link link, Roadparam rp) {
+    public LinkOfframp(Link link, Roadparam rp,int mng_lanes,FDparams mng_fd,boolean mng_barrier,boolean mng_separated) {
         super(link);
         this.params = new ParametersRamp(
                 "",
                 false,
                 link.getFullLanes(),
-                0,
-                false,
-                false,
+                mng_lanes,
+                mng_barrier,
+                mng_separated,
                 link.getLength(),
                 rp.getCapacity(),
                 rp.getJamDensity(),
                 rp.getSpeed(),
-                null,null,null);
+                mng_fd==null ? Float.NaN : mng_fd.capacity_vphpl,
+                mng_fd==null ? Float.NaN : mng_fd.jam_density_vpkpl,
+                mng_fd==null ? Float.NaN : mng_fd.ff_speed_kph);
     }
 
     public LinkOfframp(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, ParametersRamp params) {

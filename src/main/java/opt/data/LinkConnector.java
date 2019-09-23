@@ -9,8 +9,8 @@ public class LinkConnector extends LinkFreewayOrConnector {
     // construction
     /////////////////////////////////////
 
-    public LinkConnector(Link link, Roadparam rp) {
-        super(link, rp);
+    public LinkConnector(Link link, Roadparam rp,int mng_lanes,FDparams mng_fd,boolean mng_barrier,boolean mng_separated,int aux_lanes,FDparams aux_fd) {
+        super(link, rp,mng_lanes, mng_fd, mng_barrier, mng_separated, aux_lanes, aux_fd);
     }
 
     public LinkConnector(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, ParametersFreeway params) {

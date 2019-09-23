@@ -65,14 +65,14 @@ public abstract class AbstractLink implements Comparable {
         this.params = params;
     }
 
-    public AbstractLink(long id,Segment mysegment,AbstractLink up_link,AbstractLink dn_link,Long start_node_id,Long end_node_id,String name,Boolean is_inner,Integer gp_lanes,Integer managed_lanes,Integer aux_lanes,Float length,Float capacity_vphpl,Float jam_density_vpkpl,Float ff_speed_kph){
-        this.id = id;
-        this.mysegment = mysegment;
-        this.up_link = up_link;
-        this.dn_link = dn_link;
-        this.start_node_id = start_node_id;
-        this.end_node_id = end_node_id;
-    }
+//    public AbstractLink(long id,Segment mysegment,AbstractLink up_link,AbstractLink dn_link,Long start_node_id,Long end_node_id,String name,Boolean is_inner,Integer gp_lanes,Integer managed_lanes,Integer aux_lanes,Float length,Float capacity_vphpl,Float jam_density_vpkpl,Float ff_speed_kph){
+//        this.id = id;
+//        this.mysegment = mysegment;
+//        this.up_link = up_link;
+//        this.dn_link = dn_link;
+//        this.start_node_id = start_node_id;
+//        this.end_node_id = end_node_id;
+//    }
 
     @Override
     public AbstractLink clone(){
@@ -153,46 +153,17 @@ public abstract class AbstractLink implements Comparable {
         params.name = name;
     }
 
-    public int get_gp_lanes(){
-        return params.gp_lanes;
+    public final float get_length_meters() {
+        return params.length;
     }
 
-    public void set_gp_lanes(int x) {
-        params.gp_lanes = x;
+    public final void set_length_meters(float newlength) throws Exception {
+        if (newlength<=0.0001)
+            throw new Exception("Attempted to set a non-positive segment length");
+        params.length = newlength;
     }
 
-    public int get_managed_lanes() {
-        return params.managed_lanes;
-    }
-
-    public void set_managed_lanes(int x) {
-        params.managed_lanes = x;
-    }
-
-    public boolean get_barrier(){
-        return params.managed_lanes_barrier;
-    }
-
-    public void set_barrier(boolean x){
-        params.managed_lanes_barrier = x;
-    }
-
-    public boolean get_separated(){
-        return params.managed_lanes_separated;
-    }
-
-    public void set_separated(boolean x){
-        params.managed_lanes_separated = x;
-    }
-
-    public int get_aux_lanes() {
-        return (this.params instanceof ParametersFreeway) ? params.get_aux_lanes() : 0;
-    }
-
-    public void set_aux_lanes(int x) {
-        if(this.params instanceof ParametersFreeway)
-            params.set_aux_lanes(x);
-    }
+    // ramps only
 
     public boolean get_is_inner () {
         return (this.params instanceof ParametersRamp) ? params.get_is_inner() : false;
@@ -204,30 +175,14 @@ public abstract class AbstractLink implements Comparable {
             params.set_is_inner(x);
     }
 
-    public boolean get_managed_lane_barrier() {
-        return params.managed_lanes_barrier;
+    // gp ...................................................
+
+    public int get_gp_lanes(){
+        return params.gp_lanes;
     }
 
-    public void set_get_managed_lane_barrier(boolean x) {
-        params.managed_lanes_barrier = x;
-    }
-
-    public boolean get_managed_lane_separated() {
-        return params.managed_lanes_separated;
-    }
-
-    public void set_get_managed_lane_separated(boolean x) {
-        params.managed_lanes_separated = x;
-    }
-
-    public final float get_length_meters() {
-        return params.length;
-    }
-
-    public final void set_length_meters(float newlength) throws Exception {
-        if (newlength<=0.0001)
-            throw new Exception("Attempted to set a non-positive segment length");
-        params.length = newlength;
+    public void set_gp_lanes(int x) {
+        params.gp_lanes = x;
     }
 
     public float get_gp_capacity_vphpl(){
@@ -260,16 +215,42 @@ public abstract class AbstractLink implements Comparable {
         params.gp_fd.ff_speed_kph = x;
     }
 
+    // managed ..............................................
+
+    public int get_mng_lanes() {
+        return params.mng_lanes;
+    }
+
+    public void set_mng_lanes(int x) {
+        params.mng_lanes = x;
+    }
+
+    public boolean get_mng_barrier() {
+        return params.mng_barrier;
+    }
+
+    public void set_mng_barrier(boolean x) {
+        params.mng_barrier = x;
+    }
+
+    public boolean get_mng_separated() {
+        return params.mng_separated;
+    }
+
+    public void set_mng_separated(boolean x) {
+        params.mng_separated = x;
+    }
+
     public float get_mng_capacity_vphpl(){
-        return params.mng_fd.capacity_vphpl;
+        return params.mng_fd==null ? Float.NaN : params.mng_fd.capacity_vphpl;
     }
 
     public float get_mng_jam_density_vpkpl(){
-        return params.mng_fd.jam_density_vpkpl;
+        return params.mng_fd==null ? Float.NaN : params.mng_fd.jam_density_vpkpl;
     }
 
     public float get_mng_freespeed_kph(){
-        return params.mng_fd.ff_speed_kph;
+        return params.mng_fd==null ? Float.NaN : params.mng_fd.ff_speed_kph;
     }
 
     public void set_mng_capacity_vphpl(float x) throws Exception {
@@ -288,6 +269,56 @@ public abstract class AbstractLink implements Comparable {
         if(x<=0)
             throw new Exception("Non-positive free speed");
         params.mng_fd.ff_speed_kph = x;
+    }
+
+    // aux .................................................
+
+    public int get_aux_lanes() {
+        return (this.params instanceof ParametersFreeway) ? params.get_aux_lanes() : 0;
+    }
+
+    public void set_aux_lanes(int x) {
+        if(this.params instanceof ParametersFreeway)
+            params.set_aux_lanes(x);
+    }
+
+    public float get_aux_capacity_vphpl(){
+        if(this.params instanceof ParametersFreeway)
+            return ((ParametersFreeway) params).aux_fd.capacity_vphpl;
+        else return Float.NaN;
+    }
+
+    public float get_aux_jam_density_vpkpl(){
+        if(this.params instanceof ParametersFreeway)
+            return ((ParametersFreeway) params).aux_fd.jam_density_vpkpl;
+        else return Float.NaN;
+    }
+
+    public float get_aux_freespeed_kph(){
+        if(this.params instanceof ParametersFreeway)
+            return ((ParametersFreeway) params).aux_fd.ff_speed_kph;
+        else return Float.NaN;
+    }
+
+    public void set_aux_capacity_vphpl(float x) throws Exception {
+        if(x<=0)
+            throw new Exception("Non-positive capacity");
+        if(this.params instanceof ParametersFreeway)
+            ((ParametersFreeway) params).aux_fd.capacity_vphpl = x;
+    }
+
+    public void set_aux_jam_density_vpkpl(float x) throws Exception {
+        if(x<=0)
+            throw new Exception("Non-positive capacity");
+        if(this.params instanceof ParametersFreeway)
+            ((ParametersFreeway) params).aux_fd.jam_density_vpkpl = x;
+    }
+
+    public void set_aux_freespeed_kph(float x) throws Exception {
+        if(x<=0)
+            throw new Exception("Non-positive capacity");
+        if(this.params instanceof ParametersFreeway)
+            ((ParametersFreeway) params).aux_fd.ff_speed_kph = x;
     }
 
     /////////////////////////////////////

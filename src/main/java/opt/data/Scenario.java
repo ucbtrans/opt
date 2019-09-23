@@ -1,6 +1,9 @@
 package opt.data;
 
+import geometry.Side;
 import jaxb.ModelParams;
+import jaxb.Roadgeom;
+import jaxb.Roadparam;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
@@ -23,6 +26,7 @@ public class Scenario {
 
         // network
         Map<Long,jaxb.Roadparam> road_params = new HashMap<>();
+        Map<Long,jaxb.Roadgeom> road_geoms = new HashMap<>();
         if (scenario.getNetwork()!=null){
 
             jaxb.Network network = scenario.getNetwork();
@@ -31,6 +35,10 @@ public class Scenario {
                 for(jaxb.Roadparam rp: network.getRoadparams().getRoadparam())
                     road_params.put(rp.getId(),rp);
 
+            if (network.getRoadgeoms()!=null)
+                for(jaxb.Roadgeom rg: network.getRoadgeoms().getRoadgeom())
+                    road_geoms.put(rg.getId(),rg);
+
             if (network.getNodes()!=null)
                 for(jaxb.Node jnode : network.getNodes().getNode())
                     nodes.put(jnode.getId(),new Node(jnode));
@@ -38,23 +46,58 @@ public class Scenario {
             if (network.getLinks()!=null)
                 for(jaxb.Link jlink : network.getLinks().getLink()) {
                     AbstractLink link;
+
+                    Roadparam rp = road_params.get(jlink.getRoadparam());
+                    Roadgeom rg = road_geoms.get(jlink.getRoadgeom());
+
+                    // extract managed lane and aux lane information from the road geometry
+
+                    FDparams mng_fd = null;
+                    FDparams aux_fd = null;
+                    int aux_lanes = 0;
+                    int mng_lanes = 0;
+                    boolean mng_barrier = false;
+                    boolean mng_separated = false;
+
+                    if(rg!=null) {
+                        for (jaxb.AddLanes addlane : rg.getAddLanes()) {
+                            // inside->managed lane, outside->aux lane
+                            jaxb.Roadparam alrp = road_params.get(addlane.getRoadparam());
+
+                            Side side = Side.valueOf(addlane.getSide());
+                            switch (side) {
+                                case in:    // managed lane
+                                    mng_fd = new FDparams(alrp.getCapacity(), alrp.getJamDensity(), alrp.getSpeed());
+                                    mng_lanes = addlane.getLanes();
+                                    mng_barrier = !addlane.isIsopen();
+                                    break;
+                                case out:   // aux lane
+                                    aux_fd = new FDparams(alrp.getCapacity(), alrp.getJamDensity(), alrp.getSpeed());
+                                    aux_lanes = addlane.getLanes();
+                                    break;
+                                default:
+                                    break;
+
+                            }
+                        }
+                    }
+
                     switch(jlink.getRoadType()){
                         case "offramp":
-                            link = new LinkOfframp(jlink, road_params.get(jlink.getRoadparam()));
+                            link = new LinkOfframp(jlink,rp,mng_lanes,mng_fd,mng_barrier,mng_separated);
                             break;
                         case "onramp":
-                            link = new LinkOnramp(jlink, road_params.get(jlink.getRoadparam()));
+                            link = new LinkOnramp(jlink,rp,mng_lanes,mng_fd,mng_barrier,mng_separated);
                             break;
                         case "freeway":
-                            link = new LinkFreeway(jlink, road_params.get(jlink.getRoadparam()));
+                            link = new LinkFreeway(jlink,rp,mng_lanes,mng_fd,mng_barrier,mng_separated,aux_lanes,aux_fd);
                             break;
                         case "connector":
-                            link = new LinkConnector(jlink, road_params.get(jlink.getRoadparam()));
+                            link = new LinkConnector(jlink,rp,mng_lanes,mng_fd,mng_barrier,mng_separated,aux_lanes,aux_fd);
                             break;
                         default:
                             throw new Exception("Bad road type");
                     }
-
 
                     links.put(jlink.getId(),link);
                     nodes.get(jlink.getEndNodeId()).in_links.add(link.id);

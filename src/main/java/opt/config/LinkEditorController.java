@@ -52,9 +52,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
-import javafx.util.converter.DoubleStringConverter;
-import javafx.util.converter.NumberStringConverter;
 import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.AbstractLink;
@@ -717,7 +714,7 @@ public class LinkEditorController {
                 return;
             Integer num_lanes = new Integer(0);
             if (myLink != null) {
-                num_lanes = new Integer(myLink.get_managed_lanes());
+                num_lanes = new Integer(myLink.get_mng_lanes());
             }
             opt.utils.WidgetFunctionality.commitEditorText(numManagedLanes, num_lanes);
         });
@@ -934,7 +931,7 @@ public class LinkEditorController {
             rampsPane.setVisible(false);
         }
         
-        int managed_lanes = myLink.get_managed_lanes();
+        int managed_lanes = myLink.get_mng_lanes();
         int gp_lanes = myLink.get_gp_lanes();
         int aux_lanes = myLink.params.get_aux_lanes();
         
@@ -962,19 +959,19 @@ public class LinkEditorController {
         // Capacity per lane
         String unitsFlow = UserSettings.unitsFlow;
         labelGPLaneCapacity.setText("GP Lane Capacity (" + unitsFlow + "):");
-        double cap = myLink.get_capacity_vphpl();
+        double cap = myLink.get_gp_capacity_vphpl();
         cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
         capacityGPSpinnerValueFactory.setValue(cap+1);
         capacityGPSpinnerValueFactory.setValue(cap);
         ((ModifiedDoubleStringConverter)capacityGPSpinnerValueFactory.getConverter()).setDefaultValue(cap);
         labelManagedLaneCapacity.setText("M Lane Capacity (" + unitsFlow + "):");
-        cap = myLink.get_capacity_vphpl(); // FIXME
+        cap = myLink.get_mng_capacity_vphpl(); // FIXME
         cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
         capacityManagedSpinnerValueFactory.setValue(cap+1);
         capacityManagedSpinnerValueFactory.setValue(cap);
         ((ModifiedDoubleStringConverter)capacityManagedSpinnerValueFactory.getConverter()).setDefaultValue(cap);
         labelAuxLaneCapacity.setText("Aux Lane Capacity (" + unitsFlow + "):");
-        cap = myLink.get_capacity_vphpl(); // FIXME
+        cap = myLink.get_aux_capacity_vphpl(); // FIXME
         cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
         capacityAuxSpinnerValueFactory.setValue(cap+1);
         capacityAuxSpinnerValueFactory.setValue(cap);
@@ -983,19 +980,19 @@ public class LinkEditorController {
         // Free flow speed
         String unitsSpeed = UserSettings.unitsSpeed;
         labelFreeFlowSpeedGP.setText("GP Lane Free Flow Speed (" + unitsSpeed + "):");
-        double ffspeed = myLink.get_freespeed_kph();
+        double ffspeed = myLink.get_gp_freespeed_kph();
         ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
         ffSpeedGPSpinnerValueFactory.setValue(ffspeed+1);
         ffSpeedGPSpinnerValueFactory.setValue(ffspeed);
         ((ModifiedDoubleStringConverter)ffSpeedGPSpinnerValueFactory.getConverter()).setDefaultValue(ffspeed);
         labelFreeFlowSpeedManaged.setText("M Lane Free Flow Speed (" + unitsSpeed + "):");
-        ffspeed = myLink.get_freespeed_kph(); // FIXME
+        ffspeed = myLink.get_mng_freespeed_kph(); // FIXME
         ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
         ffSpeedManagedSpinnerValueFactory.setValue(ffspeed+1);
         ffSpeedManagedSpinnerValueFactory.setValue(ffspeed);
         ((ModifiedDoubleStringConverter)ffSpeedManagedSpinnerValueFactory.getConverter()).setDefaultValue(ffspeed);
         labelFreeFlowSpeedAux.setText("Aux Lane Free Flow Speed (" + unitsSpeed + "):");
-        ffspeed = myLink.get_freespeed_kph(); // FIXME
+        ffspeed = myLink.get_aux_freespeed_kph(); // FIXME
         ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
         ffSpeedAuxSpinnerValueFactory.setValue(ffspeed+1);
         ffSpeedAuxSpinnerValueFactory.setValue(ffspeed);
@@ -1004,19 +1001,19 @@ public class LinkEditorController {
         // Jam density per lane
         String unitsDensity = UserSettings.unitsDensity;
         labelJamDensityGP.setText("GP Lane Jam Density (" + unitsDensity + "):");
-        double jamDensity = myLink.get_jam_density_vpkpl();
+        double jamDensity = myLink.get_mng_jam_density_vpkpl();
         jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
         jamDensityManagedSpinnerValueFactory.setValue(jamDensity+1);
         jamDensityManagedSpinnerValueFactory.setValue(jamDensity);
         ((ModifiedDoubleStringConverter)jamDensityManagedSpinnerValueFactory.getConverter()).setDefaultValue(jamDensity);
         labelJamDensityManaged.setText("M Lane Jam Density (" + unitsDensity + "):");
-        jamDensity = myLink.get_jam_density_vpkpl(); // FIXME
-        jamDensity = UserSettings.convertDensity(ffspeed, "vpkm", unitsDensity);
+        jamDensity = myLink.get_gp_jam_density_vpkpl(); // FIXME
+        jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
         jamDensityGPSpinnerValueFactory.setValue(jamDensity+1);
         jamDensityGPSpinnerValueFactory.setValue(jamDensity);
         ((ModifiedDoubleStringConverter)jamDensityGPSpinnerValueFactory.getConverter()).setDefaultValue(jamDensity);
         labelJamDensityAux.setText("Aux Lane Jam Density (" + unitsDensity + "):");
-        jamDensity = myLink.get_jam_density_vpkpl(); // FIXME
+        jamDensity = myLink.get_aux_jam_density_vpkpl(); // FIXME
         jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
         jamDensityAuxSpinnerValueFactory.setValue(jamDensity+1);
         jamDensityAuxSpinnerValueFactory.setValue(jamDensity);
@@ -1110,8 +1107,8 @@ public class LinkEditorController {
         else
             connectSectionDownstream.setVisible(true);
         
-        cbBarrier.setSelected(myLink.get_barrier());
-        cbSeparated.setSelected(myLink.get_separated());
+        cbBarrier.setSelected(myLink.get_mng_barrier());
+        cbSeparated.setSelected(myLink.get_mng_separated());
         
         if (myLink.get_type() == AbstractLink.Type.freeway) {
              ttDeleteSection.setText("Delete the entire freeway section with all its ramps (if it has any)");
@@ -1182,12 +1179,12 @@ public class LinkEditorController {
         // Set lane properties to link
         if (!ignoreChange) {
             try {
-                myLink.set_managed_lanes(managed_lanes);
+                myLink.set_mng_lanes(managed_lanes);
                 myLink.set_gp_lanes(gp_lanes);
                 if (myLink.get_type() == AbstractLink.Type.freeway)
                     myLink.params.set_aux_lanes(aux_lanes);
-                myLink.set_barrier(barrier);
-                myLink.set_separated(separated);
+                myLink.set_mng_barrier(barrier);
+                myLink.set_mng_separated(separated);
                 appMainController.setProjectModified(true);
             } catch(Exception e) {
                 opt.utils.Dialogs.ExceptionDialog("Could not change lane configuration...", e);
@@ -1212,28 +1209,28 @@ public class LinkEditorController {
         int num_ramps = myLink.get_segment().num_out_ors();
         for (int i = 0; i < num_ramps; i++) {
             int l_count = myLink.get_segment().out_ors(i).get_gp_lanes() +
-                          myLink.get_segment().out_ors(i).get_managed_lanes();
+                          myLink.get_segment().out_ors(i).get_mng_lanes();
             if (l_count > total_ramp_lanes)
                 total_ramp_lanes = l_count;
         }
         num_ramps = myLink.get_segment().num_in_ors();
         for (int i = 0; i < num_ramps; i++) {
             int l_count = myLink.get_segment().in_ors(i).get_gp_lanes() +
-                          myLink.get_segment().in_ors(i).get_managed_lanes();
+                          myLink.get_segment().in_ors(i).get_mng_lanes();
             if (l_count > total_ramp_lanes)
                 total_ramp_lanes = l_count;
         }
         num_ramps = myLink.get_segment().num_out_frs();
         for (int i = 0; i < num_ramps; i++) {
             int l_count = myLink.get_segment().out_frs(i).get_gp_lanes() +
-                          myLink.get_segment().out_frs(i).get_managed_lanes();
+                          myLink.get_segment().out_frs(i).get_mng_lanes();
             if (l_count > total_ramp_lanes)
                 total_ramp_lanes = l_count;
         }
         num_ramps = myLink.get_segment().num_in_frs();
         for (int i = 0; i < num_ramps; i++) {
             int l_count = myLink.get_segment().in_frs(i).get_gp_lanes() +
-                          myLink.get_segment().in_frs(i).get_managed_lanes();
+                          myLink.get_segment().in_frs(i).get_mng_lanes();
             if (l_count > total_ramp_lanes)
                 total_ramp_lanes = l_count;
         }
@@ -1254,9 +1251,9 @@ public class LinkEditorController {
                 double delta = 0.0;
                 for (int i = 0; i < num_ramps; i++) {
                     int or_gp = myLink.get_segment().out_ors(i).get_gp_lanes();
-                    int or_managed = myLink.get_segment().out_ors(i).get_managed_lanes();
-                    boolean or_barrier = myLink.get_segment().out_ors(i).get_barrier();
-                    boolean or_separated = myLink.get_segment().out_ors(i).get_separated();
+                    int or_managed = myLink.get_segment().out_ors(i).get_mng_lanes();
+                    boolean or_barrier = myLink.get_segment().out_ors(i).get_mng_barrier();
+                    boolean or_separated = myLink.get_segment().out_ors(i).get_mng_separated();
                     double or_lanes = or_gp + or_managed;
                     double or_width = or_lanes * r_lane_width;
                     double or_gp_width = or_gp * r_lane_width;
@@ -1301,9 +1298,9 @@ public class LinkEditorController {
                 delta = 0.0;
                 for (int i = 0; i < num_ramps; i++) {
                     int or_gp = myLink.get_segment().in_ors(i).get_gp_lanes();
-                    int or_managed = myLink.get_segment().in_ors(i).get_managed_lanes();
-                    boolean or_barrier = myLink.get_segment().in_ors(i).get_barrier();
-                    boolean or_separated = myLink.get_segment().in_ors(i).get_separated();
+                    int or_managed = myLink.get_segment().in_ors(i).get_mng_lanes();
+                    boolean or_barrier = myLink.get_segment().in_ors(i).get_mng_barrier();
+                    boolean or_separated = myLink.get_segment().in_ors(i).get_mng_separated();
                     double or_lanes = or_gp + or_managed;
                     double or_width = or_lanes * r_lane_width;
                     double or_gp_width = or_gp * r_lane_width;
@@ -1351,9 +1348,9 @@ public class LinkEditorController {
                 delta = 0.0;
                 for (int i = num_ramps-1; i >= 0; i--) {
                     int fr_gp = myLink.get_segment().out_frs(i).get_gp_lanes();
-                    int fr_managed = myLink.get_segment().out_frs(i).get_managed_lanes();
-                    boolean fr_barrier = myLink.get_segment().out_frs(i).get_barrier();
-                    boolean fr_separated = myLink.get_segment().out_frs(i).get_separated();
+                    int fr_managed = myLink.get_segment().out_frs(i).get_mng_lanes();
+                    boolean fr_barrier = myLink.get_segment().out_frs(i).get_mng_barrier();
+                    boolean fr_separated = myLink.get_segment().out_frs(i).get_mng_separated();
                     double fr_lanes = fr_gp + fr_managed;
                     double fr_width = fr_lanes * r_lane_width;
                     double fr_gp_width = fr_gp * r_lane_width;
@@ -1398,9 +1395,9 @@ public class LinkEditorController {
                 delta = 0.0;
                 for (int i = num_ramps-1; i >= 0; i--) {
                     int fr_gp = myLink.get_segment().in_frs(i).get_gp_lanes();
-                    int fr_managed = myLink.get_segment().in_frs(i).get_managed_lanes();
-                    boolean fr_barrier = myLink.get_segment().in_frs(i).get_barrier();
-                    boolean fr_separated = myLink.get_segment().in_frs(i).get_separated();
+                    int fr_managed = myLink.get_segment().in_frs(i).get_mng_lanes();
+                    boolean fr_barrier = myLink.get_segment().in_frs(i).get_mng_barrier();
+                    boolean fr_separated = myLink.get_segment().in_frs(i).get_mng_separated();
                     double fr_lanes = fr_gp + fr_managed;
                     double fr_width = fr_lanes * r_lane_width;
                     double fr_gp_width = fr_gp * r_lane_width;

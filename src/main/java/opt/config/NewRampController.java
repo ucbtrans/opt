@@ -277,7 +277,7 @@ public class NewRampController {
 
         ParametersRamp params = UserSettings.getDefaultOnrampParams(ramp_name,(float)length);
 
-        params.managed_lanes = numLanesManagedSpinnerValueFactory.getValue();
+        params.mng_lanes = numLanesManagedSpinnerValueFactory.getValue();
         params.gp_lanes = numLanesGPSpinnerValueFactory.getValue();
         params.is_inner = cbInnerRamp.isSelected();
 

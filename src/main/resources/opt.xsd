@@ -57,10 +57,10 @@
 			<xs:attribute name="id" type="xs:long" use="required" />
 			<xs:attribute name="name" type="xs:string" />
 			<!-- additional parameters for temporary storing. Eventual solution is to put them in the scenario xml -->
-			<xs:attribute name="managed_lanes" type="xs:integer" />
-			<xs:attribute name="managed_lanes_barrier" type="xs:boolean" />
-			<xs:attribute name="managed_lanes_separated" type="xs:boolean" />
-			<xs:attribute name="aux_lanes" type="xs:integer" />
+<!--			<xs:attribute name="managed_lanes" type="xs:integer" />-->
+<!--			<xs:attribute name="managed_lanes_barrier" type="xs:boolean" />-->
+<!--			<xs:attribute name="managed_lanes_separated" type="xs:boolean" />-->
+<!--			<xs:attribute name="aux_lanes" type="xs:integer" />-->
 			<xs:attribute name="is_inner" type="xs:boolean" />
 		</xs:complexType>
 	</xs:element>
