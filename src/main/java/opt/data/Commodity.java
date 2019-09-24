@@ -29,7 +29,11 @@ public class Commodity {
     public String get_name(){
         return name;
     }
-    
+
+    public void set_name(String name){
+        this.name = name;
+    }
+
     public double get_pvequiv(){
         return pvequiv;
     }
