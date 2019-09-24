@@ -25,49 +25,36 @@
  **/
 package opt.utils;
 
-import opt.data.AbstractLink.Type;
-import opt.data.FreewayScenario;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.util.StringConverter;
 
 /**
  *
  * @author Alex Kurzhanskiy
  */
-public class Misc {
+public class WidgetFunctionality {
     
     
-    public static String linkType2String(Type t) {
-        if (t == Type.freeway)
-            return "Freeway";
-        else if (t == Type.connector)
-            return "Connector";
-        else if (t == Type.onramp)
-            return "On-Ramp";
-        else if (t == Type.offramp)
-            return "Off-Ramp";
-        
-        return "Unknown";
-    }
-    
-    
-    
-    public static String validateAndCorrectLinkName(String link_name, FreewayScenario scenario) {
-        String corrected_name = link_name;
-        if ((!scenario.is_valid_link_name(link_name)) ||
-            (!scenario.is_valid_segment_name(link_name))) {
-            int count = 1;
-            corrected_name = link_name + "(" + count + ")";
-            while ((!scenario.is_valid_link_name(corrected_name)) ||
-                   (!scenario.is_valid_segment_name(corrected_name))) {
-                count++;
-                corrected_name = link_name + "(" + count + ")";
+/**
+ * Spinner commit: c&p from Spinner
+ */
+public static <T> void commitEditorText(Spinner<T> spinner, T oldValue) {
+    if (!spinner.isEditable()) return;
+    String text = spinner.getEditor().getText();
+    SpinnerValueFactory<T> valueFactory = spinner.getValueFactory();
+    if (valueFactory != null) {
+        StringConverter<T> converter = valueFactory.getConverter();
+        if (converter != null) {
+            try {
+                T value = converter.fromString(text);
+                valueFactory.setValue(value);
+            } catch(Exception e) {
+                valueFactory.setValue(oldValue);
             }
         }
-        return corrected_name;
     }
-    
-    
-    
-    
+}
     
     
     

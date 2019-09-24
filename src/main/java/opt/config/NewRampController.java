@@ -39,6 +39,8 @@ import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.ParametersRamp;
+import opt.utils.ModifiedDoubleStringConverter;
+import opt.utils.ModifiedIntegerStringConverter;
 
 
 /**
@@ -108,14 +110,45 @@ public class NewRampController {
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
-        lengthSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1);
+        double length_step = 1;
+        if (UserSettings.unitsLength.equals("kilometers") || UserSettings.unitsLength.equals("miles"))
+            length_step = 0.1;
+        lengthSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, length_step);
+        lengthSpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter());
         linkLength.setValueFactory(lengthSpinnerValueFactory);
+        
+        linkLength.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Double length = UserSettings.convertLength(UserSettings.defaultRampLengthMeters, "meters", UserSettings.unitsLength);
+            opt.utils.WidgetFunctionality.commitEditorText(linkLength, length);
+        });
      
         numLanesGPSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1, 1);
+        numLanesGPSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter());
         numGPLanes.setValueFactory(numLanesGPSpinnerValueFactory);
         
+        numGPLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Integer num_lanes = new Integer(UserSettings.defaultOnrampGPLanes);
+            if (!is_onramp)
+                num_lanes = UserSettings.defaultOfframpGPLanes;
+            opt.utils.WidgetFunctionality.commitEditorText(numGPLanes, num_lanes);
+        });
+        
         numLanesManagedSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0, 1);
+        numLanesManagedSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter());
         numManagedLanes.setValueFactory(numLanesManagedSpinnerValueFactory);
+        
+        numManagedLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Integer num_lanes = new Integer(UserSettings.defaultOnrampManagedLanes);
+            if (!is_onramp)
+                num_lanes = UserSettings.defaultOfframpManagedLanes;
+            opt.utils.WidgetFunctionality.commitEditorText(numManagedLanes, num_lanes);
+        }); 
     }
     
     
@@ -165,7 +198,9 @@ public class NewRampController {
             }   
             to_name = "";
             numLanesManagedSpinnerValueFactory.setValue(UserSettings.defaultOnrampManagedLanes);
+            numLanesManagedSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter(UserSettings.defaultOnrampManagedLanes));
             numLanesGPSpinnerValueFactory.setValue(UserSettings.defaultOnrampGPLanes);
+            numLanesGPSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter(UserSettings.defaultOnrampGPLanes));
         } else {
             if (to_name.equals(""))
                 linkToName.setText(from_name);
@@ -185,7 +220,9 @@ public class NewRampController {
             }
             from_name = "";
             numLanesManagedSpinnerValueFactory.setValue(UserSettings.defaultOfframpManagedLanes);
+            numLanesManagedSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter(UserSettings.defaultOfframpManagedLanes));
             numLanesGPSpinnerValueFactory.setValue(UserSettings.defaultOfframpGPLanes);
+            numLanesGPSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter(UserSettings.defaultOfframpGPLanes));
         } 
         from_name = linkFromName.getText();
         to_name = linkToName.getText();
@@ -195,6 +232,7 @@ public class NewRampController {
         length = UserSettings.convertLength(length, "meters", unitsLength);
         labelLength.setText("Length (" + unitsLength + "):");
         lengthSpinnerValueFactory.setValue(length);
+        ((ModifiedDoubleStringConverter)lengthSpinnerValueFactory.getConverter()).setDefaultValue(length);
         
     }
     
