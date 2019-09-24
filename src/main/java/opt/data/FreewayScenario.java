@@ -449,6 +449,39 @@ public class FreewayScenario {
         return new_comm;
     }
 
+    /**
+     * Delete a commodity with a given name
+     * @param name
+     * @return
+     */
+    public boolean delete_commodity_with_name(String name){
+        Optional<Long> comm_id = scenario.commodities.values().stream()
+                .filter(c->c.name.equals(name))
+                .map(c->c.id)
+                .findFirst();
+
+        if(comm_id.isPresent() && scenario.commodities.containsKey(comm_id.get())) {
+            scenario.commodities.remove(comm_id.get());
+            return true;
+        }
+        else
+            return false;
+    }
+
+    /**
+     * Delete a commodity with a given id
+     * @param comm_id
+     * @return
+     */
+    public boolean delete_commodity_with_id(Long comm_id){
+        if( scenario.commodities.containsKey(comm_id) ){
+            scenario.commodities.remove(comm_id);
+            return true;
+        }
+        else
+            return false;
+    }
+
     /////////////////////////////////////
     // utilities
     /////////////////////////////////////
