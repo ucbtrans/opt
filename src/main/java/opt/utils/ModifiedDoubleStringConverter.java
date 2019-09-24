@@ -52,8 +52,8 @@ public class ModifiedDoubleStringConverter extends DoubleStringConverter {
         dflt_val = val;
     }
     
-    private DecimalFormat myDF = new DecimalFormat("#.###");
-    private double dflt_val = 1.0;
+    private DecimalFormat myDF = new DecimalFormat("#.##");
+    private double dflt_val = -1.0;
 
     @Override 
     public String toString(Double value) {

@@ -52,6 +52,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import javafx.util.converter.DoubleStringConverter;
+import javafx.util.converter.NumberStringConverter;
 import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.AbstractLink;
@@ -923,7 +926,6 @@ public class LinkEditorController {
         length = UserSettings.convertLength(length, "meters", unitsLength);
         labelLength.setText("Length (" + unitsLength + "):");
         lengthSpinnerValueFactory.setValue(length);
-        ((ModifiedDoubleStringConverter)lengthSpinnerValueFactory.getConverter()).setDefaultValue(length);
         
         if (myLink.get_type() == AbstractLink.Type.freeway) {
             rampsPane.setVisible(true);
@@ -961,63 +963,46 @@ public class LinkEditorController {
         labelGPLaneCapacity.setText("GP Lane Capacity (" + unitsFlow + "):");
         double cap = myLink.get_gp_capacity_vphpl();
         cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
-        capacityGPSpinnerValueFactory.setValue(cap+1);
         capacityGPSpinnerValueFactory.setValue(cap);
-        ((ModifiedDoubleStringConverter)capacityGPSpinnerValueFactory.getConverter()).setDefaultValue(cap);
         labelManagedLaneCapacity.setText("M Lane Capacity (" + unitsFlow + "):");
         cap = myLink.get_mng_capacity_vphpl(); // FIXME
         cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
-        capacityManagedSpinnerValueFactory.setValue(cap+1);
         capacityManagedSpinnerValueFactory.setValue(cap);
-        ((ModifiedDoubleStringConverter)capacityManagedSpinnerValueFactory.getConverter()).setDefaultValue(cap);
         labelAuxLaneCapacity.setText("Aux Lane Capacity (" + unitsFlow + "):");
         cap = myLink.get_aux_capacity_vphpl(); // FIXME
         cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
-        capacityAuxSpinnerValueFactory.setValue(cap+1);
         capacityAuxSpinnerValueFactory.setValue(cap);
-        ((ModifiedDoubleStringConverter)capacityAuxSpinnerValueFactory.getConverter()).setDefaultValue(cap);
 
         // Free flow speed
         String unitsSpeed = UserSettings.unitsSpeed;
         labelFreeFlowSpeedGP.setText("GP Lane Free Flow Speed (" + unitsSpeed + "):");
         double ffspeed = myLink.get_gp_freespeed_kph();
         ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
-        ffSpeedGPSpinnerValueFactory.setValue(ffspeed+1);
         ffSpeedGPSpinnerValueFactory.setValue(ffspeed);
-        ((ModifiedDoubleStringConverter)ffSpeedGPSpinnerValueFactory.getConverter()).setDefaultValue(ffspeed);
         labelFreeFlowSpeedManaged.setText("M Lane Free Flow Speed (" + unitsSpeed + "):");
         ffspeed = myLink.get_mng_freespeed_kph(); // FIXME
         ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
-        ffSpeedManagedSpinnerValueFactory.setValue(ffspeed+1);
         ffSpeedManagedSpinnerValueFactory.setValue(ffspeed);
-        ((ModifiedDoubleStringConverter)ffSpeedManagedSpinnerValueFactory.getConverter()).setDefaultValue(ffspeed);
         labelFreeFlowSpeedAux.setText("Aux Lane Free Flow Speed (" + unitsSpeed + "):");
         ffspeed = myLink.get_aux_freespeed_kph(); // FIXME
         ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
-        ffSpeedAuxSpinnerValueFactory.setValue(ffspeed+1);
         ffSpeedAuxSpinnerValueFactory.setValue(ffspeed);
-        ((ModifiedDoubleStringConverter)ffSpeedAuxSpinnerValueFactory.getConverter()).setDefaultValue(ffspeed);
         
         // Jam density per lane
         String unitsDensity = UserSettings.unitsDensity;
         labelJamDensityGP.setText("GP Lane Jam Density (" + unitsDensity + "):");
         double jamDensity = myLink.get_mng_jam_density_vpkpl();
         jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
-        jamDensityManagedSpinnerValueFactory.setValue(jamDensity+1);
         jamDensityManagedSpinnerValueFactory.setValue(jamDensity);
-        ((ModifiedDoubleStringConverter)jamDensityManagedSpinnerValueFactory.getConverter()).setDefaultValue(jamDensity);
         labelJamDensityManaged.setText("M Lane Jam Density (" + unitsDensity + "):");
         jamDensity = myLink.get_gp_jam_density_vpkpl(); // FIXME
         jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
-        jamDensityGPSpinnerValueFactory.setValue(jamDensity+1);
+
         jamDensityGPSpinnerValueFactory.setValue(jamDensity);
-        ((ModifiedDoubleStringConverter)jamDensityGPSpinnerValueFactory.getConverter()).setDefaultValue(jamDensity);
         labelJamDensityAux.setText("Aux Lane Jam Density (" + unitsDensity + "):");
         jamDensity = myLink.get_aux_jam_density_vpkpl(); // FIXME
         jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
-        jamDensityAuxSpinnerValueFactory.setValue(jamDensity+1);
         jamDensityAuxSpinnerValueFactory.setValue(jamDensity);
-        ((ModifiedDoubleStringConverter)jamDensityAuxSpinnerValueFactory.getConverter()).setDefaultValue(jamDensity);
         
         
         
@@ -1534,9 +1519,15 @@ public class LinkEditorController {
             return;
         String unitsLength = UserSettings.unitsLength;
         double length = lengthSpinnerValueFactory.getValue();
-        ((ModifiedDoubleStringConverter)lengthSpinnerValueFactory.getConverter()).setDefaultValue(length);
+        if (length < 0.001) {
+            length = myLink.get_length_meters();
+            length = UserSettings.convertLength(length, "meters", unitsLength);
+            lengthSpinnerValueFactory.setValue(length);
+            return;
+        }
+        
         length = UserSettings.convertLength(length, unitsLength, "meters");
-        length = Math.max(length, 0.001);
+        
         try {
             myLink.set_length_meters((float)length);
             appMainController.setProjectModified(true);
