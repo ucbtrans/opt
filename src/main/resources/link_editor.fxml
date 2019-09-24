@@ -72,7 +72,7 @@
                               </HBox>
                            </right>
                            <center>
-                              <Button id="deleteSection" fx:id="deleteSection" cancelButton="true" mnemonicParsing="false" onAction="#onDeleteSection" prefWidth="130.0" text="Delete Section" BorderPane.alignment="CENTER">
+                              <Button id="deleteSection" fx:id="deleteSection" mnemonicParsing="false" onAction="#onDeleteSection" prefWidth="130.0" text="Delete Section" BorderPane.alignment="CENTER">
                                  <tooltip>
                                     <Tooltip id="ttDeleteSection" fx:id="ttDeleteSection" text="Empty Tooltip" />
                                  </tooltip></Button>
@@ -98,7 +98,7 @@
                               <Label id="labelLength" fx:id="labelLength" text="Length (miles):" GridPane.columnIndex="2" GridPane.valignment="BOTTOM" />
                               <TextField id="linkFromName" fx:id="linkFromName" GridPane.rowIndex="1" />
                               <TextField id="linkToName" fx:id="linkToName" prefHeight="12.0" prefWidth="209.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Spinner id="linkLength" fx:id="linkLength" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                              <Spinner id="linkLength" fx:id="linkLength" editable="true" prefHeight="25.0" prefWidth="134.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                               <Spinner id="mergePriority" fx:id="mergePriority" prefHeight="25.0" prefWidth="135.0" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                            </children>
                            <padding>
@@ -297,10 +297,10 @@
                                                 </Label>
                                                 <ListView id="listOnramps" fx:id="listOnramps" onKeyPressed="#onrampsKeyPressed" onMouseClicked="#onrampsOnClick" prefHeight="136.0" prefWidth="123.0" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
                                                 <Button id="addOnRamp" fx:id="addOnRamp" alignment="CENTER_RIGHT" defaultButton="true" mnemonicParsing="false" onAction="#onAddOnRamp" text="Add On-Ramp" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                                                <Button id="deleteOnRamps" fx:id="deleteOnRamps" alignment="CENTER_RIGHT" cancelButton="true" mnemonicParsing="false" onAction="#onDeleteOnRamp" text="Delete On-Ramp" GridPane.rowIndex="5" />
+                                                <Button id="deleteOnRamps" fx:id="deleteOnRamps" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#onDeleteOnRamp" text="Delete On-Ramp" GridPane.rowIndex="5" />
                                                 <ListView id="listOfframps" fx:id="listOfframps" onKeyPressed="#offrampsKeyPressed" onMouseClicked="#offrampsOnClick" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
                                                 <Button id="addOffRamp" fx:id="addOffRamp" alignment="CENTER_RIGHT" defaultButton="true" mnemonicParsing="false" onAction="#onAddOffRamp" text="Add Off-Ramp" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                                                <Button id="deleteOffRamps" fx:id="deleteOffRamps" cancelButton="true" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onDeleteOffRamp" text="Delete Off-Ramp" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                <Button id="deleteOffRamps" fx:id="deleteOffRamps" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onDeleteOffRamp" text="Delete Off-Ramp" GridPane.columnIndex="2" GridPane.rowIndex="5" />
                                              </children>
                                              <padding>
                                                 <Insets left="10.0" right="10.0" />

@@ -116,6 +116,11 @@ public class NewRampController {
         lengthSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, length_step);
         lengthSpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter());
         linkLength.setValueFactory(lengthSpinnerValueFactory);
+        linkLength.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (Math.abs(oldValue-newValue) > 0.00001) {
+                onLinkLengthChange();
+            }
+        });
         
         linkLength.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
@@ -232,7 +237,6 @@ public class NewRampController {
         length = UserSettings.convertLength(length, "meters", unitsLength);
         labelLength.setText("Length (" + unitsLength + "):");
         lengthSpinnerValueFactory.setValue(length);
-        ((ModifiedDoubleStringConverter)lengthSpinnerValueFactory.getConverter()).setDefaultValue(length);
         
     }
     
@@ -248,6 +252,18 @@ public class NewRampController {
      * CALLBACKS
      **************************************************************************/
 
+    private void onLinkLengthChange() {
+        String unitsLength = UserSettings.unitsLength;
+        double length = lengthSpinnerValueFactory.getValue();
+        if (length < 0.001) {
+            length = myLink.get_length_meters();
+            length = UserSettings.convertLength(length, "meters", unitsLength);
+            lengthSpinnerValueFactory.setValue(length);
+        }
+        return;
+    }
+    
+    
     @FXML
     void onCancel(ActionEvent event) {
         Stage stage = (Stage) topPane.getScene().getWindow();
