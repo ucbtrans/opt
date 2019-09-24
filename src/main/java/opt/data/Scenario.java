@@ -112,7 +112,7 @@ public class Scenario {
         // commodities
         if(scenario.getCommodities()!=null)
             for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
-                this.commodities.put(comm.getId(),new Commodity(comm.getId(),comm.getName()));
+                this.commodities.put(comm.getId(),new Commodity(comm.getId(),comm.getName(),comm.getPvequiv()));
 
     }
 
@@ -163,6 +163,7 @@ public class Scenario {
             jcomm.setId(comm.id);
             jcomm.setName(comm.name);
             jcomm.setPathfull(false);
+            jcomm.setPvequiv(comm.pvequiv);
         }
 
         // network

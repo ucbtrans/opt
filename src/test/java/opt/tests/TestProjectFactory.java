@@ -1,9 +1,7 @@
 package opt.tests;
 
-import error.OTMException;
 import opt.data.*;
 import org.junit.Test;
-import xml.JaxbLoader;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

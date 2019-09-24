@@ -437,14 +437,14 @@ public class FreewayScenario {
      * @param name
      * @return
      */
-    public Commodity create_commodity(String name){
+    public Commodity create_commodity(String name, float pvequiv){
         long max_id;
         if(scenario.commodities.isEmpty())
             max_id = 0;
         else
             max_id = scenario.commodities.values().stream().mapToLong(x->x.id).max().getAsLong() + 1;
 
-        Commodity new_comm = new Commodity(max_id,name);
+        Commodity new_comm = new Commodity(max_id,name,pvequiv);
         scenario.commodities.put(new_comm.id,new_comm);
         return new_comm;
     }
