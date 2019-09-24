@@ -65,15 +65,6 @@ public abstract class AbstractLink implements Comparable {
         this.params = params;
     }
 
-//    public AbstractLink(long id,Segment mysegment,AbstractLink up_link,AbstractLink dn_link,Long start_node_id,Long end_node_id,String name,Boolean is_inner,Integer gp_lanes,Integer managed_lanes,Integer aux_lanes,Float length,Float capacity_vphpl,Float jam_density_vpkpl,Float ff_speed_kph){
-//        this.id = id;
-//        this.mysegment = mysegment;
-//        this.up_link = up_link;
-//        this.dn_link = dn_link;
-//        this.start_node_id = start_node_id;
-//        this.end_node_id = end_node_id;
-//    }
-
     @Override
     public AbstractLink clone(){
         AbstractLink new_link = null;
@@ -101,6 +92,31 @@ public abstract class AbstractLink implements Comparable {
             e.printStackTrace();
         }
         return new_link;
+    }
+
+    protected AddlanesAndRoadParams get_addlanes_and_roadparams(){
+        AddlanesAndRoadParams X = new AddlanesAndRoadParams();
+
+        X.link_id = id;
+        X.gpparams = params.gp_fd;
+
+        if(params.has_mng()){
+            X.roadGeom.mng_addlanes = new jaxb.AddLanes();
+            X.roadGeom.mng_addlanes.setIsopen(params.mng_barrier);
+            X.roadGeom.mng_addlanes.setLanes(params.mng_lanes);
+            X.roadGeom.mng_addlanes.setSide("in");
+            X.roadGeom.mng_fdparams = params.mng_fd;
+        }
+
+        if(params.has_aux()){
+            X.roadGeom.aux_addlanes = new jaxb.AddLanes();
+            X.roadGeom.aux_addlanes.setLanes(params.get_aux_lanes());
+            X.roadGeom.aux_addlanes.setSide("out");
+            X.roadGeom.aux_fdparams = ((ParametersFreeway)params).aux_fd;
+        }
+
+        return X;
+
     }
 
     /////////////////////////////////////

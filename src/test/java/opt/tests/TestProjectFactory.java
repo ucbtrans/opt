@@ -51,10 +51,14 @@ public class TestProjectFactory extends AbstractTest {
     @Test
     public void test_save_project_to_file() {
         try {
-            TestData X = new TestData();
-            ProjectFactory.save_project(X.project,get_test_fullpath("project_saved.opt"));
+//            TestData X = new TestData();
+
+            Project project = ProjectFactory.load_project(get_test_fullpath("project_hov.opt"),true);
+            FreewayScenario scenario = project.get_scenario_with_name("scenarioA");
+
+            ProjectFactory.save_project(project,get_test_fullpath("project_saved.opt"));
             Project project_saved = ProjectFactory.load_project(get_test_fullpath("project_saved.opt"),false);
-            assertTrue(X.project.equals(project_saved));
+            assertTrue(project.equals(project_saved));
         } catch (Exception e) {
             fail(e.getMessage());
         }

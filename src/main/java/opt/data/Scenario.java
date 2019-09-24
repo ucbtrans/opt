@@ -1,14 +1,18 @@
 package opt.data;
 
 import geometry.Side;
+import jaxb.AddLanes;
 import jaxb.ModelParams;
 import jaxb.Roadgeom;
 import jaxb.Roadparam;
 import profiles.Profile1D;
+import sun.net.ftp.FtpDirParser;
 import utils.OTMUtils;
 
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Scenario {
 
@@ -174,18 +178,53 @@ public class Scenario {
             jNodes.getNode().add(jaxbNode);
         }
 
+        // read road parameters and geometries from the links
+        Map<Long,AddlanesAndRoadParams> link2addlanesAndParams = new HashMap<>();
+        Set<FDparams> unique_roadparams = new HashSet<>();
+        Set<RoadGeom> unique_roadgeoms = new HashSet<>();
+        for(AbstractLink link : links.values()) {
+            AddlanesAndRoadParams x = link.get_addlanes_and_roadparams();
+            link2addlanesAndParams.put(link.id,x);
+
+            // store gp road parameters
+            unique_roadparams.add(x.gpparams) ;
+            if(x.roadGeom.mng_fdparams!=null)
+                unique_roadparams.add( x.roadGeom.mng_fdparams);
+            if(x.roadGeom.aux_fdparams!=null)
+                unique_roadparams.add(  x.roadGeom.aux_fdparams);
+
+            if(x.roadGeom.notEmpty())
+                unique_roadgeoms.add(x.roadGeom);
+        }
+
+        // map from params to its id
+        Map<FDparams,Long> param2id = new HashMap<>();
+        long c = 0;
+        for(FDparams rp : unique_roadparams)
+            param2id.put(rp,c++);
+
+        // map from roadgeom to its id
+        Map<RoadGeom,Long> geom2id = new HashMap<>();
+        c = 0;
+        for(RoadGeom rg : unique_roadgeoms)
+            geom2id.put(rg,c++);
+
+        // write road params
         jaxb.Roadparams jRoadParams = new jaxb.Roadparams();
         jNet.setRoadparams(jRoadParams);
-        Map<Long, AbstractParameters> link_params = get_link_params();
-        for(Map.Entry<Long, AbstractParameters> e : link_params.entrySet()){
-            Long id = e.getKey();
-            AbstractParameters param = e.getValue();
-            jaxb.Roadparam jaxbrp = new jaxb.Roadparam();
-            jaxbrp.setId(id);
-            jaxbrp.setCapacity(param.gp_fd.capacity_vphpl);
-            jaxbrp.setSpeed(param.gp_fd.ff_speed_kph);
-            jaxbrp.setJamDensity(param.gp_fd.jam_density_vpkpl);
-            jRoadParams.getRoadparam().add(jaxbrp);
+        for(FDparams fd : unique_roadparams){
+            jaxb.Roadparam rp = fd.to_jaxb();
+            rp.setId(param2id.get(fd));
+            jRoadParams.getRoadparam().add(rp);
+        }
+
+        // write road geoms
+        jaxb.Roadgeoms jRoadGeoms = new jaxb.Roadgeoms();
+        jNet.setRoadgeoms(jRoadGeoms);
+        for(RoadGeom rg : unique_roadgeoms){
+            jaxb.Roadgeom jrg = rg.to_jaxb(param2id);
+            jrg.setId(geom2id.get(rg));
+            jRoadGeoms.getRoadgeom().add(jrg);
         }
 
         // links
@@ -196,19 +235,19 @@ public class Scenario {
             jLinks.getLink().add(jaxbLink);
 
             jaxbLink.setId(link.id);
-            jaxbLink.setLength((float) link.get_length_meters());
+            jaxbLink.setLength(link.get_length_meters());
             jaxbLink.setFullLanes(link.get_gp_lanes());
             jaxbLink.setEndNodeId(link.end_node_id);
             jaxbLink.setStartNodeId(link.start_node_id);
             jaxbLink.setRoadType(link.get_type().toString());
 
             // road params
-            Set<Long> param_ids = link_params.entrySet().stream()
-                    .filter(e->e.getValue().equals(link.params))
-                    .map(e->e.getKey())
-                    .collect(Collectors.toSet());
-            jaxbLink.setRoadparam(param_ids.iterator().next());
+            AddlanesAndRoadParams x = link2addlanesAndParams.get(link.id);
+            jaxbLink.setRoadparam(param2id.get(x.gpparams));
 
+            // road geoms
+            if(x.roadGeom.notEmpty())
+                jaxbLink.setRoadgeom(geom2id.get(x.roadGeom));
         }
 
         // demands
@@ -306,18 +345,22 @@ public class Scenario {
         return jScn;
     }
 
-    private Map<Long, AbstractParameters> get_link_params(){
-        Set<AbstractParameters> link_params_set = links.values().stream()
-                .map(link->link.params)
-                .collect(Collectors.toSet());
+//    private Map<Long, AbstractParameters> get_link_params(){
+//        Set<AbstractParameters> link_params_set = links.values().stream()
+//                .map(link->link.params)
+//                .collect(Collectors.toSet());
+//
+//        // set ids
+//        Map<Long, AbstractParameters> link_params_map = new HashMap<>();
+//        long id = 0;
+//        for(AbstractParameters link_param : link_params_set)
+//            link_params_map.put(id++,link_param);
+//        return link_params_map;
+//    }
 
-        // set ids
-        Map<Long, AbstractParameters> link_params_map = new HashMap<>();
-        long id = 0;
-        for(AbstractParameters link_param : link_params_set)
-            link_params_map.put(id++,link_param);
-        return link_params_map;
-    }
+
+
+
 
     /////////////////////////////////////
     // override

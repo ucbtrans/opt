@@ -68,6 +68,20 @@ public abstract class AbstractParameters {
     abstract public int get_aux_lanes();
     abstract public void set_aux_lanes(int x);
 
+
+    public boolean has_mng(){
+        return mng_lanes>0 && mng_fd!=null;
+    }
+
+    public boolean has_aux(){
+        if(this instanceof ParametersFreeway) {
+            ParametersFreeway p = (ParametersFreeway) this;
+            return p.aux_lanes > 0 && p.aux_fd != null;
+        }
+        else
+            return false;
+    }
+
     /////////////////////////////////////
     // override
     /////////////////////////////////////

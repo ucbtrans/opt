@@ -3,7 +3,6 @@ package opt.data;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
