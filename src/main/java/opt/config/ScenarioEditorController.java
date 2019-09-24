@@ -48,9 +48,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.data.FreewayScenario;
@@ -73,7 +70,7 @@ public class ScenarioEditorController {
     private String origScenarioName = null;
     
     
-    @FXML // fx:id="linkEditorMainPane"
+    @FXML // fx:id="scenarioEditorMainPane"
     private SplitPane scenarioEditorMainPane; // Value injected by FXMLLoader
 
     @FXML // fx:id="canvasParent"
@@ -94,12 +91,24 @@ public class ScenarioEditorController {
     @FXML // fx:id="vehicleTypesPane"
     private TitledPane vehicleTypesPane; // Value injected by FXMLLoader
 
+    @FXML // fx:id="listVehicleTypes"
+    private ListView<?> listVehicleTypes; // Value injected by FXMLLoader
+
+    @FXML // fx:id="deleteVehicleType"
+    private Button deleteVehicleType; // Value injected by FXMLLoader
+
+    @FXML // fx:id="newVehicleType"
+    private Button newVehicleType; // Value injected by FXMLLoader
+
     @FXML // fx:id="controllerPane"
     private TitledPane controllerPane; // Value injected by FXMLLoader
 
     @FXML // fx:id="eventPane"
     private TitledPane eventPane; // Value injected by FXMLLoader
 
+    
+
+    
     
 
 
@@ -132,10 +141,32 @@ public class ScenarioEditorController {
     
     
     
+    @FXML
+    void vehicleTypesKeyPressed(KeyEvent event) {
+
+    }
+    
+    
+     @FXML
+    void onNewVehicleType(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onDeleteVehicleType(ActionEvent event) {
+
+    }
+    
+
+    
+    
+    
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
-        
+        scenarioName.textProperty().addListener((observable, oldValue, newValue) -> {
+            onScenarioNameChange(null);
+        });
         
         
     }
