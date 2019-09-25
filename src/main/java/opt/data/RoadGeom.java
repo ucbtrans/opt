@@ -36,6 +36,7 @@ public class RoadGeom {
         if(mng_addlanes!=null){
             jaxb.AddLanes addlane = new jaxb.AddLanes();
             addlane.setSide("in");
+            addlane.setIsopen(mng_addlanes.isIsopen());
             addlane.setLanes(mng_addlanes.getLanes());
             addlane.setRoadparam( param2id.get(mng_fdparams) );
             x.getAddLanes().add(addlane);

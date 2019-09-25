@@ -1,18 +1,14 @@
 package opt.data;
 
 import geometry.Side;
-import jaxb.AddLanes;
 import jaxb.ModelParams;
 import jaxb.Roadgeom;
 import jaxb.Roadparam;
 import profiles.Profile1D;
-import sun.net.ftp.FtpDirParser;
 import utils.OTMUtils;
 
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Scenario {
 
@@ -344,23 +340,6 @@ public class Scenario {
 
         return jScn;
     }
-
-//    private Map<Long, AbstractParameters> get_link_params(){
-//        Set<AbstractParameters> link_params_set = links.values().stream()
-//                .map(link->link.params)
-//                .collect(Collectors.toSet());
-//
-//        // set ids
-//        Map<Long, AbstractParameters> link_params_map = new HashMap<>();
-//        long id = 0;
-//        for(AbstractParameters link_param : link_params_set)
-//            link_params_map.put(id++,link_param);
-//        return link_params_map;
-//    }
-
-
-
-
 
     /////////////////////////////////////
     // override
