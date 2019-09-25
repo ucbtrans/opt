@@ -1,5 +1,6 @@
 package opt.data;
 
+import opt.UserSettings;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
@@ -49,11 +50,50 @@ public class FreewayScenario {
                 if (scenario.links.containsKey(lnk.getId())) {
                     AbstractLink link = scenario.links.get(lnk.getId());
                     link.set_name(lnk.getName());
-//                    link.set_aux_lanes(lnk.getAuxLanes()==null ? 0 : lnk.getAuxLanes().intValue());
-//                    link.set_mng_lanes(lnk.getManagedLanes()==null ? 0 : lnk.getManagedLanes().intValue());
+
+                    // TODO REMOVE THESE AFTER UPDATING EXISTING FILES.
+                    if(!link.params.has_mng()){
+                        link.set_mng_lanes(lnk.getManagedLanes()==null ? 0 : lnk.getManagedLanes().intValue());
+                        link.set_mng_barrier(lnk.isManagedLanesBarrier()==null ? false : lnk.isManagedLanesBarrier());
+                        link.set_mng_separated(lnk.isManagedLanesSeparated()==null ? false : lnk.isManagedLanesSeparated());
+                    }
+                    if(!link.params.has_aux()){
+                        link.set_aux_lanes(lnk.getAuxLanes()==null ? 0 : lnk.getAuxLanes().intValue());
+                    }
                     link.set_is_inner(lnk.isIsInner()==null ? false : lnk.isIsInner());
-//                    link.set_mng_barrier(lnk.isManagedLanesBarrier()==null ? false : lnk.isManagedLanesBarrier());
-//                    link.set_mng_separated(lnk.isManagedLanesSeparated()==null ? false : lnk.isManagedLanesSeparated());
+
+                    // TODO REMOVE THIS
+                    // HACK SET MNG AND AUX LANE PARAMETERS IF THEY ARE NOT SET
+                    // ---------------------------------------------------------------------------
+                    if(link.params.has_mng()){
+                        if(link.params.mng_fd==null)
+                            link.params.mng_fd = new FDparams(
+                                    (float)UserSettings.defaultManagedLaneCapacityVph,
+                                    (float)UserSettings.defaultManagedLaneJamDensityVpk,
+                                    (float)UserSettings.defaultManagedLaneFreeFlowSpeedKph);
+                        if(Float.isNaN(link.params.mng_fd.capacity_vphpl))
+                            link.params.mng_fd.capacity_vphpl = (float)UserSettings.defaultManagedLaneCapacityVph;
+                        if(Float.isNaN(link.params.mng_fd.jam_density_vpkpl))
+                            link.params.mng_fd.jam_density_vpkpl = (float)UserSettings.defaultManagedLaneJamDensityVpk;
+                        if(Float.isNaN(link.params.mng_fd.ff_speed_kph))
+                            link.params.mng_fd.ff_speed_kph = (float)UserSettings.defaultManagedLaneFreeFlowSpeedKph;
+                    }
+                    if(link.params.has_aux()){
+                        FDparams aux_fd = ((ParametersFreeway) link.params).aux_fd;
+                        if(aux_fd==null)
+                            aux_fd = new FDparams(
+                                    (float)UserSettings.defaultAuxLaneCapacityVph,
+                                    (float)UserSettings.defaultAuxLaneJamDensityVpk,
+                                    (float)UserSettings.defaultAuxLaneFreeFlowSpeedKph);
+                        if(Float.isNaN(aux_fd.capacity_vphpl))
+                            aux_fd.capacity_vphpl = (float)UserSettings.defaultManagedLaneCapacityVph;
+                        if(Float.isNaN(aux_fd.jam_density_vpkpl))
+                            aux_fd.jam_density_vpkpl = (float)UserSettings.defaultManagedLaneJamDensityVpk;
+                        if(Float.isNaN(aux_fd.ff_speed_kph))
+                            aux_fd.ff_speed_kph = (float)UserSettings.defaultManagedLaneFreeFlowSpeedKph;
+                    }
+                    // ------------------------------------------------------------------
+
                 }
 
         // create segments

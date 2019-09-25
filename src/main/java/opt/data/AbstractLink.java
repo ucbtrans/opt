@@ -102,7 +102,7 @@ public abstract class AbstractLink implements Comparable {
 
         if(params.has_mng()){
             X.roadGeom.mng_addlanes = new jaxb.AddLanes();
-            X.roadGeom.mng_addlanes.setIsopen(params.mng_barrier);
+            X.roadGeom.mng_addlanes.setIsopen(!params.mng_barrier);
             X.roadGeom.mng_addlanes.setLanes(params.mng_lanes);
             X.roadGeom.mng_addlanes.setSide("in");
             X.roadGeom.mng_fdparams = params.mng_fd;
@@ -246,6 +246,7 @@ public abstract class AbstractLink implements Comparable {
     }
 
     public void set_mng_barrier(boolean x) {
+        System.out.println("set mng barrier " + x);
         params.mng_barrier = x;
     }
 
