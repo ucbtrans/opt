@@ -246,7 +246,6 @@ public abstract class AbstractLink implements Comparable {
     }
 
     public void set_mng_barrier(boolean x) {
-        System.out.println("set mng barrier " + x);
         params.mng_barrier = x;
     }
 

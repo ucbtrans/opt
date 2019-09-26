@@ -333,9 +333,25 @@ public class NewLinkController {
             int crOpt = createOption.getSelectionModel().getSelectedIndex();
             if (crOpt == 0) {
                 new_link.set_gp_lanes(myLink.get_gp_lanes());
+                new_link.set_aux_lanes(myLink.get_aux_lanes());
                 new_link.set_mng_lanes(myLink.get_mng_lanes());
                 new_link.set_mng_barrier(myLink.get_mng_barrier());
                 new_link.set_mng_separated(myLink.get_mng_separated());
+                new_link.set_mng_barrier(myLink.get_mng_barrier());
+                new_link.set_mng_separated(myLink.get_mng_separated());
+                try {
+                    new_link.set_gp_capacity_vphpl(myLink.get_gp_capacity_vphpl());
+                    new_link.set_mng_capacity_vphpl(myLink.get_mng_capacity_vphpl());
+                    new_link.set_aux_capacity_vphpl(myLink.get_aux_capacity_vphpl());
+                    new_link.set_gp_freespeed_kph(myLink.get_gp_freespeed_kph());
+                    new_link.set_mng_freespeed_kph(myLink.get_mng_freespeed_kph());
+                    new_link.set_aux_freespeed_kph(myLink.get_aux_freespeed_kph());
+                    new_link.set_gp_jam_density_vpkpl(myLink.get_gp_jam_density_vpkpl());
+                    new_link.set_mng_jam_density_vpkpl(myLink.get_mng_jam_density_vpkpl());
+                    new_link.set_aux_jam_density_vpkpl(myLink.get_aux_jam_density_vpkpl());
+                } catch (Exception e) {
+                    opt.utils.Dialogs.ExceptionDialog("Cannot copy road parameters...", e);
+                }
             }
         } else if ((myLink.get_type() == AbstractLink.Type.onramp) || (myLink.get_type() == AbstractLink.Type.offramp)) {
             new_link.set_gp_lanes(myLink.get_gp_lanes());

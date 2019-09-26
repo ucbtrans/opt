@@ -121,7 +121,6 @@ public class NewRampController {
                 onLinkLengthChange();
             }
         });
-        
         linkLength.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;
@@ -132,7 +131,10 @@ public class NewRampController {
         numLanesGPSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1, 1);
         numLanesGPSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter());
         numGPLanes.setValueFactory(numLanesGPSpinnerValueFactory);
-        
+        numGPLanes.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue)
+                onNumLanesChange();
+        });
         numGPLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;
@@ -145,7 +147,10 @@ public class NewRampController {
         numLanesManagedSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0, 1);
         numLanesManagedSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter());
         numManagedLanes.setValueFactory(numLanesManagedSpinnerValueFactory);
-        
+        numManagedLanes.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue)
+                onNumLanesChange();
+        });
         numManagedLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;
@@ -261,6 +266,27 @@ public class NewRampController {
             lengthSpinnerValueFactory.setValue(length);
         }
         return;
+    }
+    
+    
+    private void onNumLanesChange() { 
+        int num_lanes = numLanesGPSpinnerValueFactory.getValue();
+        if (num_lanes < 1) {
+            num_lanes = UserSettings.defaultOnrampGPLanes;
+            if (!is_onramp)
+                num_lanes = UserSettings.defaultOfframpGPLanes;
+            numLanesGPSpinnerValueFactory.setValue(new Integer(num_lanes));
+            return;
+        }
+        
+        num_lanes = numLanesManagedSpinnerValueFactory.getValue();
+        if (num_lanes < 0) {
+            num_lanes = UserSettings.defaultOnrampManagedLanes;
+            if (!is_onramp)
+                num_lanes = UserSettings.defaultOfframpManagedLanes;
+            numLanesManagedSpinnerValueFactory.setValue(new Integer(num_lanes));
+            return;
+        }
     }
     
     

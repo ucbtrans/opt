@@ -39,7 +39,7 @@ public class ModifiedIntegerStringConverter extends IntegerStringConverter {
         dflt_val = val;
     }
     
-    private int dflt_val = 1;
+    private int dflt_val = -1;
     
     
     @Override 
