@@ -145,7 +145,7 @@ public class TestFreewayScenario extends AbstractTest {
     public void test_create_commodity(){
         try {
             TestData X = new TestData();
-            Commodity new_comm = X.scenario.create_commodity("new commodity");
+            Commodity new_comm = X.scenario.create_commodity("new commodity", 1.2f);
             assertNotNull(new_comm);
             assertEquals(new_comm,X.scenario.get_commodity_by_name("new commodity"));
         } catch (Exception e) {
