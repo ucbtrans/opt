@@ -410,7 +410,7 @@ public class AppMainController {
             
             TreeItem<String> links_node = new TreeItem<String>(roadLinksTreeItem);
             scenario_node.getChildren().add(links_node);
-            for (List<Segment> seg_list : scenario.get_freeways()) {
+            for (List<Segment> seg_list : scenario.get_linear_freeway_segments()) {
                 for (Segment segment : seg_list) {
                     if (segment == null)
                         continue;
