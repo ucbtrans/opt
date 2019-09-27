@@ -442,16 +442,16 @@ public class AppMainController {
                 }
             }
             
-            /*for (AbstractLink link : scenario.get_links()) {
+            for (AbstractLink link : scenario.get_connectors()) {
                 if ((link == null) || (object2tree.containsKey(link))) {
                     continue;
                 }
-
                 TreeItem<String> link_node = new TreeItem<String>(link.get_name());
                 tree2object.put(link_node, link);
                 object2tree.put(link, link_node);
                 links_node.getChildren().add(link_node);
-            }*/
+            }
+            
             
             TreeItem<String> routes_node = new TreeItem<String>(routesTreeItem);    
             scenario_node.getChildren().add(routes_node);
