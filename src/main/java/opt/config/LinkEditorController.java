@@ -1275,8 +1275,12 @@ public class LinkEditorController {
         int aux_lanes = numLanesAuxSpinnerValueFactory.getValue();
         int total_lanes = gp_lanes + managed_lanes + aux_lanes;
         
+        
         if (managed_lanes > 0) {
             cbBarrier.setDisable(false);
+            capacityManagedLane.setDisable(false);
+            ffSpeedManaged.setDisable(false);
+            jamDensityManagedLane.setDisable(false);
             if (managed_lanes > 1) {
                 cbSeparated.setDisable(false);
             } else {
@@ -1284,6 +1288,20 @@ public class LinkEditorController {
             }
         } else {
             cbBarrier.setDisable(true);
+            cbSeparated.setDisable(true);
+            capacityManagedLane.setDisable(true);
+            ffSpeedManaged.setDisable(true);
+            jamDensityManagedLane.setDisable(true);
+        }
+        
+        if (aux_lanes > 0) {
+            capacityAuxLane.setDisable(false);
+            ffSpeedAux.setDisable(false);
+            jamDensityAuxLane.setDisable(false);
+        } else {
+            capacityAuxLane.setDisable(true);
+            ffSpeedAux.setDisable(true);
+            jamDensityAuxLane.setDisable(true);
         }
         
         boolean barrier = cbBarrier.isSelected();
