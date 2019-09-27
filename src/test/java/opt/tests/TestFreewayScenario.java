@@ -30,11 +30,19 @@ public class TestFreewayScenario extends AbstractTest {
     /////////////////////////////////////
 
     @Test
-    public void test_get_freeways(){
+    public void test_get_linear_freeway_segments(){
         TestData X = new TestData();
-        List<List<Segment>> fwys = X.scenario.get_freeways();
+        List<List<Segment>> fwys = X.scenario.get_linear_freeway_segments();
         assertEquals(6,fwys.get(0).size());
         assertEquals(2,fwys.get(1).size());
+    }
+
+
+    @Test
+    public void test_get_connectors(){
+        TestData X = new TestData();
+        List<LinkConnector> connectors = X.scenario.get_connectors();
+        assertEquals(12L,connectors.get(0).get_id());
     }
 
     @Test

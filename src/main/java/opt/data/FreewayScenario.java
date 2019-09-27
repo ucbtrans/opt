@@ -258,7 +258,7 @@ public class FreewayScenario {
     // segment getters
     /////////////////////////////////////
 
-    public List<List<Segment>> get_freeways(){
+    public List<List<Segment>> get_linear_freeway_segments(){
 
         List<List<Segment>> result = new ArrayList<>();
 
@@ -291,6 +291,15 @@ public class FreewayScenario {
         // sort all freeways by the id of their first segment
         result.sort((List<Segment> o1,List<Segment> o2)->(int) (o1.get(0).get_id()-o2.get(0).get_id()));
 
+        return result;
+    }
+
+    public List<LinkConnector> get_connectors(){
+        List<LinkConnector> result = segments.values().stream()
+                .filter(sgmt->sgmt.fwy instanceof LinkConnector )
+                .map(sgmt -> (LinkConnector) sgmt.fwy )
+                .collect(toList());
+        Collections.sort(result,Comparator.comparing(AbstractLink::get_id));
         return result;
     }
 
