@@ -87,7 +87,7 @@
                                                 <RowConstraints maxHeight="40.33331298828125" minHeight="10.0" prefHeight="31.0" vgrow="SOMETIMES" />
                                             </rowConstraints>
                                              <children>
-                                                <ListView id="listVehicleTypes" fx:id="listVehicleTypes" onKeyPressed="#vehicleTypesKeyPressed" prefHeight="258.0" prefWidth="876.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="6" />
+                                                <ListView id="listVehicleTypes" fx:id="listVehicleTypes" onKeyPressed="#vehicleTypesKeyPressed" onMouseClicked="#vehicleTypesOnClick" prefHeight="258.0" prefWidth="876.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="6" />
                                                 <Button id="deleteVehicleType" fx:id="deleteVehicleType" mnemonicParsing="false" onAction="#onDeleteVehicleType" text="Delete Vehicle Type" GridPane.rowIndex="7" />
                                                 <Button id="newVehicleType" fx:id="newVehicleType" defaultButton="true" mnemonicParsing="false" onAction="#onNewVehicleType" text="New Vehicle Type" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
                                              </children>

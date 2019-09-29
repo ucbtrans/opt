@@ -25,8 +25,10 @@
  **/
 package opt.config;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -48,8 +50,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import opt.AppMainController;
+import opt.data.AbstractLink;
+import opt.data.Commodity;
 import opt.data.FreewayScenario;
 import opt.utils.Misc;
 
@@ -63,11 +68,15 @@ import opt.utils.Misc;
  */
 public class ScenarioEditorController {
     private Stage primaryStage = null;
+    private VehicleTypeController vehicleTypeController = null;
+    private Scene vehicleTypeScene = null;
+    
     private AppMainController appMainController = null;
     private FreewayScenario myScenario = null;
     private boolean ignoreChange = true;
     
     private String origScenarioName = null;
+    private List<Commodity> listVT = new ArrayList<Commodity>();
     
     
     @FXML // fx:id="scenarioEditorMainPane"
@@ -92,7 +101,7 @@ public class ScenarioEditorController {
     private TitledPane vehicleTypesPane; // Value injected by FXMLLoader
 
     @FXML // fx:id="listVehicleTypes"
-    private ListView<?> listVehicleTypes; // Value injected by FXMLLoader
+    private ListView<String> listVehicleTypes; // Value injected by FXMLLoader
 
     @FXML // fx:id="deleteVehicleType"
     private Button deleteVehicleType; // Value injected by FXMLLoader
@@ -106,10 +115,7 @@ public class ScenarioEditorController {
     @FXML // fx:id="eventPane"
     private TitledPane eventPane; // Value injected by FXMLLoader
 
-    
-
-    
-    
+   
 
 
     public void setPrimaryStage(Stage s) {
@@ -125,11 +131,42 @@ public class ScenarioEditorController {
         appMainController = ctrl;
     }
     
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the new ramp controller that is used to set up
+     *               new on- and off-ramps.
+     */
+    public void setVehicleTypeControllerAndScene(VehicleTypeController ctrl, Scene scn) {
+        vehicleTypeController = ctrl;
+        vehicleTypeScene = scn;
+        vehicleTypeScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
+    }
+    
+    
+    
+    void launchVehicleTypeWindow(Commodity comm) {
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(vehicleTypeScene);
+        vehicleTypeController.initWithCommodityAndScenario(comm, myScenario);
+        String title = "New Vehicle Type";
+        if (comm != null)
+            title = "Vehicle Type Editor";
+        inputStage.setTitle(title);
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+        
+        ignoreChange = true;
+        makeListVT(myScenario.get_commodities());
+        ignoreChange = false;
+    }
     
     
     
     @FXML
-    void onScenarioNameChange(ActionEvent event) {
+    private void onScenarioNameChange(ActionEvent event) {
         if (ignoreChange)
             return;
         
@@ -142,22 +179,83 @@ public class ScenarioEditorController {
     
     
     @FXML
-    void vehicleTypesKeyPressed(KeyEvent event) {
-
+    void vehicleTypesOnClick(MouseEvent event) {
+        if (ignoreChange)
+            return;
+        
+        if (event.getClickCount() == 2) {
+            int idx = listVehicleTypes.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= listVT.size()))
+                return;
+           launchVehicleTypeWindow(listVT.get(idx));
+        }
     }
+    
+    @FXML
+    private void vehicleTypesKeyPressed(KeyEvent event) {
+        if (ignoreChange)
+            return;
+        
+        if (event.getCode() == KeyCode.ENTER) {
+            int idx = listVehicleTypes.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= listVT.size()))
+                return;
+            launchVehicleTypeWindow(listVT.get(idx));
+        }
+        if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
+            onDeleteVehicleType(null);
+        }
+    }
+    
     
     
      @FXML
-    void onNewVehicleType(ActionEvent event) {
-
+    private void onNewVehicleType(ActionEvent event) {
+        if (ignoreChange)
+            return;
+        
+        launchVehicleTypeWindow(null);
     }
 
     @FXML
-    void onDeleteVehicleType(ActionEvent event) {
-
+    private void onDeleteVehicleType(ActionEvent event) {
+        if (ignoreChange)
+            return;
+        
+        int idx = listVehicleTypes.getSelectionModel().getSelectedIndex();
+        if ((idx < 0) || (idx >= listVT.size()))
+            return;
+        
+        if (listVT.size() < 2) {
+            String header = "Cannot delete vehicle type '" + listVT.get(idx).get_name() + "'";
+            String content = "At least one vehicle type must be present!";
+            opt.utils.Dialogs.ErrorDialog(header, content);
+            return;
+        }
+        
+        String header = "You are deleting vehicle type '" + listVT.get(idx).get_name() + "'...";       
+        if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
+            return;
+        
+        myScenario.delete_commodity_with_name(listVT.get(idx).get_name());
+        makeListVT(myScenario.get_commodities());
     }
     
-
+    
+    
+    private void makeListVT(Map<Long, Commodity> mapVT) {
+        listVT.clear();
+        listVehicleTypes.getItems().clear();
+        
+        mapVT.forEach((k, v) -> {
+            DecimalFormat df = new DecimalFormat("#.#");
+            double nc = v.get_pvequiv();
+            String s = v.get_name() + ": " + df.format(nc) + " car" + ((nc == 1) ? "" : "s");
+            listVT.add(v);
+            listVehicleTypes.getItems().add(s);
+        });
+    }
+    
     
     
     
@@ -171,11 +269,7 @@ public class ScenarioEditorController {
         
     }
     
-    
-    
-    
-    
-    
+     
     /**
      * This function is called every time one opens a scenario in the
      * configuration module.
@@ -188,12 +282,28 @@ public class ScenarioEditorController {
         origScenarioName = s.name;
         myScenario = (FreewayScenario)s;
         
+        makeListVT(myScenario.get_commodities());
+        
         ignoreChange = false;
     }
     
     
 
 
+    
+    
+    
+    
+    
+    
+    /************************************************************
+     * CALLBACKS
+     ************************************************************/
+    
+    
+    
+    
+    
 
 
     

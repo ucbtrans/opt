@@ -58,6 +58,7 @@ import opt.config.LinkInfoController;
 import opt.config.NewLinkController;
 import opt.config.NewRampController;
 import opt.config.ScenarioEditorController;
+import opt.config.VehicleTypeController;
 import opt.data.*;
 
 
@@ -84,6 +85,9 @@ public class AppMainController {
     
     private SplitPane scenarioEditorPane = null;
     private ScenarioEditorController scenarioEditorController = null;
+    private GridPane vehicleTypePane = null;
+    private VehicleTypeController vehicleTypeController = null;
+    
     private SplitPane linkEditorPane = null;
     private LinkEditorController linkEditorController = null;
     private GridPane linkInfoPane = null;
@@ -342,6 +346,13 @@ public class AppMainController {
             scenarioEditorController = loader.getController();
             scenarioEditorController.setPrimaryStage(primaryStage);
             scenarioEditorController.setAppMainController(this);
+            
+            loader = new FXMLLoader(getClass().getResource("/vehicle_type.fxml"));
+            vehicleTypePane = loader.load();
+            vehicleTypeController = loader.getController();
+            vehicleTypeController.setAppMainController(this);
+            scenarioEditorController.setVehicleTypeControllerAndScene(vehicleTypeController, new Scene(vehicleTypePane));
+            
             
             loader = new FXMLLoader(getClass().getResource("/link_editor.fxml"));
             linkEditorPane = loader.load();

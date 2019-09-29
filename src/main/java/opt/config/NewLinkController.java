@@ -119,7 +119,6 @@ public class NewLinkController {
                 onLinkLengthChange();
             }
         });
-        
         linkLength.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;

@@ -118,7 +118,7 @@ public class LinkEditorController {
     @FXML // fx:id="linkEditorMainPane"
     private SplitPane linkEditorMainPane; // Value injected by FXMLLoader
     
-     @FXML // fx:id="canvasParent"
+    @FXML // fx:id="canvasParent"
     private AnchorPane canvasParent; // Value injected by FXMLLoader
     
     @FXML // fx:id="linkEditorCanvas"
@@ -349,7 +349,7 @@ public class LinkEditorController {
         inputStage.initOwner(primaryStage);
         inputStage.setScene(newRampScene);
         newRampController.initWithLinkAndType(myLink, AbstractLink.Type.onramp);
-        inputStage.setTitle("Adding New On-Ramp");
+        inputStage.setTitle("New On-Ramp");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
         inputStage.setResizable(false);
@@ -369,7 +369,7 @@ public class LinkEditorController {
         inputStage.initOwner(primaryStage);
         inputStage.setScene(newRampScene);
         newRampController.initWithLinkAndType(myLink, AbstractLink.Type.offramp);
-        inputStage.setTitle("Adding New Off-Ramp");
+        inputStage.setTitle("New Off-Ramp");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
         inputStage.setResizable(false);
@@ -384,8 +384,8 @@ public class LinkEditorController {
             return;
         
         int idx = listOnramps.getSelectionModel().getSelectedIndex();
-            if ((idx < 0) || (idx >= onramps.size()))
-                return;
+        if ((idx < 0) || (idx >= onramps.size()))
+            return;
         
         String header = "You are deleting on-ramp '" + onramps.get(idx).get_name() + "'...";
                 
@@ -406,8 +406,8 @@ public class LinkEditorController {
             return;
         
         int idx = listOfframps.getSelectionModel().getSelectedIndex();
-            if ((idx < 0) || (idx >= offramps.size()))
-                return;
+        if ((idx < 0) || (idx >= offramps.size()))
+            return;
             
         String header = "You are deleting off-ramp '" + offramps.get(idx).get_name() + "'...";
                 
@@ -481,9 +481,9 @@ public class LinkEditorController {
         inputStage.initOwner(primaryStage);
         inputStage.setScene(newLinkScene);
         newLinkController.initWithTwoLinks(myLink, null);
-        inputStage.setTitle("Adding New Freeway Section");
+        inputStage.setTitle("New Freeway Section");
         if ((myLink.get_type() == AbstractLink.Type.onramp) || (myLink.get_type() == AbstractLink.Type.offramp))
-            inputStage.setTitle("Adding New Connector");
+            inputStage.setTitle("New Connector");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
         inputStage.setResizable(false);
@@ -496,9 +496,9 @@ public class LinkEditorController {
         inputStage.initOwner(primaryStage);
         inputStage.setScene(newLinkScene);
         newLinkController.initWithTwoLinks(null, myLink);
-        inputStage.setTitle("Adding New Freeway Section");
+        inputStage.setTitle("New Freeway Section");
         if ((myLink.get_type() == AbstractLink.Type.onramp) || (myLink.get_type() == AbstractLink.Type.offramp))
-            inputStage.setTitle("Adding New Connector");
+            inputStage.setTitle("New Connector");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
         inputStage.setResizable(false);
@@ -636,7 +636,6 @@ public class LinkEditorController {
                 onMergePriorityChange();
             }
         });
-        
         mergePriority.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;

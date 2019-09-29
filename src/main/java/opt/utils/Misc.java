@@ -25,7 +25,9 @@
  **/
 package opt.utils;
 
+import java.util.Map;
 import opt.data.AbstractLink.Type;
+import opt.data.Commodity;
 import opt.data.FreewayScenario;
 
 /**
@@ -52,6 +54,9 @@ public class Misc {
     
     public static String validateAndCorrectLinkName(String link_name, FreewayScenario scenario) {
         String corrected_name = link_name;
+        if (scenario == null)
+            return corrected_name;
+        
         if ((!scenario.is_valid_link_name(link_name)) ||
             (!scenario.is_valid_segment_name(link_name))) {
             int count = 1;
@@ -62,6 +67,25 @@ public class Misc {
                 corrected_name = link_name + "(" + count + ")";
             }
         }
+        return corrected_name;
+    }
+    
+    
+    public static String validateAndCorrectVehicleTypeName(String vt_name, FreewayScenario scenario, Commodity comm) {
+        String corrected_name = vt_name;
+        if (scenario == null)
+            return corrected_name;
+        if ((comm != null) && comm.get_name().equals(corrected_name))
+            return corrected_name;
+        
+        int count = 1;
+        Commodity another_comm = scenario.get_commodity_by_name(corrected_name);
+        while (another_comm != null) {
+            corrected_name = vt_name + "(" + count + ")";
+            another_comm = scenario.get_commodity_by_name(corrected_name);
+            count++;
+        }
+        
         return corrected_name;
     }
     
