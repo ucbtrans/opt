@@ -25,8 +25,16 @@
  **/
 package opt.config;
 
+import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.adapter.JavaBeanDoublePropertyBuilder;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -37,14 +45,25 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -52,18 +71,23 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.NumberStringConverter;
 import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.AbstractLink;
+import opt.data.Commodity;
 import opt.data.FreewayScenario;
 import opt.data.LinkOfframp;
 import opt.data.LinkOnramp;
+import opt.utils.DoubleSpinnerCell;
+import opt.utils.EditCell;
 import opt.utils.Misc;
 import opt.utils.ModifiedDoubleStringConverter;
 import opt.utils.ModifiedIntegerStringConverter;
+import opt.utils.ModifiedNumberStringConverter;
 
 
 /**
@@ -84,13 +108,14 @@ public class LinkEditorController {
     private Scene connectScene = null;
     private AbstractLink myLink = null;
     private boolean ignoreChange = true;
-    //TitledPane focusTitledPane = null;
     
     private List<AbstractLink> onramps = new ArrayList<AbstractLink>();
     private List<AbstractLink> offramps = new ArrayList<AbstractLink>();
     
     private List<AbstractLink> upConnectCandidates = new ArrayList<AbstractLink>();
     private List<AbstractLink> dnConnectCandidates = new ArrayList<AbstractLink>();
+    
+    private List<Commodity> listVT = new ArrayList<Commodity>();
     
     private SpinnerValueFactory<Double> mergePrioritySpinnerValueFactory = null;
     private SpinnerValueFactory<Double> lengthSpinnerValueFactory = null;
@@ -110,6 +135,8 @@ public class LinkEditorController {
     private SpinnerValueFactory<Double> jamDensityGPSpinnerValueFactory = null;
     private SpinnerValueFactory<Double> jamDensityAuxSpinnerValueFactory = null;
     private SpinnerValueFactory<Double> jamDensityManagedSpinnerValueFactory = null;
+    
+    private SpinnerValueFactory<Integer> dtDemandSpinnerValueFactory = null;
     
     
     
@@ -259,8 +286,17 @@ public class LinkEditorController {
     @FXML // fx:id="deleteOffRamps"
     private Button deleteOffRamps; // Value injected by FXMLLoader
 
-    @FXML // fx:id="trafficDemand1"
-    private TitledPane trafficDemand1; // Value injected by FXMLLoader
+    @FXML // fx:id="trafficDemand"
+    private TitledPane trafficDemand; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="labelDemandUpdatePeriod"
+    private Label labelDemandUpdatePeriod; // Value injected by FXMLLoader
+
+    @FXML // fx:id="dtDemand"
+    private Spinner<Integer> dtDemand; // Value injected by FXMLLoader
+
+    @FXML // fx:id="tableDemand"
+    private TableView<ObservableList<Object>> tableDemand; // Value injected by FXMLLoader
 
     @FXML // fx:id="trafficSplitDownstream"
     private TitledPane trafficSplitDownstream; // Value injected by FXMLLoader
@@ -277,16 +313,22 @@ public class LinkEditorController {
     @FXML // fx:id="ttAddSectionDownstream"
     private Tooltip ttAddSectionDownstream; // Value injected by FXMLLoader
     
-     @FXML // fx:id="ttConnectUpstream"
+    @FXML // fx:id="ttConnectUpstream"
     private Tooltip ttConnectUpstream; // Value injected by FXMLLoader
     
     @FXML // fx:id="ttConnectDownstream"
     private Tooltip ttConnectDownstream; // Value injected by FXMLLoader
     
-     @FXML // fx:id="ttDeleteSection"
+    @FXML // fx:id="ttDeleteSection"
     private Tooltip ttDeleteSection; // Value injected by FXMLLoader
 
 
+
+
+    
+    /***************************************************************************
+     * Setup and initialization
+     ***************************************************************************/
 
     public void setPrimaryStage(Stage s) {
         primaryStage = s;
@@ -335,286 +377,6 @@ public class LinkEditorController {
     }
     
     
-
-    @FXML
-    void onAddOnRamp(ActionEvent event) {
-        int num_in_ors = myLink.get_segment().num_in_ors();
-        int num_out_ors = myLink.get_segment().num_out_ors();
-        if ((num_in_ors >= 3) && (num_out_ors >= 3)) {
-            opt.utils.Dialogs.ErrorDialog("Cannot add an on-ramp to this freeway section...",
-                                          "The on-ramp limit is reached!");
-            return;
-        }
-        Stage inputStage = new Stage();
-        inputStage.initOwner(primaryStage);
-        inputStage.setScene(newRampScene);
-        newRampController.initWithLinkAndType(myLink, AbstractLink.Type.onramp);
-        inputStage.setTitle("New On-Ramp");
-        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
-        inputStage.initModality(Modality.APPLICATION_MODAL);
-        inputStage.setResizable(false);
-        inputStage.showAndWait();
-    }
-    
-    @FXML
-    void onAddOffRamp(ActionEvent event) {
-        int num_in_frs = myLink.get_segment().num_in_frs();
-        int num_out_frs = myLink.get_segment().num_out_frs();
-        if ((num_in_frs >= 3) && (num_out_frs >= 3)) {
-            opt.utils.Dialogs.ErrorDialog("Cannot add an off-ramp to this freeway section...",
-                                          "The off-ramp limit is reached!");
-            return;
-        }
-        Stage inputStage = new Stage();
-        inputStage.initOwner(primaryStage);
-        inputStage.setScene(newRampScene);
-        newRampController.initWithLinkAndType(myLink, AbstractLink.Type.offramp);
-        inputStage.setTitle("New Off-Ramp");
-        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
-        inputStage.initModality(Modality.APPLICATION_MODAL);
-        inputStage.setResizable(false);
-        inputStage.showAndWait();
-    }
-
-    
-    
-    @FXML
-    void onDeleteOnRamp(ActionEvent event) {
-        if (ignoreChange)
-            return;
-        
-        int idx = listOnramps.getSelectionModel().getSelectedIndex();
-        if ((idx < 0) || (idx >= onramps.size()))
-            return;
-        
-        String header = "You are deleting on-ramp '" + onramps.get(idx).get_name() + "'...";
-                
-        if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
-            return;
-     
-        if (idx < myLink.get_segment().num_out_ors())
-            myLink.get_segment().delete_out_or((LinkOnramp)onramps.get(idx));
-        else
-            myLink.get_segment().delete_in_or((LinkOnramp)onramps.get(idx));
-        
-        appMainController.objectNameUpdate(myLink);
-    }
-    
-    @FXML
-    void onDeleteOffRamp(ActionEvent event) {
-        if (ignoreChange)
-            return;
-        
-        int idx = listOfframps.getSelectionModel().getSelectedIndex();
-        if ((idx < 0) || (idx >= offramps.size()))
-            return;
-            
-        String header = "You are deleting off-ramp '" + offramps.get(idx).get_name() + "'...";
-                
-        if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
-            return;
-        
-        if (idx < myLink.get_segment().num_out_frs())
-            myLink.get_segment().delete_out_fr((LinkOfframp)offramps.get(idx));
-        else
-            myLink.get_segment().delete_in_fr((LinkOfframp)offramps.get(idx));
-        
-        appMainController.objectNameUpdate(myLink);
-    }
-
-    
-    
-    
-    @FXML
-    void onrampsOnClick(MouseEvent event) {
-        if (event.getClickCount() == 2) {
-            int idx = listOnramps.getSelectionModel().getSelectedIndex();
-            if ((idx < 0) || (idx >= onramps.size()))
-                return;
-            appMainController.selectLink(onramps.get(idx));
-        }
-    }
-    
-    @FXML
-    void onrampsKeyPressed(KeyEvent event) {
-        if (event.getCode() == KeyCode.ENTER) {
-            int idx = listOnramps.getSelectionModel().getSelectedIndex();
-            if ((idx < 0) || (idx >= onramps.size()))
-                return;
-            appMainController.selectLink(onramps.get(idx));
-        }
-        if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
-            onDeleteOnRamp(null);
-        }
-    }
-    
-    
-    
-    @FXML
-    void offrampsOnClick(MouseEvent event) {
-        if (event.getClickCount() == 2) {
-            int idx = listOfframps.getSelectionModel().getSelectedIndex();
-            if ((idx < 0) || (idx >= offramps.size()))
-                return;
-            appMainController.selectLink(offramps.get(idx));
-        }
-    }
-
-    @FXML
-    void offrampsKeyPressed(KeyEvent event) {
-        if (event.getCode() == KeyCode.ENTER) {
-            int idx = listOfframps.getSelectionModel().getSelectedIndex();
-            if ((idx < 0) || (idx >= offramps.size()))
-                return;
-            appMainController.selectLink(offramps.get(idx));
-        }
-        if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
-            onDeleteOffRamp(null);
-        }
-    }
-
-    
-    
-    @FXML
-    void onAddSectionDownstreamAction(ActionEvent event) {
-        Stage inputStage = new Stage();
-        inputStage.initOwner(primaryStage);
-        inputStage.setScene(newLinkScene);
-        newLinkController.initWithTwoLinks(myLink, null);
-        inputStage.setTitle("New Freeway Section");
-        if ((myLink.get_type() == AbstractLink.Type.onramp) || (myLink.get_type() == AbstractLink.Type.offramp))
-            inputStage.setTitle("New Connector");
-        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
-        inputStage.initModality(Modality.APPLICATION_MODAL);
-        inputStage.setResizable(false);
-        inputStage.showAndWait();
-    }
-
-    @FXML
-    void onAddSectionUpstreamAction(ActionEvent event) {
-        Stage inputStage = new Stage();
-        inputStage.initOwner(primaryStage);
-        inputStage.setScene(newLinkScene);
-        newLinkController.initWithTwoLinks(null, myLink);
-        inputStage.setTitle("New Freeway Section");
-        if ((myLink.get_type() == AbstractLink.Type.onramp) || (myLink.get_type() == AbstractLink.Type.offramp))
-            inputStage.setTitle("New Connector");
-        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
-        inputStage.initModality(Modality.APPLICATION_MODAL);
-        inputStage.setResizable(false);
-        inputStage.showAndWait();
-    }
-    
-    
-    
-    @FXML
-    void onConnectSectionDownstreamAction(ActionEvent event) {
-        if (dnConnectCandidates.isEmpty()) {
-            opt.utils.Dialogs.ErrorDialog("There are no sections to connect to...", "No compatibe origin sections are found!");
-            return;
-        }
-        Stage inputStage = new Stage();
-        inputStage.initOwner(primaryStage);
-        inputStage.setScene(connectScene);
-        String title = "Connect to a Freeway Section Downstream";
-        String label = "Choose an Origin Freeway Section:";
-        if (myLink.get_type() == AbstractLink.Type.offramp) {
-            title = "Connect to a Connector Downstream";
-            label = "Choose a Connector:";
-        } else if (myLink.get_type() == AbstractLink.Type.connector) {
-            title = "Connect to an On-Ramp Downstream";
-            label = "Choose an On-Ramp:";
-        } else if (myLink.get_type() == AbstractLink.Type.onramp) {
-            opt.utils.Dialogs.ErrorDialog("On-ramps cannot connect to downstream sections...", "Please, report this problem!");
-            return;
-        }
-        connectController.initWithLinkAndCandidates(myLink, dnConnectCandidates, label, true);
-        inputStage.setTitle(title);
-        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
-        inputStage.initModality(Modality.APPLICATION_MODAL);
-        inputStage.setResizable(false);
-        inputStage.showAndWait();
-    }
-
-    @FXML
-    void onConnectSectionUpstreamAction(ActionEvent event) {
-        if (upConnectCandidates.isEmpty()) {
-            opt.utils.Dialogs.ErrorDialog("There are no sections to connect to...", "No compatibe destination sections are found!");
-            return;
-        }
-        Stage inputStage = new Stage();
-        inputStage.initOwner(primaryStage);
-        inputStage.setScene(connectScene);
-        String title = "Connect to a Freeway Section Upstream";
-        String label = "Choose a Destination Freeway Section:";
-        if (myLink.get_type() == AbstractLink.Type.onramp) {
-            title = "Connect to a Connector Upstream";
-            label = "Choose a Connector:";
-        } else if (myLink.get_type() == AbstractLink.Type.connector) {
-            title = "Connect to an Off-Ramp Upstream";
-            label = "Choose an Off-Ramp:";
-        } else if (myLink.get_type() == AbstractLink.Type.offramp) {
-            opt.utils.Dialogs.ErrorDialog("Off-ramps cannot connect to upstream sections...", "Please, report this problem!");
-            return;
-        }
-        connectController.initWithLinkAndCandidates(myLink, upConnectCandidates, label, false);
-        inputStage.setTitle(title);
-        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
-        inputStage.initModality(Modality.APPLICATION_MODAL);
-        inputStage.setResizable(false);
-        inputStage.showAndWait();
-    }
-
-    
-
-    @FXML
-    void onDeleteSection(ActionEvent event) {
-        if (ignoreChange)
-            return;
-        
-        String header = "You are deleting " +
-                opt.utils.Misc.linkType2String(myLink.get_type()).toLowerCase() +
-                " section '" + myLink.get_name() + "'...";
-        String content = "Are you sure?";
-        String bt1 = "Yes, Disconnect Freeway";
-        String bt2 = "Yes, Reconnect Freeway";
-        String bt3 = "No";
-        
-        if ((myLink.get_type() == AbstractLink.Type.connector) ||
-            (myLink.get_up_link() == null) || (myLink.get_dn_link() == null)) {
-            if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, content))
-                return;
-           
-            appMainController.deleteLink(myLink, false);
-            return;
-        }
-        
-        int res = opt.utils.Dialogs.Confirmation3ButtonDialog(header, content, bt1, bt2, bt3);
-        if (res < 0)
-            return;
-        
-        appMainController.deleteLink(myLink, (res > 0));
-    }
-    
-    
-
-    @FXML
-    void onLinkNameChanged(ActionEvent event) {
-        if (ignoreChange)
-            return;
-        
-        String link_name = linkFromName.getText() + " -> " + linkToName.getText();
-        link_name = opt.utils.Misc.validateAndCorrectLinkName(link_name, myLink.get_segment().get_scenario());
-        
-        myLink.set_name(link_name);
-        if ((myLink.get_type() == AbstractLink.Type.freeway) || (myLink.get_type() == AbstractLink.Type.connector))
-            myLink.get_segment().name = link_name;
-        
-        appMainController.objectNameUpdate(myLink);
-    }
-    
-    
-
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         
@@ -889,6 +651,60 @@ public class LinkEditorController {
             opt.utils.WidgetFunctionality.commitEditorText(jamDensityManagedLane, jamDensity);
         });
         
+        
+        
+        /**
+         * Demand pane
+         **/
+        dtDemandSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1440, UserSettings.defaultDemandDtMinutes, 1);
+        dtDemandSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter());
+        dtDemand.setValueFactory(dtDemandSpinnerValueFactory);
+        dtDemand.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (!ignoreChange && (oldValue != newValue))
+                onDtDemandChange();
+        });
+        dtDemand.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Integer dt = new Integer(UserSettings.defaultDemandDtMinutes);
+            // TODO: obtain demand dt
+            opt.utils.WidgetFunctionality.commitEditorText(dtDemand, dt);
+        });
+        
+        tableDemand.setOnKeyPressed(event -> {
+            if (ignoreChange)
+                return;
+            TablePosition<ObservableList<Object>, ?> focusedCell = tableDemand.focusModelProperty().get().focusedCellProperty().get();
+            KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
+            KeyCodeCombination pasteKeyCodeCompination = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY);
+            
+            if (pasteKeyCodeCompination.match(event)) {
+                System.err.println("Paste from clipboard! " + tableDemand.getItems().size() + "\t" + tableDemand.getColumns().size());
+            }
+
+            if (event.getCode().isDigitKey()) {              
+                tableDemand.edit(focusedCell.getRow(), focusedCell.getTableColumn());
+            } else if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.TAB) {
+                tableDemand.getSelectionModel().selectNext();
+                tableDemand.getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
+                event.consume();
+            } else if (event.getCode() == KeyCode.LEFT) {
+                // work around due to
+                // TableView.getSelectionModel().selectPrevious() due to a bug
+                // stopping it from working on
+                // the first column in the last row of the table
+                //selectPrevious();
+                event.consume();
+            }
+        });
+        
+        tableDemand.getSelectionModel().setCellSelectionEnabled(true);
+        tableDemand.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        tableDemand.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+            final TableHeaderRow header = (TableHeaderRow) tableDemand.lookup("TableHeaderRow");
+            header.reorderingProperty().addListener((o, oldVal, newVal) -> header.setReordering(false));
+        });
+        
 
        
         
@@ -915,10 +731,7 @@ public class LinkEditorController {
     
     
     
-    
-    
-    
-    /**
+     /**
      * This function is called every time one opens a link in the
      * configuration module.
      * @param lnk 
@@ -927,9 +740,31 @@ public class LinkEditorController {
         if (lnk == null)
             return;
         
-        ignoreChange = true;
-                
+        ignoreChange = true;        
         myLink = lnk;
+    
+        initHeader();
+        initLaneProperties();
+        initOnOffRamps();
+        initDemand();
+            
+        drawRoadSection();
+        
+        ignoreChange = false;
+    }
+    
+    
+    
+    
+    
+    /***************************************************************************
+     * Header initialization and callbacks
+     ***************************************************************************/
+    
+    /**
+     * Initialize the header part of the Link Editor.
+     */
+    private void initHeader() {
         String link_name = myLink.get_name();
         String[] name_subs = link_name.split(" -> ");
         int sz = name_subs.length;
@@ -1012,12 +847,274 @@ public class LinkEditorController {
         labelLength.setText("Length (" + unitsLength + "):");
         lengthSpinnerValueFactory.setValue(length);
         
-        if (myLink.get_type() == AbstractLink.Type.freeway) {
-            rampsPane.setVisible(true);
-        } else {
-            rampsPane.setVisible(false);
+        
+        upConnectCandidates.clear();
+        dnConnectCandidates.clear();
+        FreewayScenario scenario = myLink.get_segment().get_scenario();
+        List<AbstractLink> allLinks = scenario.get_links();
+        for (AbstractLink l : allLinks) {
+            if (myLink.get_type() == AbstractLink.Type.freeway) {
+                if (l.get_type() == AbstractLink.Type.freeway) {
+                    if ((myLink.get_up_link() == null) && 
+                        (l.get_dn_link() == null) &&
+                        (!myLink.equals(l)))
+                        upConnectCandidates.add(l);
+                    if ((myLink.get_dn_link() == null) && 
+                        (l.get_up_link() == null) &&
+                        (!myLink.equals(l)))
+                        dnConnectCandidates.add(l);
+                }
+            } else if (myLink.get_type() == AbstractLink.Type.connector) {
+                if (l.get_type() == AbstractLink.Type.onramp) {
+                    if ((myLink.get_dn_link() == null) && 
+                        (l.get_up_link() == null))
+                        dnConnectCandidates.add(l);
+                }
+                if (l.get_type() == AbstractLink.Type.offramp) {
+                    if ((myLink.get_up_link() == null) && 
+                        (l.get_dn_link() == null))
+                        upConnectCandidates.add(l);
+                }
+            } else if (myLink.get_type() == AbstractLink.Type.onramp) {
+                if (myLink.get_up_link() != null)
+                    break;
+                if ((l.get_type() == AbstractLink.Type.connector) && (l.get_dn_link() == null))
+                    upConnectCandidates.add(l);
+            } else { // offramp
+                if (myLink.get_dn_link() != null)
+                    break;
+                if ((l.get_type() == AbstractLink.Type.connector) && (l.get_up_link() == null))
+                    dnConnectCandidates.add(l);
+            }
         }
         
+        if (upConnectCandidates.isEmpty())
+            connectSectionUpstream.setVisible(false);
+        else
+            connectSectionUpstream.setVisible(true);
+            
+        if (dnConnectCandidates.isEmpty())
+            connectSectionDownstream.setVisible(false);
+        else
+            connectSectionDownstream.setVisible(true);
+        
+        cbBarrier.setSelected(myLink.get_mng_barrier());
+        cbSeparated.setSelected(myLink.get_mng_separated());
+        
+        if (myLink.get_type() == AbstractLink.Type.freeway) {
+             ttDeleteSection.setText("Delete the entire freeway section with all its ramps (if it has any)");
+             ttAddSectionDownstream.setText("Create and attach a new freeway section downstream");
+             if (myLink.get_dn_link() != null) 
+                 ttAddSectionDownstream.setText("Create and insert a new freeway section downstream");
+             ttAddSectionUpstream.setText("Create and attach a new freeway section upstream");
+             if (myLink.get_up_link() != null) 
+                 ttAddSectionDownstream.setText("Create and insert a new freeway section upstream");
+             ttConnectDownstream.setText("Connect to an origin (source) freeway section downstream");
+             ttConnectUpstream.setText("Connect to a destination (sink) freeway section upstream");
+        } else if (myLink.get_type() == AbstractLink.Type.connector) {
+             ttDeleteSection.setText("Delete the connector");
+             ttAddSectionDownstream.setText("Create and attach a new freeway section with an on-ramp downstream");
+             ttAddSectionUpstream.setText("Create and attach a new freeway with an off-ramp section upstream");
+             ttConnectDownstream.setText("Connect to an origin (source) on-ramp downstream");
+             ttConnectUpstream.setText("Connect to a destination (sink) off-ramp section upstream");
+        } else if (myLink.get_type() == AbstractLink.Type.onramp) {
+             ttAddSectionUpstream.setText("Create and attach a new connector upstream");
+             ttConnectUpstream.setText("Connect to a destination (sink) connector upstream");
+        } else { // off-ramp
+             ttAddSectionDownstream.setText("Create and attach a new connector downstream");
+             ttConnectDownstream.setText("Connect to an origin (source) connector downstream");
+        }
+    }
+    
+    
+    
+    /*
+     * Add, Connect Delete section button callbacks
+     */
+    
+    @FXML
+    void onAddSectionDownstreamAction(ActionEvent event) {
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(newLinkScene);
+        newLinkController.initWithTwoLinks(myLink, null);
+        inputStage.setTitle("New Freeway Section");
+        if ((myLink.get_type() == AbstractLink.Type.onramp) || (myLink.get_type() == AbstractLink.Type.offramp))
+            inputStage.setTitle("New Connector");
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+    }
+
+    @FXML
+    void onAddSectionUpstreamAction(ActionEvent event) {
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(newLinkScene);
+        newLinkController.initWithTwoLinks(null, myLink);
+        inputStage.setTitle("New Freeway Section");
+        if ((myLink.get_type() == AbstractLink.Type.onramp) || (myLink.get_type() == AbstractLink.Type.offramp))
+            inputStage.setTitle("New Connector");
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+    }
+    
+    
+    @FXML
+    void onConnectSectionDownstreamAction(ActionEvent event) {
+        if (dnConnectCandidates.isEmpty()) {
+            opt.utils.Dialogs.ErrorDialog("There are no sections to connect to...", "No compatibe origin sections are found!");
+            return;
+        }
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(connectScene);
+        String title = "Connect to a Freeway Section Downstream";
+        String label = "Choose an Origin Freeway Section:";
+        if (myLink.get_type() == AbstractLink.Type.offramp) {
+            title = "Connect to a Connector Downstream";
+            label = "Choose a Connector:";
+        } else if (myLink.get_type() == AbstractLink.Type.connector) {
+            title = "Connect to an On-Ramp Downstream";
+            label = "Choose an On-Ramp:";
+        } else if (myLink.get_type() == AbstractLink.Type.onramp) {
+            opt.utils.Dialogs.ErrorDialog("On-ramps cannot connect to downstream sections...", "Please, report this problem!");
+            return;
+        }
+        connectController.initWithLinkAndCandidates(myLink, dnConnectCandidates, label, true);
+        inputStage.setTitle(title);
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+    }
+
+    @FXML
+    void onConnectSectionUpstreamAction(ActionEvent event) {
+        if (upConnectCandidates.isEmpty()) {
+            opt.utils.Dialogs.ErrorDialog("There are no sections to connect to...", "No compatibe destination sections are found!");
+            return;
+        }
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(connectScene);
+        String title = "Connect to a Freeway Section Upstream";
+        String label = "Choose a Destination Freeway Section:";
+        if (myLink.get_type() == AbstractLink.Type.onramp) {
+            title = "Connect to a Connector Upstream";
+            label = "Choose a Connector:";
+        } else if (myLink.get_type() == AbstractLink.Type.connector) {
+            title = "Connect to an Off-Ramp Upstream";
+            label = "Choose an Off-Ramp:";
+        } else if (myLink.get_type() == AbstractLink.Type.offramp) {
+            opt.utils.Dialogs.ErrorDialog("Off-ramps cannot connect to upstream sections...", "Please, report this problem!");
+            return;
+        }
+        connectController.initWithLinkAndCandidates(myLink, upConnectCandidates, label, false);
+        inputStage.setTitle(title);
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+    }
+    
+
+    @FXML
+    void onDeleteSection(ActionEvent event) {
+        if (ignoreChange)
+            return;
+        
+        String header = "You are deleting " +
+                opt.utils.Misc.linkType2String(myLink.get_type()).toLowerCase() +
+                " section '" + myLink.get_name() + "'...";
+        String content = "Are you sure?";
+        String bt1 = "Yes, Disconnect Freeway";
+        String bt2 = "Yes, Reconnect Freeway";
+        String bt3 = "No";
+        
+        if ((myLink.get_type() == AbstractLink.Type.connector) ||
+            (myLink.get_up_link() == null) || (myLink.get_dn_link() == null)) {
+            if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, content))
+                return;
+           
+            appMainController.deleteLink(myLink, false);
+            return;
+        }
+        
+        int res = opt.utils.Dialogs.Confirmation3ButtonDialog(header, content, bt1, bt2, bt3);
+        if (res < 0)
+            return;
+        
+        appMainController.deleteLink(myLink, (res > 0));
+    }
+    
+    
+    /*
+     * Link name, merge priority and length callbacks
+     */
+
+    @FXML
+    void onLinkNameChanged(ActionEvent event) {
+        if (ignoreChange)
+            return;
+        
+        String link_name = linkFromName.getText() + " -> " + linkToName.getText();
+        link_name = opt.utils.Misc.validateAndCorrectLinkName(link_name, myLink.get_segment().get_scenario());
+        
+        myLink.set_name(link_name);
+        if ((myLink.get_type() == AbstractLink.Type.freeway) || (myLink.get_type() == AbstractLink.Type.connector))
+            myLink.get_segment().name = link_name;
+        
+        appMainController.objectNameUpdate(myLink);
+    }
+    
+    
+    @FXML
+    private void onMergePriorityChange() {
+        if (ignoreChange)
+            return;
+        double mergePriority = mergePrioritySpinnerValueFactory.getValue();
+        //TODO
+
+    }
+    
+    
+    @FXML
+    private void onLinkLengthChange() {
+        if (ignoreChange)
+            return;
+        String unitsLength = UserSettings.unitsLength;
+        double length = lengthSpinnerValueFactory.getValue();
+        if (length < 0.001) {
+            length = myLink.get_length_meters();
+            length = UserSettings.convertLength(length, "meters", unitsLength);
+            lengthSpinnerValueFactory.setValue(length);
+            return;
+        }
+        
+        length = UserSettings.convertLength(length, unitsLength, "meters");
+        
+        try {
+            myLink.set_length_meters((float)length);
+            appMainController.setProjectModified(true);
+        } catch(Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Could not change section length...", e);
+        }
+
+    }
+    
+    
+    
+    
+    
+    /***************************************************************************
+     * Lane properties pane: initialization and callbacks
+     ***************************************************************************/
+    
+    private void initLaneProperties() {
         int managed_lanes = myLink.get_mng_lanes();
         int gp_lanes = myLink.get_gp_lanes();
         int aux_lanes = myLink.params.get_aux_lanes();
@@ -1134,6 +1231,211 @@ public class LinkEditorController {
         jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
         jamDensityAuxSpinnerValueFactory.setValue(jamDensity);
         
+    }
+    
+    
+    
+    /*
+     * Lane number and road parameters callbacks
+     */
+    
+    private void onNumLanesChange() { 
+        if (ignoreChange)
+            return;
+        
+        int num_lanes = numLanesGPSpinnerValueFactory.getValue();
+        if (num_lanes < 1) {
+            num_lanes = myLink.get_gp_lanes();
+            numLanesGPSpinnerValueFactory.setValue(new Integer(num_lanes));
+            return;
+        }
+        
+        num_lanes = numLanesManagedSpinnerValueFactory.getValue();
+        if (num_lanes < 0) {
+            num_lanes = myLink.get_mng_lanes();
+            numLanesManagedSpinnerValueFactory.setValue(new Integer(num_lanes));
+            return;
+        }
+        
+        num_lanes = numLanesAuxSpinnerValueFactory.getValue();
+        if (num_lanes < 0) {
+            num_lanes = myLink.get_aux_lanes();
+            numLanesAuxSpinnerValueFactory.setValue(new Integer(num_lanes));
+            return;
+        }
+        
+        drawRoadSection();
+    }
+    
+    
+    private void onParamChange() {    
+        if (ignoreChange)
+            return;
+        
+        String unitsFlow = UserSettings.unitsFlow;
+        String unitsSpeed = UserSettings.unitsSpeed;
+        String unitsDensity = UserSettings.unitsDensity;
+        
+        double cap = capacityGPSpinnerValueFactory.getValue();
+        if (cap <= 0) {
+            cap = myLink.get_gp_capacity_vphpl();
+            cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
+            capacityGPSpinnerValueFactory.setValue(cap);
+            return;
+        }
+        cap = capacityManagedSpinnerValueFactory.getValue();
+        if (cap <= 0) {
+            cap = myLink.get_mng_capacity_vphpl();
+            cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
+            capacityManagedSpinnerValueFactory.setValue(cap);
+            return;
+        }
+        cap = capacityAuxSpinnerValueFactory.getValue();
+        if (cap <= 0) {
+            cap =  myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_gp_capacity_vphpl() : 0.0;
+            cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
+            capacityAuxSpinnerValueFactory.setValue(cap);
+            return;
+        }
+        
+        double ffspeed = ffSpeedGPSpinnerValueFactory.getValue();
+        if (ffspeed <= 0) {
+            ffspeed = myLink.get_gp_freespeed_kph();
+            ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
+            ffSpeedGPSpinnerValueFactory.setValue(ffspeed);
+            return;
+        }
+        ffspeed = ffSpeedManagedSpinnerValueFactory.getValue();
+        if (ffspeed <= 0) {
+            ffspeed = myLink.get_mng_freespeed_kph();
+            ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
+            ffSpeedManagedSpinnerValueFactory.setValue(ffspeed);
+            return;
+        }
+        ffspeed = ffSpeedAuxSpinnerValueFactory.getValue();
+        if (ffspeed <= 0) {
+            ffspeed = myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_freespeed_kph() : 0.0;
+            ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
+            ffSpeedAuxSpinnerValueFactory.setValue(ffspeed);
+            return;
+        }
+        
+        double jamDensity = jamDensityGPSpinnerValueFactory.getValue();
+        if (jamDensity <= 0) {
+            jamDensity = myLink.get_gp_jam_density_vpkpl();
+            jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
+            jamDensityGPSpinnerValueFactory.setValue(jamDensity);
+            return;
+        }
+        jamDensity = jamDensityManagedSpinnerValueFactory.getValue();
+        if (jamDensity <= 0) {
+            jamDensity = myLink.get_mng_jam_density_vpkpl();
+            jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
+            jamDensityManagedSpinnerValueFactory.setValue(jamDensity);
+            return;
+        }
+        jamDensity = jamDensityAuxSpinnerValueFactory.getValue();
+        if (jamDensity <= 0) {
+            jamDensity = myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_jam_density_vpkpl() : 0.0;
+            jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
+            jamDensityAuxSpinnerValueFactory.setValue(jamDensity);
+            return;
+        }
+        
+        cap = capacityGPSpinnerValueFactory.getValue();
+        cap = UserSettings.convertFlow(cap, unitsFlow, "vph");
+        try {
+            myLink.set_gp_capacity_vphpl((float)cap);
+        } catch (Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot set capacity for general purpose lane...", e);
+        }
+        
+        cap = capacityManagedSpinnerValueFactory.getValue();
+        cap = UserSettings.convertFlow(cap, unitsFlow, "vph");
+        try {
+            myLink.set_mng_capacity_vphpl((float)cap);
+        } catch (Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot set capacity for managed lane...", e);
+        }
+        
+        cap = myLink.get_type() == AbstractLink.Type.freeway ? capacityAuxSpinnerValueFactory.getValue() : 0.0;
+        cap = UserSettings.convertFlow(cap, unitsFlow, "vph");
+        try {
+            myLink.set_aux_capacity_vphpl((float)cap);
+        } catch (Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot set capacity for auxiliary lane...", e);
+        }
+        
+        ffspeed = ffSpeedGPSpinnerValueFactory.getValue();
+        ffspeed = UserSettings.convertSpeed(ffspeed, unitsSpeed, "kph");
+        try {
+            myLink.set_gp_freespeed_kph((float)ffspeed);
+        } catch (Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot set free flow speed for general purpose lane...", e);
+        }
+        
+        ffspeed = ffSpeedManagedSpinnerValueFactory.getValue();
+        ffspeed = UserSettings.convertSpeed(ffspeed, unitsSpeed, "kph");
+        try {
+            myLink.set_mng_freespeed_kph((float)ffspeed);
+        } catch (Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot set free flow speed for managed lane...", e);
+        }
+        
+        ffspeed = myLink.get_type() == AbstractLink.Type.freeway ? ffSpeedAuxSpinnerValueFactory.getValue() : 0.0;
+        ffspeed = UserSettings.convertSpeed(ffspeed, unitsSpeed, "kph");
+        try {
+            myLink.set_aux_freespeed_kph((float)ffspeed);
+        } catch (Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot set free flow speed for auxiliary lane...", e);
+        }
+        
+        jamDensity = jamDensityGPSpinnerValueFactory.getValue();
+        jamDensity = UserSettings.convertDensity(jamDensity, unitsDensity, "vpkm");
+        try {
+            myLink.set_gp_jam_density_vpkpl((float)jamDensity);
+        } catch(Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot set jam density for general purpose lane...", e);
+        }
+        
+        jamDensity = jamDensityManagedSpinnerValueFactory.getValue();
+        jamDensity = UserSettings.convertDensity(jamDensity, unitsDensity, "vpkm");
+        try {
+            myLink.set_mng_jam_density_vpkpl((float)jamDensity);
+        } catch(Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot set jam density for managed lane...", e);
+        }
+        
+        jamDensity = myLink.get_type() == AbstractLink.Type.freeway ? jamDensityAuxSpinnerValueFactory.getValue() : 0.0;
+        jamDensity = UserSettings.convertDensity(jamDensity, unitsDensity, "vpkm");
+        try {
+            myLink.set_aux_jam_density_vpkpl((float)jamDensity);
+        } catch(Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot set jam density for auxiliary lane...", e);
+        }
+         
+        appMainController.setProjectModified(true);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    /***************************************************************************
+     * On-ramps and off-ramps pane: initialization and callbacks
+     ***************************************************************************/
+    
+    private void initOnOffRamps() {
+        if (myLink.get_type() == AbstractLink.Type.freeway) {
+            rampsPane.setDisable(false);
+        } else {
+            if (rampsPane.isExpanded())
+                laneProperties.setExpanded(true);
+            rampsPane.setDisable(true);
+        }
         
         listOnramps.getItems().clear();
         onramps.clear();
@@ -1169,95 +1471,269 @@ public class LinkEditorController {
                 offramps.add(fr);
             }
         }
-        
-        upConnectCandidates.clear();
-        dnConnectCandidates.clear();
-        FreewayScenario scenario = myLink.get_segment().get_scenario();
-        List<AbstractLink> allLinks = scenario.get_links();
-        for (AbstractLink l : allLinks) {
-            if (myLink.get_type() == AbstractLink.Type.freeway) {
-                if (l.get_type() == AbstractLink.Type.freeway) {
-                    if ((myLink.get_up_link() == null) && 
-                        (l.get_dn_link() == null) &&
-                        (!myLink.equals(l)))
-                        upConnectCandidates.add(l);
-                    if ((myLink.get_dn_link() == null) && 
-                        (l.get_up_link() == null) &&
-                        (!myLink.equals(l)))
-                        dnConnectCandidates.add(l);
-                }
-            } else if (myLink.get_type() == AbstractLink.Type.connector) {
-                if (l.get_type() == AbstractLink.Type.onramp) {
-                    if ((myLink.get_dn_link() == null) && 
-                        (l.get_up_link() == null))
-                        dnConnectCandidates.add(l);
-                }
-                if (l.get_type() == AbstractLink.Type.offramp) {
-                    if ((myLink.get_up_link() == null) && 
-                        (l.get_dn_link() == null))
-                        upConnectCandidates.add(l);
-                }
-            } else if (myLink.get_type() == AbstractLink.Type.onramp) {
-                if (myLink.get_up_link() != null)
-                    break;
-                if ((l.get_type() == AbstractLink.Type.connector) && (l.get_dn_link() == null))
-                    upConnectCandidates.add(l);
-            } else { // offramp
-                if (myLink.get_dn_link() != null)
-                    break;
-                if ((l.get_type() == AbstractLink.Type.connector) && (l.get_up_link() == null))
-                    dnConnectCandidates.add(l);
-            }
-        }
-        
-        if (upConnectCandidates.isEmpty())
-            connectSectionUpstream.setVisible(false);
-        else
-            connectSectionUpstream.setVisible(true);
-            
-        if (dnConnectCandidates.isEmpty())
-            connectSectionDownstream.setVisible(false);
-        else
-            connectSectionDownstream.setVisible(true);
-        
-        cbBarrier.setSelected(myLink.get_mng_barrier());
-        cbSeparated.setSelected(myLink.get_mng_separated());
-        
-        if (myLink.get_type() == AbstractLink.Type.freeway) {
-             ttDeleteSection.setText("Delete the entire freeway section with all its ramps (if it has any)");
-             ttAddSectionDownstream.setText("Create and attach a new freeway section downstream");
-             if (myLink.get_dn_link() != null) 
-                 ttAddSectionDownstream.setText("Create and insert a new freeway section downstream");
-             ttAddSectionUpstream.setText("Create and attach a new freeway section upstream");
-             if (myLink.get_up_link() != null) 
-                 ttAddSectionDownstream.setText("Create and insert a new freeway section upstream");
-             ttConnectDownstream.setText("Connect to an origin (source) freeway section downstream");
-             ttConnectUpstream.setText("Connect to a destination (sink) freeway section upstream");
-        } else if (myLink.get_type() == AbstractLink.Type.connector) {
-             ttDeleteSection.setText("Delete the connector");
-             ttAddSectionDownstream.setText("Create and attach a new freeway section with an on-ramp downstream");
-             ttAddSectionUpstream.setText("Create and attach a new freeway with an off-ramp section upstream");
-             ttConnectDownstream.setText("Connect to an origin (source) on-ramp downstream");
-             ttConnectUpstream.setText("Connect to a destination (sink) off-ramp section upstream");
-        } else if (myLink.get_type() == AbstractLink.Type.onramp) {
-             ttAddSectionUpstream.setText("Create and attach a new connector upstream");
-             ttConnectUpstream.setText("Connect to a destination (sink) connector upstream");
-        } else { // off-ramp
-             ttAddSectionDownstream.setText("Create and attach a new connector downstream");
-             ttConnectDownstream.setText("Connect to an origin (source) connector downstream");
-        }
-        
-        
-        drawRoadSection();
-        
-        ignoreChange = false;
     }
     
     
+    
+    /*
+     * Add/delete on/off-ramp and jump-to-ramp callbacks
+     */
 
+    @FXML
+    void onAddOnRamp(ActionEvent event) {
+        int num_in_ors = myLink.get_segment().num_in_ors();
+        int num_out_ors = myLink.get_segment().num_out_ors();
+        if ((num_in_ors >= 3) && (num_out_ors >= 3)) {
+            opt.utils.Dialogs.ErrorDialog("Cannot add an on-ramp to this freeway section...",
+                                          "The on-ramp limit is reached!");
+            return;
+        }
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(newRampScene);
+        newRampController.initWithLinkAndType(myLink, AbstractLink.Type.onramp);
+        inputStage.setTitle("New On-Ramp");
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+    }
+    
+    @FXML
+    void onAddOffRamp(ActionEvent event) {
+        int num_in_frs = myLink.get_segment().num_in_frs();
+        int num_out_frs = myLink.get_segment().num_out_frs();
+        if ((num_in_frs >= 3) && (num_out_frs >= 3)) {
+            opt.utils.Dialogs.ErrorDialog("Cannot add an off-ramp to this freeway section...",
+                                          "The off-ramp limit is reached!");
+            return;
+        }
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(newRampScene);
+        newRampController.initWithLinkAndType(myLink, AbstractLink.Type.offramp);
+        inputStage.setTitle("New Off-Ramp");
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+    }
 
+        
+    @FXML
+    void onDeleteOnRamp(ActionEvent event) {
+        if (ignoreChange)
+            return;
+        
+        int idx = listOnramps.getSelectionModel().getSelectedIndex();
+        if ((idx < 0) || (idx >= onramps.size()))
+            return;
+        
+        String header = "You are deleting on-ramp '" + onramps.get(idx).get_name() + "'...";
+                
+        if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
+            return;
+     
+        if (idx < myLink.get_segment().num_out_ors())
+            myLink.get_segment().delete_out_or((LinkOnramp)onramps.get(idx));
+        else
+            myLink.get_segment().delete_in_or((LinkOnramp)onramps.get(idx));
+        
+        appMainController.objectNameUpdate(myLink);
+    }
+    
+    @FXML
+    void onDeleteOffRamp(ActionEvent event) {
+        if (ignoreChange)
+            return;
+        
+        int idx = listOfframps.getSelectionModel().getSelectedIndex();
+        if ((idx < 0) || (idx >= offramps.size()))
+            return;
+            
+        String header = "You are deleting off-ramp '" + offramps.get(idx).get_name() + "'...";
+                
+        if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
+            return;
+        
+        if (idx < myLink.get_segment().num_out_frs())
+            myLink.get_segment().delete_out_fr((LinkOfframp)offramps.get(idx));
+        else
+            myLink.get_segment().delete_in_fr((LinkOfframp)offramps.get(idx));
+        
+        appMainController.objectNameUpdate(myLink);
+    }
 
     
+    @FXML
+    void onrampsOnClick(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            int idx = listOnramps.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= onramps.size()))
+                return;
+            appMainController.selectLink(onramps.get(idx));
+        }
+    }
+    
+    @FXML
+    void onrampsKeyPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            int idx = listOnramps.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= onramps.size()))
+                return;
+            appMainController.selectLink(onramps.get(idx));
+        }
+        if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
+            onDeleteOnRamp(null);
+        }
+    }
+    
+    
+    @FXML
+    void offrampsOnClick(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            int idx = listOfframps.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= offramps.size()))
+                return;
+            appMainController.selectLink(offramps.get(idx));
+        }
+    }
+
+    @FXML
+    void offrampsKeyPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            int idx = listOfframps.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= offramps.size()))
+                return;
+            appMainController.selectLink(offramps.get(idx));
+        }
+        if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
+            onDeleteOffRamp(null);
+        }
+    }
+
+    
+    
+    
+    
+    /***************************************************************************
+     * Demand pane: initialization and callbacks
+     ***************************************************************************/
+    
+    private void initDemand() {
+        if (myLink.get_up_link() == null) {
+            trafficDemand.setDisable(false);
+        } else {
+             if (trafficDemand.isExpanded())
+                laneProperties.setExpanded(true);
+            trafficDemand.setDisable(true);
+        }
+        
+        int dtD = dtDemandSpinnerValueFactory.getValue();
+        
+        tableDemand.getItems().clear();
+        tableDemand.getColumns().clear();
+        listVT.clear();
+        
+        TableColumn<ObservableList<Object>, String> colTime = new TableColumn("Time");
+        colTime.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get(0).toString()));
+        colTime.setStyle( "-fx-alignment: CENTER;");
+        colTime.setEditable(false);
+        colTime.setSortable(false);
+        tableDemand.getColumns().add(colTime);
+        colTime.prefWidthProperty().bind(tableDemand.widthProperty().multiply(0.09));
+        
+        Map<Long, Commodity> mapVT = myLink.get_segment().get_scenario().get_commodities();
+        mapVT.forEach((k, v) -> {listVT.add(v);});
+        int num_vt = listVT.size();
+        
+        TableColumn<ObservableList<Object>, Number> colDemand = new TableColumn("Demand (" + UserSettings.unitsFlow + ")");
+        colDemand.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter()));
+        colDemand.setCellValueFactory(data -> new SimpleDoubleProperty((Double)data.getValue().get(1)));
+        colDemand.setStyle( "-fx-alignment: CENTER-RIGHT;");
+        colDemand.setEditable(true);
+        colDemand.setSortable(false);
+        tableDemand.getColumns().add(colDemand);
+        colDemand.prefWidthProperty().bind(tableDemand.widthProperty().multiply(0.88/(num_vt+1)));
+        colDemand.setOnEditCommit(event -> {
+            if (ignoreChange)
+                return;
+            System.err.println("New = " + event.getNewValue() + "\t Old = " + event.getOldValue());
+            TablePosition<ObservableList<Object>, ?> focusedCell = event.getTablePosition();
+            System.err.println("Edited: " + focusedCell.getRow() + "\t" + focusedCell.getColumn());
+            tableDemand.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), event.getNewValue().doubleValue());
+        });
+        
+        for (int i = 0; i < num_vt; i++) {
+            final int idx = i;
+            TableColumn<ObservableList<Object>, Number> col = new TableColumn(listVT.get(i).get_name() + " (%)");
+            col.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter()));
+            col.setCellValueFactory(data -> new SimpleIntegerProperty((Integer)data.getValue().get(idx+2)));
+            col.setStyle( "-fx-alignment: CENTER-RIGHT;");
+            col.setEditable(true);
+            col.setSortable(false);
+            tableDemand.getColumns().add(col);
+            col.prefWidthProperty().bind(tableDemand.widthProperty().multiply(0.88/(num_vt+1)));
+            col.setOnEditCommit(event -> {
+                if (ignoreChange)
+                    return;
+                TablePosition<ObservableList<Object>, ?> focusedCell = event.getTablePosition();
+                tableDemand.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), event.getNewValue().intValue());
+            });
+        }
+        
+       
+        
+      
+
+        int numSteps = (60 * UserSettings.defaultSimulationDurationHours) / dtD; //FIXME
+        
+        for (int i = 0; i < numSteps; i++) {
+            ObservableList<Object> row = FXCollections.observableArrayList();
+            row.add(opt.utils.Misc.minutes2timeString(i*dtD));
+            
+            row.add(new Double(i*100.0));
+            
+            for (int j = 0; j < num_vt; j++) {
+                row.add(new Integer((j+1)));
+            }
+            tableDemand.getItems().add(row);
+        }
+        tableDemand.refresh();
+
+        
+    }
+    
+    
+    
+    /*
+     * Demand dt and matrix callbacks 
+     */
+    
+    private void onDtDemandChange() { 
+        if (ignoreChange)
+            return;
+        
+        // TODO: set demand dt
+        
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        System.err.println("Clipboard: " + clipboard.getContent(DataFormat.PLAIN_TEXT));
+        
+        appMainController.setProjectModified(true);
+    }
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    /***************************************************************************
+     * Generic callbacks
+     ***************************************************************************/
     
     /**
      * Draw the road section according to its type, lane configuration and ramps.
@@ -1631,235 +2107,6 @@ public class LinkEditorController {
         }
     }
 
-
-
-
-
-    /************************************************************
-     * CALLBACKS
-     ************************************************************/
-    
-    
-    @FXML
-    private void onMergePriorityChange() {
-        if (ignoreChange)
-            return;
-        double mergePriority = mergePrioritySpinnerValueFactory.getValue();
-        //TODO
-
-    }
-    
-    
-    @FXML
-    private void onLinkLengthChange() {
-        if (ignoreChange)
-            return;
-        String unitsLength = UserSettings.unitsLength;
-        double length = lengthSpinnerValueFactory.getValue();
-        if (length < 0.001) {
-            length = myLink.get_length_meters();
-            length = UserSettings.convertLength(length, "meters", unitsLength);
-            lengthSpinnerValueFactory.setValue(length);
-            return;
-        }
-        
-        length = UserSettings.convertLength(length, unitsLength, "meters");
-        
-        try {
-            myLink.set_length_meters((float)length);
-            appMainController.setProjectModified(true);
-        } catch(Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Could not change section length...", e);
-        }
-
-    }
-    
-    
-    
-    private void onNumLanesChange() { 
-        if (ignoreChange)
-            return;
-        
-        int num_lanes = numLanesGPSpinnerValueFactory.getValue();
-        if (num_lanes < 1) {
-            num_lanes = myLink.get_gp_lanes();
-            numLanesGPSpinnerValueFactory.setValue(new Integer(num_lanes));
-            return;
-        }
-        
-        num_lanes = numLanesManagedSpinnerValueFactory.getValue();
-        if (num_lanes < 0) {
-            num_lanes = myLink.get_mng_lanes();
-            numLanesManagedSpinnerValueFactory.setValue(new Integer(num_lanes));
-            return;
-        }
-        
-        num_lanes = numLanesAuxSpinnerValueFactory.getValue();
-        if (num_lanes < 0) {
-            num_lanes = myLink.get_aux_lanes();
-            numLanesAuxSpinnerValueFactory.setValue(new Integer(num_lanes));
-            return;
-        }
-        
-        drawRoadSection();
-    }
-    
-    
-    
-    private void onParamChange() {    
-        if (ignoreChange)
-            return;
-        
-        String unitsFlow = UserSettings.unitsFlow;
-        String unitsSpeed = UserSettings.unitsSpeed;
-        String unitsDensity = UserSettings.unitsDensity;
-        
-        double cap = capacityGPSpinnerValueFactory.getValue();
-        if (cap <= 0) {
-            cap = myLink.get_gp_capacity_vphpl();
-            cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
-            capacityGPSpinnerValueFactory.setValue(cap);
-            return;
-        }
-        cap = capacityManagedSpinnerValueFactory.getValue();
-        if (cap <= 0) {
-            cap = myLink.get_mng_capacity_vphpl();
-            cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
-            capacityManagedSpinnerValueFactory.setValue(cap);
-            return;
-        }
-        cap = capacityAuxSpinnerValueFactory.getValue();
-        if (cap <= 0) {
-            cap =  myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_gp_capacity_vphpl() : 0.0;
-            cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
-            capacityAuxSpinnerValueFactory.setValue(cap);
-            return;
-        }
-        
-        double ffspeed = ffSpeedGPSpinnerValueFactory.getValue();
-        if (ffspeed <= 0) {
-            ffspeed = myLink.get_gp_freespeed_kph();
-            ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
-            ffSpeedGPSpinnerValueFactory.setValue(ffspeed);
-            return;
-        }
-        ffspeed = ffSpeedManagedSpinnerValueFactory.getValue();
-        if (ffspeed <= 0) {
-            ffspeed = myLink.get_mng_freespeed_kph();
-            ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
-            ffSpeedManagedSpinnerValueFactory.setValue(ffspeed);
-            return;
-        }
-        ffspeed = ffSpeedAuxSpinnerValueFactory.getValue();
-        if (ffspeed <= 0) {
-            ffspeed = myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_freespeed_kph() : 0.0;
-            ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
-            ffSpeedAuxSpinnerValueFactory.setValue(ffspeed);
-            return;
-        }
-        
-        double jamDensity = jamDensityGPSpinnerValueFactory.getValue();
-        if (jamDensity <= 0) {
-            jamDensity = myLink.get_gp_jam_density_vpkpl();
-            jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
-            jamDensityGPSpinnerValueFactory.setValue(jamDensity);
-            return;
-        }
-        jamDensity = jamDensityManagedSpinnerValueFactory.getValue();
-        if (jamDensity <= 0) {
-            jamDensity = myLink.get_mng_jam_density_vpkpl();
-            jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
-            jamDensityManagedSpinnerValueFactory.setValue(jamDensity);
-            return;
-        }
-        jamDensity = jamDensityAuxSpinnerValueFactory.getValue();
-        if (jamDensity <= 0) {
-            jamDensity = myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_jam_density_vpkpl() : 0.0;
-            jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
-            jamDensityAuxSpinnerValueFactory.setValue(jamDensity);
-            return;
-        }
-        
-        cap = capacityGPSpinnerValueFactory.getValue();
-        cap = UserSettings.convertFlow(cap, unitsFlow, "vph");
-        try {
-            myLink.set_gp_capacity_vphpl((float)cap);
-        } catch (Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set capacity for general purpose lane...", e);
-        }
-        
-        cap = capacityManagedSpinnerValueFactory.getValue();
-        cap = UserSettings.convertFlow(cap, unitsFlow, "vph");
-        try {
-            myLink.set_mng_capacity_vphpl((float)cap);
-        } catch (Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set capacity for managed lane...", e);
-        }
-        
-        cap = myLink.get_type() == AbstractLink.Type.freeway ? capacityAuxSpinnerValueFactory.getValue() : 0.0;
-        cap = UserSettings.convertFlow(cap, unitsFlow, "vph");
-        try {
-            myLink.set_aux_capacity_vphpl((float)cap);
-        } catch (Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set capacity for auxiliary lane...", e);
-        }
-        
-        ffspeed = ffSpeedGPSpinnerValueFactory.getValue();
-        ffspeed = UserSettings.convertSpeed(ffspeed, unitsSpeed, "kph");
-        try {
-            myLink.set_gp_freespeed_kph((float)ffspeed);
-        } catch (Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set free flow speed for general purpose lane...", e);
-        }
-        
-        ffspeed = ffSpeedManagedSpinnerValueFactory.getValue();
-        ffspeed = UserSettings.convertSpeed(ffspeed, unitsSpeed, "kph");
-        try {
-            myLink.set_mng_freespeed_kph((float)ffspeed);
-        } catch (Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set free flow speed for managed lane...", e);
-        }
-        
-        ffspeed = myLink.get_type() == AbstractLink.Type.freeway ? ffSpeedAuxSpinnerValueFactory.getValue() : 0.0;
-        ffspeed = UserSettings.convertSpeed(ffspeed, unitsSpeed, "kph");
-        try {
-            myLink.set_aux_freespeed_kph((float)ffspeed);
-        } catch (Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set free flow speed for auxiliary lane...", e);
-        }
-        
-        jamDensity = jamDensityGPSpinnerValueFactory.getValue();
-        jamDensity = UserSettings.convertDensity(jamDensity, unitsDensity, "vpkm");
-        try {
-            myLink.set_gp_jam_density_vpkpl((float)jamDensity);
-        } catch(Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set jam density for general purpose lane...", e);
-        }
-        
-        jamDensity = jamDensityManagedSpinnerValueFactory.getValue();
-        jamDensity = UserSettings.convertDensity(jamDensity, unitsDensity, "vpkm");
-        try {
-            myLink.set_mng_jam_density_vpkpl((float)jamDensity);
-        } catch(Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set jam density for managed lane...", e);
-        }
-        
-        jamDensity = myLink.get_type() == AbstractLink.Type.freeway ? jamDensityAuxSpinnerValueFactory.getValue() : 0.0;
-        jamDensity = UserSettings.convertDensity(jamDensity, unitsDensity, "vpkm");
-        try {
-            myLink.set_aux_jam_density_vpkpl((float)jamDensity);
-        } catch(Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set jam density for auxiliary lane...", e);
-        }
-        
-        
-        
-        
-        
-        appMainController.setProjectModified(true);
-    }
-    
-    
     
     
 }

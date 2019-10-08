@@ -85,6 +85,11 @@ public class UserSettings {
     public static double defaultAuxLaneJamDensityVpk = 110;
     
     
+    public static int defaultDemandDtMinutes = 5;
+    
+    public static int defaultSimulationDtSeconds = 5;
+    public static int defaultSimulationDurationHours = 24;
+            
     
     
     // Length conversion

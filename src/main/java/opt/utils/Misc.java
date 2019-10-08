@@ -25,6 +25,7 @@
  **/
 package opt.utils;
 
+import java.text.DecimalFormat;
 import java.util.Map;
 import opt.data.AbstractLink.Type;
 import opt.data.Commodity;
@@ -90,7 +91,21 @@ public class Misc {
     }
     
     
-    
+    public static String minutes2timeString(int minutes) {
+        String timeStr = "";
+        int t = minutes;
+        if (t < 0) {
+            timeStr += "-";
+            t = -t;
+        }
+        
+        DecimalFormat df = new DecimalFormat("00");
+        int h = t / 60;
+        int m = t - 60*h; 
+        timeStr += df.format(h) + ":" + df.format(m);
+        
+        return timeStr;
+    }
     
     
     
