@@ -381,8 +381,7 @@ public class LinkEditorController {
     
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
-    void initialize() {
-        
+    void initialize() {        
         linkFromName.textProperty().addListener((observable, oldValue, newValue) -> {
             onLinkNameChanged(null);
         });
@@ -390,6 +389,7 @@ public class LinkEditorController {
         linkToName.textProperty().addListener((observable, oldValue, newValue) -> {
             onLinkNameChanged(null);
         });
+        
         
         
         double merge_priority_step = 0.01;
@@ -685,7 +685,10 @@ public class LinkEditorController {
             
             TablePosition<ObservableList<Object>, ?> focusedCell = tableDemand.focusModelProperty().get().focusedCellProperty().get();
             KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
-            KeyCodeCombination pasteKeyCodeCompination = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY);
+            if (copyKeyCodeCompination.match(event)) {
+                appMainController.setLeftStatus("Copied demand data to clipboard.");
+            }
+
             
             
 
@@ -749,6 +752,9 @@ public class LinkEditorController {
         
         ignoreChange = true;        
         myLink = lnk;
+        
+        appMainController.setLeftStatus("");
+        appMainController.setRightStatus("");
     
         initHeader();
         initLaneProperties();
@@ -1725,10 +1731,11 @@ public class LinkEditorController {
         if (ignoreChange)
             return;
         
-        // TODO: set demand dt
+        int dt = dtDemandSpinnerValueFactory.getValue();
+        demandTableHandler.setDt(dt);
+        demandTableHandler.timeColumnUpdate();
         
-        Clipboard clipboard = Clipboard.getSystemClipboard();
-        System.err.println("Clipboard: " + clipboard.getContent(DataFormat.PLAIN_TEXT));
+        // TODO: set demand dt
         
         appMainController.setProjectModified(true);
     }

@@ -33,6 +33,7 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -79,6 +80,10 @@ public class TSTableHandler {
         boolean res = true;
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
         
+        if (copyKeyCodeCompination.match(event)) {
+            return copyToClipboard();
+        }
+        
         if (pasteKeyCodeCompination.match(event)) {
             return pasteFromClipboard();
         }
@@ -89,6 +94,74 @@ public class TSTableHandler {
     
     
     
+    public boolean timeColumnUpdate() {
+        int numRows = myTable.getItems().size();
+        
+        for (int i = 0; i < numRows; i++) {
+            String ts = opt.utils.Misc.minutes2timeString(i*dt);
+            myTable.getItems().get(i).set(0, ts);
+        }
+        
+        myTable.refresh();
+        
+        return true;
+    }
+    
+    
+    
+    /**
+     * Copy table data to clipboard..
+     * @return <true> if table content changed, <false> otherwise.
+     */
+    private boolean copyToClipboard() {
+        StringBuilder clipboardString = new StringBuilder();
+        ObservableList<TablePosition> positionList = myTable.getSelectionModel().getSelectedCells();
+        int prevRow = -1;
+
+	for (TablePosition position : positionList) {
+            int row = position.getRow();
+            int col = position.getColumn();
+            Object cell = (Object) myTable.getColumns().get(col).getCellData(row);
+
+            // null-check: provide empty string for nulls
+            if (cell == null) {
+		cell = "";
+            }
+
+            // determine whether we advance in a row (tab) or a column
+            // (newline).
+            if (prevRow == row) {		
+		clipboardString.append('\t');		
+            } else if (prevRow != -1) {			
+		clipboardString.append('\n');
+            }
+
+            // create string from cell
+            String text = cell.toString();
+
+            // add new item to clipboard
+            clipboardString.append(text);
+
+            // remember previous
+            prevRow = row;
+	}
+
+	// create clipboard content
+	final ClipboardContent clipboardContent = new ClipboardContent();
+	clipboardContent.putString(clipboardString.toString());
+
+        // set clipboard content
+        Clipboard.getSystemClipboard().setContent(clipboardContent);
+        
+        return false;
+    }
+    
+    
+    
+    /**
+     * Paste numeric data into the table.
+     * @return <true> if table content changed, <false> otherwise.
+     */
     private boolean pasteFromClipboard() {
         boolean res = true;
         int i0 = focusedCell.getRow();

@@ -39,6 +39,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
@@ -142,8 +143,12 @@ public class AppMainController {
     
     @FXML // fx:id="infoAnchorPane"
     private AnchorPane infoAnchorPane; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="leftStatus"
+    private Label leftStatus; // Value injected by FXMLLoader
 
-
+    @FXML // fx:id="rightStatus"
+    private Label rightStatus; // Value injected by FXMLLoader
 
     @FXML // fx:id="x3"
     private Font x3; // Value injected by FXMLLoader
@@ -151,11 +156,33 @@ public class AppMainController {
     @FXML // fx:id="x4"
     private Color x4; // Value injected by FXMLLoader
     
+
+
     
+    /***************************************************************************
+     *  GETTERS
+     ***************************************************************************/
+    
+    public GridPane getNewLinkPane() {
+        return newLinkPane;
+    }
+    
+    public NewLinkController getNewLinkController() {
+        return newLinkController;
+    }
+
+    
+    
+    
+    
+    /***************************************************************************
+     * OPERATIONAL
+     ***************************************************************************/
     
     public void setPrimaryStage(Stage s) {
         primaryStage = s;
     }
+    
     
     public void toSaveProjectOrNot() {
         if (projectModified) {
@@ -168,14 +195,6 @@ public class AppMainController {
             }
         }
     }
-    
-    
-    
-//    public UserSettings getUserSettings() {
-//        return userSettings;
-//    }
-    
-    
     
     public void setProjectModified(boolean val) {
         projectModified = val;
@@ -193,15 +212,167 @@ public class AppMainController {
     }
     
     
-    public GridPane getNewLinkPane() {
-        return newLinkPane;
+    public void setLeftStatus(String status) {
+        leftStatus.setText(status);   
+    }
+    
+    public void setRightStatus(String status) {
+        rightStatus.setText(status);   
     }
     
     
+
     
-    public NewLinkController getNewLinkController() {
-        return newLinkController;
+    
+    
+    /***************************************************************************
+     *  INITIALIZATION
+     ***************************************************************************/
+    
+    
+    @FXML // This method is called by the FXMLLoader when initialization is complete
+    void initialize() {
+        
+        // Tree action listener
+        projectTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+           processTreeSelection((TreeItem<String>)newValue); 
+        });
+        
+        // Initialize link editor
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenario_editor.fxml"));
+            scenarioEditorPane = loader.load();
+            scenarioEditorController = loader.getController();
+            scenarioEditorController.setPrimaryStage(primaryStage);
+            scenarioEditorController.setAppMainController(this);
+            
+            loader = new FXMLLoader(getClass().getResource("/vehicle_type.fxml"));
+            vehicleTypePane = loader.load();
+            vehicleTypeController = loader.getController();
+            vehicleTypeController.setAppMainController(this);
+            scenarioEditorController.setVehicleTypeControllerAndScene(vehicleTypeController, new Scene(vehicleTypePane));
+            
+            
+            loader = new FXMLLoader(getClass().getResource("/link_editor.fxml"));
+            linkEditorPane = loader.load();
+            linkEditorController = loader.getController();
+            linkEditorController.setPrimaryStage(primaryStage);
+            linkEditorController.setAppMainController(this);
+            //linkEditorController.initWithLinkData(null);
+            
+            loader = new FXMLLoader(getClass().getResource("/link_info.fxml"));
+            linkInfoPane = loader.load();
+            linkInfoController = loader.getController();
+            linkInfoController.setAppMainController(this);
+            
+            loader = new FXMLLoader(getClass().getResource("/new_link.fxml"));
+            newLinkPane = loader.load();
+            newLinkController = loader.getController();
+            newLinkController.setAppMainController(this);
+            linkEditorController.setNewLinkControllerAndScene(newLinkController, new Scene(newLinkPane));
+            
+            loader = new FXMLLoader(getClass().getResource("/new_ramp.fxml"));
+            newRampPane = loader.load();
+            newRampController = loader.getController();
+            newRampController.setAppMainController(this);
+            linkEditorController.setNewRampControllerAndScene(newRampController, new Scene(newRampPane));
+            
+            loader = new FXMLLoader(getClass().getResource("/connect_link.fxml"));
+            connectPane = loader.load();
+            connectController = loader.getController();
+            connectController.setAppMainController(this);
+            linkEditorController.setConnectControllerAndScene(connectController, new Scene(connectPane));
+            
+            
+        } catch (IOException e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot initialize UI modules...", e);
+        }
+        
+        
     }
+    
+    
+    private void populateProjectTree() {
+        
+        if (project == null)
+            return;
+        
+        TreeItem<String> root = new TreeItem<String>("Project");
+        Collection<FreewayScenario> scenarios = project.get_scenarios();
+        for (FreewayScenario scenario : scenarios) {
+            String s_nm = "Scenario: " + scenario.name;
+            TreeItem<String> scenario_node = new TreeItem<String>(s_nm);
+            tree2object.put(scenario_node, scenario);
+            object2tree.put(scenario, scenario_node);
+            
+            // We'll display vehicle types on scenario level
+            //TreeItem<String> commodities_node = new TreeItem<String>("Traffic Types");
+            //scenario_node.getChildren().add(commodities_node);
+            
+            TreeItem<String> links_node = new TreeItem<String>(roadLinksTreeItem);
+            scenario_node.getChildren().add(links_node);
+            for (List<Segment> seg_list : scenario.get_linear_freeway_segments()) {
+                for (Segment segment : seg_list) {
+                    if (segment == null)
+                        continue;
+                    
+                    ArrayList<AbstractLink> link_list = new ArrayList<AbstractLink>();
+                    link_list.add(segment.fwy());
+                    int num_ramps = segment.num_out_ors();
+                    for (int i = 0; i < num_ramps; i++)
+                        link_list.add(segment.out_ors(i));
+                    num_ramps = segment.num_in_ors();
+                    for (int i = 0; i < num_ramps; i++)
+                        link_list.add(segment.in_ors(i));
+                    num_ramps = segment.num_out_frs();
+                    for (int i = 0; i < num_ramps; i++)
+                        link_list.add(segment.out_frs(i));
+                    num_ramps = segment.num_in_frs();
+                    for (int i = 0; i < num_ramps; i++)
+                        link_list.add(segment.in_frs(i));
+                    
+                    for (AbstractLink link : link_list) {
+                        if ((link == null) || (object2tree.containsKey(link))) {
+                            continue;
+                        }
+                        TreeItem<String> link_node = new TreeItem<String>(link.get_name());
+                        tree2object.put(link_node, link);
+                        object2tree.put(link, link_node);
+                        links_node.getChildren().add(link_node);
+                    }
+                }
+            }
+            
+            for (AbstractLink link : scenario.get_connectors()) {
+                if ((link == null) || (object2tree.containsKey(link))) {
+                    continue;
+                }
+                TreeItem<String> link_node = new TreeItem<String>(link.get_name());
+                tree2object.put(link_node, link);
+                object2tree.put(link, link_node);
+                links_node.getChildren().add(link_node);
+            }
+            
+            
+            TreeItem<String> routes_node = new TreeItem<String>(routesTreeItem);    
+            scenario_node.getChildren().add(routes_node);
+            
+            TreeItem<String> controllers_node = new TreeItem<String>(controllersTreeItem);    
+            scenario_node.getChildren().add(controllers_node);
+            
+            TreeItem<String> events_node = new TreeItem<String>(eventsTreeItem);    
+            scenario_node.getChildren().add(events_node);
+            
+            root.getChildren().add(scenario_node);
+        }
+        
+        root.setExpanded(true);
+        projectTree.setRoot(root);
+        projectTree.setShowRoot(true);
+        projectTree.refresh();
+    }
+    
+    
     
     
     
@@ -214,7 +385,7 @@ public class AppMainController {
     
     /***************************************************************************
      *  CALLBACKS
-     **************************************************************************/
+     ***************************************************************************/
     
     @FXML
     private void onClickMenuFileNew(ActionEvent event) {
@@ -327,159 +498,6 @@ public class AppMainController {
     private void onClickMenuFileExit(ActionEvent event) {
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
-    }
-    
-    
-    
-    @FXML // This method is called by the FXMLLoader when initialization is complete
-    void initialize() {
-        
-        // Tree action listener
-        projectTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-           processTreeSelection((TreeItem<String>)newValue); 
-        });
-        
-        // Initialize link editor
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenario_editor.fxml"));
-            scenarioEditorPane = loader.load();
-            scenarioEditorController = loader.getController();
-            scenarioEditorController.setPrimaryStage(primaryStage);
-            scenarioEditorController.setAppMainController(this);
-            
-            loader = new FXMLLoader(getClass().getResource("/vehicle_type.fxml"));
-            vehicleTypePane = loader.load();
-            vehicleTypeController = loader.getController();
-            vehicleTypeController.setAppMainController(this);
-            scenarioEditorController.setVehicleTypeControllerAndScene(vehicleTypeController, new Scene(vehicleTypePane));
-            
-            
-            loader = new FXMLLoader(getClass().getResource("/link_editor.fxml"));
-            linkEditorPane = loader.load();
-            linkEditorController = loader.getController();
-            linkEditorController.setPrimaryStage(primaryStage);
-            linkEditorController.setAppMainController(this);
-            //linkEditorController.initWithLinkData(null);
-            
-            loader = new FXMLLoader(getClass().getResource("/link_info.fxml"));
-            linkInfoPane = loader.load();
-            linkInfoController = loader.getController();
-            linkInfoController.setAppMainController(this);
-            
-            loader = new FXMLLoader(getClass().getResource("/new_link.fxml"));
-            newLinkPane = loader.load();
-            newLinkController = loader.getController();
-            newLinkController.setAppMainController(this);
-            linkEditorController.setNewLinkControllerAndScene(newLinkController, new Scene(newLinkPane));
-            
-            loader = new FXMLLoader(getClass().getResource("/new_ramp.fxml"));
-            newRampPane = loader.load();
-            newRampController = loader.getController();
-            newRampController.setAppMainController(this);
-            linkEditorController.setNewRampControllerAndScene(newRampController, new Scene(newRampPane));
-            
-            loader = new FXMLLoader(getClass().getResource("/connect_link.fxml"));
-            connectPane = loader.load();
-            connectController = loader.getController();
-            connectController.setAppMainController(this);
-            linkEditorController.setConnectControllerAndScene(connectController, new Scene(connectPane));
-            
-            
-        } catch (IOException e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot initialize UI modules...", e);
-        }
-        
-        
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    private void populateProjectTree() {
-        
-        if (project == null)
-            return;
-        
-        TreeItem<String> root = new TreeItem<String>("Project");
-        Collection<FreewayScenario> scenarios = project.get_scenarios();
-        for (FreewayScenario scenario : scenarios) {
-            String s_nm = "Scenario: " + scenario.name;
-            TreeItem<String> scenario_node = new TreeItem<String>(s_nm);
-            tree2object.put(scenario_node, scenario);
-            object2tree.put(scenario, scenario_node);
-            
-            // We'll display vehicle types on scenario level
-            //TreeItem<String> commodities_node = new TreeItem<String>("Traffic Types");
-            //scenario_node.getChildren().add(commodities_node);
-            
-            TreeItem<String> links_node = new TreeItem<String>(roadLinksTreeItem);
-            scenario_node.getChildren().add(links_node);
-            for (List<Segment> seg_list : scenario.get_linear_freeway_segments()) {
-                for (Segment segment : seg_list) {
-                    if (segment == null)
-                        continue;
-                    
-                    ArrayList<AbstractLink> link_list = new ArrayList<AbstractLink>();
-                    link_list.add(segment.fwy());
-                    int num_ramps = segment.num_out_ors();
-                    for (int i = 0; i < num_ramps; i++)
-                        link_list.add(segment.out_ors(i));
-                    num_ramps = segment.num_in_ors();
-                    for (int i = 0; i < num_ramps; i++)
-                        link_list.add(segment.in_ors(i));
-                    num_ramps = segment.num_out_frs();
-                    for (int i = 0; i < num_ramps; i++)
-                        link_list.add(segment.out_frs(i));
-                    num_ramps = segment.num_in_frs();
-                    for (int i = 0; i < num_ramps; i++)
-                        link_list.add(segment.in_frs(i));
-                    
-                    for (AbstractLink link : link_list) {
-                        if ((link == null) || (object2tree.containsKey(link))) {
-                            continue;
-                        }
-                        TreeItem<String> link_node = new TreeItem<String>(link.get_name());
-                        tree2object.put(link_node, link);
-                        object2tree.put(link, link_node);
-                        links_node.getChildren().add(link_node);
-                    }
-                }
-            }
-            
-            for (AbstractLink link : scenario.get_connectors()) {
-                if ((link == null) || (object2tree.containsKey(link))) {
-                    continue;
-                }
-                TreeItem<String> link_node = new TreeItem<String>(link.get_name());
-                tree2object.put(link_node, link);
-                object2tree.put(link, link_node);
-                links_node.getChildren().add(link_node);
-            }
-            
-            
-            TreeItem<String> routes_node = new TreeItem<String>(routesTreeItem);    
-            scenario_node.getChildren().add(routes_node);
-            
-            TreeItem<String> controllers_node = new TreeItem<String>(controllersTreeItem);    
-            scenario_node.getChildren().add(controllers_node);
-            
-            TreeItem<String> events_node = new TreeItem<String>(eventsTreeItem);    
-            scenario_node.getChildren().add(events_node);
-            
-            root.getChildren().add(scenario_node);
-        }
-        
-        root.setExpanded(true);
-        projectTree.setRoot(root);
-        projectTree.setShowRoot(true);
-        projectTree.refresh();
     }
     
     
@@ -645,7 +663,9 @@ public class AppMainController {
 
 
 
-    
+    /***************************************************************************
+     * RESET
+     ***************************************************************************/
     
     private void reset() {
         setProjectModified(false);
