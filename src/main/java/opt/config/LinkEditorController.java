@@ -88,6 +88,7 @@ import opt.utils.Misc;
 import opt.utils.ModifiedDoubleStringConverter;
 import opt.utils.ModifiedIntegerStringConverter;
 import opt.utils.ModifiedNumberStringConverter;
+import opt.utils.TSTableHandler;
 
 
 /**
@@ -138,6 +139,8 @@ public class LinkEditorController {
     
     private SpinnerValueFactory<Integer> dtDemandSpinnerValueFactory = null;
     
+    
+    private TSTableHandler demandTableHandler = new TSTableHandler();
     
     
     
@@ -671,16 +674,20 @@ public class LinkEditorController {
             opt.utils.WidgetFunctionality.commitEditorText(dtDemand, dt);
         });
         
+        demandTableHandler.setTable(tableDemand);
         tableDemand.setOnKeyPressed(event -> {
             if (ignoreChange)
                 return;
+            demandTableHandler.setDt(dtDemandSpinnerValueFactory.getValue());
+            if (demandTableHandler.setOnKeyPressed(event))
+                ; //TODO: call set demand on link
+            
+            
             TablePosition<ObservableList<Object>, ?> focusedCell = tableDemand.focusModelProperty().get().focusedCellProperty().get();
             KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
             KeyCodeCombination pasteKeyCodeCompination = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY);
             
-            if (pasteKeyCodeCompination.match(event)) {
-                System.err.println("Paste from clipboard! " + tableDemand.getItems().size() + "\t" + tableDemand.getColumns().size());
-            }
+            
 
             if (event.getCode().isDigitKey()) {              
                 tableDemand.edit(focusedCell.getRow(), focusedCell.getTableColumn());
@@ -1668,7 +1675,7 @@ public class LinkEditorController {
             final int idx = i;
             TableColumn<ObservableList<Object>, Number> col = new TableColumn(listVT.get(i).get_name() + " (%)");
             col.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter()));
-            col.setCellValueFactory(data -> new SimpleIntegerProperty((Integer)data.getValue().get(idx+2)));
+            col.setCellValueFactory(data -> new SimpleDoubleProperty((Double)data.getValue().get(idx+2)));
             col.setStyle( "-fx-alignment: CENTER-RIGHT;");
             col.setEditable(true);
             col.setSortable(false);
@@ -1678,7 +1685,11 @@ public class LinkEditorController {
                 if (ignoreChange)
                     return;
                 TablePosition<ObservableList<Object>, ?> focusedCell = event.getTablePosition();
-                tableDemand.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), event.getNewValue().intValue());
+                double val = event.getNewValue().doubleValue();
+                val = Math.min(Math.max(val, 0), 100);
+                tableDemand.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), val);
+                tableDemand.refresh();
+                //TODO: call to set demand on link
             });
         }
         
@@ -1695,7 +1706,7 @@ public class LinkEditorController {
             row.add(new Double(i*100.0));
             
             for (int j = 0; j < num_vt; j++) {
-                row.add(new Integer((j+1)));
+                row.add(new Double((j+1)));
             }
             tableDemand.getItems().add(row);
         }
