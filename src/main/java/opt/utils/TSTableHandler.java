@@ -25,6 +25,10 @@
  **/
 package opt.utils;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -110,7 +114,7 @@ public class TSTableHandler {
     
     
     /**
-     * Copy table data to clipboard..
+     * Copy table data to clipboard.
      * @return <true> if table content changed, <false> otherwise.
      */
     private boolean copyToClipboard() {
@@ -222,7 +226,7 @@ public class TSTableHandler {
              for (int j = 1; j < j0; j++) {
                 row.add(myItems.get(ii).get(j));
             }
-            String textCols[] = textLines[ii-i0].split(" ");
+            String textCols[] = textLines[ii-i0].split("\\s+");
             int numSubs = textCols.length;
             int jj = j0;
             int offset = 0;
@@ -268,5 +272,54 @@ public class TSTableHandler {
         
         return res;
     }
+    
+    
+    
+     /**
+     * Delete table rows whose cells are selected.
+     * @return number of deleted rows.
+     */
+    public int deleteRows() {
+        ObservableList<TablePosition> positionList = myTable.getSelectionModel().getSelectedCells();
+        Set<Integer> marked_rows = new HashSet<Integer>();
+
+	for (TablePosition position : positionList) {
+            marked_rows.add(position.getRow());
+	}
+        
+        ObservableList<ObservableList<Object>> myItems = myTable.getItems();
+        int numRows = myItems.size();
+        int numCols = myTable.getColumns().size();
+        ObservableList<ObservableList<Object>> updatedItems = FXCollections.observableArrayList();
+        
+        for (int i = 0; i < numRows; i++) {
+            if (marked_rows.contains(i))
+                continue;
+            ObservableList<Object> row = FXCollections.observableArrayList();
+            row.add(opt.utils.Misc.minutes2timeString(updatedItems.size()*dt));
+            for (int j = 1; j < numCols; j++) {
+                row.add(myItems.get(i).get(j));
+            }
+            updatedItems.add(row);
+        }
+        
+        while (updatedItems.size() < 2) {
+            ObservableList<Object> row = FXCollections.observableArrayList();
+            row.add(opt.utils.Misc.minutes2timeString(updatedItems.size()*dt));
+            for (int j = 1; j < numCols; j++) {
+                row.add(new Double(0));
+            }
+            updatedItems.add(row);
+        }
+        
+        int res = myItems.size() - updatedItems.size();
+
+        myTable.getItems().clear();
+        myTable.getItems().addAll(updatedItems);
+        myTable.refresh();
+        
+        return res;
+    }
+    
     
 }

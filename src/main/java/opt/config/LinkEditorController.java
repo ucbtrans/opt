@@ -686,7 +686,12 @@ public class LinkEditorController {
             TablePosition<ObservableList<Object>, ?> focusedCell = tableDemand.focusModelProperty().get().focusedCellProperty().get();
             KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
             if (copyKeyCodeCompination.match(event)) {
-                appMainController.setLeftStatus("Copied demand data to clipboard.");
+                appMainController.setLeftStatus("Copied demand data from '" + myLink.get_name() + "' to clipboard.");
+            }
+            
+            if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
+                int del_num = demandTableHandler.deleteRows();
+                appMainController.setLeftStatus("Deleted " + del_num + " demand entries from '" + myLink.get_name() + "'.");
             }
 
             
@@ -1703,7 +1708,7 @@ public class LinkEditorController {
         
       
 
-        int numSteps = (60 * UserSettings.defaultSimulationDurationHours) / dtD; //FIXME
+        int numSteps = 8; //FIXME
         
         for (int i = 0; i < numSteps; i++) {
             ObservableList<Object> row = FXCollections.observableArrayList();

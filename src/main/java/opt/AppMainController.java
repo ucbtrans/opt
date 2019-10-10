@@ -207,7 +207,7 @@ public class AppMainController {
             if (projectModified)
                 title += "*";
         }
-        System.err.println("setPM " + val);
+        
         primaryStage.setTitle(title);
     }
     
