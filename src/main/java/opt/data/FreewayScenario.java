@@ -199,13 +199,16 @@ public class FreewayScenario {
         // assign splits
         if (jaxb_scenario.getSplits()!=null)
             for(jaxb.SplitNode jsplitnode : jaxb_scenario.getSplits().getSplitNode())
-                for(jaxb.Split split : jsplitnode.getSplit())
-                    scenario.links.get(split.getLinkOut()).set_split(
-                            jsplitnode.getCommodityId(),
-                            new Profile1D(
-                                    jsplitnode.getStartTime(),
-                                    jsplitnode.getDt(),
-                                    OTMUtils.csv2list(split.getContent())));
+                for(jaxb.Split split : jsplitnode.getSplit()) {
+                    AbstractLink link = scenario.links.get(split.getLinkOut());
+                    if( link instanceof LinkOfframp )
+                        ((LinkOfframp)link).set_split(
+                                jsplitnode.getCommodityId(),
+                                new Profile1D(
+                                        jsplitnode.getStartTime(),
+                                        jsplitnode.getDt(),
+                                        OTMUtils.csv2list(split.getContent())));
+                }
 
         // max ids
         reset_max_ids();
@@ -444,7 +447,8 @@ public class FreewayScenario {
         // delete all links
         for(AbstractLink link : segment.get_links()) {
             link.demands = null;
-            link.splits = null;
+            if(link instanceof LinkOfframp)
+                ((LinkOfframp)link).splits = null;
             scenario.links.remove(link.id);
         }
 

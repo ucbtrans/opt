@@ -2,17 +2,10 @@ package opt.data;
 
 import jaxb.Link;
 import jaxb.Roadparam;
-import profiles.Profile1D;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toSet;
 
 public class LinkFreeway extends LinkFreewayOrConnector {
 
-/////////////////////////////////////
+    /////////////////////////////////////
     // construction
     /////////////////////////////////////
 
@@ -37,15 +30,6 @@ public class LinkFreeway extends LinkFreewayOrConnector {
     @Override
     public boolean is_ramp() {
         return false;
-    }
-
-    /////////////////////////////////////
-    // demands and splits
-    /////////////////////////////////////
-
-    @Override
-    public void set_split(Long comm_id, Profile1D profile) throws Exception {
-        this.splits.put(comm_id,profile);
     }
 
     /////////////////////////////////////
@@ -109,45 +93,46 @@ public class LinkFreeway extends LinkFreewayOrConnector {
         for(LinkOnramp or : mysegment.get_ors())
             or.end_node_id = conn_up_link.end_node_id;
 
-        // deal with splits to this link
-        this.splits = new HashMap<>();
-
-        Segment up_segment = conn_up_link.mysegment;
-
-        List<LinkOfframp> frs = up_segment.get_frs();
-        Set<Long> comm_ids = frs.stream()
-                .flatMap(link->link.splits.keySet().stream())
-                .collect(toSet());
-
-        for(Long comm_id : comm_ids){
-
-            Set<Profile1D> profiles = frs.stream()
-                    .filter(link->link.splits.containsKey(comm_id))
-                    .map(link->link.splits.get(comm_id))
-                    .collect(toSet());
-
-            if(profiles.isEmpty())
-                continue;
-
-            // check they all have the same dt
-            Set<Float> dts = profiles.stream().map(p->p.dt).collect(toSet());
-            Set<Integer> ns = profiles.stream().map(p->p.get_length()).collect(toSet());
-            assert(dts.size()==1);
-            assert(ns.size()==1);
-
-            float dt = dts.iterator().next();
-            int n = ns.iterator().next();
-
-            Profile1D fwy_split = new Profile1D(0f,dt);
-            for(int i=0;i<n;i++) {
-                int finalI = i;
-                fwy_split.add(1f-profiles.stream().mapToDouble(p->p.get_ith_value(finalI)).sum());
-            }
-
-            assert( fwy_split.values.stream().anyMatch(x->x>=0) );
-
-            this.splits.put(comm_id,fwy_split);
-        }
+        // TODO: GG THINKS THIS SHOULD NO LONGER BE NECESSARY
+//        // deal with splits to this link
+//        this.splits = new HashMap<>();
+//
+//        Segment up_segment = conn_up_link.mysegment;
+//
+//        List<LinkOfframp> frs = up_segment.get_frs();
+//        Set<Long> comm_ids = frs.stream()
+//                .flatMap(link->link.splits.keySet().stream())
+//                .collect(toSet());
+//
+//        for(Long comm_id : comm_ids){
+//
+//            Set<Profile1D> profiles = frs.stream()
+//                    .filter(link->link.splits.containsKey(comm_id))
+//                    .map(link->link.splits.get(comm_id))
+//                    .collect(toSet());
+//
+//            if(profiles.isEmpty())
+//                continue;
+//
+//            // check they all have the same dt
+//            Set<Float> dts = profiles.stream().map(p->p.dt).collect(toSet());
+//            Set<Integer> ns = profiles.stream().map(p->p.get_length()).collect(toSet());
+//            assert(dts.size()==1);
+//            assert(ns.size()==1);
+//
+//            float dt = dts.iterator().next();
+//            int n = ns.iterator().next();
+//
+//            Profile1D fwy_split = new Profile1D(0f,dt);
+//            for(int i=0;i<n;i++) {
+//                int finalI = i;
+//                fwy_split.add(1f-profiles.stream().mapToDouble(p->p.get_ith_value(finalI)).sum());
+//            }
+//
+//            assert( fwy_split.values.stream().anyMatch(x->x>=0) );
+//
+//            this.splits.put(comm_id,fwy_split);
+//        }
 
         return true;
     }

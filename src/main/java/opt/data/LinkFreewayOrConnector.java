@@ -72,13 +72,4 @@ public abstract class LinkFreewayOrConnector extends AbstractLink {
         ((ParametersFreeway)params).aux_fd.ff_speed_kph = x;
     }
 
-    /////////////////////////////////////
-    // demands and splits
-    /////////////////////////////////////
-
-    @Override
-    public void set_demand_vph(Long comm_id, Profile1D profile) throws Exception {
-        this.demands.put(comm_id,profile);
-    }
-
 }

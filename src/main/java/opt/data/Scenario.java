@@ -265,79 +265,80 @@ public class Scenario {
             }
         }
 
+        // TODO WRITE SPLITS
         // splits
-        jaxb.Splits jsplits = new jaxb.Splits();
-        jScn.setSplits(jsplits);
+//        jaxb.Splits jsplits = new jaxb.Splits();
+//        jScn.setSplits(jsplits);
 
-        for(Node node : nodes.values() ) {
+//        for(Node node : nodes.values() ) {
 
-            boolean has_splits = node.out_links.stream()
-                    .map(link_id->links.get(link_id))
-                    .anyMatch(link->!link.splits.isEmpty());
+//            boolean has_splits = node.out_links.stream()
+//                    .map(link_id->links.get(link_id))
+//                    .anyMatch(link->!link.splits.isEmpty());
 
-            if(!has_splits)
-                continue;
-
-            Set<LinkFreeway> in_links = node.in_links.stream()
-                    .map(link_id->links.get(link_id))
-                    .filter(link->link instanceof LinkFreeway)
-                    .map(link-> (LinkFreeway) link)
-                    .collect(Collectors.toSet());
-
-            if(in_links.size()>1)
-                System.err.println("90443j2f");
-
-            if(in_links.isEmpty())
-                continue;
-
-            LinkFreeway in_link = in_links.iterator().next();
-
-            Set<Long> comm_ids = node.out_links.stream()
-                    .map(link_id->links.get(link_id))
-                    .flatMap(link->link.splits.keySet().stream())
-                    .collect(Collectors.toSet());
-
-            for(Long comm_id : comm_ids){
-
-                // get unique dt and start_time
-                Set<Profile1D> profiles = node.out_links.stream()
-                        .map(link_id->links.get(link_id))
-                        .map(link->link.splits.get(comm_id))
-                        .collect(Collectors.toSet());
-
-                Set<Float> dts = profiles.stream().map(prof->prof.dt).collect(Collectors.toSet());
-                if(dts.size()!=1)
-                    System.err.println("RG)@J$G 2-43j");
-
-                Set<Float> start_times = profiles.stream().map(prof->prof.start_time).collect(Collectors.toSet());
-                if(start_times.size()!=1)
-                    System.err.println("535h3");
-
-                // to jaxb
-                jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
-                jsplits.getSplitNode().add(jsplitnode);
-                jsplitnode.setCommodityId(comm_id);
-                jsplitnode.setNodeId(node.id);
-                jsplitnode.setLinkIn(in_link.id);
-                jsplitnode.setDt(dts.iterator().next());
-                jsplitnode.setStartTime(start_times.iterator().next());
-
-                // assumes that *all* out links have splits defined
-                // and they sum up to 1.
-
-                for( Long outlink_id : node.out_links ){
-
-                    jaxb.Split jsplit = new jaxb.Split();
-                    jsplitnode.getSplit().add(jsplit);
-
-                    AbstractLink outlink = links.get(outlink_id);
-                    jsplit.setLinkOut(outlink_id);
-                    jsplit.setContent(OTMUtils.comma_format(outlink.splits.get(comm_id).values));
-                }
-
-            }
-
-        }
+//            if(!has_splits)
+//                continue;
+//
+//            Set<LinkFreeway> in_links = node.in_links.stream()
+//                    .map(link_id->links.get(link_id))
+//                    .filter(link->link instanceof LinkFreeway)
+//                    .map(link-> (LinkFreeway) link)
+//                    .collect(Collectors.toSet());
+//
+//            if(in_links.size()>1)
+//                System.err.println("90443j2f");
+//
+//            if(in_links.isEmpty())
+//                continue;
+//
+//            LinkFreeway in_link = in_links.iterator().next();
+//
+//            Set<Long> comm_ids = node.out_links.stream()
+//                    .map(link_id->links.get(link_id))
+//                    .flatMap(link->link.splits.keySet().stream())
+//                    .collect(Collectors.toSet());
+//
+//            for(Long comm_id : comm_ids){
+//
+//                // get unique dt and start_time
+//                Set<Profile1D> profiles = node.out_links.stream()
+//                        .map(link_id->links.get(link_id))
+//                        .map(link->link.splits.get(comm_id))
+//                        .collect(Collectors.toSet());
+//
+//                Set<Float> dts = profiles.stream().map(prof->prof.dt).collect(Collectors.toSet());
+//                if(dts.size()!=1)
+//                    System.err.println("RG)@J$G 2-43j");
+//
+//                Set<Float> start_times = profiles.stream().map(prof->prof.start_time).collect(Collectors.toSet());
+//                if(start_times.size()!=1)
+//                    System.err.println("535h3");
+//
+//                // to jaxb
+//                jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
+//                jsplits.getSplitNode().add(jsplitnode);
+//                jsplitnode.setCommodityId(comm_id);
+//                jsplitnode.setNodeId(node.id);
+//                jsplitnode.setLinkIn(in_link.id);
+//                jsplitnode.setDt(dts.iterator().next());
+//                jsplitnode.setStartTime(start_times.iterator().next());
+//
+//                // assumes that *all* out links have splits defined
+//                // and they sum up to 1.
+//
+//                for( Long outlink_id : node.out_links ){
+//
+//                    jaxb.Split jsplit = new jaxb.Split();
+//                    jsplitnode.getSplit().add(jsplit);
+//
+//                    AbstractLink outlink = links.get(outlink_id);
+//                    jsplit.setLinkOut(outlink_id);
+//                    jsplit.setContent(OTMUtils.comma_format(outlink.splits.get(comm_id).values));
+//                }
+//
+//            }
+//
+//        }
 
         return jScn;
     }

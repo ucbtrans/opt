@@ -20,8 +20,8 @@ public abstract class AbstractLink implements Comparable {
 
     public AbstractParameters params;
 
+    // Demands for LinkOnramp and LinkFreeway types only
     protected Map<Long, Profile1D> demands = new HashMap<>();    // commodity -> Profile1D
-    protected Map<Long, Profile1D> splits = new HashMap<>();     // commodity -> Profile1D
 
     /////////////////////////////////////
     // abstract methods
@@ -79,8 +79,6 @@ public abstract class AbstractLink implements Comparable {
 
             for(Map.Entry<Long, Profile1D> e : demands.entrySet())
                 new_link.demands.put(e.getKey(),e.getValue().clone());
-            for(Map.Entry<Long, Profile1D> e : splits.entrySet())
-                new_link.splits.put(e.getKey(),e.getValue().clone());
 
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -340,15 +338,22 @@ public abstract class AbstractLink implements Comparable {
     }
 
     /////////////////////////////////////
-    // demands and splits
+    // demands
     /////////////////////////////////////
 
-    public void set_demand_vph(Long comm_id, Profile1D profile) throws Exception {
-        throw new Exception("Invalid call");
+    public final Profile1D get_demand_vph(Long comm_id){
+        return demands.get(comm_id);
     }
 
-    public void set_split(Long comm_id,Profile1D profile) throws Exception {
-        throw new Exception("Invalid call");
+    public final void set_demand_vph(Long comm_id,float dt, double[] values) throws Exception {
+        Profile1D profile = new Profile1D(0f,dt);
+        for(double v : values)
+            profile.add(v);
+        this.demands.put(comm_id, profile);
+    }
+
+    public final void set_demand_vph(Long comm_id, Profile1D profile) throws Exception {
+        this.demands.put(comm_id,profile);
     }
 
     /////////////////////////////////////
@@ -411,13 +416,12 @@ public abstract class AbstractLink implements Comparable {
                 start_node_id == that.start_node_id &&
                 end_node_id == that.end_node_id &&
                 Objects.equals(params, that.params) &&
-                demands.equals(that.demands) &&
-                splits.equals(that.splits);
+                demands.equals(that.demands);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, start_node_id, end_node_id, params, demands, splits);
+        return Objects.hash(id, start_node_id, end_node_id, params, demands);
     }
 
     /////////////////////////////////////
@@ -587,5 +591,6 @@ public abstract class AbstractLink implements Comparable {
             new_node.in_links.add(or.id);
         }
     }
+
 
 }

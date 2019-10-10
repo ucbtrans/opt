@@ -2,7 +2,6 @@ package opt.data;
 
 import jaxb.Link;
 import jaxb.Roadparam;
-import profiles.Profile1D;
 
 public class LinkOnramp extends AbstractLink {
 
@@ -55,12 +54,6 @@ public class LinkOnramp extends AbstractLink {
     @Override
     public Segment get_dn_segment(){
         return dn_link.get_dn_segment();
-    }
-
-
-    @Override
-    public void set_demand_vph(Long comm_id, Profile1D profile) throws Exception {
-        this.demands.put(comm_id,profile);
     }
 
     /////////////////////////////////////

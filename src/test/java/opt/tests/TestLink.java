@@ -5,6 +5,8 @@ import opt.data.*;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 public class TestLink extends AbstractTest {
@@ -285,9 +287,15 @@ public class TestLink extends AbstractTest {
     // demands and splits
     /////////////////////////////////////
 
-    @Ignore
     @Test
     public void test_set_demand_vph(){
+
+        TestData X = new TestData();
+        Segment sA3 = X.scenario.get_segment_by_name("sA3");
+        LinkOnramp or8 = sA3.get_ors().get(0);
+
+
+        LinkOfframp fr9 = sA3.get_frs().get(0);
 
     }
 
