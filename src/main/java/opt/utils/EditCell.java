@@ -53,11 +53,17 @@ import javafx.util.converter.DefaultStringConverter;
 public class EditCell<S, T> extends TextFieldTableCell<S, T> {
 
     private TextField textField;
+    private boolean ignoreFirstCol = false;
     private boolean escapePressed = false;
     private TablePosition<S, ?> tablePos = null;
 
     public EditCell(final StringConverter<T> converter) {
 	super(converter);
+    }
+    
+    public EditCell(final StringConverter<T> converter, boolean ignoreFirstCol) {
+	this(converter);
+        this.ignoreFirstCol = ignoreFirstCol;
     }
 
     public static <S> Callback<TableColumn<S, String>, TableCell<S, String>> forTableColumn() {
@@ -66,6 +72,10 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
 
     public static <S, T> Callback<TableColumn<S, T>, TableCell<S, T>> forTableColumn(final StringConverter<T> converter) {
 	return list -> new EditCell<S, T>(converter);
+    }
+    
+    public static <S, T> Callback<TableColumn<S, T>, TableCell<S, T>> forTableColumn(final StringConverter<T> converter, boolean ignoreFirstCol) {
+	return list -> new EditCell<S, T>(converter, ignoreFirstCol);
     }
 
     @Override
@@ -180,12 +190,14 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
 		cancelEdit();
                 event.consume();
             } else if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.TAB) {
-		getTableView().getSelectionModel().selectNext();
-                getTableView().getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
+                moveForward(getTableView(), focusedCell);
+		//getTableView().getSelectionModel().selectNext();
+                //getTableView().getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
 		event.consume();
             } else if (event.getCode() == KeyCode.LEFT) {
-		getTableView().getSelectionModel().selectPrevious();
-                getTableView().getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
+                moveBack(getTableView(), focusedCell);
+		//getTableView().getSelectionModel().selectPrevious();
+                //getTableView().getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
 		event.consume();
             } else if (event.getCode() == KeyCode.UP) {
 		getTableView().getSelectionModel().selectAboveCell();
@@ -233,5 +245,43 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
 	// requesting focus so that key input can immediately go into the
 	// TextField
 	textField.requestFocus();
+    }
+    
+    
+    private void moveBack(TableView<S> myTable, TablePosition<S, ?> focusedCell) {
+        int numRows = myTable.getItems().size();
+        int numCols = myTable.getColumns().size();
+        
+        int row = focusedCell.getRow();
+        int col = focusedCell.getColumn() - 1;
+        myTable.getSelectionModel().clearSelection();
+        
+        if (col < (ignoreFirstCol ? 1 : 0)) {
+            row--;
+            col = numCols - 1;
+        }
+        
+        if (row >= 0) {
+             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        }
+    }
+    
+    
+    private void moveForward(TableView<S> myTable, TablePosition<S, ?> focusedCell) {
+        int numRows = myTable.getItems().size();
+        int numCols = myTable.getColumns().size();
+        
+        int row = focusedCell.getRow();
+        int col = focusedCell.getColumn() + 1;
+        myTable.getSelectionModel().clearSelection();
+        
+        if (col >= numCols) {
+            row++;
+            col = ignoreFirstCol ? 1 : 0;
+        }
+        
+        if (row < numRows) {
+             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        }
     }
 }

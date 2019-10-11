@@ -699,18 +699,7 @@ public class LinkEditorController {
 
             if (event.getCode().isDigitKey()) {              
                 tableDemand.edit(focusedCell.getRow(), focusedCell.getTableColumn());
-            } else if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.TAB) {
-                tableDemand.getSelectionModel().selectNext();
-                tableDemand.getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
-                event.consume();
-            } else if (event.getCode() == KeyCode.LEFT) {
-                // work around due to
-                // TableView.getSelectionModel().selectPrevious() due to a bug
-                // stopping it from working on
-                // the first column in the last row of the table
-                //selectPrevious();
-                event.consume();
-            }
+            } 
         });
         
         tableDemand.getSelectionModel().setCellSelectionEnabled(true);
@@ -1666,7 +1655,7 @@ public class LinkEditorController {
         int num_vt = listVT.size();
         
         TableColumn<ObservableList<Object>, Number> colDemand = new TableColumn("Demand (" + UserSettings.unitsFlow + ")");
-        colDemand.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter()));
+        colDemand.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter(), true));
         colDemand.setCellValueFactory(data -> new SimpleDoubleProperty((Double)data.getValue().get(1)));
         colDemand.setStyle( "-fx-alignment: CENTER-RIGHT;");
         colDemand.setEditable(true);
@@ -1685,7 +1674,7 @@ public class LinkEditorController {
         for (int i = 0; i < num_vt; i++) {
             final int idx = i;
             TableColumn<ObservableList<Object>, Number> col = new TableColumn(listVT.get(i).get_name() + " (%)");
-            col.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter()));
+            col.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter(), true));
             col.setCellValueFactory(data -> new SimpleDoubleProperty((Double)data.getValue().get(idx+2)));
             col.setStyle( "-fx-alignment: CENTER-RIGHT;");
             col.setEditable(true);
