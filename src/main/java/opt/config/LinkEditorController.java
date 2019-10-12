@@ -681,8 +681,7 @@ public class LinkEditorController {
                 return;
             demandTableHandler.setDt(dtDemandSpinnerValueFactory.getValue());
             if (demandTableHandler.setOnKeyPressed(event))
-                ; //TODO: call set demand on link
-            
+                setDemand();
             
             TablePosition<ObservableList<Object>, ?> focusedCell = tableDemand.focusModelProperty().get().focusedCellProperty().get();
             KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
@@ -696,8 +695,6 @@ public class LinkEditorController {
             }
 
             
-            
-
             if (event.getCode().isDigitKey()) {              
                 tableDemand.edit(focusedCell.getRow(), focusedCell.getTableColumn());
             } 
@@ -1672,7 +1669,7 @@ public class LinkEditorController {
         });
         
         List<List<Double>> profiles = new ArrayList<>();
-        double pdt = UserSettings.defaultDemandDtMinutes * 60;
+        double pdt = Integer.MAX_VALUE;
         int numSteps = 0;
         for (int i = 0; i < num_vt; i++) {
             final int idx = i;
@@ -1707,6 +1704,7 @@ public class LinkEditorController {
                 numSteps = Math.max(numSteps, lst.size());
                 profiles.add(lst);
             } else {
+                pdt = Math.min(pdt, UserSettings.defaultDemandDtMinutes * 60);
                 List<Double> lst = new ArrayList<>();
                 lst.add(new Double(0));
                 profiles.add(lst);
@@ -1759,8 +1757,36 @@ public class LinkEditorController {
         int dt = dtDemandSpinnerValueFactory.getValue();
         demandTableHandler.setDt(dt);
         demandTableHandler.timeColumnUpdate();
+        setDemand();
+    }
+    
+    
+    private void setDemand() {
+        if (ignoreChange)
+            return;
         
-        // TODO: set demand dt
+        float dt = 60 * dtDemandSpinnerValueFactory.getValue();
+        ObservableList<ObservableList<Object>> myItems = tableDemand.getItems();
+        int numSteps = myItems.size();
+        int num_vt = listVT.size();
+        
+        for (int j = 0; j < num_vt; j++) {
+            double[] values = new double[numSteps];
+            
+            for (int i = 0; i < numSteps; i++) {
+                double total_prct = 0;
+                for (int jj = 0; jj < num_vt; jj++) {
+                    total_prct += (Double)myItems.get(i).get(jj+2);
+                }
+                values[i] = (Double)myItems.get(i).get(1) * (Double)myItems.get(i).get(j+2) / total_prct;
+            }
+            
+            try {
+                myLink.set_demand_vph(listVT.get(j).getId(), dt, values);
+            } catch(Exception e) {
+                opt.utils.Dialogs.ExceptionDialog("Cannot set demand for vehicle type '" + listVT.get(j).get_name() + "'...", e);
+            }
+        }
         
         appMainController.setProjectModified(true);
     }

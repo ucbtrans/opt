@@ -83,7 +83,7 @@ public class TSTableHandler {
     
     
     public boolean setOnKeyPressed(KeyEvent event) {
-        boolean res = true;
+        boolean res = false;
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
         
         if (copyKeyCodeCompination.match(event)) {
