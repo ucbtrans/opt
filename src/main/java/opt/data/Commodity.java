@@ -26,6 +26,10 @@ public class Commodity {
     // getters
     /////////////////////////////////////
 
+    public long getId() {
+        return id;
+    }
+    
     public String get_name(){
         return name;
     }
