@@ -89,6 +89,7 @@ import opt.utils.ModifiedDoubleStringConverter;
 import opt.utils.ModifiedIntegerStringConverter;
 import opt.utils.ModifiedNumberStringConverter;
 import opt.utils.TSTableHandler;
+import profiles.Profile1D;
 
 
 /**
@@ -699,18 +700,7 @@ public class LinkEditorController {
 
             if (event.getCode().isDigitKey()) {              
                 tableDemand.edit(focusedCell.getRow(), focusedCell.getTableColumn());
-            } else if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.TAB) {
-                tableDemand.getSelectionModel().selectNext();
-                tableDemand.getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
-                event.consume();
-            } else if (event.getCode() == KeyCode.LEFT) {
-                // work around due to
-                // TableView.getSelectionModel().selectPrevious() due to a bug
-                // stopping it from working on
-                // the first column in the last row of the table
-                //selectPrevious();
-                event.consume();
-            }
+            } 
         });
         
         tableDemand.getSelectionModel().setCellSelectionEnabled(true);
@@ -1645,9 +1635,8 @@ public class LinkEditorController {
              if (trafficDemand.isExpanded())
                 laneProperties.setExpanded(true);
             trafficDemand.setDisable(true);
+            return;
         }
-        
-        int dtD = dtDemandSpinnerValueFactory.getValue();
         
         tableDemand.getItems().clear();
         tableDemand.getColumns().clear();
@@ -1666,7 +1655,7 @@ public class LinkEditorController {
         int num_vt = listVT.size();
         
         TableColumn<ObservableList<Object>, Number> colDemand = new TableColumn("Demand (" + UserSettings.unitsFlow + ")");
-        colDemand.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter()));
+        colDemand.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter(), true));
         colDemand.setCellValueFactory(data -> new SimpleDoubleProperty((Double)data.getValue().get(1)));
         colDemand.setStyle( "-fx-alignment: CENTER-RIGHT;");
         colDemand.setEditable(true);
@@ -1682,10 +1671,13 @@ public class LinkEditorController {
             tableDemand.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), event.getNewValue().doubleValue());
         });
         
+        List<List<Double>> profiles = new ArrayList<>();
+        double pdt = UserSettings.defaultDemandDtMinutes * 60;
+        int numSteps = 0;
         for (int i = 0; i < num_vt; i++) {
             final int idx = i;
             TableColumn<ObservableList<Object>, Number> col = new TableColumn(listVT.get(i).get_name() + " (%)");
-            col.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter()));
+            col.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter(), true));
             col.setCellValueFactory(data -> new SimpleDoubleProperty((Double)data.getValue().get(idx+2)));
             col.setStyle( "-fx-alignment: CENTER-RIGHT;");
             col.setEditable(true);
@@ -1702,28 +1694,56 @@ public class LinkEditorController {
                 tableDemand.refresh();
                 //TODO: call to set demand on link
             });
+            Profile1D cdp = myLink.get_demand_vph(listVT.get(i).getId());
+            if (cdp != null) {
+                pdt = Math.min(pdt, cdp.get_dt());
+                List<Double> lst = cdp.get_values();
+                if (lst == null) {
+                    lst = new ArrayList<>();
+                }
+                if (lst.size() < 1) {
+                    lst.add(new Double(0));
+                }
+                numSteps = Math.max(numSteps, lst.size());
+                profiles.add(lst);
+            } else {
+                List<Double> lst = new ArrayList<>();
+                lst.add(new Double(0));
+                profiles.add(lst);
+                numSteps = Math.max(numSteps, lst.size());
+            }
         }
         
-       
-        
-      
-
-        int numSteps = 8; //FIXME
+        int dtD = (int)Math.round(pdt / 60);
         
         for (int i = 0; i < numSteps; i++) {
             ObservableList<Object> row = FXCollections.observableArrayList();
             row.add(opt.utils.Misc.minutes2timeString(i*dtD));
             
-            row.add(new Double(i*100.0));
+            row.add(new Double(0));
+            
+            double total = 0;
+            for (int j = 0; j < num_vt; j++) {
+                double val = profiles.get(j).get(profiles.get(j).size()-1);
+                if (i < profiles.get(j).size()) {
+                    val = profiles.get(j).get(i);
+                }
+                total += val;
+                row.add(val);
+            }
             
             for (int j = 0; j < num_vt; j++) {
-                row.add(new Double((j+1)));
+                double val = (Double)row.get(j+2);
+                val = Math.round(100 * val / total);
+                row.set(j+2, val);
             }
+            
+            row.set(1, total);
             tableDemand.getItems().add(row);
         }
         tableDemand.refresh();
 
-        
+        dtDemandSpinnerValueFactory.setValue(dtD);
     }
     
     

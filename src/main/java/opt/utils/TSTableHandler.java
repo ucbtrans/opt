@@ -32,6 +32,7 @@ import java.util.Set;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TablePosition;
@@ -59,6 +60,7 @@ public class TSTableHandler {
     
     KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
     KeyCodeCombination pasteKeyCodeCompination = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY);
+    KeyCodeCombination duplicateKeyCodeCompination = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_ANY);
     
     private TablePosition<ObservableList<Object>, ?> focusedCell = null;
     
@@ -90,6 +92,24 @@ public class TSTableHandler {
         
         if (pasteKeyCodeCompination.match(event)) {
             return pasteFromClipboard();
+        }
+        
+        
+        if (duplicateKeyCodeCompination.match(event)) {
+            return duplicateRow();
+        }
+        
+        
+        if (event.getCode() == KeyCode.LEFT) {
+                moveBack();
+                event.consume();
+                return false;
+        }
+        
+        if ((event.getCode() == KeyCode.RIGHT) || (event.getCode() == KeyCode.TAB)) {
+                moveForward();
+                event.consume();
+                return false;
         }
         
         
@@ -159,7 +179,6 @@ public class TSTableHandler {
         
         return false;
     }
-    
     
     
     /**
@@ -258,6 +277,7 @@ public class TSTableHandler {
         myTable.getItems().clear();
         myTable.getItems().addAll(updatedItems);
         myTable.refresh();
+        myTable.getFocusModel().focus(i0, myTable.getColumns().get(j0));
         numRows = myTable.getItems().size();
         for (int j = 1; j < numCols; j++) {
             TableColumn<ObservableList<Object>, Number> col = (TableColumn<ObservableList<Object>, Number>)myTable.getColumns().get(j);
@@ -275,7 +295,92 @@ public class TSTableHandler {
     
     
     
-     /**
+    /**
+     * Duplicate table row.
+     * @return <true> if table content changed, <false> otherwise.
+     */
+    private boolean duplicateRow() {
+        int i0 = focusedCell.getRow();
+        int j0 = focusedCell.getColumn();
+        int numRows = myTable.getItems().size();
+        int numCols = myTable.getColumns().size();
+        
+        ObservableList<ObservableList<Object>> myItems = myTable.getItems();
+        ObservableList<ObservableList<Object>> updatedItems = FXCollections.observableArrayList();
+        
+        for (int i = 0; i <= i0; i++) {
+            updatedItems.add(myItems.get(i));
+        }
+        
+        ObservableList<Object> srcRow = myItems.get(i0);
+        ObservableList<Object> row = FXCollections.observableArrayList();
+        row.add(opt.utils.Misc.minutes2timeString((i0+1)*dt));
+        for (int j = 1; j < numCols; j++) {
+            row.add(srcRow.get(j));
+        }
+        updatedItems.add(row);
+        
+        for (int i = i0+1; i < numRows; i++) {
+            row = FXCollections.observableArrayList();
+            row.add(opt.utils.Misc.minutes2timeString(updatedItems.size()*dt));
+            
+            for (int j = 1; j < numCols; j++) {
+                row.add(myItems.get(i).get(j));
+            }
+            updatedItems.add(row); 
+        }
+        
+        myTable.getItems().clear();
+        myTable.getItems().addAll(updatedItems);
+        myTable.refresh();
+        myTable.getFocusModel().focus(i0, myTable.getColumns().get(j0));
+        
+        return true;
+    }
+    
+    
+    
+    private void moveBack() {
+        int numRows = myTable.getItems().size();
+        int numCols = myTable.getColumns().size();
+        
+        int row = focusedCell.getRow();
+        int col = focusedCell.getColumn() - 1;
+        myTable.getSelectionModel().clearSelection();
+        
+        if (col < 1) {
+            row--;
+            col = numCols - 1;
+        }
+        
+        if (row >= 0) {
+             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        }
+    }
+    
+    
+    private void moveForward() {
+        int numRows = myTable.getItems().size();
+        int numCols = myTable.getColumns().size();
+        
+        int row = focusedCell.getRow();
+        int col = focusedCell.getColumn() + 1;
+        myTable.getSelectionModel().clearSelection();
+        
+        if (col >= numCols) {
+            row++;
+            col = 1;
+        }
+        
+        if (row < numRows) {
+             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        }
+    }
+    
+    
+    
+    
+    /**
      * Delete table rows whose cells are selected.
      * @return number of deleted rows.
      */
@@ -303,7 +408,7 @@ public class TSTableHandler {
             updatedItems.add(row);
         }
         
-        while (updatedItems.size() < 2) {
+        while (updatedItems.size() < 1) {
             ObservableList<Object> row = FXCollections.observableArrayList();
             row.add(opt.utils.Misc.minutes2timeString(updatedItems.size()*dt));
             for (int j = 1; j < numCols; j++) {
@@ -320,6 +425,9 @@ public class TSTableHandler {
         
         return res;
     }
+    
+    
+    
     
     
 }
