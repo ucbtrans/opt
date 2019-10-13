@@ -59,13 +59,11 @@ public class TSTableHandler {
     TablePosition focusedCell = null;
     private int dt = 5;
     
-    KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
-    KeyCodeCombination pasteKeyCodeCompination = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY);
-    KeyCodeCombination duplicateKeyCodeCompination = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_ANY);
+    int minSelectedRow = 0;
+    int maxSelectedRow = 0;
+    int minSelectedColumn = 0;
+    int maxSelectedColumn = 0;
     
-    KeyCodeCombination leftSelectKeyCodeCompination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHIFT_ANY);
-    KeyCodeCombination rightSelectKeyCodeCompination = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHIFT_ANY);
-    KeyCodeCombination tabSelectKeyCodeCompination = new KeyCodeCombination(KeyCode.TAB, KeyCombination.SHIFT_ANY);
     
     public TableView<ObservableList<Object>> getTable() {return myTable;}
     public int getDt() {return dt;}
@@ -101,16 +99,22 @@ public class TSTableHandler {
         }
         
         
-        if ((event.getCode() == KeyCode.LEFT) && event.isShiftDown()) {
-            myTable.getSelectionModel().selectPrevious();;
+        if (event.isShiftDown()) {
+            computeSelectedBox();
+            
+            if (event.getCode() == KeyCode.LEFT) {
+                selectLeft();
+            } else if ((event.getCode() == KeyCode.RIGHT) || (event.getCode() == KeyCode.TAB)) {
+                selectRight();
+            } else if (event.getCode() == KeyCode.UP) {
+                selectUp();
+            } else if (event.getCode() == KeyCode.DOWN) {
+                selectDown();
+            }
+            
+            
             event.consume();
-            return false;
-        }
-        
-        if ((((event.getCode() == KeyCode.RIGHT) && event.isShiftDown())) || 
-            (((event.getCode() == KeyCode.TAB) && event.isShiftDown()))) {
-            myTable.getSelectionModel().selectNext();;
-            event.consume();
+            
             return false;
         }
         
@@ -145,6 +149,12 @@ public class TSTableHandler {
     
     
     
+    
+    /***************************************************************************
+     * Table data manipulation
+     * 
+     ***************************************************************************/
+    
     public boolean timeColumnUpdate() {
         int numRows = myTable.getItems().size();
         
@@ -157,7 +167,6 @@ public class TSTableHandler {
         
         return true;
     }
-    
     
     
     /**
@@ -321,7 +330,6 @@ public class TSTableHandler {
     }
     
     
-    
     /**
      * Duplicate table row.
      * @return <true> if table content changed, <false> otherwise.
@@ -364,49 +372,6 @@ public class TSTableHandler {
         
         return true;
     }
-    
-    
-    
-    
-    
-    private void moveBack() {
-        int numRows = myTable.getItems().size();
-        int numCols = myTable.getColumns().size();
-        
-        int row = focusedCell.getRow();
-        int col = focusedCell.getColumn() - 1;
-        myTable.getSelectionModel().clearSelection();
-        
-        if (col < 1) {
-            row--;
-            col = numCols - 1;
-        }
-        
-        if (row >= 0) {
-             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
-        }
-    }
-    
-    
-    private void moveForward() {
-        int numRows = myTable.getItems().size();
-        int numCols = myTable.getColumns().size();
-        
-        int row = focusedCell.getRow();
-        int col = focusedCell.getColumn() + 1;
-        myTable.getSelectionModel().clearSelection();
-        
-        if (col >= numCols) {
-            row++;
-            col = 1;
-        }
-        
-        if (row < numRows) {
-             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
-        }
-    }
-    
-    
     
     
     /**
@@ -457,6 +422,153 @@ public class TSTableHandler {
     
     
     
+    
+    
+    /***************************************************************************
+     * Navigation with cell selection
+     ***************************************************************************/
+    
+    private void selectLeft() {
+        int col = focusedCell.getColumn() - 1;
+        
+        if (col < 0)
+            return;
+        
+        if (col < minSelectedColumn) {
+            minSelectedColumn = col;
+        } else {
+            maxSelectedColumn = col;
+        }
+        
+        selectBox();
+        myTable.getFocusModel().focus(focusedCell.getRow(), myTable.getColumns().get(col));
+    }
+    
+    private void selectRight() {
+        int col = focusedCell.getColumn() + 1;
+        
+        if (col >= myTable.getColumns().size())
+            return;
+        
+        if (col > maxSelectedColumn) {
+            maxSelectedColumn = col;
+        } else {
+            minSelectedColumn = col;
+        }
+        
+        selectBox();
+        myTable.getFocusModel().focus(focusedCell.getRow(), myTable.getColumns().get(col));
+    }
+    
+    private void selectUp() {
+        int row = focusedCell.getRow() - 1;
+        
+        if (row < 0)
+            return;
+        
+        if (row < minSelectedRow) {
+            minSelectedRow = row;
+        } else {
+            maxSelectedRow = row;
+        }
+        
+        selectBox();
+        myTable.getFocusModel().focus(row, focusedCell.getTableColumn());
+    }
+    
+    private void selectDown() {
+        int row = focusedCell.getRow() + 1;
+        
+        if (row >= myTable.getItems().size())
+            return;
+        
+        if (row > maxSelectedRow) {
+            maxSelectedRow = row;
+        } else {
+            minSelectedRow = row;
+        }
+        
+        selectBox();
+        myTable.getFocusModel().focus(row, focusedCell.getTableColumn());
+    }
+    
+    
+    
+    
+    
+    /***************************************************************************
+     * Navigation with a single cell selection
+     ***************************************************************************/
+    
+    private void moveBack() {
+        int numRows = myTable.getItems().size();
+        int numCols = myTable.getColumns().size();
+        
+        int row = focusedCell.getRow();
+        int col = focusedCell.getColumn() - 1;
+        myTable.getSelectionModel().clearSelection();
+        
+        if (col < 1) {
+            row--;
+            col = numCols - 1;
+        }
+        
+        if (row >= 0) {
+             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        }
+    }
+    
+    
+    private void moveForward() {
+        int numRows = myTable.getItems().size();
+        int numCols = myTable.getColumns().size();
+        
+        int row = focusedCell.getRow();
+        int col = focusedCell.getColumn() + 1;
+        myTable.getSelectionModel().clearSelection();
+        
+        if (col >= numCols) {
+            row++;
+            col = 1;
+        }
+        
+        if (row < numRows) {
+             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        }
+    }
+        
+    
+    
+    
+    
+    /***************************************************************************
+     * Auxiliary functions
+     ***************************************************************************/
+    
+    private void computeSelectedBox() {
+        focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
+        int i0 = focusedCell.getRow();
+        int j0 = focusedCell.getColumn();
+        ObservableList<TablePosition> positionList = myTable.getSelectionModel().getSelectedCells();
+        
+        minSelectedRow = maxSelectedRow = i0;
+        minSelectedColumn = maxSelectedColumn = j0;
+        for (TablePosition pos : positionList) {
+            minSelectedRow = Math.min(minSelectedRow, pos.getRow());
+            maxSelectedRow = Math.max(maxSelectedRow, pos.getRow());
+            minSelectedColumn = Math.min(minSelectedColumn, pos.getColumn());
+            maxSelectedColumn = Math.max(maxSelectedColumn, pos.getColumn());
+        }
+    }
+    
+    
+    private void selectBox() {
+        myTable.getSelectionModel().clearSelection();
+        myTable.getSelectionModel().selectRange(minSelectedRow, 
+                                                myTable.getColumns().get(minSelectedColumn),
+                                                maxSelectedRow,
+                                                myTable.getColumns().get(maxSelectedColumn));
+    }
     
     
 }
