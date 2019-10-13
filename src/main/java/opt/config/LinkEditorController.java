@@ -139,9 +139,11 @@ public class LinkEditorController {
     private SpinnerValueFactory<Double> jamDensityManagedSpinnerValueFactory = null;
     
     private SpinnerValueFactory<Integer> dtDemandSpinnerValueFactory = null;
+    private SpinnerValueFactory<Integer> dtSRSpinnerValueFactory = null;
     
     
     private TSTableHandler demandTableHandler = new TSTableHandler();
+    private TSTableHandler srTableHandler = new TSTableHandler();
     
     
     
@@ -304,6 +306,15 @@ public class LinkEditorController {
 
     @FXML // fx:id="trafficSplitDownstream"
     private TitledPane trafficSplitDownstream; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="labelSRUpdatePeriod"
+    private Label labelSRUpdatePeriod; // Value injected by FXMLLoader
+
+    @FXML // fx:id="dtSR"
+    private Spinner<Integer> dtSR; // Value injected by FXMLLoader
+
+    @FXML // fx:id="tableSR"
+    private TableView<ObservableList<Object>> tableSR; // Value injected by FXMLLoader
     
     @FXML // fx:id="linkControllerPane"
     private TitledPane linkControllerPane; // Value injected by FXMLLoader
@@ -684,8 +695,7 @@ public class LinkEditorController {
                 setDemand();
             
             TablePosition<ObservableList<Object>, ?> focusedCell = tableDemand.focusModelProperty().get().focusedCellProperty().get();
-            KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
-            if (copyKeyCodeCompination.match(event)) {
+            if ((event.getCode() == KeyCode.C) && event.isControlDown()) {
                 appMainController.setLeftStatus("Copied demand data from '" + myLink.get_name() + "' to clipboard.");
             }
             
@@ -708,13 +718,61 @@ public class LinkEditorController {
             }
         });*/
 
-        
         tableDemand.skinProperty().addListener((obs, oldSkin, newSkin) -> {
             final TableHeaderRow header = (TableHeaderRow) tableDemand.lookup("TableHeaderRow");
             header.reorderingProperty().addListener((o, oldVal, newVal) -> header.setReordering(false));
         });
         
 
+        
+        /**
+         * Split Ratio pane
+         **/
+        dtSRSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1440, UserSettings.defaultSRDtMinutes, 1);
+        dtSRSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter());
+        dtSR.setValueFactory(dtSRSpinnerValueFactory);
+        dtSR.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (!ignoreChange && (oldValue != newValue))
+                onDtDemandChange();
+        });
+        dtSR.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Integer dt = new Integer(UserSettings.defaultSRDtMinutes);
+            // TODO: obtain demand dt
+            opt.utils.WidgetFunctionality.commitEditorText(dtSR, dt);
+        });
+        
+        srTableHandler.setTable(tableSR);
+        tableSR.setOnKeyPressed(event -> {
+            if (ignoreChange)
+                return;
+            srTableHandler.setDt(dtSRSpinnerValueFactory.getValue());
+            if (srTableHandler.setOnKeyPressed(event))
+                setSR();
+            
+            TablePosition<ObservableList<Object>, ?> focusedCell = tableSR.focusModelProperty().get().focusedCellProperty().get();
+            if ((event.getCode() == KeyCode.C) && event.isControlDown()) {
+                appMainController.setLeftStatus("Copied split ratio data from '" + myLink.get_name() + "' to clipboard.");
+            }
+            
+            if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
+                int del_num = srTableHandler.deleteRows();
+                appMainController.setLeftStatus("Deleted " + del_num + " split ratio entries from '" + myLink.get_name() + "'.");
+            }
+
+            
+            if (event.getCode().isDigitKey()) {              
+                tableSR.edit(focusedCell.getRow(), focusedCell.getTableColumn());
+            } 
+        });
+        
+        tableSR.getSelectionModel().setCellSelectionEnabled(true);
+        tableSR.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        tableSR.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+            final TableHeaderRow header = (TableHeaderRow) tableSR.lookup("TableHeaderRow");
+            header.reorderingProperty().addListener((o, oldVal, newVal) -> header.setReordering(false));
+        });
        
         
         
@@ -759,6 +817,7 @@ public class LinkEditorController {
         initLaneProperties();
         initOnOffRamps();
         initDemand();
+        initSR();
             
         drawRoadSection();
         
@@ -1665,14 +1724,14 @@ public class LinkEditorController {
         colDemand.setEditable(true);
         colDemand.setSortable(false);
         tableDemand.getColumns().add(colDemand);
-        colDemand.prefWidthProperty().bind(tableDemand.widthProperty().multiply(0.88/(num_vt+1)));
+        colDemand.prefWidthProperty().bind(tableDemand.widthProperty().multiply(0.89/(num_vt+1)));
         colDemand.setOnEditCommit(event -> {
             if (ignoreChange)
                 return;
-            System.err.println("New = " + event.getNewValue() + "\t Old = " + event.getOldValue());
             TablePosition<ObservableList<Object>, ?> focusedCell = event.getTablePosition();
-            System.err.println("Edited: " + focusedCell.getRow() + "\t" + focusedCell.getColumn());
             tableDemand.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), event.getNewValue().doubleValue());
+            tableDemand.refresh();
+            setDemand();
         });
         
         List<List<Double>> profiles = new ArrayList<>();
@@ -1687,7 +1746,7 @@ public class LinkEditorController {
             col.setEditable(true);
             col.setSortable(false);
             tableDemand.getColumns().add(col);
-            col.prefWidthProperty().bind(tableDemand.widthProperty().multiply(0.88/(num_vt+1)));
+            col.prefWidthProperty().bind(tableDemand.widthProperty().multiply(0.89/(num_vt+1)));
             col.setOnEditCommit(event -> {
                 if (ignoreChange)
                     return;
@@ -1696,7 +1755,7 @@ public class LinkEditorController {
                 val = Math.min(Math.max(val, 0), 100);
                 tableDemand.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), val);
                 tableDemand.refresh();
-                //TODO: call to set demand on link
+                setDemand();
             });
             Profile1D cdp = myLink.get_demand_vph(listVT.get(i).getId());
             if (cdp != null) {
@@ -1792,6 +1851,150 @@ public class LinkEditorController {
                 myLink.set_demand_vph(listVT.get(j).getId(), dt, values);
             } catch(Exception e) {
                 opt.utils.Dialogs.ExceptionDialog("Cannot set demand for vehicle type '" + listVT.get(j).get_name() + "'...", e);
+            }
+        }
+        
+        appMainController.setProjectModified(true);
+    }
+    
+    
+    
+    
+    
+    /***************************************************************************
+     * Split Ratio pane: initialization and callbacks
+     ***************************************************************************/
+    
+    private void initSR() {
+        if (myLink.get_type() == AbstractLink.Type.offramp) {
+            trafficSplitDownstream.setDisable(false);
+        } else {
+             if (trafficSplitDownstream.isExpanded())
+                laneProperties.setExpanded(true);
+            trafficSplitDownstream.setDisable(true);
+            return;
+        }
+        
+        tableSR.getItems().clear();
+        tableSR.getColumns().clear();
+        listVT.clear();
+        
+        TableColumn<ObservableList<Object>, String> colTime = new TableColumn("Time");
+        colTime.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get(0).toString()));
+        colTime.setStyle( "-fx-alignment: CENTER;");
+        colTime.setEditable(false);
+        colTime.setSortable(false);
+        tableSR.getColumns().add(colTime);
+        colTime.prefWidthProperty().bind(tableSR.widthProperty().multiply(0.09));
+        
+        Map<Long, Commodity> mapVT = myLink.get_segment().get_scenario().get_commodities();
+        mapVT.forEach((k, v) -> {listVT.add(v);});
+        int num_vt = listVT.size();
+        
+        List<List<Double>> profiles = new ArrayList<>();
+        double pdt = Integer.MAX_VALUE;
+        int numSteps = 0;
+        for (int i = 0; i < num_vt; i++) {
+            final int idx = i;
+            TableColumn<ObservableList<Object>, Number> col = new TableColumn(listVT.get(i).get_name() + " (%)");
+            col.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter(), true));
+            col.setCellValueFactory(data -> new SimpleDoubleProperty((Double)data.getValue().get(idx+1)));
+            col.setStyle( "-fx-alignment: CENTER-RIGHT;");
+            col.setEditable(true);
+            col.setSortable(false);
+            tableSR.getColumns().add(col);
+            col.prefWidthProperty().bind(tableSR.widthProperty().multiply(0.89/(num_vt)));
+            col.setOnEditCommit(event -> {
+                if (ignoreChange)
+                    return;
+                TablePosition<ObservableList<Object>, ?> focusedCell = event.getTablePosition();
+                double val = event.getNewValue().doubleValue();
+                val = Math.min(Math.max(val, 0), 100);
+                tableSR.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), val);
+                tableSR.refresh();
+                setSR();
+            });
+            Profile1D cdp = ((LinkOfframp)myLink).get_splits(listVT.get(i).getId());
+            if (cdp != null) {
+                pdt = Math.min(pdt, cdp.get_dt());
+                List<Double> lst = cdp.get_values();
+                if (lst == null) {
+                    lst = new ArrayList<>();
+                }
+                if (lst.size() < 1) {
+                    lst.add(new Double(0));
+                }
+                numSteps = Math.max(numSteps, lst.size());
+                profiles.add(lst);
+            } else {
+                pdt = Math.min(pdt, UserSettings.defaultSRDtMinutes * 60);
+                List<Double> lst = new ArrayList<>();
+                lst.add(new Double(0));
+                profiles.add(lst);
+                numSteps = Math.max(numSteps, lst.size());
+            }
+        }
+        
+        int dtSR = (int)Math.round(pdt / 60);
+        
+        for (int i = 0; i < numSteps; i++) {
+            ObservableList<Object> row = FXCollections.observableArrayList();
+            row.add(opt.utils.Misc.minutes2timeString(i*dtSR));
+            
+            double total = 0;
+            for (int j = 0; j < num_vt; j++) {
+                double val = profiles.get(j).get(profiles.get(j).size()-1);
+                if (i < profiles.get(j).size()) {
+                    val = profiles.get(j).get(i);
+                }
+                row.add(100*val);
+            }
+            
+            tableSR.getItems().add(row);
+        }
+        tableSR.refresh();
+
+        dtSRSpinnerValueFactory.setValue(dtSR);
+    }
+    
+    
+    
+    /*
+     * Split Ratio dt and matrix callbacks 
+     */
+    
+    private void onDtSRChange() { 
+        if (ignoreChange)
+            return;
+        
+        int dt = dtSRSpinnerValueFactory.getValue();
+        srTableHandler.setDt(dt);
+        srTableHandler.timeColumnUpdate();
+        setSR();
+    }
+    
+    
+    private void setSR() {
+        if (ignoreChange)
+            return;
+        
+        float dt = 60 * dtSRSpinnerValueFactory.getValue();
+        ObservableList<ObservableList<Object>> myItems = tableSR.getItems();
+        int numSteps = myItems.size();
+        int num_vt = listVT.size();
+        
+        for (int j = 0; j < num_vt; j++) {
+            double[] values = new double[numSteps];
+            
+            for (int i = 0; i < numSteps; i++) {
+                double total_prct = 100;
+                values[i] = (Double)myItems.get(i).get(j+1) / total_prct;
+            }
+            
+            try {
+                ((LinkOfframp)myLink).set_split(listVT.get(j).getId(), dt, values);
+            } catch(Exception e) {
+                opt.utils.Dialogs.ExceptionDialog("Cannot set split ratios for vehicle type '" + listVT.get(j).get_name() + "'...", e);
             }
         }
         

@@ -86,6 +86,7 @@ public class UserSettings {
     
     
     public static int defaultDemandDtMinutes = 5;
+    public static int defaultSRDtMinutes = 5;
     
     public static int defaultSimulationDtSeconds = 5;
     public static int defaultSimulationDurationHours = 24;
