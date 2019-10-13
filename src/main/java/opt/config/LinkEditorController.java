@@ -702,6 +702,13 @@ public class LinkEditorController {
         
         tableDemand.getSelectionModel().setCellSelectionEnabled(true);
         tableDemand.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        /*tableDemand.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                demandTableHandler.onSelection(newSelection);
+            }
+        });*/
+
+        
         tableDemand.skinProperty().addListener((obs, oldSkin, newSkin) -> {
             final TableHeaderRow header = (TableHeaderRow) tableDemand.lookup("TableHeaderRow");
             header.reorderingProperty().addListener((o, oldVal, newVal) -> header.setReordering(false));

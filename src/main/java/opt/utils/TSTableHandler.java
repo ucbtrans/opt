@@ -56,15 +56,16 @@ import javafx.util.converter.NumberStringConverter;
 public class TSTableHandler {
     private DoubleStringConverter dsc = new DoubleStringConverter();
     private TableView<ObservableList<Object>> myTable = null;
+    TablePosition focusedCell = null;
     private int dt = 5;
     
     KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
     KeyCodeCombination pasteKeyCodeCompination = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY);
     KeyCodeCombination duplicateKeyCodeCompination = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_ANY);
     
-    private TablePosition<ObservableList<Object>, ?> focusedCell = null;
-    
-    
+    KeyCodeCombination leftSelectKeyCodeCompination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHIFT_ANY);
+    KeyCodeCombination rightSelectKeyCodeCompination = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHIFT_ANY);
+    KeyCodeCombination tabSelectKeyCodeCompination = new KeyCodeCombination(KeyCode.TAB, KeyCombination.SHIFT_ANY);
     
     public TableView<ObservableList<Object>> getTable() {return myTable;}
     public int getDt() {return dt;}
@@ -86,35 +87,61 @@ public class TSTableHandler {
         boolean res = false;
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
         
-        if (copyKeyCodeCompination.match(event)) {
+        if ((event.getCode() == KeyCode.C) && event.isControlDown()) {
             return copyToClipboard();
         }
         
-        if (pasteKeyCodeCompination.match(event)) {
+        if ((event.getCode() == KeyCode.V) && event.isControlDown()) {
             return pasteFromClipboard();
         }
         
         
-        if (duplicateKeyCodeCompination.match(event)) {
+        if ((event.getCode() == KeyCode.D) && event.isControlDown()) {
             return duplicateRow();
         }
         
         
+        if ((event.getCode() == KeyCode.LEFT) && event.isShiftDown()) {
+            myTable.getSelectionModel().selectPrevious();;
+            event.consume();
+            return false;
+        }
+        
+        if ((((event.getCode() == KeyCode.RIGHT) && event.isShiftDown())) || 
+            (((event.getCode() == KeyCode.TAB) && event.isShiftDown()))) {
+            myTable.getSelectionModel().selectNext();;
+            event.consume();
+            return false;
+        }
+        
+        
         if (event.getCode() == KeyCode.LEFT) {
-                moveBack();
-                event.consume();
-                return false;
+            moveBack();
+            event.consume();
+            return false;
         }
         
         if ((event.getCode() == KeyCode.RIGHT) || (event.getCode() == KeyCode.TAB)) {
-                moveForward();
-                event.consume();
-                return false;
+            moveForward();
+            event.consume();
+            return false;
         }
-        
-        
+              
         return res;
     }
+    
+    
+    
+    public void onSelection(ObservableList<Object> newSelection) {
+        focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
+        int i0 = focusedCell.getRow();
+        int j0 = focusedCell.getColumn();
+        int numCols = myTable.getColumns().size();
+        
+       // TODO
+        
+    }
+    
     
     
     
@@ -337,6 +364,8 @@ public class TSTableHandler {
         
         return true;
     }
+    
+    
     
     
     
