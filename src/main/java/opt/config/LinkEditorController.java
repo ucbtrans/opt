@@ -691,7 +691,7 @@ public class LinkEditorController {
             if (ignoreChange)
                 return;
             demandTableHandler.setDt(dtDemandSpinnerValueFactory.getValue());
-            if (demandTableHandler.setOnKeyPressed(event))
+            if (demandTableHandler.onKeyPressed(event))
                 setDemand();
             
             TablePosition<ObservableList<Object>, ?> focusedCell = tableDemand.focusModelProperty().get().focusedCellProperty().get();
@@ -708,6 +708,12 @@ public class LinkEditorController {
             if (event.getCode().isDigitKey()) {              
                 tableDemand.edit(focusedCell.getRow(), focusedCell.getTableColumn());
             } 
+        });
+        
+        tableDemand.setOnMouseClicked(event -> {
+            if (ignoreChange)
+                return;
+            demandTableHandler.onMouseClicked(event);
         });
         
         tableDemand.getSelectionModel().setCellSelectionEnabled(true);
@@ -748,7 +754,7 @@ public class LinkEditorController {
             if (ignoreChange)
                 return;
             srTableHandler.setDt(dtSRSpinnerValueFactory.getValue());
-            if (srTableHandler.setOnKeyPressed(event))
+            if (srTableHandler.onKeyPressed(event))
                 setSR();
             
             TablePosition<ObservableList<Object>, ?> focusedCell = tableSR.focusModelProperty().get().focusedCellProperty().get();
@@ -765,6 +771,12 @@ public class LinkEditorController {
             if (event.getCode().isDigitKey()) {              
                 tableSR.edit(focusedCell.getRow(), focusedCell.getTableColumn());
             } 
+        });
+        
+        tableSR.setOnMouseClicked(event -> {
+            if (ignoreChange)
+                return;
+            srTableHandler.onMouseClicked(event);
         });
         
         tableSR.getSelectionModel().setCellSelectionEnabled(true);

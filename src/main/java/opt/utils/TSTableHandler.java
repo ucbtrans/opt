@@ -44,6 +44,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.NumberStringConverter;
 
@@ -81,7 +82,28 @@ public class TSTableHandler {
     
     
     
-    public boolean setOnKeyPressed(KeyEvent event) {
+    public void onMouseClicked(MouseEvent event) {
+        focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
+        
+        if (event.isShiftDown())
+            return;
+        
+        int i0 = focusedCell.getRow();
+        int j0 = focusedCell.getColumn();
+        if (j0 > 0)
+            return;
+        
+        minSelectedRow = maxSelectedRow = i0;
+        minSelectedColumn = 0;
+        maxSelectedColumn = myTable.getColumns().size() - 1;
+        selectBox();
+        myTable.getFocusModel().focus(i0, myTable.getColumns().get(j0));
+        event.consume();
+    }
+    
+    
+    
+    public boolean onKeyPressed(KeyEvent event) {
         boolean res = false;
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
         
