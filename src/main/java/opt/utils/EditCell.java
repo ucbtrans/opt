@@ -27,6 +27,7 @@ package opt.utils;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -40,6 +41,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseDragEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
@@ -56,9 +59,36 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
     private boolean ignoreFirstCol = false;
     private boolean escapePressed = false;
     private TablePosition<S, ?> tablePos = null;
+    
+    
+    int minSelectedRow = 0;
+    int maxSelectedRow = 0;
+    int minSelectedColumn = 0;
+    int maxSelectedColumn = 0;
+    
+    
+    
 
     public EditCell(final StringConverter<T> converter) {
 	super(converter);
+        
+        setOnDragDetected(new EventHandler<MouseEvent>() {  
+            @Override  
+            public void handle(MouseEvent event) {  
+                startFullDrag();  
+                getTableColumn().getTableView().getSelectionModel().select(getIndex(), getTableColumn());  
+            }  
+        });  
+        
+        setOnMouseDragEntered(new EventHandler<MouseDragEvent>() {  
+            @Override  
+            public void handle(MouseDragEvent event) {
+                computeSelectedBox();
+                recomputeSelectedBox(getIndex(), getTableColumn().getTableView().getColumns().indexOf(getTableColumn()));
+                //getTableColumn().getTableView().getSelectionModel().select(getIndex(), getTableColumn());  
+            }  
+                
+        });  
     }
     
     public EditCell(final StringConverter<T> converter, boolean ignoreFirstCol) {
@@ -283,5 +313,72 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
         if (row < numRows) {
              myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
         }
+    }
+    
+    
+    
+    
+    
+    /***************************************************************************
+     * Auxiliary functions
+     ***************************************************************************/
+    
+    private void computeSelectedBox() {
+        TableView<S> myTable = getTableColumn().getTableView();
+        int i0 = getIndex();
+        int j0 = myTable.getColumns().indexOf(getTableColumn());
+        ObservableList<TablePosition> positionList = myTable.getSelectionModel().getSelectedCells();
+        
+        minSelectedRow = myTable.getItems().size();
+        maxSelectedRow = 0;
+        minSelectedColumn = myTable.getColumns().size();
+        maxSelectedColumn = 0;
+        for (TablePosition pos : positionList) {
+            minSelectedRow = Math.min(minSelectedRow, pos.getRow());
+            maxSelectedRow = Math.max(maxSelectedRow, pos.getRow());
+            minSelectedColumn = Math.min(minSelectedColumn, pos.getColumn());
+            maxSelectedColumn = Math.max(maxSelectedColumn, pos.getColumn());
+        }
+    }
+    
+    
+    private void recomputeSelectedBox(int i1, int j1) {
+        if ((i1 >= minSelectedRow) && (i1 <= maxSelectedRow) &&
+            (j1 >= minSelectedColumn) && (j1 <= maxSelectedColumn)) {
+            TablePosition focusedCell = getTableColumn().getTableView().focusModelProperty().get().focusedCellProperty().get();
+            int i0 = focusedCell.getRow();
+            int j0 = focusedCell.getColumn();
+            if (i1 > i0) {
+                minSelectedRow = i1;
+            } else if (i1 < i0) {
+                maxSelectedRow = i1;
+            }
+            if (j1 > j0) {
+                minSelectedColumn = j1;
+            } else if (j1 < j0) {
+                maxSelectedColumn = j1;
+            }   
+        } else {
+            minSelectedRow = Math.min(minSelectedRow, i1);
+            maxSelectedRow = Math.max(maxSelectedRow, i1);
+            minSelectedColumn = Math.min(minSelectedColumn, j1);
+            maxSelectedColumn = Math.max(maxSelectedColumn, j1);
+        }
+        
+        selectBox();
+        getTableColumn().getTableView().getFocusModel().focus(i1, getTableColumn().getTableView().getColumns().get(j1));
+    }
+    
+    
+    private void selectBox() {
+        if ((minSelectedRow > maxSelectedRow) || (minSelectedColumn > maxSelectedColumn))
+            return;
+        
+        TableView<S> myTable = getTableColumn().getTableView();
+        myTable.getSelectionModel().clearSelection();
+        myTable.getSelectionModel().selectRange(minSelectedRow, 
+                                                myTable.getColumns().get(minSelectedColumn),
+                                                maxSelectedRow,
+                                                myTable.getColumns().get(maxSelectedColumn));
     }
 }
