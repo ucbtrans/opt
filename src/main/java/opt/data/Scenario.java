@@ -131,9 +131,10 @@ public class Scenario {
     // protected and private
     /////////////////////////////////////
 
-    protected jaxb.Scenario to_jaxb(Collection<Segment> segments){
+    protected jaxb.Scenario to_jaxb(Collection<Segment> segments) throws Exception {
         jaxb.Scenario jScn = new jaxb.Scenario();
 
+        /////////////////////////////////////////////////////
         // models : Hard code single CTM model
         jaxb.Models models = new jaxb.Models();
         jScn.setModels(models);
@@ -148,6 +149,7 @@ public class Scenario {
         params.setSimDt(2f);
         model.setModelParams(params);
 
+        /////////////////////////////////////////////////////
         // commodities
         jaxb.Commodities jComms = new jaxb.Commodities();
         jScn.setCommodities(jComms);
@@ -162,11 +164,12 @@ public class Scenario {
             jcomm.setPvequiv(comm.pvequiv);
         }
 
+        /////////////////////////////////////////////////////
         // network
         jaxb.Network jNet = new jaxb.Network();
         jScn.setNetwork(jNet);
 
-        // nodes
+        // nodes ........................
         jaxb.Nodes jNodes = new jaxb.Nodes();
         jNet.setNodes(jNodes);
         for(Node node : nodes.values()) {
@@ -206,7 +209,7 @@ public class Scenario {
         for(RoadGeom rg : unique_roadgeoms)
             geom2id.put(rg,c++);
 
-        // write road params
+        // write road params .............................
         jaxb.Roadparams jRoadParams = new jaxb.Roadparams();
         jNet.setRoadparams(jRoadParams);
         for(FDparams fd : unique_roadparams){
@@ -215,7 +218,7 @@ public class Scenario {
             jRoadParams.getRoadparam().add(rp);
         }
 
-        // write road geoms
+        // write road geoms ................................
         jaxb.Roadgeoms jRoadGeoms = new jaxb.Roadgeoms();
         jNet.setRoadgeoms(jRoadGeoms);
         for(RoadGeom rg : unique_roadgeoms){
@@ -224,7 +227,7 @@ public class Scenario {
             jRoadGeoms.getRoadgeom().add(jrg);
         }
 
-        // links
+        // links .........................................
         jaxb.Links jLinks = new jaxb.Links();
         jNet.setLinks(jLinks);
         for(AbstractLink link : links.values()){
@@ -247,7 +250,7 @@ public class Scenario {
                 jaxbLink.setRoadgeom(geom2id.get(x.roadGeom));
         }
 
-        // demands
+        // demands ........................................
         jaxb.Demands jdemands = new jaxb.Demands();
         jScn.setDemands(jdemands);
         for(AbstractLink link : links.values()) {
@@ -265,80 +268,103 @@ public class Scenario {
             }
         }
 
-        // TODO WRITE SPLITS
         // splits
-//        jaxb.Splits jsplits = new jaxb.Splits();
-//        jScn.setSplits(jsplits);
+        jaxb.Splits jsplits = new jaxb.Splits();
+        jScn.setSplits(jsplits);
 
-//        for(Node node : nodes.values() ) {
+        for(Node node : nodes.values() ) {
 
-//            boolean has_splits = node.out_links.stream()
-//                    .map(link_id->links.get(link_id))
-//                    .anyMatch(link->!link.splits.isEmpty());
+            // get offramp links ........................
+            Set<AbstractLink> outlinks = node.out_links.stream()
+                    .map(link_id->links.get(link_id))
+                    .collect(Collectors.toSet());
 
-//            if(!has_splits)
-//                continue;
-//
-//            Set<LinkFreeway> in_links = node.in_links.stream()
-//                    .map(link_id->links.get(link_id))
-//                    .filter(link->link instanceof LinkFreeway)
-//                    .map(link-> (LinkFreeway) link)
-//                    .collect(Collectors.toSet());
-//
-//            if(in_links.size()>1)
-//                System.err.println("90443j2f");
-//
-//            if(in_links.isEmpty())
-//                continue;
-//
-//            LinkFreeway in_link = in_links.iterator().next();
-//
-//            Set<Long> comm_ids = node.out_links.stream()
-//                    .map(link_id->links.get(link_id))
-//                    .flatMap(link->link.splits.keySet().stream())
-//                    .collect(Collectors.toSet());
-//
-//            for(Long comm_id : comm_ids){
-//
-//                // get unique dt and start_time
-//                Set<Profile1D> profiles = node.out_links.stream()
-//                        .map(link_id->links.get(link_id))
-//                        .map(link->link.splits.get(comm_id))
-//                        .collect(Collectors.toSet());
-//
-//                Set<Float> dts = profiles.stream().map(prof->prof.dt).collect(Collectors.toSet());
-//                if(dts.size()!=1)
-//                    System.err.println("RG)@J$G 2-43j");
-//
-//                Set<Float> start_times = profiles.stream().map(prof->prof.start_time).collect(Collectors.toSet());
-//                if(start_times.size()!=1)
-//                    System.err.println("535h3");
-//
-//                // to jaxb
-//                jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
-//                jsplits.getSplitNode().add(jsplitnode);
-//                jsplitnode.setCommodityId(comm_id);
-//                jsplitnode.setNodeId(node.id);
-//                jsplitnode.setLinkIn(in_link.id);
-//                jsplitnode.setDt(dts.iterator().next());
-//                jsplitnode.setStartTime(start_times.iterator().next());
-//
-//                // assumes that *all* out links have splits defined
-//                // and they sum up to 1.
-//
-//                for( Long outlink_id : node.out_links ){
-//
-//                    jaxb.Split jsplit = new jaxb.Split();
-//                    jsplitnode.getSplit().add(jsplit);
-//
-//                    AbstractLink outlink = links.get(outlink_id);
-//                    jsplit.setLinkOut(outlink_id);
-//                    jsplit.setContent(OTMUtils.comma_format(outlink.splits.get(comm_id).values));
-//                }
-//
-//            }
-//
-//        }
+            Set<LinkOfframp> frs = outlinks.stream()
+                    .filter(link->link instanceof LinkOfframp)
+                    .map(link-> (LinkOfframp) link)
+                    .collect(Collectors.toSet());
+
+            if(frs.isEmpty())
+                continue;
+
+            // get upstream mainline ........................
+            Set<LinkFreeway> in_links = node.in_links.stream()
+                    .map(link_id->links.get(link_id))
+                    .filter(link->link instanceof LinkFreeway)
+                    .map(link-> (LinkFreeway) link)
+                    .collect(Collectors.toSet());
+
+            if(in_links.isEmpty() || in_links.size()>1)
+                System.err.println("90443j2f");
+
+            LinkFreeway up_ml = in_links.iterator().next();
+
+            // get downstream mainline ........................
+            Set<LinkFreeway> outfreeway = outlinks.stream()
+                    .filter(link->link instanceof LinkFreeway)
+                    .map(link-> (LinkFreeway) link)
+                    .collect(Collectors.toSet());
+
+            if(outfreeway.size()>1)
+                System.err.println("h45-oh35g");
+
+            LinkFreeway dn_ml = outfreeway.isEmpty() ? null : outfreeway.iterator().next();
+
+            Set<Long> comm_ids = frs.stream()
+                    .flatMap(fr->fr.splits.keySet().stream())
+                    .collect(Collectors.toSet());
+
+            for(Long comm_id : comm_ids){
+
+                // collect the split profiles we have
+                Map<Long,Profile1D> outlink2Profile = new HashMap<>();
+                Set<Float> dts = new HashSet<>();
+                Set<Integer> prof_sizes = new HashSet<>();
+                for(LinkOfframp fr : frs)
+                    if(fr.splits.containsKey(comm_id)) {
+                        Profile1D prof = fr.splits.get(comm_id);
+                        outlink2Profile.put(fr.id,prof);
+                        dts.add(prof.dt);
+                        prof_sizes.add(prof.get_length());
+                    }
+
+                if(dts.size()!=1)
+                    System.err.println("RG)@J$G 2-43j");
+                if(prof_sizes.size()!=1)
+                    System.err.println("RG)@J$G 2-43j");
+                float dt = dts.iterator().next();
+                int prof_size = prof_sizes.iterator().next();
+
+                // profile for downstream mainline
+                Profile1D ml_prof = new Profile1D(0f,dt);
+                for(int i=0;i<prof_size;i++){
+                    float value = 1f;
+                    for(Profile1D fr_prof : outlink2Profile.values())
+                        value -= fr_prof.get_ith_value(i);
+                    if(value<0)
+                        throw new Exception(String.format("One node %d, commodity %d, offramp splits add up to more than 1.0",node.id,comm_id));
+                    ml_prof.add(value);
+                }
+                outlink2Profile.put(dn_ml.id,ml_prof);
+
+                // to jaxb
+                jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
+                jsplits.getSplitNode().add(jsplitnode);
+                jsplitnode.setCommodityId(comm_id);
+                jsplitnode.setNodeId(node.id);
+                jsplitnode.setLinkIn(up_ml.id);
+                jsplitnode.setDt(dt);
+
+                for( Map.Entry<Long,Profile1D> e : outlink2Profile.entrySet() ){
+                    jaxb.Split jsplit = new jaxb.Split();
+                    jsplitnode.getSplit().add(jsplit);
+                    jsplit.setLinkOut(e.getKey());
+                    jsplit.setContent(OTMUtils.comma_format(e.getValue().get_values()));
+                }
+
+            }
+
+        }
 
         return jScn;
     }
