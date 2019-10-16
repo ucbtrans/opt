@@ -25,7 +25,9 @@
  **/
 package opt.config;
 
-import com.sun.javafx.scene.control.skin.TableHeaderRow;
+//import com.sun.javafx.scene.control.skin.TableHeaderRow;
+import javafx.scene.control.skin.TableHeaderRow;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -724,10 +726,11 @@ public class LinkEditorController {
             }
         });*/
 
-        tableDemand.skinProperty().addListener((obs, oldSkin, newSkin) -> {
-            final TableHeaderRow header = (TableHeaderRow) tableDemand.lookup("TableHeaderRow");
-            header.reorderingProperty().addListener((o, oldVal, newVal) -> header.setReordering(false));
-        });
+        // TODO GABRIEL DISABLED. THIS WAS THE ONLY COMPILATION ERROR THAT RESULTED FROM GOING TO JAVA11
+//        tableDemand.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+//            final TableHeaderRow header = (TableHeaderRow) tableDemand.lookup("TableHeaderRow");
+//            header.reorderingProperty().addListener((o, oldVal, newVal) -> header.setReordering(false));
+//        });
         
 
         
@@ -781,10 +784,12 @@ public class LinkEditorController {
         
         tableSR.getSelectionModel().setCellSelectionEnabled(true);
         tableSR.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        tableSR.skinProperty().addListener((obs, oldSkin, newSkin) -> {
-            final TableHeaderRow header = (TableHeaderRow) tableSR.lookup("TableHeaderRow");
-            header.reorderingProperty().addListener((o, oldVal, newVal) -> header.setReordering(false));
-        });
+
+        // TODO GABRIEL DISABLED. THIS WAS THE ONLY COMPILATION ERROR THAT RESULTED FROM GOING TO JAVA11
+//        tableSR.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+//            final TableHeaderRow header = (TableHeaderRow) tableSR.lookup("TableHeaderRow");
+//            header.reorderingProperty().addListener((o, oldVal, newVal) -> header.setReordering(false));
+//        });
        
         
         

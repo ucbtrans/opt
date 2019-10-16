@@ -9,6 +9,10 @@
     <name>opt-ui</name>
     <url>http://maven.apache.org</url>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <scm>
         <connection>scm:git:git@github.com:ucbtrans/opt.git</connection>
         <developerConnection>scm:git:git@github.com:ucbtrans/opt.git</developerConnection>
@@ -51,23 +55,21 @@
                 </configuration>
             </plugin>
 
-            <!-- JAXB -->
             <plugin>
-                <groupId>org.jvnet.jaxb2.maven2</groupId>
-                <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.8.2</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.6</version>
                 <executions>
                     <execution>
-                        <id>Request</id>
+                        <id>unpack-dependencies</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>generate</goal>
+                            <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
-                            <generatePackage>jaxbopt</generatePackage>
-                            <bindingDirectory>src/main/resources</bindingDirectory>
-                            <bindingIncludes>
-                                <bindingInclude>jaxb-bindings.xjb</bindingInclude>
-                            </bindingIncludes>
+                            <excludeScope>system</excludeScope>
+                            <excludeGroupIds>junit,org.mockito,org.hamcrest</excludeGroupIds>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -77,12 +79,24 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <release>11</release>
+                </configuration>
+            </plugin>
+
+
+            <!-- MAVEN COMPILER
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
-            </plugin>
+            </plugin>  -->
+
 
             <!-- MAVEN ASSEMBLY -->
             <plugin>
@@ -111,12 +125,60 @@
                 </executions>
             </plugin>
 
-            <!-- JAVADOC -->
+            <!-- JAXB
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.8.2</version>
+                <executions>
+                    <execution>
+                        <id>Request</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <generatePackage>jaxbopt</generatePackage>
+                            <bindingDirectory>src/main/resources</bindingDirectory>
+                            <bindingIncludes>
+                                <bindingInclude>jaxb-bindings.xjb</bindingInclude>
+                            </bindingIncludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin> -->
+
+
+            <!-- CXF (JAXB REPLACEMENT) -->
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-xjc-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>xjc</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>xsdtojava</goal>
+                        </goals>
+                        <configuration>
+                            <xsdOptions>
+                                <xsdOption>
+                                    <xsd>${basedir}/src/main/resources/opt.xsd</xsd>
+                                    <packagename>jaxbopt</packagename>
+                                </xsdOption>
+                            </xsdOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <!-- JAVADOC
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.4</version>
-            </plugin>
+            </plugin> -->
 
 
 	    <!--plugin>
@@ -145,12 +207,12 @@
 
     <dependencies>
 
-        <!-- JAXB -->
+        <!-- JAXB
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
             <version>2.3.1</version>
-        </dependency>
+        </dependency> -->
 
         <!-- OTM BASE -->
         <dependency>
