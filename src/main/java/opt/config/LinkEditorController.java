@@ -1848,6 +1848,10 @@ public class LinkEditorController {
         int numSteps = myItems.size();
         int num_vt = listVT.size();
         
+        if (num_vt == 1) {
+            demandTableHandler.setColumnValue(2, 100);
+        }
+        
         for (int j = 0; j < num_vt; j++) {
             double[] values = new double[numSteps];
             

@@ -593,4 +593,22 @@ public class TSTableHandler {
     }
     
     
+    public void setColumnValue(int col, double val) {
+        int i0 = focusedCell.getRow();
+        int j0 = focusedCell.getColumn();
+        int numRows = myTable.getItems().size();
+        int numCols = myTable.getColumns().size();
+        
+        if ((col < 1) || (col >= numCols))
+            return;
+        
+        for (int i = 0; i < numRows; i++) {
+            myTable.getItems().get(i).set(col, val);
+        }
+        
+        myTable.refresh();
+        myTable.getFocusModel().focus(i0, myTable.getColumns().get(j0));
+    }
+    
+    
 }
