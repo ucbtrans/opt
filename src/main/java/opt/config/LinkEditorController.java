@@ -739,13 +739,13 @@ public class LinkEditorController {
         dtSR.setValueFactory(dtSRSpinnerValueFactory);
         dtSR.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
-                onDtDemandChange();
+                onDtSRChange();
         });
         dtSR.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;
             Integer dt = new Integer(UserSettings.defaultSRDtMinutes);
-            // TODO: obtain demand dt
+            // TODO: obtain SR dt
             opt.utils.WidgetFunctionality.commitEditorText(dtSR, dt);
         });
         
