@@ -123,6 +123,9 @@ public class AppMainController {
     @FXML // fx:id="menuFileExit"
     private MenuItem menuFileExit; // Value injected by FXMLLoader
 
+    @FXML // fx:id="menuHelpAbout"
+    private MenuItem menuHelpAbout; // Value injected by FXMLLoader
+
     @FXML // fx:id="projectTree"
     private TreeView<String> projectTree; // Value injected by FXMLLoader
 
@@ -500,6 +503,13 @@ public class AppMainController {
         stage.close();
     }
     
+    
+    
+    @FXML
+    void onClickMenuHelpAbout(ActionEvent event) {
+        String version = "2019-10-21";
+        opt.utils.Dialogs.InformationDialog(null, "OPT development version " + version);
+    }
     
     
     private void processTreeSelection(TreeItem<String> treeItem) {
