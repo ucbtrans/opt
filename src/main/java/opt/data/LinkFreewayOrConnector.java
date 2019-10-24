@@ -2,7 +2,6 @@ package opt.data;
 
 import jaxb.Link;
 import jaxb.Roadparam;
-import profiles.Profile1D;
 
 public abstract class LinkFreewayOrConnector extends AbstractLink {
 
