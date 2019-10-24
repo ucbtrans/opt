@@ -51,6 +51,25 @@
                 </configuration>
             </plugin>
 
+
+            <!-- version number -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <revisionOnScmFailure>true</revisionOnScmFailure>
+                </configuration>
+            </plugin>
+
             <!-- JAXB -->
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
