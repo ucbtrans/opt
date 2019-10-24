@@ -356,7 +356,7 @@
                                                 </Spinner>
                                                 <TableView id="tableDemand" fx:id="tableDemand" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="4" GridPane.rowIndex="2" GridPane.rowSpan="10">
                                                    <tooltip>
-                                                      <Tooltip id="ttTableDemand" fx:id="ttTableDemand" text="Ctrl+C - copy selected table cells&#10;Ctrl+V - paste items into table&#10;Ctrl+D - duplicate table row&#10;DEL - delete selected rows&#10;Shift+Mouse Click - select table cells&#10;Ctrl+A - select all table entries" />
+                                                      <Tooltip id="ttTableDemand" fx:id="ttTableDemand" text="Ctrl+C - copy selected table cells to clipboard&#10;Ctrl+V - paste items into table from clipboard&#10;Ctrl+D - duplicate table row&#10;DEL - delete selected rows&#10;Shift+Mouse Click - select table cells&#10;Ctrl+A - select all table entries" />
                                                    </tooltip></TableView>
                                              </children>
                                           </GridPane>
@@ -409,7 +409,7 @@
                                                 </Spinner>
                                                 <TableView id="tableSR" fx:id="tableSR" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="4" GridPane.rowIndex="2" GridPane.rowSpan="10">
                                                    <tooltip>
-                                                      <Tooltip id="ttTableSR" fx:id="ttTableSR" text="Ctrl+C - copy selected table cells&#10;Ctrl+V - paste items into table&#10;Ctrl+D - duplicate table row&#10;DEL - delete selected rows&#10;Shift+Mouse Click - select table cells&#10;Ctrl+A - select all table entries" />
+                                                      <Tooltip id="ttTableSR" fx:id="ttTableSR" text="Ctrl+C - copy selected table cells to clipboard&#10;Ctrl+V - paste items into table from clipboard&#10;Ctrl+D - duplicate table row&#10;DEL - delete selected rows&#10;Shift+Mouse Click - select table cells&#10;Ctrl+A - select all table entries" />
                                                    </tooltip>
                                                 </TableView>
                                              </children>
