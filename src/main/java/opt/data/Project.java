@@ -21,14 +21,14 @@ public class Project {
         scenarios.put(scn_name,new FreewayScenario(scn_name,sgmt_name,params));
     }
 
-    public Project(jaxbopt.Prj project,String folder,boolean validate) throws Exception {
+    public Project(jaxb.Prj project,String folder,boolean validate) throws Exception {
 
         if(project.getScns()==null)
             return;
 
         try {
 
-            for(jaxbopt.Scn jaxb_scn : project.getScns().getScn()){
+            for(jaxb.Scn jaxb_scn : project.getScns().getScn()){
 
                 boolean has_file = jaxb_scn.getFile()!=null;
                 boolean has_scenario = jaxb_scn.getScenario()!=null;
@@ -53,7 +53,7 @@ public class Project {
                     // GG: This is more or less a hack. Is there a better way?
 
                     // marshall jaxbopt.Scenario into StringWriter
-                    JAXBContext jaxbContext = JAXBContext.newInstance(jaxbopt.Scenario.class);
+                    JAXBContext jaxbContext = JAXBContext.newInstance(jaxb.Scenario.class);
                     Marshaller marshaller = jaxbContext.createMarshaller();
                     StringWriter sw = new StringWriter();
                     marshaller.marshal(jaxb_scn.getScenario(),sw);
@@ -171,14 +171,14 @@ public class Project {
     // protected and private
     /////////////////////////////////////
 
-    protected jaxbopt.Prj to_jaxb(Map<String,String> scenario_file_names){
-        jaxbopt.Prj jaxbPrj = new jaxbopt.Prj();
-        jaxbopt.Scns jaxbScns = new jaxbopt.Scns();
+    protected jaxb.Prj to_jaxb(Map<String,String> scenario_file_names){
+        jaxb.Prj jaxbPrj = new jaxb.Prj();
+        jaxb.Scns jaxbScns = new jaxb.Scns();
         jaxbPrj.setScns(jaxbScns);
 
-        List<jaxbopt.Scn> scnlist = jaxbScns.getScn();
+        List<jaxb.Scn> scnlist = jaxbScns.getScn();
         for(FreewayScenario fwy_scenario: scenarios.values()) {
-            jaxbopt.Scn jScn = fwy_scenario.to_jaxb();
+            jaxb.Scn jScn = fwy_scenario.to_jaxb();
             jScn.setFile(scenario_file_names.get(jScn.getName()));
             scnlist.add(jScn);
         }

@@ -27,7 +27,7 @@ public class ProjectFactory {
     public static Project load_project(String filename,boolean validate) throws Exception {
         try {
             File project_file = new File(filename);
-            return new Project((jaxbopt.Prj) create_unmarshaller().unmarshal(project_file),project_file.getParent(),validate);
+            return new Project((jaxb.Prj) create_unmarshaller().unmarshal(project_file),project_file.getParent(),validate);
         } catch(org.xml.sax.SAXException e){
             throw new Exception(e);
         }  catch (JAXBException e) {
@@ -66,7 +66,7 @@ public class ProjectFactory {
         }
 
         // save project file
-        create_marshaller(jaxbopt.Prj.class).marshal(project.to_jaxb(scenario_file_names), file_info.get_project_file());
+        create_marshaller(jaxb.Prj.class).marshal(project.to_jaxb(scenario_file_names), file_info.get_project_file());
 
     }
 
@@ -106,7 +106,7 @@ public class ProjectFactory {
     /////////////////////////////////////
 
     private static Unmarshaller create_unmarshaller() throws JAXBException, SAXException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(jaxbopt.Prj.class);
+        JAXBContext jaxbContext = JAXBContext.newInstance(jaxb.Prj.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 //        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 //        InputStream resourceAsStream = ProjectFactory.class.getResourceAsStream("/opt.xsd");

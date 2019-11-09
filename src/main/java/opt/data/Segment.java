@@ -24,7 +24,7 @@ public final class Segment implements Comparable {
     public Segment(){}
 
     // used by FreewayScenario jaxb constructor
-    public Segment(FreewayScenario fwy_scenario,long id, jaxbopt.Sgmt sgmt) {
+    public Segment(FreewayScenario fwy_scenario,long id, jaxb.Sgmt sgmt) {
 
         this.id = id;
         this.fwy_scenario = fwy_scenario;
@@ -391,8 +391,8 @@ public final class Segment implements Comparable {
         }
     }
 
-    protected jaxbopt.Sgmt to_jaxb(){
-        jaxbopt.Sgmt sgmt = new jaxbopt.Sgmt();
+    protected jaxb.Sgmt to_jaxb(){
+        jaxb.Sgmt sgmt = new jaxb.Sgmt();
         sgmt.setName(name);
         sgmt.setType(get_type());
 

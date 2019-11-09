@@ -162,7 +162,7 @@
                             <xsdOptions>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/opt.xsd</xsd>
-                                    <packagename>jaxbopt</packagename>
+                                    <packagename>jaxb</packagename>
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>

@@ -37,7 +37,7 @@ public class FreewayScenario {
         scenario.commodities.put(0l,new Commodity(0l,"Unnamed commodity",1f));
     }
 
-    public FreewayScenario(String name,jaxbopt.Lnks jaxb_lnks,jaxbopt.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
+    public FreewayScenario(String name,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
 
         this.name = name;
 
@@ -46,7 +46,7 @@ public class FreewayScenario {
 
         // attach link names
         if (jaxb_lnks!=null)
-            for(jaxbopt.Lnk lnk : jaxb_lnks.getLnk())
+            for(jaxb.Lnk lnk : jaxb_lnks.getLnk())
                 if (scenario.links.containsKey(lnk.getId())) {
                     AbstractLink link = scenario.links.get(lnk.getId());
                     link.set_name(lnk.getName());
@@ -99,7 +99,7 @@ public class FreewayScenario {
         // create segments
         long max_sgmt_id = 0;
         if(jaxb_segments!=null)
-            for (jaxbopt.Sgmt sgmt : jaxb_segments.getSgmt()) {
+            for (jaxb.Sgmt sgmt : jaxb_segments.getSgmt()) {
                 Segment segment = new Segment(this,max_sgmt_id++, sgmt);
                 segments.put(segment.id,segment);
             }
@@ -560,23 +560,23 @@ public class FreewayScenario {
     // protected and private
     /////////////////////////////////////
 
-    protected jaxbopt.Scn to_jaxb(){
-        jaxbopt.Scn scn = new jaxbopt.Scn();
+    protected jaxb.Scn to_jaxb(){
+        jaxb.Scn scn = new jaxb.Scn();
         scn.setName(name);
 
-        jaxbopt.Sgmts sgmts = new jaxbopt.Sgmts();
+        jaxb.Sgmts sgmts = new jaxb.Sgmts();
         scn.setSgmts(sgmts);
         for(Segment segment : segments.values())
             sgmts.getSgmt().add(segment.to_jaxb());
 
-        jaxbopt.Lnks lnks = new jaxbopt.Lnks();
+        jaxb.Lnks lnks = new jaxb.Lnks();
         scn.setLnks(lnks);
         List<AbstractLink> all_links = get_links();
         Collections.sort(all_links);
         for(AbstractLink link : all_links ){
             if(link==null)
                 continue;
-            jaxbopt.Lnk lnk = new jaxbopt.Lnk();
+            jaxb.Lnk lnk = new jaxb.Lnk();
             lnk.setId(link.id);
             lnk.setName(link.get_name());
 //            lnk.setManagedLanes(BigInteger.valueOf(link.get_mng_lanes()));
