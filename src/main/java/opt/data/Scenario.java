@@ -131,7 +131,7 @@ public class Scenario {
     // protected and private
     /////////////////////////////////////
 
-    protected jaxb.Scenario to_jaxb(Collection<Segment> segments) throws Exception {
+    protected jaxb.Scenario to_jaxb() throws Exception {
         jaxb.Scenario jScn = new jaxb.Scenario();
 
         /////////////////////////////////////////////////////

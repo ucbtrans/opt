@@ -54,20 +54,8 @@ public class ProjectFactory {
         // parse the filePath
         FileInfo file_info = new FileInfo(filePath);
 
-        // save each of the scenarios
-        Map<String,String> scenario_file_names = new HashMap<>();
-        for(String scenario_name : project.get_scenario_names()){
-            FreewayScenario fwy_scenario = project.get_scenario_with_name(scenario_name);
-            File scenario_file = file_info.get_scenario_file(scenario_name);
-            scenario_file_names.put(scenario_name,scenario_file.getName());
-            create_marshaller(jaxb.Scenario.class).marshal(
-                    fwy_scenario.scenario.to_jaxb(fwy_scenario.segments.values()),
-                    scenario_file);
-        }
-
         // save project file
-        create_marshaller(jaxb.Prj.class).marshal(project.to_jaxb(scenario_file_names), file_info.get_project_file());
-
+        create_marshaller(jaxb.Prj.class).marshal(project.to_jaxb(), file_info.get_project_file());
     }
 
     /////////////////////////////////////

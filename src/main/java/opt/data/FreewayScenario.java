@@ -560,8 +560,11 @@ public class FreewayScenario {
     // protected and private
     /////////////////////////////////////
 
-    protected jaxb.Scn to_jaxb(){
+    protected jaxb.Scn to_jaxb() throws Exception {
         jaxb.Scn scn = new jaxb.Scn();
+
+        scn.setScenario(scenario.to_jaxb());
+
         scn.setName(name);
 
         jaxb.Sgmts sgmts = new jaxb.Sgmts();

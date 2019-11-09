@@ -171,7 +171,7 @@ public class Project {
     // protected and private
     /////////////////////////////////////
 
-    protected jaxb.Prj to_jaxb(Map<String,String> scenario_file_names){
+    protected jaxb.Prj to_jaxb() throws Exception {
         jaxb.Prj jaxbPrj = new jaxb.Prj();
         jaxb.Scns jaxbScns = new jaxb.Scns();
         jaxbPrj.setScns(jaxbScns);
@@ -179,7 +179,7 @@ public class Project {
         List<jaxb.Scn> scnlist = jaxbScns.getScn();
         for(FreewayScenario fwy_scenario: scenarios.values()) {
             jaxb.Scn jScn = fwy_scenario.to_jaxb();
-            jScn.setFile(scenario_file_names.get(jScn.getName()));
+//            jScn.setFile(scenario_file_names.get(jScn.getName()));
             scnlist.add(jScn);
         }
         return jaxbPrj;
