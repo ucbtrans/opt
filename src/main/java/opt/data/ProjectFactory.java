@@ -108,10 +108,10 @@ public class ProjectFactory {
     private static Unmarshaller create_unmarshaller() throws JAXBException, SAXException {
         JAXBContext jaxbContext = JAXBContext.newInstance(jaxbopt.Prj.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        InputStream resourceAsStream = ProjectFactory.class.getResourceAsStream("/opt.xsd");
-        Schema schema = sf.newSchema(new StreamSource(resourceAsStream));
-        unmarshaller.setSchema(schema);
+//        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+//        InputStream resourceAsStream = ProjectFactory.class.getResourceAsStream("/opt.xsd");
+//        Schema schema = sf.newSchema(new StreamSource(resourceAsStream));
+//        unmarshaller.setSchema(schema);
         return unmarshaller;
     }
 

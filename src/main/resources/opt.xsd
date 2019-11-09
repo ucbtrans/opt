@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0.2"
 	targetNamespace="https://github.com/ucbtrans/opt"
-    xmlns:opt="https://github.com/ucbtrans/opt"
+	xmlns:opt="https://github.com/ucbtrans/opt"
+	xmlns:otm="opentrafficmodels"
 	elementFormDefault="qualified">
 
-<!--	<xs:import schemaLocation="otm.xsd" namespace="opentrafficmodels" />-->
+	<xs:import schemaLocation="otm.xsd" namespace="opentrafficmodels" />
 
 	<xs:element name="prj">
+
 		<xs:complexType>
 			<xs:all>
 				<xs:element ref="opt:scns" minOccurs="0" maxOccurs="1" />
@@ -25,13 +27,14 @@
 	<xs:element name="scn">
 		<xs:complexType>
 			<xs:all>
+				<xs:element ref="otm:scenario" minOccurs="0" maxOccurs="1" />
 				<xs:element ref="opt:lnks" minOccurs="0" maxOccurs="1" />
 				<xs:element ref="opt:sgmts" minOccurs="0" maxOccurs="1" />
 			</xs:all>
 			<xs:attribute name="name" type="xs:string" default="unnamed" />
 
 			<!-- Full file name for the scenario. THIS WILL BE REMOVED IN FUTURE VERSIONS -->
-			<xs:attribute name="file" type="xs:string" use="required" />
+			<xs:attribute name="file" type="xs:string" use="optional" />
 
 		</xs:complexType>
 	</xs:element>

@@ -3,7 +3,10 @@ package opt.data;
 import error.OTMException;
 import xml.JaxbLoader;
 
-import java.io.File;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.*;
 import java.util.*;
 
 public class Project {
@@ -27,15 +30,43 @@ public class Project {
 
             for(jaxbopt.Scn jaxb_scn : project.getScns().getScn()){
 
-                String scn_file = (new File(folder,jaxb_scn.getFile())).getAbsolutePath();
-                String scn_name = jaxb_scn.getName();
+                boolean has_file = jaxb_scn.getFile()!=null;
+                boolean has_scenario = jaxb_scn.getScenario()!=null;
 
+                // error conditions
+                if(!(has_file ^ has_scenario))
+                    throw new Exception("Error code: lsdgfj_TKK");
+
+                String scn_name = jaxb_scn.getName();
                 if(scenarios.containsKey(scn_name))
                     throw new Exception("Repeated scenario name in project file.");
 
-                // load the scenario
-                jaxb.Scenario jaxb_scenario = JaxbLoader.load_scenario(scn_file,validate);
+                // load the scenario from a file
+                jaxb.Scenario jaxb_scenario = null;
+                if(has_file){
+                    String scn_file = (new File(folder,jaxb_scn.getFile())).getAbsolutePath();
+                    jaxb_scenario = JaxbLoader.load_scenario(scn_file,validate);
+                }
+
+                if(has_scenario){
+
+                    // GG: This is more or less a hack. Is there a better way?
+
+                    // marshall jaxbopt.Scenario into StringWriter
+                    JAXBContext jaxbContext = JAXBContext.newInstance(jaxbopt.Scenario.class);
+                    Marshaller marshaller = jaxbContext.createMarshaller();
+                    StringWriter sw = new StringWriter();
+                    marshaller.marshal(jaxb_scn.getScenario(),sw);
+
+                    // unmarshall string into jaxb.Scenario
+                    JAXBContext jaxbContext2 = JAXBContext.newInstance(jaxb.Scenario.class);
+                    Unmarshaller unmarshaller2 = jaxbContext2.createUnmarshaller();
+                    jaxb_scenario = (jaxb.Scenario) unmarshaller2.unmarshal(new StringReader(sw.toString()));
+                }
+
+                // build the FreewayScenario and store
                 scenarios.put(scn_name,new FreewayScenario(scn_name,jaxb_scn.getLnks(),jaxb_scn.getSgmts(),jaxb_scenario));
+
             }
 
         } catch (OTMException e) {
