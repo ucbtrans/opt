@@ -48,21 +48,8 @@ public class Project {
                     jaxb_scenario = JaxbLoader.load_scenario(scn_file,validate);
                 }
 
-                if(has_scenario){
-
-                    // GG: This is more or less a hack. Is there a better way?
-
-                    // marshall jaxbopt.Scenario into StringWriter
-                    JAXBContext jaxbContext = JAXBContext.newInstance(jaxb.Scenario.class);
-                    Marshaller marshaller = jaxbContext.createMarshaller();
-                    StringWriter sw = new StringWriter();
-                    marshaller.marshal(jaxb_scn.getScenario(),sw);
-
-                    // unmarshall string into jaxb.Scenario
-                    JAXBContext jaxbContext2 = JAXBContext.newInstance(jaxb.Scenario.class);
-                    Unmarshaller unmarshaller2 = jaxbContext2.createUnmarshaller();
-                    jaxb_scenario = (jaxb.Scenario) unmarshaller2.unmarshal(new StringReader(sw.toString()));
-                }
+                if(has_scenario)
+                	jaxb_scenario = jaxb_scn.getScenario();
 
                 // build the FreewayScenario and store
                 scenarios.put(scn_name,new FreewayScenario(scn_name,jaxb_scn.getLnks(),jaxb_scn.getSgmts(),jaxb_scenario));

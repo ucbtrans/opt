@@ -4,6 +4,7 @@ import geometry.Side;
 import jaxb.ModelParams;
 import jaxb.Roadgeom;
 import jaxb.Roadparam;
+import models.AbstractFluidModel;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
@@ -15,8 +16,10 @@ public class Scenario {
     protected Map<Long, Node> nodes = new HashMap<>();
     protected Map<Long, AbstractLink> links = new HashMap<>();
     protected Map<Long, Commodity> commodities = new HashMap<>();
+    protected Map<Long, AbstractController> controllers = new HashMap<>();
+	protected Map<Long, AbstractActuator> actuators = new HashMap<>();
 
-    /////////////////////////////////////
+	/////////////////////////////////////
     // construction
     /////////////////////////////////////
 
@@ -110,6 +113,41 @@ public class Scenario {
             for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
                 this.commodities.put(comm.getId(),new Commodity(comm.getId(),comm.getName(),comm.getPvequiv()));
 
+		// actuators
+		if(scenario.getActuators()!=null){
+			for(jaxb.Actuator jact : scenario.getActuators().getActuator()){
+				AbstractActuator act = null;
+				switch(jact.getType()){
+					case "ramp_meter":
+						act = new ActuatorRampMeter(jact,this);
+						break;
+					default:
+						throw new Exception("Wrong actuator type, actuator id=" + jact.getId());
+				}
+				this.actuators.put(jact.getId(), act);
+			}
+		}
+
+
+		// sensors
+		if(scenario.getSensors()!=null){
+			// TODO COMPLETE THIS
+		}
+
+		// controllers
+		if(scenario.getControllers()!=null){
+			for(jaxb.Controller jcnt : scenario.getControllers().getController()){
+				AbstractController cnt = null;
+				switch( jcnt.getType()){
+					case "XXXX":
+						cnt = new ControllerRampMeter(jcnt,this);
+						break;
+					default:
+						throw new Exception("Wrong controller type, controller id=" + jcnt.getId());
+				}
+				this.controllers.put(jcnt.getId(), cnt);
+			}
+		}
     }
 
     protected Scenario clone() {

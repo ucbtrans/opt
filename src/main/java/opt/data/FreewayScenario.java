@@ -210,6 +210,9 @@ public class FreewayScenario {
                                         OTMUtils.csv2list(split.getContent())));
                 }
 
+        // assign actuators
+
+
         // max ids
         reset_max_ids();
 
