@@ -49,7 +49,7 @@ public class TestProjectFactory extends AbstractTest {
     @Test
     public void test_save_project_to_file() {
         try {
-            Project project = ProjectFactory.load_project(get_test_fullpath("project2.opt"),true);
+            Project project = ProjectFactory.load_project(get_test_fullpath("project2_rm.opt"),true);
             ProjectFactory.save_project(project,get_test_fullpath("project_saved.opt"));
             Project project_saved = ProjectFactory.load_project(get_test_fullpath("project_saved.opt"),true);
             assertTrue(project.equals(project_saved));

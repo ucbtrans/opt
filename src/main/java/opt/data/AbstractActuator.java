@@ -1,15 +1,24 @@
 package opt.data;
 
-import java.util.Set;
-
 public abstract class AbstractActuator {
 	public long id;
-	public float min_value;
-	public float max_value;
+	public AbstractController myController;
+	public AbstractLink link;
 
 	public AbstractActuator(jaxb.Actuator j,Scenario scenario){
 		this.id = j.getId();
-		this.min_value = j.getMinValue();
-		this.max_value = j.getMaxValue();
 	}
+
+	public jaxb.Actuator to_jaxb(){
+		jaxb.Actuator j = new jaxb.Actuator();
+		j.setId(id);
+		j.setDt(myController.dt);
+		j.setType("ramp_meter");
+		jaxb.ActuatorTarget jtgt = new jaxb.ActuatorTarget();
+		j.setActuatorTarget(jtgt);
+		jtgt.setType("link");
+		jtgt.setId(link.id);
+		return j;
+	}
+
 }

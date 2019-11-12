@@ -1,5 +1,6 @@
 package opt.data;
 
+import error.OTMException;
 import opt.UserSettings;
 import profiles.Profile1D;
 import utils.OTMUtils;
@@ -210,8 +211,31 @@ public class FreewayScenario {
                                         OTMUtils.csv2list(split.getContent())));
                 }
 
-        // assign actuators
+        // assign actuators to links
+		if(jaxb_scenario.getActuators()!=null)
+			for(jaxb.Actuator jact : jaxb_scenario.getActuators().getActuator()){
+				if(jact.getActuatorTarget()==null)
+					continue;
+				switch(jact.getActuatorTarget().getType()){
+					case "link":
+						AbstractLink link = scenario.links.get(jact.getActuatorTarget().getId());
+						AbstractActuator act = scenario.actuators.get(jact.getId());
+						act.link = link;
+						link.actuator = act;
+						break;
+					default:
+						throw new OTMException("Unknown actuator target type: " + jact.getActuatorTarget().getType());
+				}
+			}
 
+		// assign controllers to actuators
+		for(AbstractController ctrl : this.scenario.controllers.values()){
+			for(AbstractActuator act : ctrl.actuators.values()){
+				if(act.myController!=null)
+					throw new OTMException(String.format("Actuator %d has been assigned to multiple controllers",act.id));
+				act.myController = ctrl;
+			}
+		}
 
         // max ids
         reset_max_ids();
@@ -247,7 +271,7 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
-    // scenario getters
+    // network getters
     /////////////////////////////////////
 
     public List<AbstractLink> get_links(){

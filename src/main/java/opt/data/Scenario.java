@@ -4,7 +4,6 @@ import geometry.Side;
 import jaxb.ModelParams;
 import jaxb.Roadgeom;
 import jaxb.Roadparam;
-import models.AbstractFluidModel;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
@@ -139,7 +138,8 @@ public class Scenario {
 			for(jaxb.Controller jcnt : scenario.getControllers().getController()){
 				AbstractController cnt = null;
 				switch( jcnt.getType()){
-					case "XXXX":
+					case "fuzzylogic":
+                    case "alinea":
 						cnt = new ControllerRampMeter(jcnt,this);
 						break;
 					default:
@@ -191,7 +191,6 @@ public class Scenario {
         // commodities
         jaxb.Commodities jComms = new jaxb.Commodities();
         jScn.setCommodities(jComms);
-
         for(Map.Entry<Long, Commodity> e : commodities.entrySet()){
             jaxb.Commodity jcomm = new jaxb.Commodity();
             jComms.getCommodity().add(jcomm);
@@ -216,7 +215,7 @@ public class Scenario {
             jNodes.getNode().add(jaxbNode);
         }
 
-        // read road parameters and geometries from the links
+        // read road parameters and geometries from the links ...........
         Map<Long,AddlanesAndRoadParams> link2addlanesAndParams = new HashMap<>();
         Set<FDparams> unique_roadparams = new HashSet<>();
         Set<RoadGeom> unique_roadgeoms = new HashSet<>();
@@ -235,13 +234,13 @@ public class Scenario {
                 unique_roadgeoms.add(x.roadGeom);
         }
 
-        // map from params to its id
+        // map from params to its id ...................
         Map<FDparams,Long> param2id = new HashMap<>();
         long c = 0;
         for(FDparams rp : unique_roadparams)
             param2id.put(rp,c++);
 
-        // map from roadgeom to its id
+        // map from roadgeom to its id ...................
         Map<RoadGeom,Long> geom2id = new HashMap<>();
         c = 0;
         for(RoadGeom rg : unique_roadgeoms)
@@ -288,7 +287,8 @@ public class Scenario {
                 jaxbLink.setRoadgeom(geom2id.get(x.roadGeom));
         }
 
-        // demands ........................................
+        /////////////////////////////////////////////////////
+        // demands
         jaxb.Demands jdemands = new jaxb.Demands();
         jScn.setDemands(jdemands);
         for(AbstractLink link : links.values()) {
@@ -306,10 +306,10 @@ public class Scenario {
             }
         }
 
+        /////////////////////////////////////////////////////
         // splits
         jaxb.Splits jsplits = new jaxb.Splits();
         jScn.setSplits(jsplits);
-
         for(Node node : nodes.values() ) {
 
             // get offramp links ........................
@@ -403,6 +403,22 @@ public class Scenario {
             }
 
         }
+
+        /////////////////////////////////////////////////////
+        // actuators
+        jaxb.Actuators jacts = new jaxb.Actuators();
+        if(!actuators.isEmpty())
+            jScn.setActuators(jacts);
+        for(AbstractActuator act : actuators.values())
+            jacts.getActuator().add(act.to_jaxb());
+
+        /////////////////////////////////////////////////////
+        // controllers
+        jaxb.Controllers jcntrls = new jaxb.Controllers();
+        if(!controllers.isEmpty())
+            jScn.setControllers(jcntrls);
+        for(AbstractController cntrl : controllers.values())
+            jcntrls.getController().add(cntrl.to_jaxb());
 
         return jScn;
     }

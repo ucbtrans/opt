@@ -89,7 +89,7 @@
                 </actuators>
 
                 <controllers>
-                    <controller id="8" type="XXXX" dt="10">
+                    <controller id="8" type="fuzzylogic" dt="10">
                         <target_actuators ids="8"/>
                         <!-- <feedback_sensors> -->
 <!--                         </feedback_sensors>
