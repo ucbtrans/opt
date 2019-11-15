@@ -2,6 +2,8 @@ package opt.data;
 
 import error.OTMException;
 import opt.UserSettings;
+import opt.data.control.AbstractActuator;
+import opt.data.control.AbstractController;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
@@ -20,6 +22,7 @@ public class FreewayScenario {
     public String name;
     protected Scenario scenario;
     protected Map<Long,Segment> segments = new HashMap<>();
+    protected Schedule controller_schedule = new Schedule();
 
     /////////////////////////////////////
     // construction
@@ -268,6 +271,14 @@ public class FreewayScenario {
         }
 
         return scn_cpy;
+    }
+
+    /////////////////////////////////////
+    // controller getters
+    /////////////////////////////////////
+
+    public Schedule get_schedule(){
+        return controller_schedule;
     }
 
     /////////////////////////////////////

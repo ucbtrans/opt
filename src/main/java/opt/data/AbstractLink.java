@@ -1,5 +1,6 @@
 package opt.data;
 
+import opt.data.control.AbstractActuator;
 import profiles.Profile1D;
 
 import java.lang.reflect.InvocationTargetException;

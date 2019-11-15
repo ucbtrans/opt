@@ -4,6 +4,7 @@ import geometry.Side;
 import jaxb.ModelParams;
 import jaxb.Roadgeom;
 import jaxb.Roadparam;
+import opt.data.control.*;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
@@ -120,6 +121,9 @@ public class Scenario {
 					case "ramp_meter":
 						act = new ActuatorRampMeter(jact,this);
 						break;
+                    case "policy":
+                        act = new ActuatorPolicy(jact,this);
+                        break;
 					default:
 						throw new Exception("Wrong actuator type, actuator id=" + jact.getId());
 				}
@@ -138,12 +142,20 @@ public class Scenario {
 			for(jaxb.Controller jcnt : scenario.getControllers().getController()){
 				AbstractController cnt = null;
 				switch( jcnt.getType()){
-					case "fuzzylogic":
+					case "tod":
+                        cnt = new ControllerRampMeterTOD(jcnt,this);
+                        break;
                     case "alinea":
-						cnt = new ControllerRampMeter(jcnt,this);
+						cnt = new ControllerRampMeterAlinea(jcnt,this);
 						break;
+                    case "hov":
+                        cnt = new ControllerPolicyHOV(jcnt,this);
+                        break;
+                    case "hot":
+                        cnt = new ControllerPolicyHOT(jcnt,this);
+                        break;
 					default:
-						throw new Exception("Wrong controller type, controller id=" + jcnt.getId());
+						throw new Exception("Unkonwn controller type: " + jcnt.getType());
 				}
 				this.controllers.put(jcnt.getId(), cnt);
 			}
@@ -163,6 +175,14 @@ public class Scenario {
             jscn_cpy.commodities.put(e.getKey(),e.getValue().clone());
 
         return jscn_cpy;
+    }
+
+    /////////////////////////////////////
+    // public
+    /////////////////////////////////////
+
+    public AbstractActuator get_actuator_with_id(long id){
+        return actuators.get(id);
     }
 
     /////////////////////////////////////

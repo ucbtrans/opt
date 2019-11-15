@@ -1,6 +1,7 @@
 package opt.data;
 
 import jaxb.Actuator;
+import opt.data.control.AbstractActuator;
 
 public class ActuatorRampMeter extends AbstractActuator {
 
