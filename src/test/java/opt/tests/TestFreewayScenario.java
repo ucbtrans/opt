@@ -19,7 +19,7 @@ public class TestFreewayScenario extends AbstractTest {
 
     @Test
     public void test_get_links(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         Collection<AbstractLink> links = X.scenario.get_links();
         assertNotNull(links);
         assertEquals(16,links.stream().count());
@@ -31,23 +31,22 @@ public class TestFreewayScenario extends AbstractTest {
 
     @Test
     public void test_get_linear_freeway_segments(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         List<List<Segment>> fwys = X.scenario.get_linear_freeway_segments();
         assertEquals(6,fwys.get(0).size());
         assertEquals(2,fwys.get(1).size());
     }
 
-
     @Test
     public void test_get_connectors(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         List<LinkConnector> connectors = X.scenario.get_connectors();
         assertEquals(12L,connectors.get(0).get_id());
     }
 
     @Test
     public void test_get_segments(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         Collection<Segment> segments = X.scenario.get_segments();
         assertNotNull(segments);
         assertEquals(9,segments.size());
@@ -55,19 +54,19 @@ public class TestFreewayScenario extends AbstractTest {
 
     @Test
     public void test_get_segment_names(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         assertEquals(9,X.scenario.get_segment_names().size());
     }
 
     @Test
     public void test_get_segment_by_name(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         assertEquals("sA1",X.scenario.get_segment_by_name("sA1").name);
     }
 
     @Test
     public void test_get_segment_with_id(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         Segment segment = X.scenario.get_segment_with_id(0l);
         assertNotNull(segment);
     }
@@ -78,7 +77,7 @@ public class TestFreewayScenario extends AbstractTest {
 
     @Test
     public void test_create_isolated_segment() {
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         ParametersFreeway params = new ParametersFreeway(100f,200f,300f,100f,200f,300f,100f,200f,300f);
         Segment new_segment =  X.scenario.create_isolated_segment("Lonely segment",params,AbstractLink.Type.freeway);
         assertNotNull(new_segment);
@@ -87,7 +86,7 @@ public class TestFreewayScenario extends AbstractTest {
     @Test
     public void test_delete_segment() {
         try {
-            TestData X = new TestData();
+            TestData X = new TestData("project2.opt");
             Segment sA2 = X.scenario.get_segment_by_name("sA2");
             Segment sA3 = X.scenario.get_segment_by_name("sA3");
             Segment sA4 = X.scenario.get_segment_by_name("sA4");
@@ -135,14 +134,14 @@ public class TestFreewayScenario extends AbstractTest {
 
     @Test
     public void test_get_commodities(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         assertEquals(1,X.scenario.get_commodities().size());
     }
 
     @Test
     public void test_get_commodity_by_name(){
         try {
-            TestData X = new TestData();
+            TestData X = new TestData("project2.opt");
             assertNotNull(X.scenario.get_commodity_by_name("c1"));
         } catch (Exception e) {
             fail(e.getMessage());
@@ -152,14 +151,13 @@ public class TestFreewayScenario extends AbstractTest {
     @Test
     public void test_create_commodity(){
         try {
-            TestData X = new TestData();
+            TestData X = new TestData("project2.opt");
             Commodity new_comm = X.scenario.create_commodity("new commodity", 1.2f);
             assertNotNull(new_comm);
             assertEquals(new_comm,X.scenario.get_commodity_by_name("new commodity"));
         } catch (Exception e) {
             fail(e.getMessage());
         }
-
     }
 
     /////////////////////////////////////
@@ -168,14 +166,14 @@ public class TestFreewayScenario extends AbstractTest {
 
     @Test
     public void test_is_valid_segment_name() {
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         assertFalse(X.scenario.is_valid_segment_name("sA3"));
         assertTrue(X.scenario.is_valid_segment_name("invalid name"));
     }
 
     @Test
     public void test_is_valid_link_name() {
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         assertFalse(X.scenario.is_valid_link_name("lA13"));
         assertTrue(X.scenario.is_valid_link_name("invalid name"));
     }

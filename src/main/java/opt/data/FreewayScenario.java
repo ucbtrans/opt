@@ -18,6 +18,8 @@ public class FreewayScenario {
     private Long max_link_id;
     private Long max_node_id;
     private Long max_seg_id;
+    private Long max_controller_id;
+    private Long max_actuator_id;
 
     public String name;
     protected Scenario scenario;
@@ -36,6 +38,8 @@ public class FreewayScenario {
         max_link_id = -1l;
         max_node_id = -1l;
         max_seg_id = -1l;
+        max_controller_id = -1l;
+        max_actuator_id = -1l;
         scenario = new Scenario();
         create_isolated_segment(segmentname,params, AbstractLink.Type.freeway);
         scenario.commodities.put(0l,new Commodity(0l,"Unnamed commodity",1f));
@@ -240,6 +244,12 @@ public class FreewayScenario {
 			}
 		}
 
+		// populate the schedule
+        this.controller_schedule = new Schedule();
+        for(AbstractController ctrl : this.scenario.controllers.values())
+            controller_schedule.items.add(ctrl);
+        Collections.sort(controller_schedule.items);
+
         // max ids
         reset_max_ids();
 
@@ -251,8 +261,9 @@ public class FreewayScenario {
         scn_cpy.max_link_id = max_link_id;
         scn_cpy.max_node_id = max_node_id;
         scn_cpy.max_seg_id = max_seg_id;
+        scn_cpy.max_controller_id = max_controller_id;
+        scn_cpy.max_actuator_id = max_actuator_id;
         scn_cpy.scenario = scenario.clone();
-        scn_cpy.segments = new HashMap<>();
         for(Map.Entry<Long,Segment> e : segments.entrySet()) {
             Segment new_segment = e.getValue().clone();
             new_segment.fwy_scenario = scn_cpy;
@@ -270,15 +281,45 @@ public class FreewayScenario {
                 new_link.dn_link = scn_cpy.scenario.links.get(link.dn_link.id);
         }
 
+        for(AbstractController ctrl : controller_schedule.items)
+            scn_cpy.controller_schedule.items.add(ctrl);
+
         return scn_cpy;
     }
 
     /////////////////////////////////////
-    // controller getters
+    // scenario
     /////////////////////////////////////
 
-    public Schedule get_schedule(){
+    public Scenario get_scenario(){
+        return scenario;
+    }
+
+    /////////////////////////////////////
+    // controller
+    /////////////////////////////////////
+
+    public Schedule get_controller_schedule(){
         return controller_schedule;
+    }
+
+    public void clear_controller_schedule(){
+        controller_schedule.items.clear();
+    }
+
+    public void add_controller(AbstractController controller){
+        if(!scenario.controllers.containsKey(controller.id))
+            scenario.controllers.put(controller.id,controller);
+        controller_schedule.items.add(controller);
+        Collections.sort(controller_schedule.items);
+    }
+
+    public void delete_controller(long id) throws OTMException {
+        if(scenario.controllers.containsKey(id)){
+            AbstractController ctrl = scenario.controllers.get(id);
+            controller_schedule.items.remove(ctrl);
+            scenario.controllers.remove(id);
+        }
     }
 
     /////////////////////////////////////
@@ -627,6 +668,7 @@ public class FreewayScenario {
             lnk.setIsInner(link.get_is_inner());
             lnks.getLnk().add(lnk);
         }
+
         return scn;
     }
 
@@ -651,6 +693,16 @@ public class FreewayScenario {
                 .max(Comparator.comparing(Long::valueOf));
         max_seg_id = opt_max_seg_id.isPresent() ? opt_max_seg_id.get() : 0l;
 
+        // controller
+        Optional<Long> opt_max_cntrl_id = scenario.controllers.keySet().stream()
+                .max(Comparator.comparing(Long::valueOf));
+        max_controller_id = opt_max_cntrl_id.isPresent() ? opt_max_cntrl_id.get() : 0l;
+
+        // actuator
+        Optional<Long> opt_max_act_id = scenario.actuators.keySet().stream()
+                .max(Comparator.comparing(Long::valueOf));
+        max_actuator_id = opt_max_act_id.isPresent() ? opt_max_act_id.get() : 0l;
+
     }
 
     protected long new_link_id(){
@@ -663,6 +715,14 @@ public class FreewayScenario {
 
     protected long new_seg_id(){
         return ++max_seg_id;
+    }
+
+    public long new_controller_id(){
+        return ++max_controller_id;
+    }
+
+    public long new_actuator_id(){
+        return ++max_actuator_id;
     }
 
     private List<Segment> build_freeway_from_segment(Segment first){

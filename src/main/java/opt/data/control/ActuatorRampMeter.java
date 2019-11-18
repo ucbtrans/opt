@@ -1,12 +1,16 @@
 package opt.data.control;
 
 import jaxb.Actuator;
-import opt.data.Scenario;
+import opt.data.AbstractLink;
 
 public class ActuatorRampMeter extends AbstractActuator {
 
-	public ActuatorRampMeter(Actuator j, Scenario scenario) {
-		super(j, scenario);
+	public ActuatorRampMeter(long id, AbstractLink link){
+		super(id,link);
+	}
+
+	public ActuatorRampMeter(Actuator j) {
+		super(j);
 	}
 
 	@Override

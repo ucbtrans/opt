@@ -166,7 +166,6 @@ public class Project {
         List<jaxb.Scn> scnlist = jaxbScns.getScn();
         for(FreewayScenario fwy_scenario: scenarios.values()) {
             jaxb.Scn jScn = fwy_scenario.to_jaxb();
-//            jScn.setFile(scenario_file_names.get(jScn.getName()));
             scnlist.add(jScn);
         }
         return jaxbPrj;

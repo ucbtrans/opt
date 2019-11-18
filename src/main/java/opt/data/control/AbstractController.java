@@ -1,16 +1,15 @@
 package opt.data.control;
 
 import error.OTMException;
+import opt.data.FreewayScenario;
 import opt.data.Scenario;
 import utils.OTMUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
 
-public abstract class AbstractController {
+public abstract class AbstractController implements Comparable {
 
 	// TODO Use the one in otm-sim instead
 	public enum Algorithm {
@@ -27,23 +26,36 @@ public abstract class AbstractController {
 	public Algorithm algorithm;
 	public Map<Long,AbstractActuator> actuators;
 
-	public AbstractController(jaxb.Controller j, Scenario scn) throws OTMException {
-		this.id = j.getId();
-		this.dt = j.getDt();
-		this.start_time = j.getStartTime();
-		this.end_time = j.getEndTime()==null ? Float.POSITIVE_INFINITY : j.getEndTime();
-		this.algorithm = Algorithm.valueOf(j.getType());
-		this.actuators = new HashMap<>();
-		List<Long> ids = OTMUtils.csv2longlist(j.getTargetActuators().getIds());
-		for(Long id :ids)
-			this.actuators.put(id,scn.get_actuator_with_id(id));
+	public AbstractController(long id, float dt, float start_time, Float end_time, String algorithm, Collection<AbstractActuator> actuators) throws OTMException {
 
 		// CHECKS
 		if(start_time<0)
 			throw new OTMException("start_time<0");
 
-		if(end_time<=start_time)
+		if(end_time!=null && end_time<=start_time)
 			throw new OTMException("end_time<=start_time");
+
+		if(actuators.stream().anyMatch(x->x==null))
+			throw new OTMException("Bad id in actuator list for controller id="+id);
+
+		this.id = id;
+		this.dt = dt;
+		this.start_time = start_time;
+		this.end_time = end_time==null ? Float.POSITIVE_INFINITY : end_time;
+		try {
+			this.algorithm = Algorithm.valueOf(algorithm);
+		} catch(IllegalArgumentException e){
+			throw new OTMException(e.getMessage());
+		}
+		this.actuators = new HashMap<>();
+		for(AbstractActuator act :actuators)
+			this.actuators.put(act.id,act);
+
+	}
+
+	public AbstractController(jaxb.Controller j, Scenario scn) throws OTMException {
+		this(j.getId(),j.getDt(),j.getStartTime(),j.getEndTime(),j.getType(),
+				OTMUtils.csv2longlist(j.getTargetActuators().getIds()).stream().map(act->scn.get_actuator_with_id(act)).collect(toSet()));
 	}
 
 	public jaxb.Controller to_jaxb(){
@@ -96,6 +108,18 @@ public abstract class AbstractController {
 
 	public void setAlgorithm(String algorithm) {
 		this.algorithm = Algorithm.valueOf(algorithm);
+	}
+
+
+
+	@Override
+	public int compareTo(Object o) {
+		AbstractController that = (AbstractController) o;
+		if(this.start_time<that.start_time)
+			return -1;
+		else if(this.start_time>that.start_time)
+			return 1;
+		else return 0;
 	}
 
 }

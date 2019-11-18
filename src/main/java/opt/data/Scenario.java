@@ -1,5 +1,6 @@
 package opt.data;
 
+import error.OTMException;
 import geometry.Side;
 import jaxb.ModelParams;
 import jaxb.Roadgeom;
@@ -119,10 +120,10 @@ public class Scenario {
 				AbstractActuator act = null;
 				switch(jact.getType()){
 					case "ramp_meter":
-						act = new ActuatorRampMeter(jact,this);
+						act = new opt.data.control.ActuatorRampMeter(jact);
 						break;
                     case "policy":
-                        act = new ActuatorPolicy(jact,this);
+                        act = new opt.data.control.ActuatorPolicy(jact);
                         break;
 					default:
 						throw new Exception("Wrong actuator type, actuator id=" + jact.getId());
@@ -178,11 +179,47 @@ public class Scenario {
     }
 
     /////////////////////////////////////
-    // public
+    // control
     /////////////////////////////////////
+
+    public Collection<AbstractActuator> get_actuators(){
+        return actuators.values();
+    }
 
     public AbstractActuator get_actuator_with_id(long id){
         return actuators.get(id);
+    }
+
+    public void add_actuator(AbstractActuator act) throws OTMException {
+        if(actuators.containsKey(act.id))
+            throw new OTMException("Actuator already exists");
+        actuators.put(act.id,act);
+    }
+
+    public void delete_actuator(long act_id) throws OTMException {
+        if(!actuators.containsKey(act_id))
+            throw new OTMException("Actuator doesn't exist");
+        actuators.remove(act_id);
+    }
+
+    public void add_controller(AbstractController ctrl) throws OTMException {
+        if(controllers.containsKey(ctrl.id))
+            throw new OTMException("Controller already exists");
+        controllers.put(ctrl.id,ctrl);
+    }
+
+    public void delete_controller(long ctrl_id) throws OTMException {
+        if(!controllers.containsKey(ctrl_id))
+            throw new OTMException("Controller doesn't exist");
+        controllers.remove(ctrl_id);
+    }
+
+    /////////////////////////////////////
+    // network
+    /////////////////////////////////////
+
+    public AbstractLink get_link_with_id(long id){
+        return links.get(id);
     }
 
     /////////////////////////////////////

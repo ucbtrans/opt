@@ -18,7 +18,7 @@ public class TestProject extends AbstractTest {
     @Ignore
     public void test_run_all_scenarios(){
         try {
-            TestData X = new TestData();
+            TestData X = new TestData("project2.opt");
             X.project.run_all_scenarios();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -29,7 +29,7 @@ public class TestProject extends AbstractTest {
     @Ignore
     public void test_run_scenario(){
         try {
-            TestData X = new TestData();
+            TestData X = new TestData("project2.opt");
             X.project.run_scenario("scenarioA");
         } catch (Exception e) {
             fail(e.getMessage());
@@ -43,7 +43,7 @@ public class TestProject extends AbstractTest {
     @Test
     public void test_get_scenario_names(){
         try {
-            TestData X = new TestData();
+            TestData X = new TestData("project2.opt");
             Collection<String> x = X.project.get_scenario_names();
             assertEquals(1,x.size());
             assertTrue(x.contains("scenarioA"));
@@ -56,7 +56,7 @@ public class TestProject extends AbstractTest {
     @Test
     public void test_get_scenarios(){
         try {
-            TestData X = new TestData();
+            TestData X = new TestData("project2.opt");
             Collection<FreewayScenario> x = X.project.get_scenarios();
             assertEquals(1,x.size());
         } catch (Exception e) {
@@ -67,7 +67,7 @@ public class TestProject extends AbstractTest {
     @Test
     public void test_get_scenario_with_name(){
         try {
-            TestData X = new TestData();
+            TestData X = new TestData("project2.opt");
             for(String name : X.project.get_scenario_names())
                 assertNotNull(X.project.get_scenario_with_name(name));
             assertNull(X.project.get_scenario_with_name("bad name"));
@@ -79,7 +79,7 @@ public class TestProject extends AbstractTest {
     @Test
     public void test_set_scenario_name(){
         try {
-            TestData X = new TestData();
+            TestData X = new TestData("project2.opt");
             X.project.set_scenario_name("scenarioA","newname");
             Collection<String> names = X.project.get_scenario_names();
             assertTrue(names.contains("newname"));
@@ -96,7 +96,7 @@ public class TestProject extends AbstractTest {
     @Test
     public void test_create_scenario() {
         try {
-            TestData X = new TestData();
+            TestData X = new TestData("project2.opt");
             String new_name = "new_scenario";
             X.project.create_scenario(new_name);
             assertNotNull(X.project.get_scenario_with_name(new_name));
@@ -113,7 +113,7 @@ public class TestProject extends AbstractTest {
     @Test
     public void test_clone_scenario(){
         try {
-            TestData X = new TestData();
+            TestData X = new TestData("project2.opt");
             X.project.clone_scenario("scenarioA","new_scenario");
             assertTrue(
                     X.project.get_scenario_with_name("scenarioA")

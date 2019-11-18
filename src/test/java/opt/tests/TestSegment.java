@@ -17,7 +17,7 @@ public class TestSegment extends AbstractTest {
     private static TestData sX;
 
     static{
-        sX = new TestData();
+        sX = new TestData("project2.opt");
     }
 
     /////////////////////////////////////
@@ -26,7 +26,7 @@ public class TestSegment extends AbstractTest {
 
     @Test
     public void test_set_get_length_meters(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         try {
             float ml_length = 3480.346f;
             Segment segment = X.scenario.get_segment_by_name("sA2");
@@ -123,7 +123,7 @@ public class TestSegment extends AbstractTest {
 
     @Test
     public void test_add_out_or(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         Segment segment = X.scenario.get_segment_by_name("sA1");
         assertTrue(segment.num_out_ors()==0);
         ParametersRamp params = new ParametersRamp(100f,200f,300f,100f,200f,300f);
@@ -137,7 +137,7 @@ public class TestSegment extends AbstractTest {
 
     @Test
     public void test_add_in_fr(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         Segment segment = X.scenario.get_segment_by_name("sA1");
         assertTrue(segment.num_in_frs()==0);
         ParametersRamp params = new ParametersRamp(100f,200f,300f,100f,200f,300f);
@@ -173,7 +173,7 @@ public class TestSegment extends AbstractTest {
     @Ignore
     @Test
     public void test_delete_out_or(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
 
         Segment sA7 = X.scenario.get_segment_by_name("sA7");
         Segment sA8 = X.scenario.get_segment_by_name("sA8");
@@ -199,7 +199,7 @@ public class TestSegment extends AbstractTest {
     @Test
     public void test_delete_out_fr(){
 
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         Segment sA1 = X.scenario.get_segment_by_name("sA1");
         LinkOfframp lA7 = sA1.out_frs(0);
 

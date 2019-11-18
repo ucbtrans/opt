@@ -1,14 +1,19 @@
 package opt.data.control;
 
 import opt.data.AbstractLink;
-import opt.data.Scenario;
 
 public abstract class AbstractActuator {
-	public long id;
-	public AbstractController myController;
-	public AbstractLink link;
 
-	public AbstractActuator(jaxb.Actuator j, Scenario scenario){
+	public long id;
+	public AbstractLink link;
+	public AbstractController myController;
+
+	public AbstractActuator(long id,AbstractLink link){
+		this.id = id;
+		this.link = link;
+	}
+
+	public AbstractActuator(jaxb.Actuator j){
 		this.id = j.getId();
 	}
 

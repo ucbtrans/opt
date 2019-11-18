@@ -27,7 +27,7 @@ public class TestLink extends AbstractTest {
 
     @Test
     public void test_insert_up_segment(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         Segment sA1 = X.scenario.get_segment_by_name("sA1");
         Segment sA2 = X.scenario.get_segment_by_name("sA2");
         Segment sA3 = X.scenario.get_segment_by_name("sA3");
@@ -92,7 +92,7 @@ public class TestLink extends AbstractTest {
     @Test
     public void test_insert_dn_segment(){
 
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
 
         Segment sA1 = X.scenario.get_segment_by_name("sA1");
         Segment sA3 = X.scenario.get_segment_by_name("sA3");
@@ -244,7 +244,7 @@ public class TestLink extends AbstractTest {
 
     @Test
     public void test_set_capacity_vphpl(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         Segment sA2 = X.scenario.get_segment_by_name("sA2");
         try {
             float ml_capacity = 3498.2356f;
@@ -257,7 +257,7 @@ public class TestLink extends AbstractTest {
 
     @Test
     public void test_set_jam_density_vpkpl(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         Segment sA2 = X.scenario.get_segment_by_name("sA2");
         try {
             float ml_jam_density = 245.234f;
@@ -270,7 +270,7 @@ public class TestLink extends AbstractTest {
 
     @Test
     public void test_set_freespeed_kph(){
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         Segment sA2 = X.scenario.get_segment_by_name("sA2");
         try {
             float ml_speed = 348934.435f;
@@ -288,7 +288,7 @@ public class TestLink extends AbstractTest {
     @Test
     public void test_set_demand_vph(){
 
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
         Segment sA3 = X.scenario.get_segment_by_name("sA3");
         LinkOnramp or8 = sA3.get_ors().get(0);
 
@@ -311,7 +311,7 @@ public class TestLink extends AbstractTest {
     @Test
     public void test_connect_to_upstream(){
 
-        TestData X = new TestData();
+        TestData X = new TestData("project2.opt");
 
         // TODO GG REMOVE THE FD CONSTRUCTOR FOR PARAMETERS
         ParametersFreeway params = new ParametersFreeway(100f,200f,300f,100f,200f,300f,100f,200f,300f);
