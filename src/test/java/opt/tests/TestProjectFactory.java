@@ -37,6 +37,7 @@ public class TestProjectFactory extends AbstractTest {
         ParametersFreeway params = new ParametersFreeway(100f,200f,300f,100f,200f,300f,100f,200f,300f);
         Project project = ProjectFactory.create_empty_project(
                 "Unnamed scenario",
+                "Empty description",
                 "Unnamed segment",
                 params);
         assertNotNull(project);

@@ -22,6 +22,7 @@ public class FreewayScenario {
     private Long max_actuator_id;
 
     public String name;
+    public String description;
     protected Scenario scenario;
     protected Map<Long,Segment> segments = new HashMap<>();
     protected Schedule controller_schedule = new Schedule();
@@ -33,8 +34,9 @@ public class FreewayScenario {
     public FreewayScenario() {
     }
 
-    public FreewayScenario(String scnname, String segmentname, ParametersFreeway params){
+    public FreewayScenario(String scnname,String description, String segmentname, ParametersFreeway params){
         this.name = scnname;
+        this.description = description;
         max_link_id = -1l;
         max_node_id = -1l;
         max_seg_id = -1l;
@@ -45,9 +47,10 @@ public class FreewayScenario {
         scenario.commodities.put(0l,new Commodity(0l,"Unnamed commodity",1f));
     }
 
-    public FreewayScenario(String name,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
+    public FreewayScenario(String name,String description,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
 
         this.name = name;
+        this.description = description;
 
         // create Scenario object
         this.scenario = new Scenario(jaxb_scenario);
@@ -258,6 +261,7 @@ public class FreewayScenario {
     public FreewayScenario clone(){
         FreewayScenario scn_cpy = new FreewayScenario();
         scn_cpy.name = name;
+        scn_cpy.description = description;
         scn_cpy.max_link_id = max_link_id;
         scn_cpy.max_node_id = max_node_id;
         scn_cpy.max_seg_id = max_seg_id;
@@ -645,6 +649,7 @@ public class FreewayScenario {
         scn.setScenario(scenario.to_jaxb());
 
         scn.setName(name);
+        scn.setDescription(description);
 
         jaxb.Sgmts sgmts = new jaxb.Sgmts();
         scn.setSgmts(sgmts);
@@ -746,12 +751,13 @@ public class FreewayScenario {
         if (o == null || getClass() != o.getClass()) return false;
         FreewayScenario that = (FreewayScenario) o;
         return name.equals(that.name) &&
+                description.equals(that.description) &&
                 scenario.equals(that.scenario) &&
                 segments.equals(that.segments);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, scenario, segments);
+        return Objects.hash(name, description, scenario, segments);
     }
 }

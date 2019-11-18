@@ -32,6 +32,7 @@
 				<xs:element ref="opt:sgmts" minOccurs="0" maxOccurs="1" />
 			</xs:all>
 			<xs:attribute name="name" type="xs:string" default="unnamed" />
+			<xs:attribute name="description" type="xs:string" default="unnamed" />
 
 			<!-- Full file name for the scenario. THIS WILL BE REMOVED IN FUTURE VERSIONS -->
 			<xs:attribute name="file" type="xs:string" use="optional" />

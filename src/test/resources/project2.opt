@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:prj xmlns="opentrafficmodels" xmlns:ns2="https://github.com/ucbtrans/opt">
     <ns2:scns>
-        <ns2:scn name="scenarioA">
+        <ns2:scn name="scenarioA" description="This is the description of scenario A.">
             <scenario>
                 <commodities>
                     <commodity id="0" name="c1" pvequiv="1.0" pathfull="false"/>

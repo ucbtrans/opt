@@ -398,7 +398,7 @@ public class AppMainController {
         reset();
         
         ParametersFreeway params = UserSettings.getDefaultFreewayParams("A -> B",null);
-        project = new Project("A", "A -> B",params);
+        project = new Project("A","description A", "A -> B",params);
         menuFileSave.setDisable(false);
         menuFileSaveAs.setDisable(false);
         Collection<FreewayScenario> scenarios = project.get_scenarios();
