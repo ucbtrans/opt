@@ -472,9 +472,9 @@ public class LinkEditorController {
         numAuxLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;
-            Integer num_lanes = new Integer(0);
+            Integer num_lanes = 0;
             if (myLink != null) {
-                num_lanes = new Integer(myLink.get_aux_lanes());
+                num_lanes = myLink.get_aux_lanes();
             }
             opt.utils.WidgetFunctionality.commitEditorText(numAuxLanes, num_lanes);
         });
@@ -489,9 +489,9 @@ public class LinkEditorController {
         numManagedLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;
-            Integer num_lanes = new Integer(0);
+            Integer num_lanes = 0;
             if (myLink != null) {
-                num_lanes = new Integer(myLink.get_mng_lanes());
+                num_lanes = myLink.get_mng_lanes();
             }
             opt.utils.WidgetFunctionality.commitEditorText(numManagedLanes, num_lanes);
         });
@@ -510,9 +510,9 @@ public class LinkEditorController {
         capacityGPLane.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;
-            Double cap = new Double(-1);
+            Double cap = -1.0;
             if (myLink != null) {
-                cap = new Double(myLink.get_gp_capacity_vphpl());
+                cap = (double)myLink.get_gp_capacity_vphpl();
                 cap = UserSettings.convertFlow(cap, "vph", UserSettings.unitsFlow);
             }
             opt.utils.WidgetFunctionality.commitEditorText(capacityGPLane, cap);
@@ -528,9 +528,9 @@ public class LinkEditorController {
         capacityAuxLane.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;
-            Double cap = new Double(-1);
+            Double cap = -1.0;
             if (myLink != null) {
-                cap = new Double(myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_capacity_vphpl() : 0.0);
+                cap = (double)(myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_capacity_vphpl() : 0.0);
                 cap = UserSettings.convertFlow(cap, "vph", UserSettings.unitsFlow);
             }
             opt.utils.WidgetFunctionality.commitEditorText(capacityAuxLane, cap);
@@ -600,9 +600,9 @@ public class LinkEditorController {
         ffSpeedManaged.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;
-            Double ffspeed = new Double(-1);
+            Double ffspeed = -1.0;
             if (myLink != null) {
-                ffspeed = new Double(myLink.get_mng_freespeed_kph());
+                ffspeed = (double)myLink.get_mng_freespeed_kph();
                 ffspeed = UserSettings.convertFlow(ffspeed, "kph", UserSettings.unitsSpeed);
             }
             opt.utils.WidgetFunctionality.commitEditorText(ffSpeedManaged, ffspeed);
@@ -747,7 +747,7 @@ public class LinkEditorController {
         dtSR.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;
-            Integer dt = new Integer(UserSettings.defaultSRDtMinutes);
+            Integer dt = UserSettings.defaultSRDtMinutes;
             // TODO: obtain SR dt
             opt.utils.WidgetFunctionality.commitEditorText(dtSR, dt);
         });
@@ -1348,7 +1348,7 @@ public class LinkEditorController {
         num_lanes = numLanesAuxSpinnerValueFactory.getValue();
         if (num_lanes < 0) {
             num_lanes = myLink.get_aux_lanes();
-            numLanesAuxSpinnerValueFactory.setValue(new Integer(num_lanes));
+            numLanesAuxSpinnerValueFactory.setValue(num_lanes);
             return;
         }
         
@@ -1356,7 +1356,7 @@ public class LinkEditorController {
     }
     
     
-    private void onParamChange() {    
+    private void onParamChange() {  
         if (ignoreChange)
             return;
         
@@ -1371,21 +1371,6 @@ public class LinkEditorController {
             capacityGPSpinnerValueFactory.setValue(cap);
             return;
         }
-        cap = capacityManagedSpinnerValueFactory.getValue();
-        if (cap <= 0) {
-            cap = myLink.get_mng_capacity_vphpl();
-            cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
-            capacityManagedSpinnerValueFactory.setValue(cap);
-            return;
-        }
-        cap = capacityAuxSpinnerValueFactory.getValue();
-        if (cap <= 0) {
-            cap =  myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_gp_capacity_vphpl() : 0.0;
-            cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
-            capacityAuxSpinnerValueFactory.setValue(cap);
-            return;
-        }
-        
         double ffspeed = ffSpeedGPSpinnerValueFactory.getValue();
         if (ffspeed <= 0) {
             ffspeed = myLink.get_gp_freespeed_kph();
@@ -1393,40 +1378,11 @@ public class LinkEditorController {
             ffSpeedGPSpinnerValueFactory.setValue(ffspeed);
             return;
         }
-        ffspeed = ffSpeedManagedSpinnerValueFactory.getValue();
-        if (ffspeed <= 0) {
-            ffspeed = myLink.get_mng_freespeed_kph();
-            ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
-            ffSpeedManagedSpinnerValueFactory.setValue(ffspeed);
-            return;
-        }
-        ffspeed = ffSpeedAuxSpinnerValueFactory.getValue();
-        if (ffspeed <= 0) {
-            ffspeed = myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_freespeed_kph() : 0.0;
-            ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
-            ffSpeedAuxSpinnerValueFactory.setValue(ffspeed);
-            return;
-        }
-        
         double jamDensity = jamDensityGPSpinnerValueFactory.getValue();
         if (jamDensity <= 0) {
             jamDensity = myLink.get_gp_jam_density_vpkpl();
             jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
             jamDensityGPSpinnerValueFactory.setValue(jamDensity);
-            return;
-        }
-        jamDensity = jamDensityManagedSpinnerValueFactory.getValue();
-        if (jamDensity <= 0) {
-            jamDensity = myLink.get_mng_jam_density_vpkpl();
-            jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
-            jamDensityManagedSpinnerValueFactory.setValue(jamDensity);
-            return;
-        }
-        jamDensity = jamDensityAuxSpinnerValueFactory.getValue();
-        if (jamDensity <= 0) {
-            jamDensity = myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_jam_density_vpkpl() : 0.0;
-            jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
-            jamDensityAuxSpinnerValueFactory.setValue(jamDensity);
             return;
         }
         
@@ -1437,23 +1393,6 @@ public class LinkEditorController {
         } catch (Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Cannot set capacity for general purpose lane...", e);
         }
-        
-        cap = capacityManagedSpinnerValueFactory.getValue();
-        cap = UserSettings.convertFlow(cap, unitsFlow, "vph");
-        try {
-            myLink.set_mng_capacity_vphpl((float)cap);
-        } catch (Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set capacity for managed lane...", e);
-        }
-        
-        cap = myLink.get_type() == AbstractLink.Type.freeway ? capacityAuxSpinnerValueFactory.getValue() : 0.0;
-        cap = UserSettings.convertFlow(cap, unitsFlow, "vph");
-        try {
-            myLink.set_aux_capacity_vphpl((float)cap);
-        } catch (Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set capacity for auxiliary lane...", e);
-        }
-        
         ffspeed = ffSpeedGPSpinnerValueFactory.getValue();
         ffspeed = UserSettings.convertSpeed(ffspeed, unitsSpeed, "kph");
         try {
@@ -1461,23 +1400,6 @@ public class LinkEditorController {
         } catch (Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Cannot set free flow speed for general purpose lane...", e);
         }
-        
-        ffspeed = ffSpeedManagedSpinnerValueFactory.getValue();
-        ffspeed = UserSettings.convertSpeed(ffspeed, unitsSpeed, "kph");
-        try {
-            myLink.set_mng_freespeed_kph((float)ffspeed);
-        } catch (Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set free flow speed for managed lane...", e);
-        }
-        
-        ffspeed = myLink.get_type() == AbstractLink.Type.freeway ? ffSpeedAuxSpinnerValueFactory.getValue() : 0.0;
-        ffspeed = UserSettings.convertSpeed(ffspeed, unitsSpeed, "kph");
-        try {
-            myLink.set_aux_freespeed_kph((float)ffspeed);
-        } catch (Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set free flow speed for auxiliary lane...", e);
-        }
-        
         jamDensity = jamDensityGPSpinnerValueFactory.getValue();
         jamDensity = UserSettings.convertDensity(jamDensity, unitsDensity, "vpkm");
         try {
@@ -1486,20 +1408,97 @@ public class LinkEditorController {
             opt.utils.Dialogs.ExceptionDialog("Cannot set jam density for general purpose lane...", e);
         }
         
-        jamDensity = jamDensityManagedSpinnerValueFactory.getValue();
-        jamDensity = UserSettings.convertDensity(jamDensity, unitsDensity, "vpkm");
-        try {
-            myLink.set_mng_jam_density_vpkpl((float)jamDensity);
-        } catch(Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set jam density for managed lane...", e);
-        }
         
-        jamDensity = myLink.get_type() == AbstractLink.Type.freeway ? jamDensityAuxSpinnerValueFactory.getValue() : 0.0;
-        jamDensity = UserSettings.convertDensity(jamDensity, unitsDensity, "vpkm");
-        try {
-            myLink.set_aux_jam_density_vpkpl((float)jamDensity);
-        } catch(Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Cannot set jam density for auxiliary lane...", e);
+        if (myLink.get_mng_lanes() > 0) {
+            cap = capacityManagedSpinnerValueFactory.getValue();
+            if (cap < 0) {
+                cap = myLink.get_mng_capacity_vphpl();
+                cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
+                capacityManagedSpinnerValueFactory.setValue(cap);
+                return;
+            }
+            ffspeed = ffSpeedManagedSpinnerValueFactory.getValue();
+            if (ffspeed <= 0) {
+                ffspeed = myLink.get_mng_freespeed_kph();
+                ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
+                ffSpeedManagedSpinnerValueFactory.setValue(ffspeed);
+                return;
+            }
+            jamDensity = jamDensityManagedSpinnerValueFactory.getValue();
+            if (jamDensity <= 0) {
+                jamDensity = myLink.get_mng_jam_density_vpkpl();
+                jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
+                jamDensityManagedSpinnerValueFactory.setValue(jamDensity);
+                return;
+            }
+            
+            cap = capacityManagedSpinnerValueFactory.getValue();
+            cap = UserSettings.convertFlow(cap, unitsFlow, "vph");
+            try {
+                myLink.set_mng_capacity_vphpl((float)cap);
+            } catch (Exception e) {
+                opt.utils.Dialogs.ExceptionDialog("Cannot set capacity for managed lane...", e);
+            }
+            ffspeed = ffSpeedManagedSpinnerValueFactory.getValue();
+            ffspeed = UserSettings.convertSpeed(ffspeed, unitsSpeed, "kph");
+            try {
+                myLink.set_mng_freespeed_kph((float)ffspeed);
+            } catch (Exception e) {
+                opt.utils.Dialogs.ExceptionDialog("Cannot set free flow speed for managed lane...", e);
+            }
+            jamDensity = jamDensityManagedSpinnerValueFactory.getValue();
+            jamDensity = UserSettings.convertDensity(jamDensity, unitsDensity, "vpkm");
+            try {
+                myLink.set_mng_jam_density_vpkpl((float)jamDensity);
+            } catch(Exception e) {
+                opt.utils.Dialogs.ExceptionDialog("Cannot set jam density for managed lane...", e);
+            }
+        }
+    
+        if (myLink.get_aux_lanes() > 0) {
+            cap = capacityAuxSpinnerValueFactory.getValue();
+            if (cap < 0) {
+                cap =  myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_gp_capacity_vphpl() : 0.0;
+                cap = UserSettings.convertFlow(cap, "vph", unitsFlow);
+                capacityAuxSpinnerValueFactory.setValue(cap);
+                return;
+            }
+            ffspeed = ffSpeedAuxSpinnerValueFactory.getValue();
+            if (ffspeed <= 0) {
+                ffspeed = myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_freespeed_kph() : 0.0;
+                ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
+                ffSpeedAuxSpinnerValueFactory.setValue(ffspeed);
+                return;
+            }
+            jamDensity = jamDensityAuxSpinnerValueFactory.getValue();
+            if (jamDensity <= 0) {
+                jamDensity = myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_jam_density_vpkpl() : 0.0;
+                jamDensity = UserSettings.convertDensity(jamDensity, "vpkm", unitsDensity);
+                jamDensityAuxSpinnerValueFactory.setValue(jamDensity);
+                return;
+            }
+            
+            cap = myLink.get_type() == AbstractLink.Type.freeway ? capacityAuxSpinnerValueFactory.getValue() : 0.0;
+            cap = UserSettings.convertFlow(cap, unitsFlow, "vph");
+            try {
+                myLink.set_aux_capacity_vphpl((float)cap);
+            } catch (Exception e) {
+                opt.utils.Dialogs.ExceptionDialog("Cannot set capacity for auxiliary lane...", e);
+            }
+            ffspeed = myLink.get_type() == AbstractLink.Type.freeway ? ffSpeedAuxSpinnerValueFactory.getValue() : 0.0;
+            ffspeed = UserSettings.convertSpeed(ffspeed, unitsSpeed, "kph");
+            try {
+                myLink.set_aux_freespeed_kph((float)ffspeed);
+            } catch (Exception e) {
+                opt.utils.Dialogs.ExceptionDialog("Cannot set free flow speed for auxiliary lane...", e);
+            }
+            jamDensity = myLink.get_type() == AbstractLink.Type.freeway ? jamDensityAuxSpinnerValueFactory.getValue() : 0.0;
+            jamDensity = UserSettings.convertDensity(jamDensity, unitsDensity, "vpkm");
+            try {
+                myLink.set_aux_jam_density_vpkpl((float)jamDensity);
+            } catch(Exception e) {
+                opt.utils.Dialogs.ExceptionDialog("Cannot set jam density for auxiliary lane...", e);
+            }
         }
          
         appMainController.setProjectModified(true);
