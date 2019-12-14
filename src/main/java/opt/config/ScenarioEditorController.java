@@ -90,6 +90,9 @@ public class ScenarioEditorController {
 
     @FXML // fx:id="scenarioName"
     private TextField scenarioName; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="runSimulationButton"
+    private Button runSimulationButton; // Value injected by FXMLLoader
 
     @FXML // fx:id="scenarioEditorAccordionParent"
     private AnchorPane scenarioEditorAccordionParent; // Value injected by FXMLLoader
@@ -109,6 +112,9 @@ public class ScenarioEditorController {
     @FXML // fx:id="newVehicleType"
     private Button newVehicleType; // Value injected by FXMLLoader
 
+    @FXML // fx:id="timePane"
+    private TitledPane timePane; // Value injected by FXMLLoader
+    
     @FXML // fx:id="controllerPane"
     private TitledPane controllerPane; // Value injected by FXMLLoader
 
@@ -163,6 +169,17 @@ public class ScenarioEditorController {
         ignoreChange = false;
     }
     
+    
+    
+    /**
+     * Start simulation of the current scenario.
+     * @param event 
+     */
+    @FXML
+    void runSimulation(ActionEvent event) {
+        // GABRIEL to fill in...
+    }
+
     
     
     @FXML
