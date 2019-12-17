@@ -89,7 +89,8 @@ public class UserSettings {
     public static int defaultSRDtMinutes = 5;
     
     public static int defaultSimulationDtSeconds = 5;
-    public static int defaultSimulationDurationHours = 24;
+    public static String defaultStartTime = "0000";
+    public static String defaultSimulationDuration = "2400";
             
     
     

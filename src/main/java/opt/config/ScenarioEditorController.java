@@ -53,7 +53,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import opt.AppMainController;
-import opt.data.AbstractLink;
+import opt.UserSettings;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
 import opt.utils.Misc;
@@ -114,6 +114,12 @@ public class ScenarioEditorController {
 
     @FXML // fx:id="timePane"
     private TitledPane timePane; // Value injected by FXMLLoader
+    
+     @FXML // fx:id="startTime"
+    private TextField startTime; // Value injected by FXMLLoader
+
+    @FXML // fx:id="sDuration"
+    private TextField sDuration; // Value injected by FXMLLoader
     
     @FXML // fx:id="controllerPane"
     private TitledPane controllerPane; // Value injected by FXMLLoader
@@ -182,6 +188,83 @@ public class ScenarioEditorController {
 
     
     
+    
+    
+    private void makeListVT(Map<Long, Commodity> mapVT) {
+        listVT.clear();
+        listVehicleTypes.getItems().clear();
+        
+        mapVT.forEach((k, v) -> {
+            DecimalFormat df = new DecimalFormat("#.#");
+            double nc = v.get_pvequiv();
+            String s = v.get_name() + ": " + df.format(nc) + " car" + ((nc == 1) ? "" : "s");
+            listVT.add(v);
+            listVehicleTypes.getItems().add(s);
+        });
+    }
+    
+    
+    
+    
+
+    @FXML // This method is called by the FXMLLoader when initialization is complete
+    void initialize() {
+        scenarioName.textProperty().addListener((observable, oldValue, newValue) -> {
+            onScenarioNameChange(null);
+        });
+        
+        startTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(opt.UserSettings.defaultStartTime));
+        startTime.textProperty().addListener((observable, oldValue, newValue) -> {
+            onStartTimeChange(null);
+        });
+        
+        sDuration.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(opt.UserSettings.defaultSimulationDuration));
+        sDuration.textProperty().addListener((observable, oldValue, newValue) -> {
+            onDurationChange(null);
+        });
+        
+    }
+    
+     
+    /**
+     * This function is called every time one opens a scenario in the
+     * configuration module.
+     * @param s - Simulation scenario. 
+     */
+    public void initWithScenarioData(FreewayScenario s) {
+        ignoreChange = true;
+        
+        scenarioName.setText(s.name);
+        origScenarioName = s.name;
+        myScenario = (FreewayScenario)s;
+        
+        makeListVT(myScenario.get_commodities());
+        
+        initScenarioTiming();
+        
+        ignoreChange = false;
+    }
+    
+    
+    public void initScenarioTiming() {
+        
+        startTime.setText(opt.UserSettings.defaultStartTime);
+        sDuration.setText(opt.UserSettings.defaultSimulationDuration);
+        
+    }
+    
+
+
+    
+    
+    
+    
+    
+    
+    /************************************************************
+     * CALLBACKS
+     ************************************************************/
+    
     @FXML
     private void onScenarioNameChange(ActionEvent event) {
         if (ignoreChange)
@@ -192,6 +275,8 @@ public class ScenarioEditorController {
             nm = origScenarioName;
         appMainController.changeScenarioName(myScenario, nm);
     }
+    
+    
     
     
     
@@ -223,7 +308,6 @@ public class ScenarioEditorController {
             onDeleteVehicleType(null);
         }
     }
-    
     
     
      @FXML
@@ -260,67 +344,42 @@ public class ScenarioEditorController {
     
     
     
-    private void makeListVT(Map<Long, Commodity> mapVT) {
-        listVT.clear();
-        listVehicleTypes.getItems().clear();
+    
+    
+    @FXML
+    private void onStartTimeChange(ActionEvent event) {
+        if (ignoreChange)
+            return;
+    
+        String buf = startTime.getText();
+        if (buf.indexOf(':') == -1)
+            return;
         
-        mapVT.forEach((k, v) -> {
-            DecimalFormat df = new DecimalFormat("#.#");
-            double nc = v.get_pvequiv();
-            String s = v.get_name() + ": " + df.format(nc) + " car" + ((nc == 1) ? "" : "s");
-            listVT.add(v);
-            listVehicleTypes.getItems().add(s);
-        });
+        String[] hhmm = buf.split(":");
+        int hh = Integer.valueOf(hhmm[0]);
+        int mm = Integer.valueOf(hhmm[1]);
+        int seconds = 3600*hh + 60*mm;
+        
+        //TODO: set
     }
     
     
+    @FXML
+    private void onDurationChange(ActionEvent event) {
+        if (ignoreChange)
+            return;
     
-    
-
-    @FXML // This method is called by the FXMLLoader when initialization is complete
-    void initialize() {
-        scenarioName.textProperty().addListener((observable, oldValue, newValue) -> {
-            onScenarioNameChange(null);
-        });
+        String buf = sDuration.getText();
+        if (buf.indexOf(':') == -1)
+            return;
         
+        String[] hhmm = buf.split(":");
+        int hh = Integer.valueOf(hhmm[0]);
+        int mm = Integer.valueOf(hhmm[1]);
+        int seconds = 3600*hh + 60*mm;
         
+        //TODO: set
     }
-    
-     
-    /**
-     * This function is called every time one opens a scenario in the
-     * configuration module.
-     * @param lnk 
-     */
-    public void initWithScenarioData(FreewayScenario s) {
-        ignoreChange = true;
-        
-        scenarioName.setText(s.name);
-        origScenarioName = s.name;
-        myScenario = (FreewayScenario)s;
-        
-        makeListVT(myScenario.get_commodities());
-        
-        ignoreChange = false;
-    }
-    
-    
-
-
-    
-    
-    
-    
-    
-    
-    /************************************************************
-     * CALLBACKS
-     ************************************************************/
-    
-    
-    
-    
-    
 
 
     
