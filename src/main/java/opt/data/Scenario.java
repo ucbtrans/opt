@@ -222,11 +222,7 @@ public class Scenario {
         return links.get(id);
     }
 
-    /////////////////////////////////////
-    // protected and private
-    /////////////////////////////////////
-
-    protected jaxb.Scenario to_jaxb() throws Exception {
+    public jaxb.Scenario to_jaxb() throws Exception {
         jaxb.Scenario jScn = new jaxb.Scenario();
 
         /////////////////////////////////////////////////////

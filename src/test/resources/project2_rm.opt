@@ -82,29 +82,6 @@
                     </split_node>
                 </splits>
 
-                <actuators>
-                    <actuator id="8" type="ramp_meter">
-                        <actuator_target id="8" type="link"/>
-                    </actuator>
-                    <actuator id="11" type="ramp_meter">
-                        <actuator_target id="11" type="link"/>
-                    </actuator>
-                    <actuator id="13" type="ramp_meter">
-                        <actuator_target id="13" type="link"/>
-                    </actuator>
-
-                    <actuator id="2" type="policy">
-                        <actuator_target id="2" type="link"/>
-                    </actuator>
-                    <actuator id="3" type="policy">
-                        <actuator_target id="3" type="link"/>
-                    </actuator>
-                    <actuator id="4" type="policy">
-                        <actuator_target id="4" type="link"/>
-                    </actuator>
-
-                </actuators>
-
                 <controllers>
                     <controller id="8" type="alinea" dt="10" start_time="0" end_time="3600">
                         <target_actuators ids="8"/>
@@ -115,10 +92,30 @@
                     <controller id="13" type="tod" dt="10" start_time="3600" end_time="7200">
                         <target_actuators ids="13"/>
                     </controller>
-                    <controller id="0" type="hov" dt="10" start_time="3600" end_time="7200">
-                        <target_actuators ids="2,3,4"/>
-                    </controller>
                 </controllers>
+
+                <actuators>
+                    <actuator id="2" type="policy">
+                        <actuator_target id="2" type="link"/>
+                    </actuator>
+                    <actuator id="3" type="policy">
+                        <actuator_target id="3" type="link"/>
+                    </actuator>
+                    <actuator id="4" type="policy">
+                        <actuator_target id="4" type="link"/>
+                    </actuator>
+                    <actuator id="8" type="ramp_meter">
+                        <actuator_target id="8" type="link"/>
+                    </actuator>
+                    <actuator id="11" type="ramp_meter">
+                        <actuator_target id="11" type="link"/>
+                    </actuator>
+                    <actuator id="13" type="ramp_meter">
+                        <actuator_target id="13" type="link"/>
+                    </actuator>
+
+
+                </actuators>
 
 
             </scenario>

@@ -639,11 +639,7 @@ public class FreewayScenario {
         throw new Exception("NOT IMPLEMENTED!");
     }
 
-    /////////////////////////////////////
-    // protected and private
-    /////////////////////////////////////
-
-    protected jaxb.Scn to_jaxb() throws Exception {
+    public jaxb.Scn to_jaxb() throws Exception {
         jaxb.Scn scn = new jaxb.Scn();
 
         scn.setScenario(scenario.to_jaxb());
@@ -676,6 +672,10 @@ public class FreewayScenario {
 
         return scn;
     }
+
+    /////////////////////////////////////
+    // protected and private
+    /////////////////////////////////////
 
     protected AbstractLink get_link(Long id){
         return scenario.links.get(id);

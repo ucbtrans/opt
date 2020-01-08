@@ -19,6 +19,7 @@ public class ActuatorRampMeter extends AbstractActuator {
 		j.setType("ramp_meter");
 		jaxb.ActuatorTarget jtgt = new jaxb.ActuatorTarget();
 		j.setActuatorTarget(jtgt);
+		jtgt.setType("link");
 		jtgt.setId(link.id);
 		return j;
 	}

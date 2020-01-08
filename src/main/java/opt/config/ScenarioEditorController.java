@@ -29,6 +29,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import api.OTMdev;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -56,7 +58,9 @@ import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
+import opt.simulation.OTMTask;
 import opt.utils.Misc;
+import runner.OTM;
 
 
 /**
@@ -183,7 +187,23 @@ public class ScenarioEditorController {
      */
     @FXML
     void runSimulation(ActionEvent event) {
-        // GABRIEL to fill in...
+        System.out.println("RUN SIMULATION PRESSED.");
+        System.out.println(startTime.getCharacters());
+        System.out.println(startTime.getTextFormatter().getValue());
+
+        // OTM TASK CODE
+//        OTMTask otm_task = new OTMTask(myApp.otm,myApp.params,myApp.menuController,myApp.graphController,myApp.statusbarController);
+//        myApp.statusbarController.bind_progress(otm_task.progressProperty());
+//        myApp.statusbarController.bind_text(otm_task.messageProperty());
+//        new Thread(otm_task).start();
+
+        float duration = 1000f;
+        long sim_delay = 0l;
+        float refresh_seconds = 10f;
+
+        OTMTask otm_task = new OTMTask(myScenario,duration,sim_delay,refresh_seconds);
+        new Thread(otm_task).start();
+
     }
 
     
@@ -193,7 +213,7 @@ public class ScenarioEditorController {
     private void makeListVT(Map<Long, Commodity> mapVT) {
         listVT.clear();
         listVehicleTypes.getItems().clear();
-        
+
         mapVT.forEach((k, v) -> {
             DecimalFormat df = new DecimalFormat("#.#");
             double nc = v.get_pvequiv();

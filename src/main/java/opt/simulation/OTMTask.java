@@ -3,10 +3,11 @@ package opt.simulation;
 import api.OTMdev;
 import error.OTMException;
 import javafx.concurrent.Task;
+import opt.data.FreewayScenario;
 
 public class OTMTask  extends Task {
 
-	private OTMdev otm;
+	private OTMdev otmdev;
 	private OTMException exception;
 	private final float start_time = 0f;
 	private float duration;
@@ -29,8 +30,18 @@ public class OTMTask  extends Task {
 //		this.statusBarController = statusBarController;
 //	}
 
-	public OTMTask(OTMdev otm,float duration,long sim_delay,float refresh_seconds){
-		this.otm = otm;
+	public OTMTask(FreewayScenario fwyscenario,float duration, long sim_delay, float refresh_seconds){
+
+		// create a runnable OTM scenario
+		try {
+			jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
+			api.OTM otm = new api.OTM();
+			otm.load_from_jaxb(jscenario,true);
+			this.otmdev = new OTMdev(otm);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		this.duration = duration;
 		this.sim_delay = sim_delay;
 		this.refresh_seconds = refresh_seconds;
@@ -47,7 +58,7 @@ public class OTMTask  extends Task {
 //			menuController.disablePlots();
 
 			float start_time = 0f;
-			otm.otm.initialize(start_time);
+			otmdev.otm.initialize(start_time);
 			final int steps = (int) (duration / refresh_seconds);
 			for (int i=1; i<=steps; i++) {
 
@@ -58,7 +69,9 @@ public class OTMTask  extends Task {
 				Thread.sleep(sim_delay);
 
 				// advance otm, get back information
-				otm.otm.advance(refresh_seconds);
+				otmdev.otm.advance(refresh_seconds);
+
+				System.out.println(otmdev.otm.get_current_time());
 
 				// TODO : PUT THIS BACK
 //				final AnimationInfo info = otm.otm.get_animation_info();
