@@ -577,7 +577,7 @@ public class AppMainController {
         tree2object = new HashMap<TreeItem, Object>();
         object2tree = new HashMap<Object, TreeItem>();
         
-        setProjectModified(true);
+        //setProjectModified(true);
         populateProjectTree();
         
         TreeItem item = object2tree.get(lnk);
