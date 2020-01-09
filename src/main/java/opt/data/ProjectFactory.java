@@ -44,6 +44,21 @@ public class ProjectFactory {
     }
 
     /**
+     * Save scenario to xml files
+     * @param scenario
+     * @param filePath Full path and name for the output file. (
+     * @throws Exception
+     */
+    public static void save_scenario(FreewayScenario scenario,String filePath) throws Exception {
+
+        // parse the filePath
+        FileInfo file_info = new FileInfo(filePath);
+
+        // save project file
+        create_marshaller(jaxb.Scenario.class).marshal(scenario.scenario.to_jaxb(), file_info.get_scenario_file());
+    }
+
+    /**
      * Save project to xml files
      * @param project
      * @param filePath Full path and name for the output file. (
@@ -82,10 +97,10 @@ public class ProjectFactory {
         public File get_project_file(){
             return new File(folder,file_name + "." + project_extension);
         }
-        public File get_scenario_file(String scenario_name){
+        public File get_scenario_file(){
             // remove whitespace
-            scenario_name.replaceAll("\\s+","");
-            return new File(folder,file_name + "_" + scenario_name + "." + scenario_extension);
+//            scenario_name.replaceAll("\\s+","");
+            return new File(folder,file_name + "." + scenario_extension);
         }
     }
 

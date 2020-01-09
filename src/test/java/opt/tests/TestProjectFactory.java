@@ -48,6 +48,17 @@ public class TestProjectFactory extends AbstractTest {
     }
 
     @Test
+    public void test_save_scenario_to_file() {
+        try {
+            Project project = ProjectFactory.load_project(get_test_fullpath("project2_rm.opt"),true);
+            FreewayScenario scneario = project.get_scenarios().iterator().next();
+            ProjectFactory.save_scenario(scneario,get_test_fullpath("scenario_saved"));
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
     public void test_save_project_to_file() {
         try {
             Project project = ProjectFactory.load_project(get_test_fullpath("project2_rm.opt"),true);

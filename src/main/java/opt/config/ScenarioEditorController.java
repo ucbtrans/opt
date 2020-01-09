@@ -55,12 +55,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import opt.AppMainController;
-import opt.UserSettings;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
 import opt.simulation.OTMTask;
-import opt.utils.Misc;
-import runner.OTM;
 
 
 /**
@@ -187,7 +184,7 @@ public class ScenarioEditorController {
      */
     @FXML
     void runSimulation(ActionEvent event) {
-        System.out.println("RUN SIMULATION PRESSED.");
+
         System.out.println(startTime.getCharacters());
         System.out.println(startTime.getTextFormatter().getValue());
 
@@ -202,7 +199,9 @@ public class ScenarioEditorController {
         float refresh_seconds = 10f;
 
         OTMTask otm_task = new OTMTask(myScenario,duration,sim_delay,refresh_seconds);
-        new Thread(otm_task).start();
+
+        // single-thread run
+        otm_task.run_simulation();
 
     }
 

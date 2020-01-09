@@ -4,12 +4,12 @@ import api.OTMdev;
 import error.OTMException;
 import javafx.concurrent.Task;
 import opt.data.FreewayScenario;
+import output.animation.AnimationInfo;
 
 public class OTMTask  extends Task {
 
 	private OTMdev otmdev;
 	private OTMException exception;
-	private final float start_time = 0f;
 	private float duration;
 	private long sim_delay;
 	private float refresh_seconds;
@@ -32,6 +32,8 @@ public class OTMTask  extends Task {
 
 	public OTMTask(FreewayScenario fwyscenario,float duration, long sim_delay, float refresh_seconds){
 
+		System.out.println("OTMTask Constructor");
+
 		// create a runnable OTM scenario
 		try {
 			jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
@@ -49,6 +51,22 @@ public class OTMTask  extends Task {
 
 	@Override
 	protected Object call()  {
+		this.run_simulation();
+		return null;
+	}
+
+	@Override
+	protected void failed() {
+		super.failed();
+		System.out.println("OTMTask failed");
+		System.err.println(exception);
+	}
+
+	public void run_simulation(){
+
+		System.out.println("OTMTask run_simulation");
+
+
 		try {
 
 //			menuController.disableRun();
@@ -71,10 +89,8 @@ public class OTMTask  extends Task {
 				// advance otm, get back information
 				otmdev.otm.advance(refresh_seconds);
 
-				System.out.println(otmdev.otm.get_current_time());
+				final AnimationInfo info = otmdev.otm.scenario().get_animation_info();
 
-				// TODO : PUT THIS BACK
-//				final AnimationInfo info = otm.otm.get_animation_info();
 //				final int ii = i;
 //                Platform.runLater(new Runnable() {
 //                    @Override public void run() {
@@ -100,12 +116,9 @@ public class OTMTask  extends Task {
 //			menuController.enableParameters();
 //			menuController.enablePlots();
 		}
-		return null;
+
+		System.out.println("OTMTask DONE");
+
 	}
 
-	@Override
-	protected void failed() {
-		super.failed();
-		System.err.println(exception);
-	}
 }
