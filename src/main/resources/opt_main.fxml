@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
@@ -83,7 +84,6 @@
                      <content>
                         <AnchorPane id="configAnchorPane" fx:id="configAnchorPane" minHeight="200.0" minWidth="200.0" prefHeight="900.0" />
                      </content></Tab>
-                <Tab id="simTabPane" fx:id="simTabPane" disable="true" text="Simulation" />
                   <Tab id="reportTabPane" fx:id="reportTabPane" disable="true" text="Reports" />
               </tabs>
             </TabPane>
@@ -100,8 +100,8 @@
             <Color blue="0.625" green="0.625" red="0.625" fx:id="x4" />
           </textFill>
         </Label>
-        <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
-        <Label id="rightStatus" fx:id="rightStatus" font="$x3" maxWidth="-1.0" textFill="$x4" HBox.hgrow="NEVER" />
+        <Pane prefHeight="18.0" prefWidth="925.0" HBox.hgrow="ALWAYS" />
+            <ProgressBar id="simProgressBar" fx:id="simProgressBar" prefHeight="18.0" prefWidth="239.0" progress="0.0" />
       </children>
       <padding>
         <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />

@@ -202,7 +202,8 @@ public class ScenarioEditorController {
 
         // single-thread run
         otm_task.run_simulation();
-
+        
+        appMainController.unbindSimProgress();
     }
 
     

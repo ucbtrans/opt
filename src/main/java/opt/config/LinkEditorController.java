@@ -828,7 +828,6 @@ public class LinkEditorController {
         myLink = lnk;
         
         appMainController.setLeftStatus("");
-        appMainController.setRightStatus("");
     
         initHeader();
         initLaneProperties();

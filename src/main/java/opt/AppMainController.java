@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -42,6 +43,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -150,8 +152,8 @@ public class AppMainController {
     @FXML // fx:id="leftStatus"
     private Label leftStatus; // Value injected by FXMLLoader
 
-    @FXML // fx:id="rightStatus"
-    private Label rightStatus; // Value injected by FXMLLoader
+    @FXML // fx:id="simProgressBar"
+    private ProgressBar simProgressBar; // Value injected by FXMLLoader
 
     @FXML // fx:id="x3"
     private Font x3; // Value injected by FXMLLoader
@@ -219,8 +221,14 @@ public class AppMainController {
         leftStatus.setText(status);   
     }
     
-    public void setRightStatus(String status) {
-        rightStatus.setText(status);   
+    public void bindSimProgress(ReadOnlyDoubleProperty prop) {
+        simProgressBar.progressProperty().bind(prop);
+        simProgressBar.setVisible(true);
+    }
+
+    public void unbindSimProgress() {
+        simProgressBar.progressProperty().unbind();
+        simProgressBar.setVisible(false);
     }
     
     
@@ -240,6 +248,8 @@ public class AppMainController {
         projectTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
            processTreeSelection((TreeItem<String>)newValue); 
         });
+        
+        simProgressBar.setVisible(false);
         
         // Initialize link editor
         try {

@@ -89,7 +89,7 @@ public class OTMTask  extends Task {
 				// advance otm, get back information
 				otmdev.otm.advance(refresh_seconds);
 
-				final AnimationInfo info = otmdev.otm.scenario().get_animation_info();
+				//final AnimationInfo info = otmdev.otm.scenario().get_animation_info();
 
 //				final int ii = i;
 //                Platform.runLater(new Runnable() {
