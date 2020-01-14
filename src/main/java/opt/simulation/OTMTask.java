@@ -2,37 +2,32 @@ package opt.simulation;
 
 import api.OTMdev;
 import error.OTMException;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
+import opt.AppMainController;
 import opt.data.FreewayScenario;
-import output.animation.AnimationInfo;
 
 public class OTMTask  extends Task {
 
 	private OTMdev otmdev;
-	private OTMException exception;
+	private Exception exception;
+
+	private float start_time;
 	private float duration;
-	private long sim_delay;
-	private float refresh_seconds;
-//	private AbstractColormap colormap;
-//	private MenuController menuController;
-//	private GraphPaneController graphPaneController;
-//	private StatusBarController statusBarController;
+	private int numsteps;
+	private int step_per_update;
+	private AppMainController mainController;
+	private float simdt;
 
-//	public OTMTask(OTMdev otm, GlobalParameters params, MenuController menuController,GraphPaneController graphPaneController, StatusBarController statusBarController){
-//		this.otm = otm;
-//		this.start_time = params.start_time.floatValue();
-//		this.duration = params.duration.floatValue();
-//		this.sim_dt = params.sim_dt.floatValue();
-//		this.sim_delay = params.sim_delay.longValue();
-//		this.colormap = params.get_colormap();
-//		this.menuController = menuController;
-//		this.graphPaneController = graphPaneController;
-//		this.statusBarController = statusBarController;
-//	}
 
-	public OTMTask(FreewayScenario fwyscenario,float duration, long sim_delay, float refresh_seconds){
+	public OTMTask(AppMainController mainController, FreewayScenario fwyscenario,float start_time, float duration, int progbar_steps){
 
-		System.out.println("OTMTask Constructor");
+		this.mainController = mainController;
+		this.start_time = start_time;
+		this.duration = duration;
+
+		// bind the progress bar and make it visible
+		mainController.bindSimProgress(progressProperty());
 
 		// create a runnable OTM scenario
 		try {
@@ -44,9 +39,13 @@ public class OTMTask  extends Task {
 			e.printStackTrace();
 		}
 
-		this.duration = duration;
-		this.sim_delay = sim_delay;
-		this.refresh_seconds = refresh_seconds;
+		// number of time steps in the simulation
+		this.simdt = 2f;
+		this.numsteps = (int) Math.ceil(duration/simdt);
+
+		// number of steps per progrbar update
+		this.step_per_update = Math.max( numsteps / progbar_steps , 1);
+
 	}
 
 	@Override
@@ -56,68 +55,52 @@ public class OTMTask  extends Task {
 	}
 
 	@Override
-	protected void failed() {
-		super.failed();
-		System.out.println("OTMTask failed");
-		System.err.println(exception);
+	protected void done() {
+		super.done();
+
+		// unbind progress bar and make it invisible.
+		mainController.unbindSimProgress();
 	}
 
 	public void run_simulation(){
 
-		System.out.println("OTMTask run_simulation");
-
-
 		try {
 
-//			menuController.disableRun();
-//			menuController.enablePause();
-//			menuController.enableRewind();
-//			menuController.disableParameters();
-//			menuController.disablePlots();
-
-			float start_time = 0f;
 			otmdev.otm.initialize(start_time);
-			final int steps = (int) (duration / refresh_seconds);
-			for (int i=1; i<=steps; i++) {
+
+			int steps_taken = 0;
+
+			while(steps_taken<numsteps){
 
 				if (isCancelled())
 					break;
 
-				// delay simulation for better visualization
-				Thread.sleep(sim_delay);
+//				Thread.sleep(sim_delay);
 
 				// advance otm, get back information
-				otmdev.otm.advance(refresh_seconds);
+				int steps_to_take = Math.min( step_per_update , numsteps-steps_taken );
 
+
+				otmdev.otm.advance(steps_to_take*simdt);
+				steps_taken += steps_to_take;
+
+				// retrieve animation info
 				//final AnimationInfo info = otmdev.otm.scenario().get_animation_info();
 
-//				final int ii = i;
-//                Platform.runLater(new Runnable() {
-//                    @Override public void run() {
-//                        graphPaneController.draw_link_state(info,colormap);
-//                        updateProgress(ii, steps);
-//                        updateMessage(String.format("%.0f",info.timestamp));
-//                    }
-//                });
+				// ui manipulations
+				final int ii = steps_taken;
+				Platform.runLater(new Runnable() {
+                    @Override public void run() {
+                        updateProgress(ii, numsteps);
+                    }
+                });
 
 			}
 
 		} catch (OTMException e) {
 			this.exception = e;
 			failed();
-		} catch (InterruptedException e) {
-			this.exception = new OTMException(e);
-			failed();
-		} finally {
-//			statusBarController.unbind_progress();
-//			statusBarController.unbind_text();
-//			menuController.disablePause();
-//			menuController.enableRewind();
-//			menuController.enableParameters();
-//			menuController.enablePlots();
 		}
-
-		System.out.println("OTMTask DONE");
 
 	}
 

@@ -185,25 +185,13 @@ public class ScenarioEditorController {
     @FXML
     void runSimulation(ActionEvent event) {
 
-        System.out.println(startTime.getCharacters());
-        System.out.println(startTime.getTextFormatter().getValue());
+        float start_time = (float) read_time_in_seconds(startTime.getText());
+        float duration = (float) read_time_in_seconds(sDuration.getText());
+        int progbar_steps = 50;
 
-        // OTM TASK CODE
-//        OTMTask otm_task = new OTMTask(myApp.otm,myApp.params,myApp.menuController,myApp.graphController,myApp.statusbarController);
-//        myApp.statusbarController.bind_progress(otm_task.progressProperty());
-//        myApp.statusbarController.bind_text(otm_task.messageProperty());
-//        new Thread(otm_task).start();
-
-        float duration = 1000f;
-        long sim_delay = 0l;
-        float refresh_seconds = 10f;
-
-        OTMTask otm_task = new OTMTask(myScenario,duration,sim_delay,refresh_seconds);
-
-        // single-thread run
-        otm_task.run_simulation();
-        
-        appMainController.unbindSimProgress();
+        Thread th = new Thread(new OTMTask(appMainController,myScenario,start_time,duration,progbar_steps));
+        th.setDaemon(true);
+        th.start();
     }
 
     
@@ -374,11 +362,8 @@ public class ScenarioEditorController {
         String buf = startTime.getText();
         if (buf.indexOf(':') == -1)
             return;
-        
-        String[] hhmm = buf.split(":");
-        int hh = Integer.valueOf(hhmm[0]);
-        int mm = Integer.valueOf(hhmm[1]);
-        int seconds = 3600*hh + 60*mm;
+
+        int seconds = read_time_in_seconds(buf);
         
         //TODO: set
     }
@@ -392,16 +377,18 @@ public class ScenarioEditorController {
         String buf = sDuration.getText();
         if (buf.indexOf(':') == -1)
             return;
-        
-        String[] hhmm = buf.split(":");
-        int hh = Integer.valueOf(hhmm[0]);
-        int mm = Integer.valueOf(hhmm[1]);
-        int seconds = 3600*hh + 60*mm;
-        
+
+        int seconds = read_time_in_seconds(buf);
+
         //TODO: set
     }
 
 
-    
+    private static int read_time_in_seconds(String buf){
+        String[] hhmm = buf.split(":");
+        int hh = Integer.valueOf(hhmm[0]);
+        int mm = Integer.valueOf(hhmm[1]);
+        return 3600*hh + 60*mm;
+    }
     
 }
