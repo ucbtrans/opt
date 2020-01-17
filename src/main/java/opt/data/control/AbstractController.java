@@ -110,8 +110,6 @@ public abstract class AbstractController implements Comparable {
 		this.algorithm = Algorithm.valueOf(algorithm);
 	}
 
-
-
 	@Override
 	public int compareTo(Object o) {
 		AbstractController that = (AbstractController) o;

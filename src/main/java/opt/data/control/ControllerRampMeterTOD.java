@@ -4,11 +4,23 @@ import error.OTMException;
 import jaxb.Controller;
 import opt.data.Scenario;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
-public class ControllerRampMeterTOD extends AbstractController {
+public class ControllerRampMeterTOD extends AbstractControllerRampMeter {
+
+	class TODEntry implements Comparable<TODEntry>{
+		public float time;
+		public float rate_vph;
+		public TODEntry(float time,float rate_vph){
+			this.time = time;
+			this.rate_vph = rate_vph;
+		}
+
+		@Override
+		public int compareTo(TODEntry that) {
+			return Float.compare(this.time,that.time);
+		}
+	}
 
 	public List<TODEntry> entries = new ArrayList<>();
 
@@ -38,9 +50,30 @@ public class ControllerRampMeterTOD extends AbstractController {
 
 	}
 
-	class TODEntry {
-		public float time;
-		public float rate_vph;
+	/////////////////////////
+	// API
+	/////////////////////////
+
+	public void clear_schedule(){
+		entries.clear();
+	}
+
+	public void add_entry(float time,float rate_vph){
+		entries.add(new TODEntry(time,rate_vph));
+	}
+
+	public void remove_entry(float time,float rate_vph) {
+		Iterator<TODEntry> it = entries.iterator();
+		while(it.hasNext()){
+			TODEntry e = it.next();
+			if(e.time==time && e.rate_vph==rate_vph)
+				entries.remove(e);
+		}
+	}
+
+	public List<TODEntry> get_entries(){
+		Collections.sort(entries);
+		return entries;
 	}
 
 }
