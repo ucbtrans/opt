@@ -9,7 +9,7 @@ import java.util.Collection;
 public class ControllerRampMeterAlinea extends AbstractControllerRampMeter {
 
 	protected long sensor_link_id;
-	protected long sensor_offset_m;
+	protected float sensor_offset_m;
 
 	public ControllerRampMeterAlinea(long id,float dt, float start_time, Float end_time, Collection<AbstractActuator> xactuators) throws OTMException {
 		super(id,dt,start_time,end_time,"alinea",xactuators);
@@ -35,11 +35,11 @@ public class ControllerRampMeterAlinea extends AbstractControllerRampMeter {
 		this.sensor_link_id = sensor_link_id;
 	}
 
-	public long getSensor_offset_m() {
+	public float getSensor_offset_m() {
 		return sensor_offset_m;
 	}
 
-	public void setSensor_offset_m(long sensor_offset_m) {
+	public void setSensor_offset_m(float sensor_offset_m) {
 		this.sensor_offset_m = sensor_offset_m;
 	}
 
