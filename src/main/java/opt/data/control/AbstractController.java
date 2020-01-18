@@ -18,33 +18,8 @@ public abstract class AbstractController implements Comparable {
 	protected Map<Long,AbstractActuator> actuators;
 	protected Map<Long,Sensor> sensors;
 
-	public AbstractController(long id, float dt, float start_time, Float end_time, String algorithm) throws Exception {
 
-		// CHECKS
-		if(start_time<0)
-			throw new OTMException("start_time<0");
-
-		if(end_time!=null && end_time<=start_time)
-			throw new OTMException("end_time<=start_time");
-
-//		if(actuators.stream().anyMatch(x->x==null))
-//			throw new OTMException("Bad id in actuator list for controller id="+id);
-
-		this.id = id;
-		this.dt = dt;
-		this.start_time = start_time;
-		this.end_time = end_time==null ? Float.POSITIVE_INFINITY : end_time;
-		try {
-			this.algorithm = control.AbstractController.Algorithm.valueOf(algorithm);
-		} catch(IllegalArgumentException e){
-			throw new OTMException(e.getMessage());
-		}
-//		this.actuators = new HashMap<>();
-//		for(AbstractActuator act :actuators)
-//			this.actuators.put(act.id,act);
-
-	}
-
+	// jaxb
 	public AbstractController(jaxb.Controller jcntrl,Map<Long,jaxb.Actuator> jactuators, Map<Long,jaxb.Sensor> jsensors,  Scenario scn) throws Exception {
 
 		this.id = jcntrl.getId();
@@ -94,7 +69,40 @@ public abstract class AbstractController implements Comparable {
 			// complex sensors : check that there are none
 			assert(!jcntrl.getFeedbackSensors().getFeedbackSensor().isEmpty());
 		}
+	}
 
+	// factory
+	public AbstractController(long id, float dt, float start_time, Float end_time, String algorithm) throws Exception {
+
+		// CHECKS
+		if(start_time<0)
+			throw new OTMException("start_time<0");
+
+		if(end_time!=null && end_time<=start_time)
+			throw new OTMException("end_time<=start_time");
+
+		this.id = id;
+		this.dt = dt;
+		this.start_time = start_time;
+		this.end_time = end_time==null ? Float.POSITIVE_INFINITY : end_time;
+		try {
+			this.algorithm = control.AbstractController.Algorithm.valueOf(algorithm);
+		} catch(IllegalArgumentException e){
+			throw new Exception(e.getMessage());
+		}
+
+	}
+
+	public void add_sensor(Sensor sensor){
+		if(sensors==null)
+			sensors = new HashMap<>();
+		sensors.put(sensor.id,sensor);
+	}
+
+	public void add_actuator(AbstractActuator actuator){
+		if(actuators==null)
+			actuators = new HashMap<>();
+		actuators.put(actuator.id,actuator);
 	}
 
 	public jaxb.Controller to_jaxb(){

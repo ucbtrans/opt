@@ -6,9 +6,10 @@ public abstract class AbstractActuator {
 	public long link_id;
 	public AbstractController myController;
 
-	public AbstractActuator(long id,long link_id){
+	public AbstractActuator(long id,long link_id,AbstractController myController){
 		this.id = id;
 		this.link_id = link_id;
+		this.myController = myController;
 	}
 
 	public AbstractActuator(jaxb.Actuator j){

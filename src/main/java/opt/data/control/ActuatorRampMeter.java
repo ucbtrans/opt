@@ -4,8 +4,9 @@ import jaxb.Actuator;
 
 public class ActuatorRampMeter extends AbstractActuator {
 
-	public ActuatorRampMeter(long id, long link_id){
-		super(id,link_id);
+
+	public ActuatorRampMeter(long id, long link_id,AbstractController myController ){
+		super(id,link_id,myController);
 	}
 
 	public ActuatorRampMeter(Actuator j) {

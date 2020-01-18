@@ -12,12 +12,17 @@ public abstract class AbstractControllerRampMeter extends AbstractController {
     protected float min_rate_vph;
     protected float max_rate_vph;
 
-    public AbstractControllerRampMeter(long id, float dt, float start_time, Float end_time, String algorithm) throws Exception {
-        super(id, dt, start_time, end_time, algorithm);
-    }
-
+    // jaxb
     public AbstractControllerRampMeter(Controller j, Map<Long, Actuator> a, Map<Long,jaxb.Sensor> s, Scenario scn) throws Exception {
         super(j,a,s,scn);
+    }
+
+    // factory
+    public AbstractControllerRampMeter(long id, float dt, float start_time, Float end_time, String algorithm,boolean has_queue_control,float min_rate_vph,float max_rate_vph) throws Exception {
+        super(id, dt, start_time, end_time, algorithm);
+        this.has_queue_control = has_queue_control;
+        this.min_rate_vph = min_rate_vph;
+        this.max_rate_vph = max_rate_vph;
     }
 
     ////////////////////////////////

@@ -1,7 +1,5 @@
 package opt.data.control;
 
-import jaxb.Actuator;
-
 public class Sensor {
 
     public long id;

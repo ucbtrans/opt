@@ -24,30 +24,17 @@ public class ControllerRampMeterTOD extends AbstractControllerRampMeter {
 
 	protected List<TODEntry> entries = new ArrayList<>();
 
-	// from jaxb
+	// jaxb
 	public ControllerRampMeterTOD(Controller j, Map<Long,jaxb.Actuator> a, Map<Long,jaxb.Sensor> s,Scenario scn) throws Exception {
 		super(j,a,s,scn);
-
-		// CHECK
-		for(TODEntry entry : entries){
-			if(entry.time<0)
-				throw new OTMException("entry.time<0");
-			if(entry.rate_vph<0)
-				throw new OTMException("entry.rate_vph<0");
-		}
-
-//		if(actuators.values().stream().anyMatch(act -> !(act instanceof opt.data.control.ActuatorRampMeter)))
-//			throw new OTMException("Found a TOD controller on a non-ramp meter actuator");
-
 	}
 
-	// from factory
-	public ControllerRampMeterTOD(long id,float dt, float start_time, Float end_time) throws Exception {
-		super(id,dt,start_time,end_time,"tod");
+	// factory
+	public ControllerRampMeterTOD(long id,float dt, float start_time, Float end_time, long ramp_link_id) throws Exception {
+		super(id,dt,start_time,end_time,"tod",false,Float.NaN,Float.NaN);
 
-//		// CHECK
-//		if(actuators.values().stream().anyMatch(act -> !(act instanceof opt.data.control.ActuatorRampMeter)))
-//			throw new OTMException("Found an TOD controller on a non-ramp meter actuator");
+		// ramp meter actuator
+		add_actuator(ControlFactory.create_ramp_meter(ramp_link_id,this));
 	}
 
 	/////////////////////////

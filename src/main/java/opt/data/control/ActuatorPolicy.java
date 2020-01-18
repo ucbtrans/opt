@@ -4,8 +4,8 @@ import jaxb.Actuator;
 
 public class ActuatorPolicy extends AbstractActuator {
 
-	public ActuatorPolicy(long id, long link_id){
-		super(id,link_id);
+	public ActuatorPolicy(long id, long link_id,AbstractController myController){
+		super(id,link_id,myController);
 	}
 
 	public ActuatorPolicy(Actuator j) {

@@ -1,6 +1,7 @@
 package opt.tests;
 
 import error.OTMException;
+import opt.data.FreewayScenario;
 import opt.data.Schedule;
 import opt.data.control.*;
 import org.junit.Test;
@@ -23,9 +24,13 @@ public class TestControl extends AbstractTest{
 	public void test_create_controller_alinea(){
 		try {
 			TestData X = new TestData("project2_rm.opt");
-			Set<Long> link_ids = new HashSet<>();
-			link_ids.add(8l);
-			ControllerRampMeterAlinea cntrl = ControlFactory.create_controller_alinea(dt,start_time,end_time, link_ids,X.scenario);
+			boolean has_queue_control = false;
+			float min_rate_vph = 100f;
+			float max_rate_vph = 900f;
+			long sensor_link_id = 9l;
+			float sensor_offset = 100f;
+			long ramp_link_id = 8l;
+			ControllerRampMeterAlinea cntrl = ControlFactory.create_controller_alinea(X.scenario,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,sensor_link_id,sensor_offset,ramp_link_id);
 			assertNotNull(cntrl);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -36,9 +41,8 @@ public class TestControl extends AbstractTest{
 	public void test_create_controller_tod(){
 		try {
 			TestData X = new TestData("project2_rm.opt");
-			Set<Long> link_ids = new HashSet<>();
-			link_ids.add(8l);
-			ControllerRampMeterTOD cntrl = ControlFactory.create_controller_tod(dt,start_time,end_time, link_ids,X.scenario);
+			long ramp_link_id = 8l;
+			ControllerRampMeterTOD cntrl = ControlFactory.create_controller_tod(X.scenario,dt,start_time,end_time,ramp_link_id);
 			assertNotNull(cntrl);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -110,13 +114,13 @@ public class TestControl extends AbstractTest{
 			TestData X = new TestData("project2.opt");
 			X.scenario.clear_controller_schedule();
 
-			float dt = 300f;   // update time in seconds
-			float start_time = 0f; // start time in seconds after midnight
-			Float end_time = null; // end time in seconds after midnight, or null for 'never'
-			Set<Long> link_ids = new HashSet<>(); // set of onramp link ids
-			link_ids.add(8l);
-
-			ControllerRampMeterAlinea alinea = ControlFactory.create_controller_alinea(dt,start_time,end_time,link_ids,X.scenario);
+			boolean has_queue_control = false;
+			float min_rate_vph = 100f;
+			float max_rate_vph = 900f;
+			long sensor_link_id = 9l;
+			float sensor_offset = 100f;
+			long ramp_link_id = 8l;
+			ControllerRampMeterAlinea alinea = ControlFactory.create_controller_alinea(X.scenario,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,sensor_link_id,sensor_offset,ramp_link_id);
 			X.scenario.add_controller(alinea);
 
 			Schedule schedule = X.scenario.get_controller_schedule();
