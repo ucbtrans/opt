@@ -27,7 +27,7 @@ public class TestControl extends AbstractTest{
 			link_ids.add(8l);
 			ControllerRampMeterAlinea cntrl = ControlFactory.create_controller_alinea(dt,start_time,end_time, link_ids,X.scenario);
 			assertNotNull(cntrl);
-		} catch (OTMException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -40,7 +40,7 @@ public class TestControl extends AbstractTest{
 			link_ids.add(8l);
 			ControllerRampMeterTOD cntrl = ControlFactory.create_controller_tod(dt,start_time,end_time, link_ids,X.scenario);
 			assertNotNull(cntrl);
-		} catch (OTMException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -55,7 +55,7 @@ public class TestControl extends AbstractTest{
 			link_ids.add(4l);
 			ControllerPolicyHOV cntrl = ControlFactory.create_controller_hov(dt,start_time,end_time, link_ids,X.scenario);
 			assertNotNull(cntrl);
-		} catch (OTMException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -70,7 +70,7 @@ public class TestControl extends AbstractTest{
 			link_ids.add(4l);
 			ControllerPolicyHOT cntrl = ControlFactory.create_controller_hot(dt,start_time,end_time, link_ids,X.scenario);
 			assertNotNull(cntrl);
-		} catch (OTMException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -136,7 +136,7 @@ public class TestControl extends AbstractTest{
 			Schedule schedule = X.scenario.get_controller_schedule();
 			System.out.println(schedule);
 
-			long controller_id = schedule.items.get(0).id;
+			long controller_id = schedule.items.get(0).getId();
 			X.scenario.delete_controller(controller_id);
 
 			System.out.println();

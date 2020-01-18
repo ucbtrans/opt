@@ -1,10 +1,10 @@
 package opt.data.control;
 
-import error.OTMException;
+import jaxb.Actuator;
 import jaxb.Controller;
 import opt.data.Scenario;
 
-import java.util.Collection;
+import java.util.Map;
 
 public abstract class AbstractControllerRampMeter extends AbstractController {
 
@@ -12,13 +12,17 @@ public abstract class AbstractControllerRampMeter extends AbstractController {
     protected float min_rate_vph;
     protected float max_rate_vph;
 
-    public AbstractControllerRampMeter(long id, float dt, float start_time, Float end_time, String algorithm, Collection<AbstractActuator> actuators) throws OTMException {
-        super(id, dt, start_time, end_time, algorithm, actuators);
+    public AbstractControllerRampMeter(long id, float dt, float start_time, Float end_time, String algorithm) throws Exception {
+        super(id, dt, start_time, end_time, algorithm);
     }
 
-    public AbstractControllerRampMeter(Controller j, Scenario scn) throws OTMException {
-        super(j, scn);
+    public AbstractControllerRampMeter(Controller j, Map<Long, Actuator> a, Map<Long,jaxb.Sensor> s, Scenario scn) throws Exception {
+        super(j,a,s,scn);
     }
+
+    ////////////////////////////////
+    // API
+    ////////////////////////////////
 
     public boolean isHas_queue_control() {
         return has_queue_control;

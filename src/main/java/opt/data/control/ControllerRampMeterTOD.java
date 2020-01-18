@@ -22,20 +22,11 @@ public class ControllerRampMeterTOD extends AbstractControllerRampMeter {
 		}
 	}
 
-	public List<TODEntry> entries = new ArrayList<>();
+	protected List<TODEntry> entries = new ArrayList<>();
 
-	public ControllerRampMeterTOD(long id,float dt, float start_time, Float end_time, Collection<AbstractActuator> xactuators) throws OTMException {
-		super(id,dt,start_time,end_time,"tod",xactuators);
-
-		// CHECK
-		if(actuators.values().stream().anyMatch(act -> !(act instanceof opt.data.control.ActuatorRampMeter)))
-			throw new OTMException("Found an TOD controller on a non-ramp meter actuator");
-	}
-
-	public ControllerRampMeterTOD(Controller j, Scenario scn) throws OTMException {
-		super(j, scn);
-
-		// TODO READ ENTRIES
+	// from jaxb
+	public ControllerRampMeterTOD(Controller j, Map<Long,jaxb.Actuator> a, Map<Long,jaxb.Sensor> s,Scenario scn) throws Exception {
+		super(j,a,s,scn);
 
 		// CHECK
 		for(TODEntry entry : entries){
@@ -45,9 +36,18 @@ public class ControllerRampMeterTOD extends AbstractControllerRampMeter {
 				throw new OTMException("entry.rate_vph<0");
 		}
 
-		if(actuators.values().stream().anyMatch(act -> !(act instanceof opt.data.control.ActuatorRampMeter)))
-			throw new OTMException("Found a TOD controller on a non-ramp meter actuator");
+//		if(actuators.values().stream().anyMatch(act -> !(act instanceof opt.data.control.ActuatorRampMeter)))
+//			throw new OTMException("Found a TOD controller on a non-ramp meter actuator");
 
+	}
+
+	// from factory
+	public ControllerRampMeterTOD(long id,float dt, float start_time, Float end_time) throws Exception {
+		super(id,dt,start_time,end_time,"tod");
+
+//		// CHECK
+//		if(actuators.values().stream().anyMatch(act -> !(act instanceof opt.data.control.ActuatorRampMeter)))
+//			throw new OTMException("Found an TOD controller on a non-ramp meter actuator");
 	}
 
 	/////////////////////////

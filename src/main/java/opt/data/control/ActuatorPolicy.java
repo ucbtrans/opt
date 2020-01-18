@@ -1,12 +1,11 @@
 package opt.data.control;
 
 import jaxb.Actuator;
-import opt.data.AbstractLink;
 
 public class ActuatorPolicy extends AbstractActuator {
 
-	public ActuatorPolicy(long id, AbstractLink link){
-		super(id,link);
+	public ActuatorPolicy(long id, long link_id){
+		super(id,link_id);
 	}
 
 	public ActuatorPolicy(Actuator j) {
@@ -20,7 +19,8 @@ public class ActuatorPolicy extends AbstractActuator {
 		jaxb.ActuatorTarget jtgt = new jaxb.ActuatorTarget();
 		j.setActuatorTarget(jtgt);
 		jtgt.setType("link");
-		jtgt.setId(link.id);
+		jtgt.setId(link_id);
 		return j;
 	}
+
 }

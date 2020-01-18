@@ -104,13 +104,13 @@
                     <actuator id="4" type="policy">
                         <actuator_target id="4" type="link"/>
                     </actuator> -->
-                    <actuator id="8" type="ramp_meter">
+                    <actuator id="8" type="capacity">
                         <actuator_target id="8" type="link"/>
                     </actuator>
-                    <actuator id="11" type="ramp_meter">
+                    <actuator id="11" type="capacity">
                         <actuator_target id="11" type="link"/>
                     </actuator>
-<!--                     <actuator id="13" type="ramp_meter">
+<!--                     <actuator id="13" type="capacity">
                         <actuator_target id="13" type="link"/>
                     </actuator> -->
 

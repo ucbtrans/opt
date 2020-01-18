@@ -12,13 +12,14 @@ import utils.OTMUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toSet;
+
 public class Scenario {
 
     protected Map<Long, Node> nodes = new HashMap<>();
     protected Map<Long, AbstractLink> links = new HashMap<>();
     protected Map<Long, Commodity> commodities = new HashMap<>();
     protected Map<Long, AbstractController> controllers = new HashMap<>();
-	protected Map<Long, AbstractActuator> actuators = new HashMap<>();
 
 	/////////////////////////////////////
     // construction
@@ -114,46 +115,33 @@ public class Scenario {
             for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
                 this.commodities.put(comm.getId(),new Commodity(comm.getId(),comm.getName(),comm.getPvequiv()));
 
-		// actuators
-		if(scenario.getActuators()!=null){
-			for(jaxb.Actuator jact : scenario.getActuators().getActuator()){
-				AbstractActuator act = null;
-				switch(jact.getType()){
-					case "ramp_meter":
-						act = new opt.data.control.ActuatorRampMeter(jact);
-						break;
-                    case "policy":
-                        act = new opt.data.control.ActuatorPolicy(jact);
-                        break;
-					default:
-						throw new Exception("Wrong actuator type, actuator id=" + jact.getId());
-				}
-				this.actuators.put(jact.getId(), act);
-			}
-		}
+        // actuator and sensor maps
+        Map<Long,jaxb.Actuator> actuators = new HashMap<>();
+        if(scenario.getActuators()!=null)
+            for(jaxb.Actuator x : scenario.getActuators().getActuator())
+                actuators.put(x.getId(),x);
 
+        Map<Long,jaxb.Sensor> sensors = new HashMap<>();
+        if(scenario.getSensors()!=null)
+            for(jaxb.Sensor x : scenario.getSensors().getSensor())
+                sensors.put(x.getId(),x);
 
-		// sensors
-		if(scenario.getSensors()!=null){
-			// TODO COMPLETE THIS
-		}
-
-		// controllers
-		if(scenario.getControllers()!=null){
+        // controllers
+        if(scenario.getControllers()!=null){
 			for(jaxb.Controller jcnt : scenario.getControllers().getController()){
 				AbstractController cnt = null;
 				switch( jcnt.getType()){
 					case "tod":
-                        cnt = new ControllerRampMeterTOD(jcnt,this);
+                        cnt = new ControllerRampMeterTOD(jcnt,actuators,sensors,this);
                         break;
                     case "alinea":
-						cnt = new ControllerRampMeterAlinea(jcnt,this);
+						cnt = new ControllerRampMeterAlinea(jcnt,actuators,sensors,this);
 						break;
                     case "hov":
-                        cnt = new ControllerPolicyHOV(jcnt,this);
+                        cnt = new ControllerPolicyHOV(jcnt,actuators,sensors,this);
                         break;
                     case "hot":
-                        cnt = new ControllerPolicyHOT(jcnt,this);
+                        cnt = new ControllerPolicyHOT(jcnt,actuators,sensors,this);
                         break;
 					default:
 						throw new Exception("Unkonwn controller type: " + jcnt.getType());
@@ -182,30 +170,10 @@ public class Scenario {
     // control
     /////////////////////////////////////
 
-    public Collection<AbstractActuator> get_actuators(){
-        return actuators.values();
-    }
-
-    public AbstractActuator get_actuator_with_id(long id){
-        return actuators.get(id);
-    }
-
-    public void add_actuator(AbstractActuator act) throws OTMException {
-        if(actuators.containsKey(act.id))
-            throw new OTMException("Actuator already exists");
-        actuators.put(act.id,act);
-    }
-
-    public void delete_actuator(long act_id) throws OTMException {
-        if(!actuators.containsKey(act_id))
-            throw new OTMException("Actuator doesn't exist");
-        actuators.remove(act_id);
-    }
-
     public void add_controller(AbstractController ctrl) throws OTMException {
-        if(controllers.containsKey(ctrl.id))
+        if(controllers.containsKey(ctrl.getId()))
             throw new OTMException("Controller already exists");
-        controllers.put(ctrl.id,ctrl);
+        controllers.put(ctrl.getId(),ctrl);
     }
 
     public void delete_controller(long ctrl_id) throws OTMException {
@@ -368,12 +336,12 @@ public class Scenario {
             // get offramp links ........................
             Set<AbstractLink> outlinks = node.out_links.stream()
                     .map(link_id->links.get(link_id))
-                    .collect(Collectors.toSet());
+                    .collect(toSet());
 
             Set<LinkOfframp> frs = outlinks.stream()
                     .filter(link->link instanceof LinkOfframp)
                     .map(link-> (LinkOfframp) link)
-                    .collect(Collectors.toSet());
+                    .collect(toSet());
 
             if(frs.isEmpty())
                 continue;
@@ -383,7 +351,7 @@ public class Scenario {
                     .map(link_id->links.get(link_id))
                     .filter(link->link instanceof LinkFreeway)
                     .map(link-> (LinkFreeway) link)
-                    .collect(Collectors.toSet());
+                    .collect(toSet());
 
             if(in_links.isEmpty() || in_links.size()>1)
                 System.err.println("90443j2f");
@@ -394,7 +362,7 @@ public class Scenario {
             Set<LinkFreeway> outfreeway = outlinks.stream()
                     .filter(link->link instanceof LinkFreeway)
                     .map(link-> (LinkFreeway) link)
-                    .collect(Collectors.toSet());
+                    .collect(toSet());
 
             if(outfreeway.size()>1)
                 System.err.println("h45-oh35g");
@@ -403,7 +371,7 @@ public class Scenario {
 
             Set<Long> comm_ids = frs.stream()
                     .flatMap(fr->fr.splits.keySet().stream())
-                    .collect(Collectors.toSet());
+                    .collect(toSet());
 
             for(Long comm_id : comm_ids){
 
@@ -458,14 +426,6 @@ public class Scenario {
         }
 
         /////////////////////////////////////////////////////
-        // actuators
-        jaxb.Actuators jacts = new jaxb.Actuators();
-        if(!actuators.isEmpty())
-            jScn.setActuators(jacts);
-        for(AbstractActuator act : actuators.values())
-            jacts.getActuator().add(act.to_jaxb());
-
-        /////////////////////////////////////////////////////
         // controllers
         jaxb.Controllers jcntrls = new jaxb.Controllers();
         if(!controllers.isEmpty())
@@ -473,7 +433,31 @@ public class Scenario {
         for(AbstractController cntrl : controllers.values())
             jcntrls.getController().add(cntrl.to_jaxb());
 
+        /////////////////////////////////////////////////////
+        // actuators
+        jaxb.Actuators jacts = new jaxb.Actuators();
+        Set<AbstractActuator> actuators = controllers.values().stream()
+                .flatMap(x->x.get_actuators().values().stream())
+                .collect(toSet());
+
+        if(!actuators.isEmpty())
+            jScn.setActuators(jacts);
+        for(AbstractActuator act : actuators)
+            jacts.getActuator().add(act.to_jaxb());
+
+        /////////////////////////////////////////////////////
+        // sensors
+        jaxb.Sensors jsens = new jaxb.Sensors();
+        Set<Sensor> sensors = controllers.values().stream()
+                .flatMap(x->x.get_sensors().values().stream())
+                .collect(toSet());
+        if(!sensors.isEmpty())
+            jScn.setSensors(jsens);
+        for(Sensor sns : sensors)
+            jsens.getSensor().add(sns.to_jaxb());
+
         return jScn;
+
     }
 
     /////////////////////////////////////

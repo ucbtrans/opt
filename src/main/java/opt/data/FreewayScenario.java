@@ -10,8 +10,7 @@ import utils.OTMUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.*;
 
 public class FreewayScenario {
 
@@ -19,6 +18,7 @@ public class FreewayScenario {
     private Long max_node_id;
     private Long max_seg_id;
     private Long max_controller_id;
+    private Long max_sensor_id;
     private Long max_actuator_id;
 
     public String name;
@@ -41,6 +41,7 @@ public class FreewayScenario {
         max_node_id = -1l;
         max_seg_id = -1l;
         max_controller_id = -1l;
+        max_sensor_id = -1l;
         max_actuator_id = -1l;
         scenario = new Scenario();
         create_isolated_segment(segmentname,params, AbstractLink.Type.freeway);
@@ -221,37 +222,39 @@ public class FreewayScenario {
                                         OTMUtils.csv2list(split.getContent())));
                 }
 
-        // assign actuators to links
-		if(jaxb_scenario.getActuators()!=null)
-			for(jaxb.Actuator jact : jaxb_scenario.getActuators().getActuator()){
-				if(jact.getActuatorTarget()==null)
-					continue;
-				switch(jact.getActuatorTarget().getType()){
-					case "link":
-						AbstractLink link = scenario.links.get(jact.getActuatorTarget().getId());
-						AbstractActuator act = scenario.actuators.get(jact.getId());
-						act.link = link;
-						link.actuator = act;
-						break;
-					default:
-						throw new OTMException("Unknown actuator target type: " + jact.getActuatorTarget().getType());
-				}
-			}
+        // TODO DO ALL OF THIS BELOW AT CONSTRUCTION TIME
 
-		// assign controllers to actuators
-		for(AbstractController ctrl : this.scenario.controllers.values()){
-			for(AbstractActuator act : ctrl.actuators.values()){
-				if(act.myController!=null)
-					throw new OTMException(String.format("Actuator %d has been assigned to multiple controllers",act.id));
-				act.myController = ctrl;
-			}
-		}
-
-		// populate the schedule
-        this.controller_schedule = new Schedule();
-        for(AbstractController ctrl : this.scenario.controllers.values())
-            controller_schedule.items.add(ctrl);
-        Collections.sort(controller_schedule.items);
+//        // assign actuators to links
+//		if(jaxb_scenario.getActuators()!=null)
+//			for(jaxb.Actuator jact : jaxb_scenario.getActuators().getActuator()){
+//				if(jact.getActuatorTarget()==null)
+//					continue;
+//				switch(jact.getActuatorTarget().getType()){
+//					case "link":
+//						AbstractLink link = scenario.links.get(jact.getActuatorTarget().getId());
+//						AbstractActuator act = scenario.actuators.get(jact.getId());
+//						act.link = link;
+//						link.actuator = act;
+//						break;
+//					default:
+//						throw new OTMException("Unknown actuator target type: " + jact.getActuatorTarget().getType());
+//				}
+//			}
+//
+//		// assign controllers to actuators
+//		for(AbstractController ctrl : this.scenario.controllers.values()){
+//			for(AbstractActuator act : ctrl.actuators.values()){
+//				if(act.myController!=null)
+//					throw new OTMException(String.format("Actuator %d has been assigned to multiple controllers",act.id));
+//				act.myController = ctrl;
+//			}
+//		}
+//
+//		// populate the schedule
+//        this.controller_schedule = new Schedule();
+//        for(AbstractController ctrl : this.scenario.controllers.values())
+//            controller_schedule.items.add(ctrl);
+//        Collections.sort(controller_schedule.items);
 
         // max ids
         reset_max_ids();
@@ -266,6 +269,7 @@ public class FreewayScenario {
         scn_cpy.max_node_id = max_node_id;
         scn_cpy.max_seg_id = max_seg_id;
         scn_cpy.max_controller_id = max_controller_id;
+        scn_cpy.max_sensor_id = max_sensor_id;
         scn_cpy.max_actuator_id = max_actuator_id;
         scn_cpy.scenario = scenario.clone();
         for(Map.Entry<Long,Segment> e : segments.entrySet()) {
@@ -312,8 +316,8 @@ public class FreewayScenario {
     }
 
     public void add_controller(AbstractController controller){
-        if(!scenario.controllers.containsKey(controller.id))
-            scenario.controllers.put(controller.id,controller);
+        if(!scenario.controllers.containsKey(controller.getId()))
+            scenario.controllers.put(controller.getId(),controller);
         controller_schedule.items.add(controller);
         Collections.sort(controller_schedule.items);
     }
@@ -704,10 +708,16 @@ public class FreewayScenario {
         max_controller_id = opt_max_cntrl_id.isPresent() ? opt_max_cntrl_id.get() : 0l;
 
         // actuator
-        Optional<Long> opt_max_act_id = scenario.actuators.keySet().stream()
+        Optional<Long> opt_max_act_id = scenario.controllers.values().stream()
+                .flatMap(c->c.get_actuator_ids().stream())
                 .max(Comparator.comparing(Long::valueOf));
         max_actuator_id = opt_max_act_id.isPresent() ? opt_max_act_id.get() : 0l;
 
+        // sensor
+        Optional<Long> opt_max_sens_id = scenario.controllers.values().stream()
+                .flatMap(c->c.get_sensor_ids().stream())
+                .max(Comparator.comparing(Long::valueOf));
+        max_sensor_id = opt_max_sens_id.isPresent() ? opt_max_sens_id.get() : 0l;
     }
 
     protected long new_link_id(){
@@ -728,6 +738,10 @@ public class FreewayScenario {
 
     public long new_actuator_id(){
         return ++max_actuator_id;
+    }
+
+    public long new_sensor_id(){
+        return ++max_sensor_id;
     }
 
     private List<Segment> build_freeway_from_segment(Segment first){

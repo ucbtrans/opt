@@ -20,7 +20,7 @@ public class Schedule {
 	public Schedule get_schedule_for_link(long link_id){
 		Schedule sched = new Schedule();
 		for(AbstractController ctrl : items)
-			if(ctrl.actuators.values().stream().anyMatch(act->act.link.id==link_id))
+			if(ctrl.get_actuators().values().stream().anyMatch(act->act.link_id==link_id))
 				sched.items.add(ctrl);
 		Collections.sort(sched.items);
 		return sched;
@@ -29,7 +29,7 @@ public class Schedule {
 	public Schedule get_schedule_for_time_range(float start_time,float end_time){
 		Schedule sched = new Schedule();
 		for(AbstractController ctrl : items)
-			if(ctrl.end_time>=start_time || ctrl.start_time<=end_time)
+			if(ctrl.getEndTime()>=start_time || ctrl.getStartTime()<=end_time)
 				sched.items.add(ctrl);
 		Collections.sort(sched.items);
 		return sched;
@@ -39,8 +39,8 @@ public class Schedule {
 	public String toString() {
 		String str = "start\tend\ttype\tlink(s)";
 		for(AbstractController cntrl : this.items){
-			String link_ids = OTMUtils.comma_format(cntrl.actuators.values().stream().map(act->act.link.id).collect(toList()));
-			str = String.format("%s\n%.1f\t%.1f\t%s\t%s",str,cntrl.start_time,cntrl.end_time,cntrl.getAlgorithm(),link_ids);
+			String link_ids = OTMUtils.comma_format(cntrl.get_actuators().values().stream().map(act->act.link_id).collect(toList()));
+			str = String.format("%s\n%.1f\t%.1f\t%s\t%s",str,cntrl.getStartTime(),cntrl.getEndTime(),cntrl.getAlgorithm(),link_ids);
 		}
 		return str;
 	}

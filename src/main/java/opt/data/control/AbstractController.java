@@ -1,7 +1,6 @@
 package opt.data.control;
 
 import error.OTMException;
-import opt.data.FreewayScenario;
 import opt.data.Scenario;
 import utils.OTMUtils;
 
@@ -11,22 +10,15 @@ import static java.util.stream.Collectors.toSet;
 
 public abstract class AbstractController implements Comparable {
 
-	// TODO Use the one in otm-sim instead
-	public enum Algorithm {
-		tod,
-		alinea,
-		hov,
-		hot
-	}
+	protected long id;
+	protected float dt;
+	protected float start_time;
+	protected float end_time;
+	protected control.AbstractController.Algorithm algorithm;
+	protected Map<Long,AbstractActuator> actuators;
+	protected Map<Long,Sensor> sensors;
 
-	public long id;
-	public float dt;
-	public float start_time;
-	public float end_time;
-	public Algorithm algorithm;
-	public Map<Long,AbstractActuator> actuators;
-
-	public AbstractController(long id, float dt, float start_time, Float end_time, String algorithm, Collection<AbstractActuator> actuators) throws OTMException {
+	public AbstractController(long id, float dt, float start_time, Float end_time, String algorithm) throws Exception {
 
 		// CHECKS
 		if(start_time<0)
@@ -35,27 +27,74 @@ public abstract class AbstractController implements Comparable {
 		if(end_time!=null && end_time<=start_time)
 			throw new OTMException("end_time<=start_time");
 
-		if(actuators.stream().anyMatch(x->x==null))
-			throw new OTMException("Bad id in actuator list for controller id="+id);
+//		if(actuators.stream().anyMatch(x->x==null))
+//			throw new OTMException("Bad id in actuator list for controller id="+id);
 
 		this.id = id;
 		this.dt = dt;
 		this.start_time = start_time;
 		this.end_time = end_time==null ? Float.POSITIVE_INFINITY : end_time;
 		try {
-			this.algorithm = Algorithm.valueOf(algorithm);
+			this.algorithm = control.AbstractController.Algorithm.valueOf(algorithm);
 		} catch(IllegalArgumentException e){
 			throw new OTMException(e.getMessage());
 		}
-		this.actuators = new HashMap<>();
-		for(AbstractActuator act :actuators)
-			this.actuators.put(act.id,act);
+//		this.actuators = new HashMap<>();
+//		for(AbstractActuator act :actuators)
+//			this.actuators.put(act.id,act);
 
 	}
 
-	public AbstractController(jaxb.Controller j, Scenario scn) throws OTMException {
-		this(j.getId(),j.getDt(),j.getStartTime(),j.getEndTime(),j.getType(),
-				OTMUtils.csv2longlist(j.getTargetActuators().getIds()).stream().map(act->scn.get_actuator_with_id(act)).collect(toSet()));
+	public AbstractController(jaxb.Controller jcntrl,Map<Long,jaxb.Actuator> jactuators, Map<Long,jaxb.Sensor> jsensors,  Scenario scn) throws Exception {
+
+		this.id = jcntrl.getId();
+		this.dt = jcntrl.getDt();
+		this.start_time = jcntrl.getStartTime();
+		this.end_time = jcntrl.getEndTime();
+		this.algorithm = control.AbstractController.Algorithm.valueOf(jcntrl.getType());
+		this.actuators = new HashMap<>();
+		this.sensors = new HashMap<>();
+
+		// read actuators
+		if(jcntrl.getTargetActuators()!=null){
+
+			// plain actuators
+			for(long act_id : OTMUtils.csv2longlist(jcntrl.getTargetActuators().getIds())) {
+				jaxb.Actuator jact = jactuators.get(act_id);
+				AbstractActuator act = null;
+				switch(jact.getType()){
+					case "capacity":
+						act = new opt.data.control.ActuatorRampMeter(jact);
+						break;
+					case "policy":
+						act = new opt.data.control.ActuatorPolicy(jact);
+						break;
+					default:
+						throw new Exception("Wrong actuator type, actuator id=" + jact.getId());
+				}
+				actuators.put(act_id, act);
+				act.myController = this;
+			}
+
+			// complex actuators : check that there are none
+			assert(!jcntrl.getTargetActuators().getTargetActuator().isEmpty());
+		}
+
+		// read sensors
+		if(jcntrl.getFeedbackSensors()!=null){
+
+			// plain sensors
+			for(long sens_id : OTMUtils.csv2longlist(jcntrl.getFeedbackSensors().getIds())) {
+				jaxb.Sensor jsns = jsensors.get(sens_id);
+				Sensor sensor = new Sensor(jsns);
+				sensors.put(sens_id, sensor);
+				sensor.myController = this;
+			}
+
+			// complex sensors : check that there are none
+			assert(!jcntrl.getFeedbackSensors().getFeedbackSensor().isEmpty());
+		}
+
 	}
 
 	public jaxb.Controller to_jaxb(){
@@ -66,12 +105,41 @@ public abstract class AbstractController implements Comparable {
 		j.setEndTime(end_time);
 		j.setType(algorithm.toString());
 
-		jaxb.TargetActuators tgtacts = new jaxb.TargetActuators();
-		j.setTargetActuators(tgtacts);
-		tgtacts.setIds(OTMUtils.comma_format(actuators.values().stream().map(x->x.id).collect(toSet())));
+		if(actuators!=null && !actuators.isEmpty()){
+			jaxb.TargetActuators tgtacts = new jaxb.TargetActuators();
+			j.setTargetActuators(tgtacts);
+			tgtacts.setIds(OTMUtils.comma_format(actuators.values().stream().map(x->x.id).collect(toSet())));
+		}
 
-//		j.setFeedbackSensors();
+		if(sensors!=null && !sensors.isEmpty()){
+			jaxb.FeedbackSensors fbsensors = new jaxb.FeedbackSensors();
+			j.setFeedbackSensors(fbsensors);
+			fbsensors.setIds(OTMUtils.comma_format(sensors.values().stream().map(x->x.id).collect(toSet())));
+		}
+
 		return j;
+	}
+
+	@Override
+	public int compareTo(Object o) {
+		AbstractController that = (AbstractController) o;
+		if(this.start_time<that.start_time)
+			return -1;
+		else if(this.start_time>that.start_time)
+			return 1;
+		else return 0;
+	}
+
+	////////////////////////////////
+	// API
+	////////////////////////////////
+
+	public Set<Long>get_actuator_ids(){
+		return actuators.keySet();
+	}
+
+	public Set<Long>get_sensor_ids(){
+		return sensors.keySet();
 	}
 
 	public long getId() {
@@ -107,17 +175,15 @@ public abstract class AbstractController implements Comparable {
 	}
 
 	public void setAlgorithm(String algorithm) {
-		this.algorithm = Algorithm.valueOf(algorithm);
+		this.algorithm = control.AbstractController.Algorithm.valueOf(algorithm);
 	}
 
-	@Override
-	public int compareTo(Object o) {
-		AbstractController that = (AbstractController) o;
-		if(this.start_time<that.start_time)
-			return -1;
-		else if(this.start_time>that.start_time)
-			return 1;
-		else return 0;
+	public Map<Long,AbstractActuator> get_actuators(){
+		return actuators;
+	}
+
+	public Map<Long,Sensor> get_sensors(){
+		return sensors;
 	}
 
 }

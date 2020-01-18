@@ -1,12 +1,11 @@
 package opt.data.control;
 
 import jaxb.Actuator;
-import opt.data.AbstractLink;
 
 public class ActuatorRampMeter extends AbstractActuator {
 
-	public ActuatorRampMeter(long id, AbstractLink link){
-		super(id,link);
+	public ActuatorRampMeter(long id, long link_id){
+		super(id,link_id);
 	}
 
 	public ActuatorRampMeter(Actuator j) {
@@ -20,7 +19,7 @@ public class ActuatorRampMeter extends AbstractActuator {
 		jaxb.ActuatorTarget jtgt = new jaxb.ActuatorTarget();
 		j.setActuatorTarget(jtgt);
 		jtgt.setType("link");
-		jtgt.setId(link.id);
+		jtgt.setId(link_id);
 		return j;
 	}
 

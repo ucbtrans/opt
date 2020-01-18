@@ -1,47 +1,49 @@
 package opt.data.control;
 
-import error.OTMException;
-import jaxb.Controller;
 import opt.data.Scenario;
 
-import java.util.Collection;
+import java.util.Map;
 
 public class ControllerRampMeterAlinea extends AbstractControllerRampMeter {
 
-	protected long sensor_link_id;
-	protected float sensor_offset_m;
+	protected Sensor sensor;
 
-	public ControllerRampMeterAlinea(long id,float dt, float start_time, Float end_time, Collection<AbstractActuator> xactuators) throws OTMException {
-		super(id,dt,start_time,end_time,"alinea",xactuators);
+	// from jaxb
+	public ControllerRampMeterAlinea(jaxb.Controller j, Map<Long,jaxb.Actuator> a, Map<Long,jaxb.Sensor> s, Scenario scn) throws Exception {
+		super(j,a,s,scn);
 
-		// CHECK
-		if(actuators.values().stream().anyMatch(act -> !(act instanceof opt.data.control.ActuatorRampMeter)))
-			throw new OTMException("Found an Alinea controller on a non-ramp meter actuator");
+//		// CHECK
+//		if(actuators.values().stream().anyMatch(act -> !(act instanceof opt.data.control.ActuatorRampMeter)))
+//			throw new OTMException("Found an Alinea controller on a non-ramp meter actuator");
 	}
 
-	public ControllerRampMeterAlinea(Controller j, Scenario scn) throws OTMException {
-		super(j, scn);
+	// from factory
+	public ControllerRampMeterAlinea(long id,float dt, float start_time, Float end_time) throws Exception {
+		super(id,dt,start_time,end_time,"alinea");
 
 		// CHECK
-		if(actuators.values().stream().anyMatch(act -> !(act instanceof opt.data.control.ActuatorRampMeter)))
-			throw new OTMException("Found an Alinea controller on a non-ramp meter actuator");
+//		if(actuators.values().stream().anyMatch(act -> !(act instanceof opt.data.control.ActuatorRampMeter)))
+//			throw new OTMException("Found an Alinea controller on a non-ramp meter actuator");
 	}
+
+	////////////////////////////////
+	// API
+	////////////////////////////////
 
 	public long getSensor_link_id() {
-		return sensor_link_id;
+		return sensor.link_id;
 	}
 
 	public void setSensor_link_id(long sensor_link_id) {
-		this.sensor_link_id = sensor_link_id;
+		this.sensor.link_id = sensor_link_id;
 	}
 
 	public float getSensor_offset_m() {
-		return sensor_offset_m;
+		return this.sensor.offset;
 	}
 
 	public void setSensor_offset_m(float sensor_offset_m) {
-		this.sensor_offset_m = sensor_offset_m;
+		this.sensor.offset = sensor_offset_m;
 	}
-
 
 }
