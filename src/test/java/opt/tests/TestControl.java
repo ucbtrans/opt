@@ -52,11 +52,7 @@ public class TestControl extends AbstractTest{
 	public void test_create_controller_hov(){
 		try {
 			TestData X = new TestData("project2_rm.opt");
-			Set<Long> link_ids = new HashSet<>();
-			link_ids.add(2l);
-			link_ids.add(3l);
-			link_ids.add(4l);
-			ControllerPolicyHOV cntrl = ControlFactory.create_controller_hov(dt,start_time,end_time, link_ids,X.scenario);
+			ControllerPolicyHOV cntrl = ControlFactory.create_controller_hov(X.scenario,dt,start_time,end_time);
 			assertNotNull(cntrl);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -67,11 +63,7 @@ public class TestControl extends AbstractTest{
 	public void test_create_controller_hot(){
 		try {
 			TestData X = new TestData("project2_rm.opt");
-			Set<Long> link_ids = new HashSet<>();
-			link_ids.add(2l);
-			link_ids.add(3l);
-			link_ids.add(4l);
-			ControllerPolicyHOT cntrl = ControlFactory.create_controller_hot(dt,start_time,end_time, link_ids,X.scenario);
+			ControllerPolicyHOT cntrl = ControlFactory.create_controller_hot(X.scenario,dt,start_time,end_time);
 			assertNotNull(cntrl);
 		} catch (Exception e) {
 			e.printStackTrace();

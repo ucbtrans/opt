@@ -18,7 +18,6 @@ public class Scenario {
     protected Map<Long, Node> nodes = new HashMap<>();
     protected Map<Long, AbstractLink> links = new HashMap<>();
     protected Map<Long, Commodity> commodities = new HashMap<>();
-    protected Map<Long, AbstractController> controllers = new HashMap<>();
 
 	/////////////////////////////////////
     // construction
@@ -149,7 +148,7 @@ public class Scenario {
 					default:
 						throw new Exception("Unkonwn controller type: " + jcnt.getType());
 				}
-				this.controllers.put(jcnt.getId(), cnt);
+				my_fwy_scenario.add_controller(cnt);
 			}
 		}
     }
@@ -167,24 +166,6 @@ public class Scenario {
             jscn_cpy.commodities.put(e.getKey(),e.getValue().clone());
 
         return jscn_cpy;
-    }
-
-    /////////////////////////////////////
-    // control
-    /////////////////////////////////////
-
-    public void add_controller(AbstractController ctrl) throws Exception {
-
-        // this will check conflicts with other controllers and throw an exception if it finds one.
-        my_fwy_scenario.controller_schedule.add_item(ctrl);
-
-        controllers.put(ctrl.getId(),ctrl);
-    }
-
-    public void delete_controller(long ctrl_id) throws Exception {
-        if(!controllers.containsKey(ctrl_id))
-            throw new Exception("Controller doesn't exist");
-        controllers.remove(ctrl_id);
     }
 
     /////////////////////////////////////
@@ -432,16 +413,17 @@ public class Scenario {
 
         /////////////////////////////////////////////////////
         // controllers
+        List<AbstractController> controllers = my_fwy_scenario.controller_schedule.items;
         jaxb.Controllers jcntrls = new jaxb.Controllers();
         if(!controllers.isEmpty())
             jScn.setControllers(jcntrls);
-        for(AbstractController cntrl : controllers.values())
+        for(AbstractController cntrl : controllers)
             jcntrls.getController().add(cntrl.to_jaxb());
 
         /////////////////////////////////////////////////////
         // actuators
         jaxb.Actuators jacts = new jaxb.Actuators();
-        Set<AbstractActuator> actuators = controllers.values().stream()
+        Set<AbstractActuator> actuators = controllers.stream()
                 .flatMap(x->x.get_actuators().values().stream())
                 .collect(toSet());
 
@@ -453,7 +435,7 @@ public class Scenario {
         /////////////////////////////////////////////////////
         // sensors
         jaxb.Sensors jsens = new jaxb.Sensors();
-        Set<Sensor> sensors = controllers.values().stream()
+        Set<Sensor> sensors = controllers.stream()
                 .flatMap(x->x.get_sensors().values().stream())
                 .collect(toSet());
         if(!sensors.isEmpty())

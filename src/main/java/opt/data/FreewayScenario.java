@@ -220,40 +220,6 @@ public class FreewayScenario {
                                         OTMUtils.csv2list(split.getContent())));
                 }
 
-        // TODO DO ALL OF THIS BELOW AT CONSTRUCTION TIME
-
-//        // assign actuators to links
-//		if(jaxb_scenario.getActuators()!=null)
-//			for(jaxb.Actuator jact : jaxb_scenario.getActuators().getActuator()){
-//				if(jact.getActuatorTarget()==null)
-//					continue;
-//				switch(jact.getActuatorTarget().getType()){
-//					case "link":
-//						AbstractLink link = scenario.links.get(jact.getActuatorTarget().getId());
-//						AbstractActuator act = scenario.actuators.get(jact.getId());
-//						act.link = link;
-//						link.actuator = act;
-//						break;
-//					default:
-//						throw new OTMException("Unknown actuator target type: " + jact.getActuatorTarget().getType());
-//				}
-//			}
-//
-//		// assign controllers to actuators
-//		for(AbstractController ctrl : this.scenario.controllers.values()){
-//			for(AbstractActuator act : ctrl.actuators.values()){
-//				if(act.myController!=null)
-//					throw new OTMException(String.format("Actuator %d has been assigned to multiple controllers",act.id));
-//				act.myController = ctrl;
-//			}
-//		}
-//
-//		// populate the schedule
-//        this.controller_schedule = new Schedule();
-//        for(AbstractController ctrl : this.scenario.controllers.values())
-//            controller_schedule.items.add(ctrl);
-//        Collections.sort(controller_schedule.items);
-
         // max ids
         reset_max_ids();
 
@@ -299,21 +265,10 @@ public class FreewayScenario {
 
     protected void add_controller(AbstractController controller) throws Exception {
         controller_schedule.add_item(controller);
-
-        // add it to the scenario
-        scenario.controllers.put(controller.getId(),controller);
     }
 
     protected void clear_controller_schedule(){
         controller_schedule.items.clear();
-    }
-
-    public void delete_controller(long id) {
-        if(scenario.controllers.containsKey(id)){
-            AbstractController ctrl = scenario.controllers.get(id);
-            controller_schedule.delete_controller(ctrl);
-            scenario.controllers.remove(id);
-        }
     }
 
     /////////////////////////////////////
@@ -693,18 +648,19 @@ public class FreewayScenario {
         max_seg_id = opt_max_seg_id.isPresent() ? opt_max_seg_id.get() : 0l;
 
         // controller
-        Optional<Long> opt_max_cntrl_id = scenario.controllers.keySet().stream()
+        Optional<Long> opt_max_cntrl_id = controller_schedule.items.stream()
+                .map(c->c.getId())
                 .max(Comparator.comparing(Long::valueOf));
         max_controller_id = opt_max_cntrl_id.isPresent() ? opt_max_cntrl_id.get() : 0l;
 
         // actuator
-        Optional<Long> opt_max_act_id = scenario.controllers.values().stream()
+        Optional<Long> opt_max_act_id = controller_schedule.items.stream()
                 .flatMap(c->c.get_actuator_ids().stream())
                 .max(Comparator.comparing(Long::valueOf));
         max_actuator_id = opt_max_act_id.isPresent() ? opt_max_act_id.get() : 0l;
 
         // sensor
-        Optional<Long> opt_max_sens_id = scenario.controllers.values().stream()
+        Optional<Long> opt_max_sens_id = controller_schedule.items.stream()
                 .flatMap(c->c.get_sensor_ids().stream())
                 .max(Comparator.comparing(Long::valueOf));
         max_sensor_id = opt_max_sens_id.isPresent() ? opt_max_sens_id.get() : 0l;

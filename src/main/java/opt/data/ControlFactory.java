@@ -34,26 +34,23 @@ public class ControlFactory {
 		if(ramp.actuator!=null)
 			throw new Exception("The ramp is already controlled. Please remove the controller first.");
 
-		Scenario scenario = fwyscn.get_scenario();
 		ControllerRampMeterTOD ctrl = new ControllerRampMeterTOD(fwyscn,dt,start_time,end_time,ramp_link_id);
 		ramp.actuator = ctrl.get_actuators().values().iterator().next();
-		scenario.add_controller(ctrl);
+		fwyscn.add_controller(ctrl);
 		return ctrl;
 	}
 
-	public static ControllerPolicyHOV create_controller_hov(float dt, float start_time, Float end_time, Collection<Long> link_ids, FreewayScenario fwyscn) throws Exception {
+	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn, float dt, float start_time, Float end_time) throws Exception {
 		parameters_check(dt,start_time,end_time);
-		Scenario scenario = fwyscn.get_scenario();
 		ControllerPolicyHOV ctrl = new ControllerPolicyHOV(fwyscn,dt,start_time,end_time);
-		scenario.add_controller(ctrl);
+		fwyscn.add_controller(ctrl);
 		return ctrl;
 	}
 
-	public static ControllerPolicyHOT create_controller_hot(float dt, float start_time, Float end_time, Collection<Long> link_ids, FreewayScenario fwyscn) throws Exception {
+	public static ControllerPolicyHOT create_controller_hot(FreewayScenario fwyscn, float dt, float start_time, Float end_time) throws Exception {
 		parameters_check(dt,start_time,end_time);
-		Scenario scenario = fwyscn.get_scenario();
 		ControllerPolicyHOT ctrl = new ControllerPolicyHOT(fwyscn,dt,start_time,end_time);
-		scenario.add_controller(ctrl);
+		fwyscn.add_controller(ctrl);
 		return ctrl;
 	}
 
