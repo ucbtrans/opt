@@ -3,15 +3,38 @@ package opt.data;
 import opt.data.control.AbstractController;
 import utils.OTMUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
 public class Schedule {
 
-	public List<AbstractController> items = new ArrayList<>();
+	protected List<AbstractController> items = new ArrayList<>();
+
+	protected void add_item(AbstractController newcontroller) throws Exception {
+
+		Set<Long> actuator_ids = newcontroller.get_actuator_ids();
+
+		// find controllers that address the same actuators as newcontroller
+		Set<AbstractController> intersecting_controllers = new HashSet<>();
+		for(AbstractController c : items){
+			Set<Long> common_actuators = c.get_actuator_ids();
+			common_actuators.retainAll(actuator_ids);
+			if(!common_actuators.isEmpty())
+				intersecting_controllers.add(c);
+		}
+
+		// of the intersecting controllers, find whether there is one whose time period intersects
+		if( intersecting_controllers.stream()
+				.anyMatch(i-> i.getEndTime() > newcontroller.getStartTime() && i.getStartTime() < newcontroller.getEndTime()) )
+			throw new Exception("There is at least one controller whose time period intersects with this one.");
+
+		// otherwise add the controller to the schedule
+		items.add(newcontroller);
+
+		// sort
+		Collections.sort(items);
+	}
 
 	///////////////////
 	// API
@@ -37,6 +60,10 @@ public class Schedule {
 				sched.items.add(ctrl);
 		Collections.sort(sched.items);
 		return sched;
+	}
+
+	public boolean delete_controller(AbstractController c){
+		return items.remove(c);
 	}
 
 	@Override

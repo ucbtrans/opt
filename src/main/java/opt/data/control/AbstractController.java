@@ -141,6 +141,10 @@ public abstract class AbstractController implements Comparable {
 	// API
 	////////////////////////////////
 
+	public Set<Long> get_link_ids(){
+		return actuators.values().stream().map(a->a.link_id).collect(toSet());
+	}
+
 	public Set<Long>get_actuator_ids(){
 		return actuators.keySet();
 	}

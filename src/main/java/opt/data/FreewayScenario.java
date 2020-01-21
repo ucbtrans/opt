@@ -1,6 +1,5 @@
 package opt.data;
 
-import error.OTMException;
 import opt.UserSettings;
 import opt.data.control.AbstractController;
 import profiles.Profile1D;
@@ -42,7 +41,7 @@ public class FreewayScenario {
         max_controller_id = -1l;
         max_sensor_id = -1l;
         max_actuator_id = -1l;
-        scenario = new Scenario();
+        scenario = new Scenario(this);
         create_isolated_segment(segmentname,params, AbstractLink.Type.freeway);
         scenario.commodities.put(0l,new Commodity(0l,"Unnamed commodity",1f));
     }
@@ -53,7 +52,7 @@ public class FreewayScenario {
         this.description = description;
 
         // create Scenario object
-        this.scenario = new Scenario(jaxb_scenario);
+        this.scenario = new Scenario(this,jaxb_scenario);
 
         // attach link names
         if (jaxb_lnks!=null)
@@ -295,7 +294,30 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
-    // scenario
+    // protected
+    /////////////////////////////////////
+
+    protected void add_controller(AbstractController controller) throws Exception {
+        controller_schedule.add_item(controller);
+
+        // add it to the scenario
+        scenario.controllers.put(controller.getId(),controller);
+    }
+
+    protected void clear_controller_schedule(){
+        controller_schedule.items.clear();
+    }
+
+    public void delete_controller(long id) {
+        if(scenario.controllers.containsKey(id)){
+            AbstractController ctrl = scenario.controllers.get(id);
+            controller_schedule.delete_controller(ctrl);
+            scenario.controllers.remove(id);
+        }
+    }
+
+    /////////////////////////////////////
+    // API scenario
     /////////////////////////////////////
 
     public Scenario get_scenario(){
@@ -303,35 +325,15 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
-    // controller
+    // API controller
     /////////////////////////////////////
 
     public Schedule get_controller_schedule(){
         return controller_schedule;
     }
 
-    public void clear_controller_schedule(){
-        controller_schedule.items.clear();
-    }
-
-    public void add_controller(AbstractController controller){
-        if(!scenario.controllers.containsKey(controller.getId()))
-            scenario.controllers.put(controller.getId(),controller);
-        controller_schedule.items.add(controller);
-        Collections.sort(controller_schedule.items);
-    }
-
-    public void delete_controller(long id) throws OTMException {
-        if(scenario.controllers.containsKey(id)){
-            AbstractController ctrl = scenario.controllers.get(id);
-            controller_schedule.items.remove(ctrl);
-            scenario.controllers.remove(id);
-        }
-    }
-
-
     /////////////////////////////////////
-    // network getters
+    // API network
     /////////////////////////////////////
 
     public List<AbstractLink> get_links(){
@@ -345,7 +347,7 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
-    // segment getters
+    // API segment
     /////////////////////////////////////
 
     public List<List<Segment>> get_linear_freeway_segments(){
@@ -393,18 +395,10 @@ public class FreewayScenario {
         return result;
     }
 
-    /**
-     * get all segments in this scenario
-     * @return Collection of segments
-     */
     public Set<Segment> get_segments(){
         return new HashSet<>(segments.values());
     }
 
-    /**
-     * Get an order list of the names of segments
-     * @return
-     */
     public Set<String> get_segment_names(){
         return segments.values().stream().map(segment->segment.name).collect(Collectors.toSet());
     }
@@ -416,10 +410,6 @@ public class FreewayScenario {
         return xsegments.size()==0 ? null : xsegments.iterator().next();
     }
 
-    /**
-     * Get a segment with its id
-     * @return
-     */
     public Segment get_segment_with_id(Long id){
         return segments.containsKey(id) ? segments.get(id) : null;
     }

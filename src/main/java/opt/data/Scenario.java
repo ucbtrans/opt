@@ -1,6 +1,5 @@
 package opt.data;
 
-import error.OTMException;
 import geometry.Side;
 import jaxb.ModelParams;
 import jaxb.Roadgeom;
@@ -10,12 +9,12 @@ import profiles.Profile1D;
 import utils.OTMUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 
 public class Scenario {
 
+    protected FreewayScenario my_fwy_scenario;
     protected Map<Long, Node> nodes = new HashMap<>();
     protected Map<Long, AbstractLink> links = new HashMap<>();
     protected Map<Long, Commodity> commodities = new HashMap<>();
@@ -25,9 +24,13 @@ public class Scenario {
     // construction
     /////////////////////////////////////
 
-    protected Scenario(){}
+    protected Scenario(FreewayScenario my_fwy_scenario){
+        this.my_fwy_scenario = my_fwy_scenario;
+    }
 
-    protected Scenario(jaxb.Scenario scenario) throws Exception {
+    protected Scenario(FreewayScenario my_fwy_scenario,jaxb.Scenario scenario) throws Exception {
+
+        this.my_fwy_scenario = my_fwy_scenario;
 
         // network
         Map<Long,jaxb.Roadparam> road_params = new HashMap<>();
@@ -152,7 +155,7 @@ public class Scenario {
     }
 
     protected Scenario clone() {
-        Scenario jscn_cpy = new Scenario();
+        Scenario jscn_cpy = new Scenario(this.my_fwy_scenario);
 
         for (Map.Entry<Long, Node> e : nodes.entrySet())
             jscn_cpy.nodes.put(e.getKey(), e.getValue().clone());
@@ -170,15 +173,17 @@ public class Scenario {
     // control
     /////////////////////////////////////
 
-    public void add_controller(AbstractController ctrl) throws OTMException {
-        if(controllers.containsKey(ctrl.getId()))
-            throw new OTMException("Controller already exists");
+    public void add_controller(AbstractController ctrl) throws Exception {
+
+        // this will check conflicts with other controllers and throw an exception if it finds one.
+        my_fwy_scenario.controller_schedule.add_item(ctrl);
+
         controllers.put(ctrl.getId(),ctrl);
     }
 
-    public void delete_controller(long ctrl_id) throws OTMException {
+    public void delete_controller(long ctrl_id) throws Exception {
         if(!controllers.containsKey(ctrl_id))
-            throw new OTMException("Controller doesn't exist");
+            throw new Exception("Controller doesn't exist");
         controllers.remove(ctrl_id);
     }
 

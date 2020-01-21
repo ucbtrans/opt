@@ -1,7 +1,6 @@
 package opt.tests;
 
-import error.OTMException;
-import opt.data.FreewayScenario;
+import opt.data.ControlFactory;
 import opt.data.Schedule;
 import opt.data.control.*;
 import org.junit.Test;
@@ -95,60 +94,60 @@ public class TestControl extends AbstractTest{
 		}
 	}
 
-	@Test
-	public void test_schedule_clear(){
-		try {
-			TestData X = new TestData("project2_rm.opt");
-			X.scenario.clear_controller_schedule();
-			Schedule schedule = X.scenario.get_controller_schedule();
-			System.out.println(schedule);
-			assertTrue(schedule.get_num_items()==0);
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-	}
+//	@Test
+//	public void test_schedule_clear(){
+//		try {
+//			TestData X = new TestData("project2_rm.opt");
+//			X.scenario.clear_controller_schedule();
+//			Schedule schedule = X.scenario.get_controller_schedule();
+//			System.out.println(schedule);
+//			assertTrue(schedule.get_num_items()==0);
+//		} catch (Exception e) {
+//			fail(e.getMessage());
+//		}
+//	}
 
-	@Test
-	public void test_add_controller(){
-		try {
-			TestData X = new TestData("project2.opt");
-			X.scenario.clear_controller_schedule();
+//	@Test
+//	public void test_add_controller(){
+//		try {
+//			TestData X = new TestData("project2.opt");
+//			X.scenario.clear_controller_schedule();
+//
+//			boolean has_queue_control = false;
+//			float min_rate_vph = 100f;
+//			float max_rate_vph = 900f;
+//			long sensor_link_id = 9l;
+//			float sensor_offset = 100f;
+//			long ramp_link_id = 8l;
+//			ControllerRampMeterAlinea alinea = ControlFactory.create_controller_alinea(X.scenario,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,sensor_link_id,sensor_offset,ramp_link_id);
+//			X.scenario.add_controller(alinea);
+//
+//			Schedule schedule = X.scenario.get_controller_schedule();
+//			System.out.println(schedule);
+//			assertTrue(schedule.get_num_items()==1);
+//		} catch (Exception e) {
+//			fail(e.getMessage());
+//		}
+//	}
 
-			boolean has_queue_control = false;
-			float min_rate_vph = 100f;
-			float max_rate_vph = 900f;
-			long sensor_link_id = 9l;
-			float sensor_offset = 100f;
-			long ramp_link_id = 8l;
-			ControllerRampMeterAlinea alinea = ControlFactory.create_controller_alinea(X.scenario,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,sensor_link_id,sensor_offset,ramp_link_id);
-			X.scenario.add_controller(alinea);
-
-			Schedule schedule = X.scenario.get_controller_schedule();
-			System.out.println(schedule);
-			assertTrue(schedule.get_num_items()==1);
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-	}
-
-	@Test
-	public void test_delete_controller(){
-		try {
-			TestData X = new TestData("project2_rm.opt");
-
-
-			Schedule schedule = X.scenario.get_controller_schedule();
-			System.out.println(schedule);
-
-			long controller_id = schedule.items.get(0).getId();
-			X.scenario.delete_controller(controller_id);
-
-			System.out.println();
-			System.out.println(schedule);
-
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-	}
+//	@Test
+//	public void test_delete_controller(){
+//		try {
+//			TestData X = new TestData("project2_rm.opt");
+//
+//
+//			Schedule schedule = X.scenario.get_controller_schedule();
+//			System.out.println(schedule);
+//
+//			long controller_id = schedule.items.get(0).getId();
+//			X.scenario.delete_controller(controller_id);
+//
+//			System.out.println();
+//			System.out.println(schedule);
+//
+//		} catch (Exception e) {
+//			fail(e.getMessage());
+//		}
+//	}
 
 }

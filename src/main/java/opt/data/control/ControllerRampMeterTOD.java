@@ -3,6 +3,7 @@ package opt.data.control;
 import jaxb.Actuator;
 import jaxb.Controller;
 import jaxb.Sensor;
+import opt.data.ControlFactory;
 import opt.data.FreewayScenario;
 import opt.data.Scenario;
 
