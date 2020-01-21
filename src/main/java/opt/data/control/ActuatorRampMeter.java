@@ -21,6 +21,13 @@ public class ActuatorRampMeter extends AbstractActuator {
 		j.setActuatorTarget(jtgt);
 		jtgt.setType("link");
 		jtgt.setId(link_id);
+
+		if(myController instanceof AbstractControllerRampMeter){
+			AbstractControllerRampMeter c = (AbstractControllerRampMeter) myController;
+			j.setMinValue(c.min_rate_vph);
+			j.setMaxValue(c.max_rate_vph);
+		}
+
 		return j;
 	}
 

@@ -2,7 +2,6 @@ package opt.data;
 
 import error.OTMException;
 import opt.UserSettings;
-import opt.data.control.AbstractActuator;
 import opt.data.control.AbstractController;
 import profiles.Profile1D;
 import utils.OTMUtils;
@@ -329,6 +328,7 @@ public class FreewayScenario {
             scenario.controllers.remove(id);
         }
     }
+
 
     /////////////////////////////////////
     // network getters

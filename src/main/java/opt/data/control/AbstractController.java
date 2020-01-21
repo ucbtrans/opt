@@ -18,7 +18,6 @@ public abstract class AbstractController implements Comparable {
 	protected Map<Long,AbstractActuator> actuators;
 	protected Map<Long,Sensor> sensors;
 
-
 	// jaxb
 	public AbstractController(jaxb.Controller jcntrl,Map<Long,jaxb.Actuator> jactuators, Map<Long,jaxb.Sensor> jsensors,  Scenario scn) throws Exception {
 
@@ -93,13 +92,13 @@ public abstract class AbstractController implements Comparable {
 
 	}
 
-	public void add_sensor(Sensor sensor){
+	protected void add_sensor(Sensor sensor){
 		if(sensors==null)
 			sensors = new HashMap<>();
 		sensors.put(sensor.id,sensor);
 	}
 
-	public void add_actuator(AbstractActuator actuator){
+	protected void add_actuator(AbstractActuator actuator){
 		if(actuators==null)
 			actuators = new HashMap<>();
 		actuators.put(actuator.id,actuator);

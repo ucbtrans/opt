@@ -2,6 +2,7 @@ package opt.data.control;
 
 import jaxb.Actuator;
 import jaxb.Controller;
+import opt.data.FreewayScenario;
 import opt.data.Scenario;
 
 import java.util.Map;
@@ -18,8 +19,8 @@ public class ControllerPolicyHOT extends AbstractController {
 	}
 
 	// from factory
-	public ControllerPolicyHOT(long id,float dt, float start_time, Float end_time) throws Exception {
-		super(id,dt,start_time,end_time,"hot");
+	public ControllerPolicyHOT(FreewayScenario scn, float dt, float start_time, Float end_time) throws Exception {
+		super(scn.new_controller_id(),dt,start_time,end_time,"hot");
 
 //		// CHECK
 //		if(actuators.values().stream().anyMatch(act -> !(act instanceof opt.data.control.ActuatorPolicy)))

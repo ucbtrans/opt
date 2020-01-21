@@ -24,6 +24,7 @@ public abstract class AbstractActuator {
 		target.setType("link");
 		target.setId(link_id);
 		j.setActuatorTarget(target);
+
 		return j;
 	}
 

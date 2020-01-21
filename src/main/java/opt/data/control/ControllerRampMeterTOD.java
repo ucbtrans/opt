@@ -1,7 +1,9 @@
 package opt.data.control;
 
-import error.OTMException;
+import jaxb.Actuator;
 import jaxb.Controller;
+import jaxb.Sensor;
+import opt.data.FreewayScenario;
 import opt.data.Scenario;
 
 import java.util.*;
@@ -24,17 +26,16 @@ public class ControllerRampMeterTOD extends AbstractControllerRampMeter {
 
 	protected List<TODEntry> entries = new ArrayList<>();
 
-	// jaxb
-	public ControllerRampMeterTOD(Controller j, Map<Long,jaxb.Actuator> a, Map<Long,jaxb.Sensor> s,Scenario scn) throws Exception {
-		super(j,a,s,scn);
+	public ControllerRampMeterTOD(Controller j, Map<Long, Actuator> a, Map<Long, Sensor> s, Scenario scn) throws Exception {
+		super(j, a, s, scn);
 	}
 
 	// factory
-	public ControllerRampMeterTOD(long id,float dt, float start_time, Float end_time, long ramp_link_id) throws Exception {
-		super(id,dt,start_time,end_time,"tod",false,Float.NaN,Float.NaN);
+	public ControllerRampMeterTOD(FreewayScenario scn, float dt, float start_time, Float end_time, long ramp_link_id) throws Exception {
+		super(scn.new_controller_id(),dt,start_time,end_time,"tod",false,Float.NaN,Float.NaN);
 
 		// ramp meter actuator
-		add_actuator(ControlFactory.create_ramp_meter(ramp_link_id,this));
+		add_actuator(ControlFactory.create_ramp_meter(scn,ramp_link_id,this));
 	}
 
 	/////////////////////////
