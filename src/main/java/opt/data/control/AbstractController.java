@@ -72,7 +72,7 @@ public abstract class AbstractController implements Comparable {
 	}
 
 	// factory
-	public AbstractController(long id, float dt, float start_time, Float end_time, String algorithm) throws Exception {
+	public AbstractController(long id, float dt, float start_time, Float end_time, control.AbstractController.Algorithm algorithm) throws Exception {
 
 		// CHECKS
 		if(start_time<0)
@@ -85,11 +85,7 @@ public abstract class AbstractController implements Comparable {
 		this.dt = dt;
 		this.start_time = start_time;
 		this.end_time = end_time==null ? Float.POSITIVE_INFINITY : end_time;
-		try {
-			this.algorithm = control.AbstractController.Algorithm.valueOf(algorithm);
-		} catch(IllegalArgumentException e){
-			throw new Exception(e.getMessage());
-		}
+		this.algorithm = algorithm;
 
 	}
 

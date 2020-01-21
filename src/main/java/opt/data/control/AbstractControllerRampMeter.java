@@ -29,7 +29,7 @@ public abstract class AbstractControllerRampMeter extends AbstractController {
     }
 
     // factory
-    public AbstractControllerRampMeter(long id, float dt, float start_time, Float end_time, String algorithm,boolean has_queue_control,float min_rate_vph,float max_rate_vph) throws Exception {
+    public AbstractControllerRampMeter(long id, float dt, float start_time, Float end_time, control.AbstractController.Algorithm  algorithm,boolean has_queue_control,float min_rate_vph,float max_rate_vph) throws Exception {
         super(id, dt, start_time, end_time, algorithm);
         this.has_queue_control = has_queue_control;
         this.min_rate_vph = min_rate_vph;

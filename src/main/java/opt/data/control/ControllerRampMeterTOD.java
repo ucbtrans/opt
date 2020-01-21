@@ -34,7 +34,7 @@ public class ControllerRampMeterTOD extends AbstractControllerRampMeter {
 
 	// factory
 	public ControllerRampMeterTOD(FreewayScenario scn, float dt, float start_time, Float end_time, long ramp_link_id, LaneGroupType lgtype) throws Exception {
-		super(scn.new_controller_id(),dt,start_time,end_time,"tod",false,Float.NaN,Float.NaN);
+		super(scn.new_controller_id(),dt,start_time,end_time,control.AbstractController.Algorithm.tod,false,Float.NaN,Float.NaN);
 
 		// ramp meter actuator
 		add_actuator(ControlFactory.create_ramp_meter(scn,ramp_link_id,lgtype,this));

@@ -3,7 +3,17 @@ package opt.data;
 import error.OTMException;
 import opt.data.control.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class ControlFactory {
+
+	public static Set<control.AbstractController.Algorithm> get_available_ramp_metering_algorithms(){
+		Set<control.AbstractController.Algorithm> x = new HashSet<>();
+		x.add(control.AbstractController.Algorithm.alinea);
+		x.add(control.AbstractController.Algorithm.tod);
+		return x;
+	}
 
 	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn, float dt, float start_time, Float end_time, boolean has_queue_control, float min_rate_vph, float max_rate_vph, long sensor_link_id, float sensor_offset, long ramp_link_id, LaneGroupType lgtype) throws Exception {
 		parameters_check(dt,start_time,end_time);

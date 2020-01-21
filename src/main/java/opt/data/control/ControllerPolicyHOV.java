@@ -20,11 +20,7 @@ public class ControllerPolicyHOV extends AbstractController {
 
 	// from factory
 	public ControllerPolicyHOV(FreewayScenario scn, float dt, float start_time, Float end_time) throws Exception {
-		super(scn.new_controller_id(),dt,start_time,end_time,"hov");
-
-		// CHECK
-//		if(actuators.values().stream().anyMatch(act -> !(act instanceof opt.data.control.ActuatorPolicy)))
-//			throw new OTMException("Found an HOV controller on a non-policy actuator");
+		super(scn.new_controller_id(),dt,start_time,end_time,null);
 	}
 
 	////////////////////////////////

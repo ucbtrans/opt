@@ -20,7 +20,7 @@ public class ControllerPolicyHOT extends AbstractController {
 
 	// from factory
 	public ControllerPolicyHOT(FreewayScenario scn, float dt, float start_time, Float end_time) throws Exception {
-		super(scn.new_controller_id(),dt,start_time,end_time,"hot");
+		super(scn.new_controller_id(),dt,start_time,end_time,null);
 
 //		// CHECK
 //		if(actuators.values().stream().anyMatch(act -> !(act instanceof opt.data.control.ActuatorPolicy)))
