@@ -1,11 +1,12 @@
 package opt.data.control;
 
 import jaxb.Actuator;
+import opt.data.LaneGroupType;
 
 public class ActuatorPolicy extends AbstractActuator {
 
-	public ActuatorPolicy(long id, long link_id,AbstractController myController){
-		super(id,link_id,myController);
+	public ActuatorPolicy(long id, long link_id, LaneGroupType lgtype, AbstractController myController){
+		super(id,link_id,lgtype,myController);
 	}
 
 	public ActuatorPolicy(Actuator j) {

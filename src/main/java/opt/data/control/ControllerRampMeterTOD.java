@@ -5,6 +5,7 @@ import jaxb.Controller;
 import jaxb.Sensor;
 import opt.data.ControlFactory;
 import opt.data.FreewayScenario;
+import opt.data.LaneGroupType;
 import opt.data.Scenario;
 
 import java.util.*;
@@ -32,11 +33,11 @@ public class ControllerRampMeterTOD extends AbstractControllerRampMeter {
 	}
 
 	// factory
-	public ControllerRampMeterTOD(FreewayScenario scn, float dt, float start_time, Float end_time, long ramp_link_id) throws Exception {
+	public ControllerRampMeterTOD(FreewayScenario scn, float dt, float start_time, Float end_time, long ramp_link_id, LaneGroupType lgtype) throws Exception {
 		super(scn.new_controller_id(),dt,start_time,end_time,"tod",false,Float.NaN,Float.NaN);
 
 		// ramp meter actuator
-		add_actuator(ControlFactory.create_ramp_meter(scn,ramp_link_id,this));
+		add_actuator(ControlFactory.create_ramp_meter(scn,ramp_link_id,lgtype,this));
 	}
 
 	/////////////////////////

@@ -1,6 +1,7 @@
 package opt.tests;
 
 import opt.data.ControlFactory;
+import opt.data.LaneGroupType;
 import opt.data.Schedule;
 import opt.data.control.*;
 import org.junit.Test;
@@ -26,7 +27,8 @@ public class TestControl extends AbstractTest{
 			long sensor_link_id = 9l;
 			float sensor_offset = 100f;
 			long ramp_link_id = 8l;
-			ControllerRampMeterAlinea cntrl = ControlFactory.create_controller_alinea(X.scenario,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,sensor_link_id,sensor_offset,ramp_link_id);
+			LaneGroupType lgtype = LaneGroupType.gp;
+			ControllerRampMeterAlinea cntrl = ControlFactory.create_controller_alinea(X.scenario,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,sensor_link_id,sensor_offset,ramp_link_id,lgtype);
 			assertNotNull(cntrl);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -38,7 +40,8 @@ public class TestControl extends AbstractTest{
 		try {
 			TestData X = new TestData("project2_rm.opt");
 			long ramp_link_id = 8l;
-			ControllerRampMeterTOD cntrl = ControlFactory.create_controller_tod(X.scenario,dt,start_time,end_time,ramp_link_id);
+			LaneGroupType lgtype = LaneGroupType.gp;
+			ControllerRampMeterTOD cntrl = ControlFactory.create_controller_tod(X.scenario,dt,start_time,end_time,ramp_link_id,lgtype);
 			assertNotNull(cntrl);
 		} catch (Exception e) {
 			e.printStackTrace();

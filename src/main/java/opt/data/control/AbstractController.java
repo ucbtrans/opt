@@ -1,6 +1,7 @@
 package opt.data.control;
 
 import error.OTMException;
+import opt.data.LaneGroupType;
 import opt.data.Scenario;
 import utils.OTMUtils;
 
@@ -140,6 +141,10 @@ public abstract class AbstractController implements Comparable {
 	////////////////////////////////
 	// API
 	////////////////////////////////
+
+	public Set<LaneGroupType> get_lanegroup_types(){
+		return actuators.values().stream().map(a->a.lgtype).collect(toSet());
+	}
 
 	public Set<Long> get_link_ids(){
 		return actuators.values().stream().map(a->a.link_id).collect(toSet());

@@ -1,12 +1,12 @@
 package opt.data.control;
 
 import jaxb.Actuator;
+import opt.data.LaneGroupType;
 
 public class ActuatorRampMeter extends AbstractActuator {
 
-
-	public ActuatorRampMeter(long id, long link_id,AbstractController myController ){
-		super(id,link_id,myController);
+	public ActuatorRampMeter(long id, long link_id, LaneGroupType lgtype, AbstractController myController ){
+		super(id,link_id,lgtype,myController);
 	}
 
 	public ActuatorRampMeter(Actuator j) {
