@@ -260,18 +260,6 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
-    // protected
-    /////////////////////////////////////
-
-    protected void add_controller(AbstractController controller) throws Exception {
-        controller_schedule.add_item(controller);
-    }
-
-    protected void clear_controller_schedule(){
-        controller_schedule.items.clear();
-    }
-
-    /////////////////////////////////////
     // API scenario
     /////////////////////////////////////
 

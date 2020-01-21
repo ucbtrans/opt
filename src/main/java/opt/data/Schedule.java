@@ -9,31 +9,16 @@ import static java.util.stream.Collectors.toList;
 
 public class Schedule {
 
-	protected List<AbstractController> items = new ArrayList<>();
+	public List<AbstractController> items = new ArrayList<>();
 
-	protected void add_item(AbstractController newcontroller) throws Exception {
-
-		Set<Long> actuator_ids = newcontroller.get_actuator_ids();
-
-		// find controllers that address the same actuators as newcontroller
-		Set<AbstractController> intersecting_controllers = new HashSet<>();
-		for(AbstractController c : items){
-			Set<Long> common_actuators = c.get_actuator_ids();
-			common_actuators.retainAll(actuator_ids);
-			if(!common_actuators.isEmpty())
-				intersecting_controllers.add(c);
+	@Override
+	public String toString() {
+		String str = "start\tend\ttype\tlink(s)";
+		for(AbstractController cntrl : this.items){
+			String link_ids = OTMUtils.comma_format(cntrl.get_actuators().values().stream().map(act->act.link_id).collect(toList()));
+			str = String.format("%s\n%.1f\t%.1f\t%s\t%s",str,cntrl.getStartTime(),cntrl.getEndTime(),cntrl.getAlgorithm(),link_ids);
 		}
-
-		// of the intersecting controllers, find whether there is one whose time period intersects
-		if( intersecting_controllers.stream()
-				.anyMatch(i-> i.getEndTime() > newcontroller.getStartTime() && i.getStartTime() < newcontroller.getEndTime()) )
-			throw new Exception("There is at least one controller whose time period intersects with this one.");
-
-		// otherwise add the controller to the schedule
-		items.add(newcontroller);
-
-		// sort
-		Collections.sort(items);
+		return str;
 	}
 
 	///////////////////
@@ -66,13 +51,33 @@ public class Schedule {
 		return items.remove(c);
 	}
 
-	@Override
-	public String toString() {
-		String str = "start\tend\ttype\tlink(s)";
-		for(AbstractController cntrl : this.items){
-			String link_ids = OTMUtils.comma_format(cntrl.get_actuators().values().stream().map(act->act.link_id).collect(toList()));
-			str = String.format("%s\n%.1f\t%.1f\t%s\t%s",str,cntrl.getStartTime(),cntrl.getEndTime(),cntrl.getAlgorithm(),link_ids);
+	public void add_item(AbstractController newcontroller) throws Exception {
+
+		Set<Long> actuator_ids = newcontroller.get_actuator_ids();
+
+		// find controllers that address the same actuators as newcontroller
+		Set<AbstractController> intersecting_controllers = new HashSet<>();
+		for(AbstractController c : items){
+			Set<Long> common_actuators = c.get_actuator_ids();
+			common_actuators.retainAll(actuator_ids);
+			if(!common_actuators.isEmpty())
+				intersecting_controllers.add(c);
 		}
-		return str;
+
+		// of the intersecting controllers, find whether there is one whose time period intersects
+		if( intersecting_controllers.stream()
+				.anyMatch(i-> i.getEndTime() > newcontroller.getStartTime() && i.getStartTime() < newcontroller.getEndTime()) )
+			throw new Exception("There is at least one controller whose time period intersects with this one.");
+
+		// otherwise add the controller to the schedule
+		items.add(newcontroller);
+
+		// sort
+		Collections.sort(items);
 	}
+
+	public void clear(){
+		items.clear();
+	}
+
 }
