@@ -1,10 +1,7 @@
 package opt.data;
 
 import error.OTMException;
-import opt.data.*;
 import opt.data.control.*;
-
-import java.util.Collection;
 
 public class ControlFactory {
 
@@ -15,12 +12,12 @@ public class ControlFactory {
 		AbstractLink ramp = fwyscn.get_scenario().get_link_with_id(ramp_link_id);
 		if(ramp==null)
 			throw new Exception("Bad link id.");
-		if(ramp.actuator!=null)
+		if(ramp.actuator !=null)
 			throw new Exception("The ramp is already controlled. Please remove the controller first.");
 
 		ControllerRampMeterAlinea ctrl = new ControllerRampMeterAlinea(fwyscn,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,sensor_link_id,sensor_offset,ramp_link_id);
 		ramp.actuator = ctrl.get_actuators().values().iterator().next();
-		fwyscn.add_controller(ctrl);
+		fwyscn.controller_schedule.add_item(ctrl);
 		return ctrl;
 	}
 
@@ -31,26 +28,26 @@ public class ControlFactory {
 		AbstractLink ramp = fwyscn.get_scenario().get_link_with_id(ramp_link_id);
 		if(ramp==null)
 			throw new Exception("Bad link id.");
-		if(ramp.actuator!=null)
+		if(ramp.actuator !=null)
 			throw new Exception("The ramp is already controlled. Please remove the controller first.");
 
 		ControllerRampMeterTOD ctrl = new ControllerRampMeterTOD(fwyscn,dt,start_time,end_time,ramp_link_id);
 		ramp.actuator = ctrl.get_actuators().values().iterator().next();
-		fwyscn.add_controller(ctrl);
+		fwyscn.controller_schedule.add_item(ctrl);
 		return ctrl;
 	}
 
 	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn, float dt, float start_time, Float end_time) throws Exception {
 		parameters_check(dt,start_time,end_time);
 		ControllerPolicyHOV ctrl = new ControllerPolicyHOV(fwyscn,dt,start_time,end_time);
-		fwyscn.add_controller(ctrl);
+		fwyscn.controller_schedule.add_item(ctrl);
 		return ctrl;
 	}
 
 	public static ControllerPolicyHOT create_controller_hot(FreewayScenario fwyscn, float dt, float start_time, Float end_time) throws Exception {
 		parameters_check(dt,start_time,end_time);
 		ControllerPolicyHOT ctrl = new ControllerPolicyHOT(fwyscn,dt,start_time,end_time);
-		fwyscn.add_controller(ctrl);
+		fwyscn.controller_schedule.add_item(ctrl);
 		return ctrl;
 	}
 

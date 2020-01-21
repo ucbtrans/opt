@@ -148,7 +148,7 @@ public class Scenario {
 					default:
 						throw new Exception("Unkonwn controller type: " + jcnt.getType());
 				}
-				my_fwy_scenario.add_controller(cnt);
+				my_fwy_scenario.controller_schedule.add_item(cnt);
 			}
 		}
     }
