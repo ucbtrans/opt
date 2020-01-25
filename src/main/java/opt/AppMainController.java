@@ -60,6 +60,7 @@ import opt.config.LinkEditorController;
 import opt.config.LinkInfoController;
 import opt.config.NewLinkController;
 import opt.config.NewRampController;
+import opt.config.NewRampMeterController;
 import opt.config.ScenarioEditorController;
 import opt.config.VehicleTypeController;
 import opt.data.*;
@@ -101,6 +102,8 @@ public class AppMainController {
     private NewRampController newRampController = null;
     private GridPane connectPane = null;
     private ConnectController connectController = null;
+    private GridPane newRampMeterPane = null;
+    private NewRampMeterController newRampMeterController = null;
     
     
     
@@ -296,6 +299,12 @@ public class AppMainController {
             connectController.setAppMainController(this);
             linkEditorController.setConnectControllerAndScene(connectController, new Scene(connectPane));
             
+            loader = new FXMLLoader(getClass().getResource("/new_ramp_meter.fxml"));
+            newRampMeterPane = loader.load();
+            newRampMeterController = loader.getController();
+            newRampMeterController.setLinkEditorController(linkEditorController);
+            linkEditorController.setNewRampMeterControllerAndScene(newRampMeterController, new Scene(newRampMeterPane));
+            
             
         } catch (IOException e) {
             opt.utils.Dialogs.ExceptionDialog("Cannot initialize UI modules...", e);
@@ -370,8 +379,8 @@ public class AppMainController {
             TreeItem<String> routes_node = new TreeItem<String>(routesTreeItem);    
             scenario_node.getChildren().add(routes_node);
             
-            TreeItem<String> controllers_node = new TreeItem<String>(controllersTreeItem);    
-            scenario_node.getChildren().add(controllers_node);
+            //TreeItem<String> controllers_node = new TreeItem<String>(controllersTreeItem);    
+            //scenario_node.getChildren().add(controllers_node);
             
             TreeItem<String> events_node = new TreeItem<String>(eventsTreeItem);    
             scenario_node.getChildren().add(events_node);

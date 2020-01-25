@@ -108,6 +108,22 @@ public class Misc {
     }
     
     
+    public static String seconds2timestring(float seconds) {
+        String timeStr = "";
+        int t = Math.round(seconds);
+        if (t < 0) {
+            timeStr += "-";
+            t = -t;
+        }
+        
+        DecimalFormat df = new DecimalFormat("00");
+        int h = t / 3600;
+        int m = (t - 3600*h) / 60; 
+        timeStr += df.format(h) + ":" + df.format(m);
+        
+        return timeStr;
+    }
+    
     
     
     

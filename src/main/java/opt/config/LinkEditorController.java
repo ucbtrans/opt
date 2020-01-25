@@ -31,6 +31,7 @@ import javafx.scene.control.skin.TableHeaderRow;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -82,8 +83,11 @@ import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
+import opt.data.LaneGroupType;
 import opt.data.LinkOfframp;
 import opt.data.LinkOnramp;
+import opt.data.Schedule;
+import opt.data.control.AbstractController;
 import opt.utils.DoubleSpinnerCell;
 import opt.utils.EditCell;
 import opt.utils.Misc;
@@ -110,6 +114,8 @@ public class LinkEditorController {
     private Scene newRampScene = null;
     private ConnectController connectController = null;
     private Scene connectScene = null;
+    private NewRampMeterController newRampMeterController = null;
+    private Scene newRampMeterScene = null;
     private AbstractLink myLink = null;
     private boolean ignoreChange = true;
     
@@ -120,6 +126,11 @@ public class LinkEditorController {
     private List<AbstractLink> dnConnectCandidates = new ArrayList<AbstractLink>();
     
     private List<Commodity> listVT = new ArrayList<Commodity>();
+    
+    private Schedule controlSchedule = null;
+    private float max_control_end_time = 0.0f;
+    private control.AbstractController.Algorithm newControlAlgorithm = null;
+    private LaneGroupType newControlLaneGroup = LaneGroupType.gp;
     
     private SpinnerValueFactory<Double> mergePrioritySpinnerValueFactory = null;
     private SpinnerValueFactory<Double> lengthSpinnerValueFactory = null;
@@ -246,7 +257,7 @@ public class LinkEditorController {
     @FXML // fx:id="cbSeparated"
     private CheckBox cbSeparated; // Value injected by FXMLLoader
     
-     @FXML // fx:id="labelManagedLaneCapacity"
+    @FXML // fx:id="labelManagedLaneCapacity"
     private Label labelManagedLaneCapacity; // Value injected by FXMLLoader
 
     @FXML // fx:id="labelGPLaneCapacity"
@@ -321,6 +332,15 @@ public class LinkEditorController {
     @FXML // fx:id="linkControllerPane"
     private TitledPane linkControllerPane; // Value injected by FXMLLoader
     
+    @FXML // fx:id="listControllers"
+    private ListView<String> listControllers; // Value injected by FXMLLoader
+
+    @FXML // fx:id="deleteController"
+    private Button deleteController; // Value injected by FXMLLoader
+
+    @FXML // fx:id="addController"
+    private Button addController; // Value injected by FXMLLoader
+    
     @FXML // fx:id="linkEventPane"
     private TitledPane linkEventPane; // Value injected by FXMLLoader
     
@@ -391,6 +411,17 @@ public class LinkEditorController {
         connectController = ctrl;
         connectScene = scn;
         connectScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
+    }
+    
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the new ramp meter controller that is used to
+     *               create a new ramp meter.
+     */
+    public void setNewRampMeterControllerAndScene(NewRampMeterController ctrl, Scene scn) {
+        newRampMeterController = ctrl;
+        newRampMeterScene = scn;
+        newRampMeterScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
     
     
@@ -834,6 +865,7 @@ public class LinkEditorController {
         initOnOffRamps();
         initDemand();
         initSR();
+        initControllers();
             
         drawRoadSection();
         
@@ -2023,6 +2055,95 @@ public class LinkEditorController {
     
     
 
+    
+    
+    
+    
+    
+    
+    /***************************************************************************
+     * Controller pane: initialization and callbacks
+     ***************************************************************************/
+    
+    private void refreshControllerList() {
+        listControllers.getItems().clear();
+        
+        controlSchedule = myLink.get_segment().get_scenario().get_controller_schedule().get_schedule_for_link(myLink.get_id());
+        for (AbstractController ctrl : controlSchedule.items) {
+            float start = ctrl.getStartTime();
+            float end = ctrl.getEndTime();
+            max_control_end_time = end;
+            String ct = "";
+            if (ctrl instanceof opt.data.control.AbstractControllerRampMeter) {
+                ct = "Ramp meter - ";
+            }
+            String buf = Misc.seconds2timestring(start) + " - " + Misc.seconds2timestring(end) + ": " + ct + ctrl.getAlgorithm();
+            Set<LaneGroupType> lgt_set = ctrl.get_lanegroup_types();
+            String lgt_s = "";
+            for (LaneGroupType lgt : lgt_set) {
+                if (lgt == LaneGroupType.mng) {
+                    lgt_s = " (managed lanes)";
+                    break;
+                }
+            }
+            buf += lgt_s;
+            listControllers.getItems().add(buf);
+        }
+    }
+    
+    
+    private void initControllers() {
+        if (myLink.get_type() == AbstractLink.Type.onramp) {
+            linkControllerPane.setDisable(false);
+        } else {
+            linkControllerPane.setDisable(true);
+            if (linkControllerPane.isExpanded())
+                laneProperties.setExpanded(true);
+            return;
+        }
+        
+        refreshControllerList();
+        
+    }
+    
+    
+    public void prepareNewRampMeter(control.AbstractController.Algorithm rampMeteringAlgorithm, boolean managedLanes) {
+        
+    }
+    
+    
+    @FXML
+    void onAddController(ActionEvent event) {
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(newRampMeterScene);
+        newRampMeterController.initWithLink(myLink);
+        inputStage.setTitle("New Ramp Meter");
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+
+    }
+    
+    
+    @FXML
+    void onDeleteController(ActionEvent event) {
+
+    }
+    
+    
+    @FXML
+    void controllersOnKeyPressed(KeyEvent event) {
+
+    }
+    
+    
+    @FXML
+    void controllersOnClick(MouseEvent event) {
+
+    }
+    
     
     
     

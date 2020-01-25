@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019, Regents of the University of California
+ * Copyright (c) 2020, Regents of the University of California
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,38 +26,33 @@
 package opt.config;
 
 import java.util.List;
+import java.util.Set;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import opt.AppMainController;
 import opt.data.AbstractLink;
+import opt.data.ControlFactory;
 
 
 /**
- * Controller for the pop-up dialog that connects two links.
+ * Controller for the pop-up dialog that creates a new ramp meter.
  * 
  * @author Alex Kurzhanskiy
  */
-public class ConnectController {
-    private AppMainController appMainController = null;
+public class NewRampMeterController {
+    private LinkEditorController linkEditorController = null;
     private AbstractLink myLink = null;
-    private List<AbstractLink> candidates = null;
-    private boolean dnConnect = true;
-    
     
 
     @FXML // fx:id="topPane"
     private GridPane topPane; // Value injected by FXMLLoader
 
-    @FXML // fx:id="labelConnect"
-    private Label labelConnect; // Value injected by FXMLLoader
-
-    @FXML // fx:id="linkList"
-    private ChoiceBox<String> linkList; // Value injected by FXMLLoader
+    @FXML // fx:id="listRM"
+    private ChoiceBox<control.AbstractController.Algorithm> listRM; // Value injected by FXMLLoader
 
     @FXML // fx:id="buttonCancel"
     private Button buttonCancel; // Value injected by FXMLLoader
@@ -65,26 +60,27 @@ public class ConnectController {
     @FXML // fx:id="buttonOK"
     private Button buttonOK; // Value injected by FXMLLoader
 
+    @FXML // fx:id="cbManagedLanes"
+    private CheckBox cbManagedLanes; // Value injected by FXMLLoader
 
-    
     
     
     
     /**
      * This function should be called once: during the initialization.
-     * @param ctrl - pointer to the main app controller that is used to sync up
-     *               all sub-windows.
+     * @param ctrl - pointer to the link editor controller from where this
+     *               sub-window is launched.
      */
-    public void setAppMainController(AppMainController ctrl) {
-        appMainController = ctrl;
+    public void setLinkEditorController(LinkEditorController ctrl) {
+        linkEditorController = ctrl;
     }
     
     
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
-        linkList.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (linkList.getSelectionModel().getSelectedIndex() < 0)
+        listRM.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (listRM.getSelectionModel().getSelectedIndex() < 0)
                 buttonOK.setDisable(true);
             else
                 buttonOK.setDisable(false);
@@ -93,29 +89,26 @@ public class ConnectController {
     
     
     
-    public void initWithLinkAndCandidates(AbstractLink lnk, List<AbstractLink> candidates, String label, boolean downstream) {
-        linkList.getItems().clear();
-        buttonOK.setDisable(true);
-        dnConnect = downstream;
-        labelConnect.setText(label);
-        if ((lnk == null) || (candidates == null))
-            return;
-        
+    public void initWithLink(AbstractLink lnk) {
         myLink = lnk;
-        this.candidates = candidates;
+        cbManagedLanes.setSelected(false);
+        if (myLink.get_mng_lanes() > 0) {
+            cbManagedLanes.setDisable(false);
+        } else {
+            cbManagedLanes.setDisable(true);
+        }
         
-        for (AbstractLink l : candidates) {
-            linkList.getItems().add(l.get_name());
+        buttonOK.setDisable(true);
+        listRM.getItems().clear();
+        
+        Set<control.AbstractController.Algorithm> ctrl_set = ControlFactory.get_available_ramp_metering_algorithms();
+        for (control.AbstractController.Algorithm ctrl : ctrl_set) {
+            listRM.getItems().add(ctrl);
         }
     }
     
     
-    
-    
-    
-    
-    
-    
+   
     
     /***************************************************************************
      * CALLBACKS
@@ -123,32 +116,21 @@ public class ConnectController {
 
     @FXML
     void onCancel(ActionEvent event) {
+        linkEditorController.prepareNewRampMeter(null, cbManagedLanes.isSelected());
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
     }
 
     @FXML
     void onOK(ActionEvent event) {
-        int idx = linkList.getSelectionModel().getSelectedIndex();
+        int idx = listRM.getSelectionModel().getSelectedIndex();
         
         if (idx < 0) {
-            opt.utils.Dialogs.WarningDialog("No road section selected!", "Please, choose a road section from the list...");
+            opt.utils.Dialogs.WarningDialog("No ramp metering algorithm selected!", "Please, choose a ramp meter from the list...");
             return;
         }
         
-        if (idx >= candidates.size()) {
-            opt.utils.Dialogs.ErrorDialog("Unknown error...", "Please, report this problem!");
-            return;
-        }
-        
-        AbstractLink lnk = candidates.get(idx);
-        if (dnConnect)
-            lnk.connect_to_upstream(myLink);
-        else
-            myLink.connect_to_upstream(lnk);
-
-        appMainController.setProjectModified(true);
-        appMainController.selectLink(myLink);
+        linkEditorController.prepareNewRampMeter(listRM.getItems().get(idx), cbManagedLanes.isSelected());
         
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();

@@ -51,7 +51,8 @@
                                     <Button id="connectSectionUpstream" fx:id="connectSectionUpstream" defaultButton="true" mnemonicParsing="false" onAction="#onConnectSectionUpstreamAction" prefWidth="130.0" text="&lt;&lt; Connect Section" visible="false">
                                        <tooltip>
                                           <Tooltip id="ttConnectUpstream" fx:id="ttConnectUpstream" text="Empty Tooltip" />
-                                       </tooltip></Button>
+                                       </tooltip>
+                                    </Button>
                                  </children>
                               </HBox>
                            </left>
@@ -73,7 +74,7 @@
                               </HBox>
                            </right>
                            <center>
-                              <Button id="deleteSection" fx:id="deleteSection" mnemonicParsing="false" onAction="#onDeleteSection" prefWidth="130.0" text="Delete Section" BorderPane.alignment="CENTER">
+                              <Button id="deleteSection" fx:id="deleteSection" mnemonicParsing="false" onAction="#onDeleteSection" prefWidth="130.0" text="Delete Section" BorderPane.alignment="TOP_CENTER">
                                  <tooltip>
                                     <Tooltip id="ttDeleteSection" fx:id="ttDeleteSection" text="Empty Tooltip" />
                                  </tooltip></Button>
@@ -418,9 +419,39 @@
                                     </AnchorPane>
                                  </content>
                               </TitledPane>
-                              <TitledPane id="linkControllerPane" fx:id="linkControllerPane" animated="false" disable="true" expanded="false" layoutX="10.0" layoutY="85.0" prefHeight="198.0" prefWidth="514.0" text="Controllers">
+                              <TitledPane id="linkControllerPane" fx:id="linkControllerPane" animated="false" expanded="false" layoutX="10.0" layoutY="85.0" prefHeight="198.0" prefWidth="514.0" text="Controllers">
                                  <content>
-                                    <AnchorPane prefHeight="300.0" prefWidth="512.0" />
+                                    <AnchorPane prefHeight="300.0" prefWidth="512.0">
+                                       <children>
+                                          <GridPane layoutX="41.0" layoutY="70.0" prefHeight="389.0" prefWidth="896.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columnConstraints>
+                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="540.6666870117188" minWidth="10.0" prefWidth="436.6666564941406" />
+                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="439.3333435058594" minWidth="10.0" prefWidth="439.3333435058594" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                              <RowConstraints maxHeight="28.6666259765625" minHeight="10.0" prefHeight="16.0" vgrow="SOMETIMES" />
+                                              <RowConstraints maxHeight="62.0" minHeight="10.0" prefHeight="62.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints maxHeight="43.33331298828125" minHeight="0.33331298828125" prefHeight="33.66668701171875" vgrow="SOMETIMES" />
+                                              <RowConstraints maxHeight="87.0" minHeight="10.0" prefHeight="36.33331298828125" vgrow="SOMETIMES" />
+                                                <RowConstraints maxHeight="65.66668701171875" minHeight="0.0" prefHeight="22.66668701171875" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                             <padding>
+                                                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                             </padding>
+                                             <children>
+                                                <ListView id="listControllers" fx:id="listControllers" onKeyPressed="#controllersOnKeyPressed" onMouseClicked="#controllersOnClick" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="9" />
+                                                <Button id="deleteController" fx:id="deleteController" mnemonicParsing="false" onAction="#onDeleteController" text="Delete Controller" GridPane.rowIndex="10" />
+                                                <Button id="addController" fx:id="addController" defaultButton="true" mnemonicParsing="false" onAction="#onAddController" text="Add Controller" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
+                                             </children>
+                                          </GridPane>
+                                       </children></AnchorPane>
                                  </content>
                               </TitledPane>
                               <TitledPane id="linkEventPane" fx:id="linkEventPane" animated="false" disable="true" expanded="false" layoutX="10.0" layoutY="606.0" prefHeight="198.0" prefWidth="514.0" text="Events">
