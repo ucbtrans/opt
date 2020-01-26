@@ -91,35 +91,42 @@ public class UserSettings {
     public static int defaultSimulationDtSeconds = 5;
     public static String defaultStartTime = "0000";
     public static String defaultSimulationDuration = "2400";
+    
+    
+    public static double minGPRampMeteringRatePerLaneVph = 160;
+    public static double minManagedRampMeteringRatePerLaneVph = 320;
+    public static double maxGPRampMeteringRatePerLaneVph = 1200;
+    public static double maxManagedRampMeteringRatePerLaneVph = 1400;
+    public static double defaultControlDtSeconds = 30;
             
     
     
     // Length conversion
     private static Map<String, Double> lengthConversionMap = new HashMap<String, Double>();
     static {
-        lengthConversionMap.put("metersmeters", new Double(1));
-        lengthConversionMap.put("metersfeet", new Double(3.28084));
-        lengthConversionMap.put("meterskilometers", new Double(0.001));
-        lengthConversionMap.put("metersmiles", new Double(0.000621371));
-        lengthConversionMap.put("feetmeters", new Double(0.3048));
-        lengthConversionMap.put("feetfeet", new Double(1));
-        lengthConversionMap.put("feetkilometers", new Double(0.0003048));
-        lengthConversionMap.put("feetmiles", new Double(0.000189394));
-        lengthConversionMap.put("kilometersmeters", new Double(1000));
-        lengthConversionMap.put("kilometersfeet", new Double(3280.84));
-        lengthConversionMap.put("kilometerskilometers", new Double(1));
-        lengthConversionMap.put("kilometersmiles", new Double(0.621371));
-        lengthConversionMap.put("milesmeters", new Double(1609.34));
-        lengthConversionMap.put("milesfeet", new Double(5280));
-        lengthConversionMap.put("mileskilometers", new Double(1.60934));
-        lengthConversionMap.put("milesmiles", new Double(1));      
+        lengthConversionMap.put("metersmeters", 1.0);
+        lengthConversionMap.put("metersfeet", 3.28084);
+        lengthConversionMap.put("meterskilometers", 0.001);
+        lengthConversionMap.put("metersmiles", 0.000621371);
+        lengthConversionMap.put("feetmeters", 0.3048);
+        lengthConversionMap.put("feetfeet", 1.0);
+        lengthConversionMap.put("feetkilometers", 0.0003048);
+        lengthConversionMap.put("feetmiles", 0.000189394);
+        lengthConversionMap.put("kilometersmeters", 1000.0);
+        lengthConversionMap.put("kilometersfeet", 3280.84);
+        lengthConversionMap.put("kilometerskilometers", 1.0);
+        lengthConversionMap.put("kilometersmiles", 0.621371);
+        lengthConversionMap.put("milesmeters", 1609.34);
+        lengthConversionMap.put("milesfeet", 5280.0);
+        lengthConversionMap.put("mileskilometers", 1.60934);
+        lengthConversionMap.put("milesmiles", 1.0);      
     }
 
 
     // Speed conversion
     private static Map<String, Double> speedConversionMap = new HashMap<String, Double>();
     static {
-        speedConversionMap.put("mpsmps", new Double(1));
+        speedConversionMap.put("mpsmps", 1.0);
         speedConversionMap.put("mpsfps", new Double(3.28084));
         speedConversionMap.put("mpsmph", new Double(2.23694));
         speedConversionMap.put("mpskph", new Double(3.6));
@@ -141,53 +148,53 @@ public class UserSettings {
     // Flow conversion (vehicles per <unit of time>: vps, vpm, vp5m, vp15m, vph)
     private static Map<String, Double> flowConversionMap = new HashMap<String, Double>();
     static {
-        flowConversionMap.put("vpsvps", new Double(1));
-        flowConversionMap.put("vpsvpm", new Double(60));
-        flowConversionMap.put("vpsvp5m", new Double(300));
-        flowConversionMap.put("vpsvp15m", new Double(900));
-        flowConversionMap.put("vpsvph", new Double(3600));
-        flowConversionMap.put("vpmvps", new Double(1.0/60.0));
-        flowConversionMap.put("vpmvpm", new Double(1));
-        flowConversionMap.put("vpmvp5m", new Double(5));
-        flowConversionMap.put("vpmvp15m", new Double(15));
-        flowConversionMap.put("vpmvph", new Double(60));
-        flowConversionMap.put("vp5mvps", new Double(1.0/300.0));
-        flowConversionMap.put("vp5mvpm", new Double(1.0/5.0));
-        flowConversionMap.put("vp5mvp5m", new Double(1));
-        flowConversionMap.put("vp5mvp15m", new Double(3));
-        flowConversionMap.put("vp5mvph", new Double(12));
-        flowConversionMap.put("vp15mvps", new Double(1.0/900.0));
-        flowConversionMap.put("vp15mvpm", new Double(1.0/15.0));
-        flowConversionMap.put("vp15mvp5m", new Double(1.0/3.0));
-        flowConversionMap.put("vp15mvp15m", new Double(1));
-        flowConversionMap.put("vp15mvph", new Double(4));
-        flowConversionMap.put("vphvps", new Double(1.0/3600.0));
-        flowConversionMap.put("vphvpm", new Double(1.0/60.0));
-        flowConversionMap.put("vphvp5m", new Double(1.0/12.0));
-        flowConversionMap.put("vphvp15m", new Double(1.0/4.0));
-        flowConversionMap.put("vphvph", new Double(1));
+        flowConversionMap.put("vpsvps", 1.0);
+        flowConversionMap.put("vpsvpm", 60.0);
+        flowConversionMap.put("vpsvp5m", 300.0);
+        flowConversionMap.put("vpsvp15m", 900.0);
+        flowConversionMap.put("vpsvph", 3600.0);
+        flowConversionMap.put("vpmvps", 1.0/60.0);
+        flowConversionMap.put("vpmvpm", 1.0);
+        flowConversionMap.put("vpmvp5m", 5.0);
+        flowConversionMap.put("vpmvp15m", 15.0);
+        flowConversionMap.put("vpmvph", 60.0);
+        flowConversionMap.put("vp5mvps", 1.0/300.0);
+        flowConversionMap.put("vp5mvpm", 1.0/5.0);
+        flowConversionMap.put("vp5mvp5m", 1.0);
+        flowConversionMap.put("vp5mvp15m", 3.0);
+        flowConversionMap.put("vp5mvph", 12.0);
+        flowConversionMap.put("vp15mvps", 1.0/900.0);
+        flowConversionMap.put("vp15mvpm", 1.0/15.0);
+        flowConversionMap.put("vp15mvp5m", 1.0/3.0);
+        flowConversionMap.put("vp15mvp15m", 1.0);
+        flowConversionMap.put("vp15mvph", 4.0);
+        flowConversionMap.put("vphvps", 1.0/3600.0);
+        flowConversionMap.put("vphvpm", 1.0/60.0);
+        flowConversionMap.put("vphvp5m", 1.0/12.0);
+        flowConversionMap.put("vphvp15m", 1.0/4.0);
+        flowConversionMap.put("vphvph", 1.0);
     }
     
     
     // Density conversion (vehicles per <unit of length>: vpmtr, vpf, vpm, vpkm)
     private static Map<String, Double> densityConversionMap = new HashMap<String, Double>();
     static {
-        densityConversionMap.put("vpmtrvpmtr", new Double(1)); // mtr = meter => vpmtr = vehicles per meter
-        densityConversionMap.put("vpmtrvpf", new Double(0.3048));
-        densityConversionMap.put("vpmtrvpm", new Double(1609.34));
-        densityConversionMap.put("vpmtrvpkm", new Double(1000));
-        densityConversionMap.put("vpfvpmtr", new Double(3.28084));
-        densityConversionMap.put("vpfvpf", new Double(1));
-        densityConversionMap.put("vpfvpm", new Double(5280));
-        densityConversionMap.put("vpfvpkm", new Double(3280.84));
-        densityConversionMap.put("vpmvpmtr", new Double(0.000621371));
-        densityConversionMap.put("vpmvpf", new Double(0.000189394));
-        densityConversionMap.put("vpmvpm", new Double(1));
-        densityConversionMap.put("vpmvpkm", new Double(0.621371));
-        densityConversionMap.put("vpkmvpmtr", new Double(0.001));
-        densityConversionMap.put("vpkmvpf", new Double(0.0003048));
-        densityConversionMap.put("vpkmvpm", new Double(1.60934));
-        densityConversionMap.put("vpkmvpkm", new Double(1));
+        densityConversionMap.put("vpmtrvpmtr", 1.0); // mtr = meter => vpmtr = vehicles per meter
+        densityConversionMap.put("vpmtrvpf", 0.3048);
+        densityConversionMap.put("vpmtrvpm", 1609.34);
+        densityConversionMap.put("vpmtrvpkm", 1000.0);
+        densityConversionMap.put("vpfvpmtr", 3.28084);
+        densityConversionMap.put("vpfvpf", 1.0);
+        densityConversionMap.put("vpfvpm", 5280.0);
+        densityConversionMap.put("vpfvpkm", 3280.84);
+        densityConversionMap.put("vpmvpmtr", 0.000621371);
+        densityConversionMap.put("vpmvpf", 0.000189394);
+        densityConversionMap.put("vpmvpm", 1.0);
+        densityConversionMap.put("vpmvpkm", 0.621371);
+        densityConversionMap.put("vpkmvpmtr", 0.001);
+        densityConversionMap.put("vpkmvpf", 0.0003048);
+        densityConversionMap.put("vpkmvpm", 1.60934);
+        densityConversionMap.put("vpkmvpkm", 1.0);
     }
     
     
@@ -272,28 +279,28 @@ public class UserSettings {
     public static double convertLength(double value, String fromUnits, String toUnits) {
         Double res = lengthConversionMap.get(fromUnits + toUnits);
         if (res == null)
-            res = new Double(1);
+            res = 1.0;
         return res * value;
     }
     
     public static double convertSpeed(double value, String fromUnits, String toUnits) {
         Double res = speedConversionMap.get(fromUnits + toUnits);
         if (res == null)
-            res = new Double(1);
+            res = 1.0;
         return res * value;
     }
     
     public static double convertFlow(double value, String fromUnits, String toUnits) {
         Double res = flowConversionMap.get(fromUnits + toUnits);
         if (res == null)
-            res = new Double(1);
+            res = 1.0;
         return res * value;
     }
     
     public static double convertDensity(double value, String fromUnits, String toUnits) {
         Double res = densityConversionMap.get(fromUnits + toUnits);
         if (res == null)
-            res = new Double(1);
+            res = 1.0;
         return res * value;
     }
     

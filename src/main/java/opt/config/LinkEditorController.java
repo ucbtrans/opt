@@ -82,6 +82,7 @@ import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.Commodity;
+import opt.data.ControlFactory;
 import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
 import opt.data.LinkOfframp;
@@ -128,8 +129,8 @@ public class LinkEditorController {
     private List<Commodity> listVT = new ArrayList<Commodity>();
     
     private Schedule controlSchedule = null;
-    private float max_control_end_time = 0.0f;
-    private control.AbstractController.Algorithm newControlAlgorithm = null;
+    private int max_control_end_time = 0;
+    private AbstractController newController = null;
     private LaneGroupType newControlLaneGroup = LaneGroupType.gp;
     
     private SpinnerValueFactory<Double> mergePrioritySpinnerValueFactory = null;
@@ -2072,7 +2073,6 @@ public class LinkEditorController {
         for (AbstractController ctrl : controlSchedule.items) {
             float start = ctrl.getStartTime();
             float end = ctrl.getEndTime();
-            max_control_end_time = end;
             String ct = "";
             if (ctrl instanceof opt.data.control.AbstractControllerRampMeter) {
                 ct = "Ramp meter - ";
@@ -2108,6 +2108,63 @@ public class LinkEditorController {
     
     
     public void prepareNewRampMeter(control.AbstractController.Algorithm rampMeteringAlgorithm, boolean managedLanes) {
+        newController = null;
+        if (rampMeteringAlgorithm == null)
+            return;
+        
+        int begin_seconds = 0;
+        for (AbstractController ctrl : controlSchedule.items) {
+            boolean skip = true;
+            Set<LaneGroupType> lgt_set = ctrl.get_lanegroup_types();
+            for (LaneGroupType lgt : lgt_set) {
+                if (lgt != newControlLaneGroup) {
+                    skip = false;
+                    break;
+                }
+            }
+            if (skip)
+                continue;
+            int new_bs = Math.round(ctrl.getEndTime());
+            if (new_bs >= begin_seconds)
+                begin_seconds = new_bs;
+        }
+        
+        newControlLaneGroup = LaneGroupType.gp;
+        double min_rate_vph = opt.UserSettings.minGPRampMeteringRatePerLaneVph;
+        double max_rate_vph = opt.UserSettings.maxGPRampMeteringRatePerLaneVph;
+        double dt = opt.UserSettings.defaultControlDtSeconds;
+        
+        if (managedLanes) {
+            newControlLaneGroup = LaneGroupType.mng;
+            min_rate_vph = opt.UserSettings.minManagedRampMeteringRatePerLaneVph;
+            max_rate_vph = opt.UserSettings.maxManagedRampMeteringRatePerLaneVph;
+        }
+        
+        try {
+            if (rampMeteringAlgorithm == control.AbstractController.Algorithm.alinea) {
+                AbstractLink sensor_link = myLink.get_dn_link();
+                newController = ControlFactory.create_controller_alinea(myLink.get_segment().get_scenario(),
+                                                                        (float)dt,
+                                                                        begin_seconds,
+                                                                        begin_seconds + 3600f,
+                                                                        false,
+                                                                        (float)min_rate_vph,
+                                                                        (float)max_rate_vph,
+                                                                        sensor_link.get_id(),
+                                                                        sensor_link.get_length_meters() / 2f,
+                                                                        myLink.get_id(),
+                                                                        newControlLaneGroup);
+            } else if (rampMeteringAlgorithm == control.AbstractController.Algorithm.tod) {
+                newController = ControlFactory.create_controller_tod(myLink.get_segment().get_scenario(),
+                                                                    (float)dt,
+                                                                    begin_seconds,
+                                                                    begin_seconds + 3600f,
+                                                                    myLink.get_id(),
+                                                                    newControlLaneGroup);
+            }
+        } catch (Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Could not create new ramp meter...", e);
+        }
         
     }
     
