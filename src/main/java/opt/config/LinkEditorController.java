@@ -89,6 +89,7 @@ import opt.data.LinkOfframp;
 import opt.data.LinkOnramp;
 import opt.data.Schedule;
 import opt.data.control.AbstractController;
+import opt.utils.ControlUtils;
 import opt.utils.DoubleSpinnerCell;
 import opt.utils.EditCell;
 import opt.utils.Misc;
@@ -117,6 +118,8 @@ public class LinkEditorController {
     private Scene connectScene = null;
     private NewRampMeterController newRampMeterController = null;
     private Scene newRampMeterScene = null;
+    private RampMeterAlinea rampMeterAlinea = null;
+    private Scene rampMeterAlineaScene = null;
     private AbstractLink myLink = null;
     private boolean ignoreChange = true;
     
@@ -423,6 +426,17 @@ public class LinkEditorController {
         newRampMeterController = ctrl;
         newRampMeterScene = scn;
         newRampMeterScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
+    }
+    
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the ALINEA ramp meter controller that is used to
+     *               edit ALINEA ramp meter.
+     */
+    public void setRampMeterAlineaControllerAndScene(RampMeterAlinea ctrl, Scene scn) {
+        rampMeterAlinea = ctrl;
+        rampMeterAlineaScene = scn;
+        rampMeterAlineaScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
     
     
@@ -1832,7 +1846,7 @@ public class LinkEditorController {
             ObservableList<Object> row = FXCollections.observableArrayList();
             row.add(opt.utils.Misc.minutes2timeString(i*dtD));
             
-            row.add(new Double(0));
+            row.add(0.0);
             
             double total = 0;
             for (int j = 0; j < num_vt; j++) {
@@ -2077,7 +2091,7 @@ public class LinkEditorController {
             if (ctrl instanceof opt.data.control.AbstractControllerRampMeter) {
                 ct = "Ramp meter - ";
             }
-            String buf = Misc.seconds2timestring(start) + " - " + Misc.seconds2timestring(end) + ": " + ct + ctrl.getAlgorithm();
+            String buf = Misc.seconds2timestring(start, ":") + " - " + Misc.seconds2timestring(end, ":") + ": " + ct + ctrl.getAlgorithm();
             Set<LaneGroupType> lgt_set = ctrl.get_lanegroup_types();
             String lgt_s = "";
             for (LaneGroupType lgt : lgt_set) {
@@ -2164,8 +2178,40 @@ public class LinkEditorController {
             }
         } catch (Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not create new ramp meter...", e);
+        }   
+    }
+    
+    
+    public boolean checkControllerOverlap(AbstractController ctrl) {
+        boolean res = false;
+        for (AbstractController c : controlSchedule.items) {
+            if (ControlUtils.controllerOverlap(ctrl, c))
+                return true;
         }
+        appMainController.setProjectModified(true);
+        return res;
+    }
+    
+    
+    
+    void launchRampMeterEditor(AbstractController ctrl, boolean isnew) {
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
         
+        if (ctrl.getAlgorithm().toLowerCase().compareTo("alinea") == 0) {
+            inputStage.setScene(rampMeterAlineaScene);
+            rampMeterAlinea.initWithLinkAndController(myLink, ctrl, isnew);
+            inputStage.setTitle("Ramp Meter ALINEA");
+        } else {
+            // should not end up here...
+            opt.utils.Dialogs.ErrorDialog("Ramp meter '" + ctrl.getAlgorithm() + "' is not supported...", "Please, report this problem!");
+            return;
+        }
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+        refreshControllerList();
     }
     
     
@@ -2180,25 +2226,44 @@ public class LinkEditorController {
         inputStage.initModality(Modality.APPLICATION_MODAL);
         inputStage.setResizable(false);
         inputStage.showAndWait();
-
+        if (newController != null)
+            launchRampMeterEditor(newController, true);
     }
     
     
     @FXML
     void onDeleteController(ActionEvent event) {
-
+        int idx = listControllers.getSelectionModel().getSelectedIndex();
+        if ((idx < 0) || (idx >= controlSchedule.get_num_items()))
+            return;
+        myLink.get_segment().get_scenario().get_controller_schedule().delete_controller(controlSchedule.items.get(idx));
+        refreshControllerList();
+        appMainController.setProjectModified(true);
     }
     
     
     @FXML
     void controllersOnKeyPressed(KeyEvent event) {
-
+        if (event.getCode() == KeyCode.ENTER) {
+            int idx = listControllers.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= controlSchedule.get_num_items()))
+                return;
+            launchRampMeterEditor(controlSchedule.items.get(idx), false);
+        }
+        if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
+            onDeleteController(null);
+        }
     }
     
     
     @FXML
     void controllersOnClick(MouseEvent event) {
-
+        if (event.getClickCount() == 2) {
+            int idx = listControllers.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= controlSchedule.get_num_items()))
+                return;
+            launchRampMeterEditor(controlSchedule.items.get(idx), false);
+        }
     }
     
     

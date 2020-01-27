@@ -40,9 +40,11 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.UserSettings;
 import opt.data.AbstractLink;
+import opt.data.Schedule;
 import opt.data.control.AbstractController;
 import opt.data.control.AbstractControllerRampMeter;
 import opt.data.control.ControllerRampMeterAlinea;
+import opt.utils.ControlUtils;
 import opt.utils.Misc;
 import opt.utils.ModifiedDoubleStringConverter;
 import opt.utils.ModifiedIntegerStringConverter;
@@ -58,7 +60,9 @@ public class RampMeterAlinea {
     private AbstractLink myLink = null;
     private AbstractController myController = null;
     private List<AbstractLink> listSensorLinkCandidates = new ArrayList<AbstractLink>();
-    boolean isnew = false;
+    private boolean isnew = false;
+    private float origStartTime;
+    private float origEndTime;
     
 
     @FXML // fx:id="topPane"
@@ -128,7 +132,7 @@ public class RampMeterAlinea {
         rateSpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter());
         spinnerMaxRate.setValueFactory(rateSpinnerValueFactory);
         
-        SpinnerValueFactory<Integer> controlDtSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1, 1);
+        SpinnerValueFactory<Integer> controlDtSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 3600, 1, 1);
         controlDtSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter());
         controlDt.setValueFactory(controlDtSpinnerValueFactory);
     }
@@ -139,9 +143,11 @@ public class RampMeterAlinea {
         myLink = lnk;
         myController = ctrl;
         this.isnew = isnew;
+        origStartTime = ctrl.getStartTime();
+        origEndTime = ctrl.getEndTime();
         
-        textStartTime.setText(Misc.seconds2timestring(ctrl.getStartTime(), ""));
-        textEndTime.setText(Misc.seconds2timestring(ctrl.getEndTime(), ""));
+        textStartTime.setText(Misc.seconds2timestring(origStartTime, ""));
+        textEndTime.setText(Misc.seconds2timestring(origEndTime, ""));
         
         double min_rate = ((AbstractControllerRampMeter)ctrl).getMin_rate_vph();
         double max_rate = ((AbstractControllerRampMeter)ctrl).getMax_rate_vph();
@@ -186,14 +192,47 @@ public class RampMeterAlinea {
 
     @FXML
     void onCancel(ActionEvent event) {
+        if (isnew) {
+            myLink.get_segment().get_scenario().get_controller_schedule().delete_controller(myController);
+        }
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
     }
 
     @FXML
     void onOK(ActionEvent event) {
-
+        int startSeconds = Misc.timeString2Seconds(textStartTime.getText());
+        int endSeconds = Misc.timeString2Seconds(textEndTime.getText());
         
+        if (endSeconds <= startSeconds) {
+            opt.utils.Dialogs.ErrorDialog("Start time must be smaller than end time...", "Please, correct the time range.");
+            return;
+        }
+        
+        myController.setStartTime(startSeconds);
+        myController.setEndTime(endSeconds);
+        if (linkEditorController.checkControllerOverlap(myController)) {
+            myController.setStartTime(origStartTime);
+            myController.setEndTime(origEndTime);
+            opt.utils.Dialogs.ErrorDialog("Time range overlaps with other ramp meters in the schedule...", "Please, correct the time range.");
+            return;
+        }
+        
+        double rate = spinnerMinRate.getValue();
+        UserSettings.convertFlow(rate, UserSettings.unitsFlow, "vph");
+        ((AbstractControllerRampMeter)myController).setMin_rate_vph((float)rate);
+        
+        rate = spinnerMaxRate.getValue();
+        UserSettings.convertFlow(rate, UserSettings.unitsFlow, "vph");
+        ((AbstractControllerRampMeter)myController).setMax_rate_vph((float)rate);
+        
+        myController.setDt(controlDt.getValue());
+        ((AbstractControllerRampMeter)myController).setHas_queue_control(cbQueueControl.isSelected());
+        
+        AbstractLink sensor_link = listSensorLinkCandidates.get(cbSensorLink.getSelectionModel().getSelectedIndex());
+        ((ControllerRampMeterAlinea)myController).setSensor_link_id(sensor_link.get_id());
+        ((ControllerRampMeterAlinea)myController).setSensor_offset_m(0.5f*sensor_link.get_length_meters());
+
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
     }

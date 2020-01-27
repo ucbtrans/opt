@@ -139,7 +139,7 @@
                                                       <Insets left="20.0" right="20.0" />
                                                    </GridPane.margin>
                                                 </Label>
-                                                <TextField id="startTime" fx:id="startTime" alignment="CENTER_RIGHT" onAction="#onStartTimeChange" prefHeight="25.0" prefWidth="219.0" text="00:00" GridPane.rowIndex="2">
+                                                <TextField id="startTime" fx:id="startTime" alignment="CENTER_RIGHT" onAction="#onStartTimeChange" prefHeight="25.0" prefWidth="220.0" text="00:00" GridPane.rowIndex="2">
                                                    <GridPane.margin>
                                                       <Insets left="20.0" right="200.0" />
                                                    </GridPane.margin>
@@ -147,7 +147,7 @@
                                                       <Tooltip text="Enter the scenario start time in the format 'hhmm'" wrapText="true" />
                                                    </tooltip>
                                                 </TextField>
-                                                <TextField id="sDuration" fx:id="sDuration" alignment="CENTER_RIGHT" onAction="#onDurationChange" text="24:00" GridPane.rowIndex="5">
+                                                <TextField id="sDuration" fx:id="sDuration" alignment="CENTER_RIGHT" onAction="#onDurationChange" prefHeight="25.0" prefWidth="220.0" text="24:00" GridPane.rowIndex="5">
                                                    <GridPane.margin>
                                                       <Insets left="20.0" right="200.0" />
                                                    </GridPane.margin>
