@@ -2,7 +2,6 @@ package opt.data;
 
 import opt.data.control.AbstractActuator;
 import opt.data.control.AbstractController;
-import opt.data.control.Sensor;
 import utils.OTMUtils;
 
 import java.util.*;
@@ -60,46 +59,24 @@ public class Schedule {
 		if(!items.contains(c))
 			return false;
 
-		// unlink actuators from links
-		for(AbstractActuator act : c.get_actuators().values()) {
-			AbstractLink link = my_fwy_scenario.scenario.links.get(act.link_id);
-			link.actuator.remove(act.lgtype);
-		}
+//		// unlink actuators from links
+//		for(AbstractActuator act : c.get_actuators().values()) {
+//			AbstractLink link = my_fwy_scenario.scenario.links.get(act.link_id);
+//			link.actuator.remove(act.lgtype);
+//		}
 
 		return items.remove(c);
 	}
 
 	public void add_item(AbstractController newcontroller) throws Exception {
 
-		Set<Long> actuator_ids = newcontroller.get_actuator_ids();
-
-		// find controllers that address the same actuators as newcontroller
-		Set<AbstractController> intersecting_controllers = new HashSet<>();
-		for(AbstractController c : items){
-			Set<Long> common_actuators = c.get_actuator_ids();
-			common_actuators.retainAll(actuator_ids);
-			if(!common_actuators.isEmpty())
-				intersecting_controllers.add(c);
-		}
-
-		// of the intersecting controllers, find whether there is one whose time period intersects=
-		if( intersecting_controllers.stream()
-				.anyMatch(i-> i.getEndTime() > newcontroller.getStartTime() && i.getStartTime() < newcontroller.getEndTime()) )
-			throw new Exception("There is at least one controller whose time period intersects with this one.");
-
-		// link references to actuators
-		for(AbstractActuator actuator : newcontroller.get_actuators().values()){
-
-			AbstractLink link = my_fwy_scenario.get_scenario().get_link_with_id(actuator.link_id);
-			if(link==null)
-				throw new Exception("Bad link id.");
-
-			if(link.actuator.get(actuator.lgtype)!=null)
-				throw new Exception("The lane group is already controlled. Please remove the controller first.");
-
-			link.actuator.put(actuator.lgtype,actuator);
-
-		}
+		// find controllers that simultaneously address the same actuators as new controller
+		for (AbstractController c : items)
+			if (interval_overlaps_with(newcontroller,c))
+				for (AbstractActuator act : c.get_actuators().values())
+					for (AbstractActuator new_act : newcontroller.get_actuators().values())
+						if (same_lanegroup_as(new_act,act))
+							throw new Exception(String.format("The new controller has an actuator on link %d, lane group %s, where another controller is already present.",act.link_id,act.lgtype));
 
 		// add the controller to the schedule
 		items.add(newcontroller);
@@ -112,4 +89,11 @@ public class Schedule {
 		items.clear();
 	}
 
+	private static boolean interval_overlaps_with(AbstractController a, AbstractController b){
+		return b.getStartTime()<a.getEndTime() && a.getStartTime()<b.getEndTime();
+	}
+
+	private static boolean same_lanegroup_as(AbstractActuator a,AbstractActuator b){
+		return a.lgtype==b.lgtype && a.link_id==b.link_id;
+	}
 }

@@ -24,7 +24,7 @@ public abstract class AbstractLink implements Comparable {
     // Demands for LinkOnramp and LinkFreeway types only
     protected Map<Long, Profile1D> demands = new HashMap<>();    // commodity -> Profile1D
 
-    public Map<LaneGroupType,AbstractActuator> actuator = new HashMap<>();
+//    public Map<LaneGroupType,AbstractActuator> actuator = new HashMap<>();
 
     /////////////////////////////////////
     // abstract methods
