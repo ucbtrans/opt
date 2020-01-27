@@ -46,10 +46,10 @@ public class LinkConnector extends LinkFreewayOrConnector {
         LinkFreeway fwy = (LinkFreeway) segment.fwy;
 
         // create the offramp
-        Node conn_start_node = mysegment.fwy_scenario.scenario.nodes.get(this.start_node_id);
+        Node conn_start_node = mysegment.my_fwy_scenario.scenario.nodes.get(this.start_node_id);
 
         LinkOfframp fr = new LinkOfframp(
-                mysegment.fwy_scenario.new_link_id(), // id,
+                mysegment.my_fwy_scenario.new_link_id(), // id,
                 segment,// mysegment,
                 null,       // up_link
                 null,       // dn_link
@@ -57,9 +57,9 @@ public class LinkConnector extends LinkFreewayOrConnector {
                 conn_start_node.id,   // end_node_id
                 ramp_params );
 
-        mysegment.fwy_scenario.scenario.links.put(fr.id,fr);
+        mysegment.my_fwy_scenario.scenario.links.put(fr.id,fr);
         conn_start_node.in_links.add(fr.id);
-        mysegment.fwy_scenario.scenario.nodes.get(fwy.end_node_id).out_links.add(fr.id);
+        mysegment.my_fwy_scenario.scenario.nodes.get(fwy.end_node_id).out_links.add(fr.id);
 
         if(ramp_params.is_inner)
             segment.in_frs.add(fr);
@@ -85,10 +85,10 @@ public class LinkConnector extends LinkFreewayOrConnector {
         LinkFreeway fwy = (LinkFreeway) segment.fwy;
 
         // create the onramp
-        Node conn_end_node = mysegment.fwy_scenario.scenario.nodes.get(this.end_node_id);
+        Node conn_end_node = mysegment.my_fwy_scenario.scenario.nodes.get(this.end_node_id);
 
         LinkOnramp or = new LinkOnramp(
-                mysegment.fwy_scenario.new_link_id(), // id,
+                mysegment.my_fwy_scenario.new_link_id(), // id,
                 segment, // mysegment,
                 null, // up_link,
                 null, // dn_link,
@@ -96,9 +96,9 @@ public class LinkConnector extends LinkFreewayOrConnector {
                 fwy.start_node_id,      // end_node_id
                 ramp_params);
 
-        mysegment.fwy_scenario.scenario.links.put(or.id,or);
+        mysegment.my_fwy_scenario.scenario.links.put(or.id,or);
         conn_end_node.out_links.add(or.id);
-        mysegment.fwy_scenario.scenario.nodes.get(fwy.start_node_id).in_links.add(or.id);
+        mysegment.my_fwy_scenario.scenario.nodes.get(fwy.start_node_id).in_links.add(or.id);
 
         if(ramp_params.is_inner)
             segment.in_ors.add(or);
@@ -124,14 +124,14 @@ public class LinkConnector extends LinkFreewayOrConnector {
 
     private Segment create_isolated_segment(String seg_name, ParametersFreeway fwy_params) {
 
-        FreewayScenario fwy_scenario = this.mysegment.fwy_scenario;
+        FreewayScenario fwy_scenario = this.mysegment.my_fwy_scenario;
 
         // create a segment
         Long segment_id = fwy_scenario.new_seg_id();
         Segment segment = new Segment();
         segment.id = segment_id;
         segment.name = seg_name;
-        segment.fwy_scenario = fwy_scenario;
+        segment.my_fwy_scenario = fwy_scenario;
         fwy_scenario.segments.put(segment_id,segment);
 
         // create nodes and freeway link

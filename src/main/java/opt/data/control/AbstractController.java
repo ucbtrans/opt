@@ -2,7 +2,6 @@ package opt.data.control;
 
 import error.OTMException;
 import opt.data.LaneGroupType;
-import opt.data.Scenario;
 import utils.OTMUtils;
 
 import java.util.*;
@@ -19,59 +18,6 @@ public abstract class AbstractController implements Comparable {
 	protected Map<Long,AbstractActuator> actuators;
 	protected Map<Long,Sensor> sensors;
 
-	// jaxb
-	public AbstractController(jaxb.Controller jcntrl,Map<Long,jaxb.Actuator> jactuators, Map<Long,jaxb.Sensor> jsensors,  Scenario scn) throws Exception {
-
-		this.id = jcntrl.getId();
-		this.dt = jcntrl.getDt();
-		this.start_time = jcntrl.getStartTime();
-		this.end_time = jcntrl.getEndTime();
-		this.algorithm = control.AbstractController.Algorithm.valueOf(jcntrl.getType());
-		this.actuators = new HashMap<>();
-		this.sensors = new HashMap<>();
-
-		// read actuators
-		if(jcntrl.getTargetActuators()!=null){
-
-			// plain actuators
-			for(long act_id : OTMUtils.csv2longlist(jcntrl.getTargetActuators().getIds())) {
-				jaxb.Actuator jact = jactuators.get(act_id);
-				AbstractActuator act = null;
-				switch(jact.getType()){
-					case "capacity":
-						act = new opt.data.control.ActuatorRampMeter(jact);
-						break;
-					case "policy":
-						act = new opt.data.control.ActuatorPolicy(jact);
-						break;
-					default:
-						throw new Exception("Wrong actuator type, actuator id=" + jact.getId());
-				}
-				actuators.put(act_id, act);
-				act.myController = this;
-			}
-
-			// complex actuators : check that there are none
-			assert(!jcntrl.getTargetActuators().getTargetActuator().isEmpty());
-		}
-
-		// read sensors
-		if(jcntrl.getFeedbackSensors()!=null){
-
-			// plain sensors
-			for(long sens_id : OTMUtils.csv2longlist(jcntrl.getFeedbackSensors().getIds())) {
-				jaxb.Sensor jsns = jsensors.get(sens_id);
-				Sensor sensor = new Sensor(jsns);
-				sensors.put(sens_id, sensor);
-				sensor.myController = this;
-			}
-
-			// complex sensors : check that there are none
-			assert(!jcntrl.getFeedbackSensors().getFeedbackSensor().isEmpty());
-		}
-	}
-
-	// factory
 	public AbstractController(long id, float dt, float start_time, Float end_time, control.AbstractController.Algorithm algorithm) throws Exception {
 
 		// CHECKS
@@ -139,15 +85,15 @@ public abstract class AbstractController implements Comparable {
 	////////////////////////////////
 
 	public Set<LaneGroupType> get_lanegroup_types(){
-		return actuators.values().stream().map(a->a.lgtype).collect(toSet());
+		return new HashSet<>(actuators.values().stream().map(a->a.lgtype).collect(toSet()));
 	}
 
 	public Set<Long> get_link_ids(){
-		return actuators.values().stream().map(a->a.link_id).collect(toSet());
+		return new HashSet<>(actuators.values().stream().map(a->a.link_id).collect(toSet()));
 	}
 
 	public Set<Long>get_actuator_ids(){
-		return actuators.keySet();
+		return new HashSet<>(actuators.keySet());
 	}
 
 	public Set<Long>get_sensor_ids(){

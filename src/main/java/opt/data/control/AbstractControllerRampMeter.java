@@ -1,32 +1,12 @@
 package opt.data.control;
 
-import jaxb.Actuator;
 import jaxb.Controller;
-import opt.data.Scenario;
-
-import java.util.Map;
 
 public abstract class AbstractControllerRampMeter extends AbstractController {
 
     protected boolean has_queue_control;
     protected float min_rate_vph;
     protected float max_rate_vph;
-
-    // jaxb
-    public AbstractControllerRampMeter(Controller j, Map<Long, Actuator> a, Map<Long,jaxb.Sensor> s, Scenario scn) throws Exception {
-        super(j,a,s,scn);
-
-        // get my ramp meter id
-        if(j.getTargetActuators()!=null){
-            long act_id = j.getTargetActuators().getTargetActuator().iterator().next().getId();
-            Actuator actuator = a.get(act_id);
-            this.min_rate_vph = actuator.getMinValue();
-            this.max_rate_vph = actuator.getMaxValue();
-        }
-
-        // TODO READ has_queue_control from JAXB
-
-    }
 
     // factory
     public AbstractControllerRampMeter(long id, float dt, float start_time, Float end_time, control.AbstractController.Algorithm  algorithm,boolean has_queue_control,float min_rate_vph,float max_rate_vph) throws Exception {

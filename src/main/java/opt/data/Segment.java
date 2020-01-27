@@ -8,7 +8,7 @@ import static java.util.stream.Collectors.toSet;
 
 public final class Segment implements Comparable {
 
-    protected FreewayScenario fwy_scenario;
+    protected FreewayScenario my_fwy_scenario;
     protected long id;
     public String name;
     protected LinkFreewayOrConnector fwy;
@@ -24,30 +24,30 @@ public final class Segment implements Comparable {
     public Segment(){}
 
     // used by FreewayScenario jaxb constructor
-    public Segment(FreewayScenario fwy_scenario,long id, jaxb.Sgmt sgmt) {
+    public Segment(FreewayScenario my_fwy_scenario, long id, jaxb.Sgmt sgmt) {
 
         this.id = id;
-        this.fwy_scenario = fwy_scenario;
+        this.my_fwy_scenario = my_fwy_scenario;
         this.name = sgmt.getName();
 
-        this.fwy = (LinkFreewayOrConnector) fwy_scenario.scenario.links.get(Long.valueOf(sgmt.getFwy()));
+        this.fwy = (LinkFreewayOrConnector) my_fwy_scenario.scenario.links.get(Long.valueOf(sgmt.getFwy()));
 
         // onramps and offramps
         if(sgmt.getInOrs()!=null && !sgmt.getInOrs().isEmpty())
             for (Long orid : OTMUtils.csv2longlist(sgmt.getInOrs()))
-                in_ors.add((LinkOnramp)fwy_scenario.scenario.links.get(orid));
+                in_ors.add((LinkOnramp) my_fwy_scenario.scenario.links.get(orid));
 
         if(sgmt.getOutOrs()!=null && !sgmt.getOutOrs().isEmpty())
             for(Long orid : OTMUtils.csv2longlist(sgmt.getOutOrs()))
-                out_ors.add((LinkOnramp)fwy_scenario.scenario.links.get(orid));
+                out_ors.add((LinkOnramp) my_fwy_scenario.scenario.links.get(orid));
 
         if(sgmt.getInFrs()!=null && !sgmt.getInFrs().isEmpty())
             for(Long frid : OTMUtils.csv2longlist(sgmt.getInFrs()))
-                in_frs.add((LinkOfframp)fwy_scenario.scenario.links.get(frid));
+                in_frs.add((LinkOfframp) my_fwy_scenario.scenario.links.get(frid));
 
         if(sgmt.getOutFrs()!=null && !sgmt.getOutFrs().isEmpty())
             for(Long frid : OTMUtils.csv2longlist(sgmt.getOutFrs()))
-                out_frs.add((LinkOfframp)fwy_scenario.scenario.links.get(frid));
+                out_frs.add((LinkOfframp) my_fwy_scenario.scenario.links.get(frid));
 
         // assign segment to links
         for(AbstractLink link : get_links())
@@ -91,7 +91,7 @@ public final class Segment implements Comparable {
      * Get scenario, to which this segment belongs.
      */
     public FreewayScenario get_scenario() {
-        return fwy_scenario;
+        return my_fwy_scenario;
     }
 
     /**
@@ -309,7 +309,7 @@ public final class Segment implements Comparable {
         if(!(link instanceof LinkOfframp) && !(link instanceof LinkOnramp))
             return;
 
-        Scenario scenario = fwy_scenario.scenario;
+        Scenario scenario = my_fwy_scenario.scenario;
 
         // disconnect from start and end nodes
         Node start_node = scenario.nodes.get(link.start_node_id);
@@ -336,10 +336,10 @@ public final class Segment implements Comparable {
 
     private LinkOnramp create_onramp(ParametersRamp params){
 
-        Long link_id = fwy_scenario.new_link_id();
-        Node or_start_node = new Node(fwy_scenario.new_node_id());
-        fwy_scenario.scenario.nodes.put(or_start_node.id,or_start_node);
-        Node or_end_node = fwy_scenario.scenario.nodes.get(fwy.start_node_id);
+        Long link_id = my_fwy_scenario.new_link_id();
+        Node or_start_node = new Node(my_fwy_scenario.new_node_id());
+        my_fwy_scenario.scenario.nodes.put(or_start_node.id,or_start_node);
+        Node or_end_node = my_fwy_scenario.scenario.nodes.get(fwy.start_node_id);
 
         LinkOnramp or = new LinkOnramp(
                 link_id, // id,
@@ -350,7 +350,7 @@ public final class Segment implements Comparable {
                 or_end_node.id,// end_node_id,
                 params); // params)
 
-        fwy_scenario.scenario.links.put(or.id,or);
+        my_fwy_scenario.scenario.links.put(or.id,or);
         or.dn_link = fwy;
         or_start_node.out_links.add(or.id);
 
@@ -359,10 +359,10 @@ public final class Segment implements Comparable {
 
     private LinkOfframp create_offramp(ParametersRamp params){
 
-        Long link_id = fwy_scenario.new_link_id();
-        Node fr_start_node = fwy_scenario.scenario.nodes.get(fwy.end_node_id);
-        Node fr_end_node = new Node(fwy_scenario.new_node_id());
-        fwy_scenario.scenario.nodes.put(fr_end_node.id,fr_end_node);
+        Long link_id = my_fwy_scenario.new_link_id();
+        Node fr_start_node = my_fwy_scenario.scenario.nodes.get(fwy.end_node_id);
+        Node fr_end_node = new Node(my_fwy_scenario.new_node_id());
+        my_fwy_scenario.scenario.nodes.put(fr_end_node.id,fr_end_node);
 
         LinkOfframp fr = new LinkOfframp(
                 link_id, // id,
@@ -373,7 +373,7 @@ public final class Segment implements Comparable {
                 fr_end_node.id,// end_node_id,
                 params); // params)
 
-        fwy_scenario.scenario.links.put(fr.id,fr);
+        my_fwy_scenario.scenario.links.put(fr.id,fr);
         fr.up_link = fwy;
         fr_end_node.in_links.add(fr.id);
 

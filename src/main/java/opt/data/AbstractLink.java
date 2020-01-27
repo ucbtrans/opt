@@ -371,7 +371,7 @@ public abstract class AbstractLink implements Comparable {
         if(!is_permitted_uplink(conn_up_link))
             return false;
 
-        FreewayScenario fwy_scenario = mysegment.fwy_scenario;
+        FreewayScenario fwy_scenario = mysegment.my_fwy_scenario;
         Node my_start_node = fwy_scenario.scenario.nodes.get(start_node_id);
         Node their_end_node = fwy_scenario.scenario.nodes.get(conn_up_link.end_node_id);
 
@@ -433,7 +433,7 @@ public abstract class AbstractLink implements Comparable {
 
     protected LinkFreewayOrConnector create_up_FwyOrConnLink(Type linktype, ParametersFreeway link_params){
 
-        FreewayScenario fwy_scenario = mysegment.fwy_scenario;
+        FreewayScenario fwy_scenario = mysegment.my_fwy_scenario;
 
         // create new upstream node
         Node existing_node = fwy_scenario.scenario.nodes.get(start_node_id);
@@ -484,7 +484,7 @@ public abstract class AbstractLink implements Comparable {
 
     protected LinkFreewayOrConnector create_dn_FwyOrConnLink(Type linktype, ParametersFreeway link_params){
 
-        FreewayScenario fwy_scenario = mysegment.fwy_scenario;
+        FreewayScenario fwy_scenario = mysegment.my_fwy_scenario;
 
         // create new dnstream node
         Node existing_node = fwy_scenario.scenario.nodes.get(end_node_id);
@@ -535,11 +535,11 @@ public abstract class AbstractLink implements Comparable {
 
     protected Segment create_segment(LinkFreewayOrConnector fwy,String seg_name){
 
-        FreewayScenario fwy_scenario = mysegment.fwy_scenario;
+        FreewayScenario fwy_scenario = mysegment.my_fwy_scenario;
 
         // create new segment
         Segment newseg = new Segment();
-        newseg.fwy_scenario = fwy_scenario;
+        newseg.my_fwy_scenario = fwy_scenario;
         newseg.id = fwy_scenario.new_seg_id();
         newseg.name = seg_name;
         newseg.fwy = fwy;
@@ -553,7 +553,7 @@ public abstract class AbstractLink implements Comparable {
         if(segment==null)
             return;
 
-        FreewayScenario fwy_scenario = segment.fwy_scenario;
+        FreewayScenario fwy_scenario = segment.my_fwy_scenario;
 
         Node new_node = fwy_scenario.scenario.nodes.get(new_node_id);
 
@@ -577,7 +577,7 @@ public abstract class AbstractLink implements Comparable {
         if(segment==null)
             return;
 
-        FreewayScenario fwy_scenario = segment.fwy_scenario;
+        FreewayScenario fwy_scenario = segment.my_fwy_scenario;
         Node new_node = fwy_scenario.scenario.nodes.get(new_node_id);
 
         Node old_up_node = fwy_scenario.scenario.nodes.get(segment.fwy.start_node_id);

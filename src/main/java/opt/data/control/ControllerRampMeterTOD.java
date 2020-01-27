@@ -1,12 +1,8 @@
 package opt.data.control;
 
-import jaxb.Actuator;
-import jaxb.Controller;
-import jaxb.Sensor;
 import opt.data.ControlFactory;
 import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
-import opt.data.Scenario;
 
 import java.util.*;
 
@@ -28,11 +24,6 @@ public class ControllerRampMeterTOD extends AbstractControllerRampMeter {
 
 	protected List<TODEntry> entries = new ArrayList<>();
 
-	public ControllerRampMeterTOD(Controller j, Map<Long, Actuator> a, Map<Long, Sensor> s, Scenario scn) throws Exception {
-		super(j, a, s, scn);
-	}
-
-	// factory
 	public ControllerRampMeterTOD(FreewayScenario scn, float dt, float start_time, Float end_time, long ramp_link_id, LaneGroupType lgtype) throws Exception {
 		super(scn.new_controller_id(),dt,start_time,end_time,control.AbstractController.Algorithm.tod,false,Float.NaN,Float.NaN);
 

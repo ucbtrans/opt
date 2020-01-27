@@ -1,7 +1,7 @@
 package opt.data;
 
 import opt.UserSettings;
-import opt.data.control.AbstractController;
+import opt.data.control.*;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
@@ -23,7 +23,7 @@ public class FreewayScenario {
     public String description;
     protected Scenario scenario;
     protected Map<Long,Segment> segments = new HashMap<>();
-    protected Schedule controller_schedule = new Schedule();
+    protected Schedule controller_schedule;
 
     /////////////////////////////////////
     // construction
@@ -33,20 +33,18 @@ public class FreewayScenario {
     }
 
     public FreewayScenario(String scnname,String description, String segmentname, ParametersFreeway params){
+
+        reset_max_ids();
         this.name = scnname;
         this.description = description;
-        max_link_id = -1l;
-        max_node_id = -1l;
-        max_seg_id = -1l;
-        max_controller_id = -1l;
-        max_sensor_id = -1l;
-        max_actuator_id = -1l;
         scenario = new Scenario(this);
         create_isolated_segment(segmentname,params, AbstractLink.Type.freeway);
         scenario.commodities.put(0l,new Commodity(0l,"Unnamed commodity",1f));
     }
 
     public FreewayScenario(String name,String description,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
+
+        reset_max_ids();
 
         this.name = name;
         this.description = description;
@@ -220,6 +218,44 @@ public class FreewayScenario {
                                         OTMUtils.csv2list(split.getContent())));
                 }
 
+        // controller schedule .....................................
+        controller_schedule = new Schedule(this);
+
+        // create actuator and sensor maps
+        Map<Long,jaxb.Actuator> actuators = new HashMap<>();
+        if(jaxb_scenario.getActuators()!=null)
+            for(jaxb.Actuator x : jaxb_scenario.getActuators().getActuator())
+                actuators.put(x.getId(),x);
+
+        Map<Long,jaxb.Sensor> sensors = new HashMap<>();
+        if(jaxb_scenario.getSensors()!=null)
+            for(jaxb.Sensor x : jaxb_scenario.getSensors().getSensor())
+                sensors.put(x.getId(),x);
+
+        // read controllers
+        if(jaxb_scenario.getControllers()!=null){
+            for(jaxb.Controller jcnt : jaxb_scenario.getControllers().getController()){
+                AbstractController cnt;
+                switch( jcnt.getType()){
+                    case "tod":
+                        cnt = ControlFactory.create_controller_tod(this, jcnt,actuators);
+                        break;
+                    case "alinea":
+                        cnt = ControlFactory.create_controller_alinea(this,jcnt,actuators,sensors);
+                        break;
+                    case "hov":
+                        cnt = ControlFactory.create_controller_hov(this,jcnt);
+                        break;
+                    case "hot":
+                        cnt = ControlFactory.create_controller_hot(this,jcnt);
+                        break;
+                    default:
+                        throw new Exception("Unkonwn controller type: " + jcnt.getType());
+                }
+                controller_schedule.add_item(cnt);
+            }
+        }
+
         // max ids
         reset_max_ids();
 
@@ -238,7 +274,7 @@ public class FreewayScenario {
         scn_cpy.scenario = scenario.clone();
         for(Map.Entry<Long,Segment> e : segments.entrySet()) {
             Segment new_segment = e.getValue().clone();
-            new_segment.fwy_scenario = scn_cpy;
+            new_segment.my_fwy_scenario = scn_cpy;
             scn_cpy.segments.put(e.getKey(),new_segment );
         }
 
@@ -375,7 +411,7 @@ public class FreewayScenario {
         Segment segment = new Segment();
         segment.id = segment_id;
         segment.name = segment_name;
-        segment.fwy_scenario = this;
+        segment.my_fwy_scenario = this;
         segments.put(segment_id,segment);
 
         // create nodes and freeway link
@@ -619,6 +655,16 @@ public class FreewayScenario {
     }
 
     protected void reset_max_ids(){
+
+        if(scenario==null) {
+            max_link_id = 0l;
+            max_node_id = 0l;
+            max_seg_id = 0l;
+            max_controller_id = 0l;
+            max_sensor_id = 0l;
+            max_actuator_id = 0l;
+            return;
+        }
 
         // link
         Optional<Long> opt_max_link_id = scenario.links.keySet().stream()

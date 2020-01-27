@@ -117,40 +117,6 @@ public class Scenario {
             for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
                 this.commodities.put(comm.getId(),new Commodity(comm.getId(),comm.getName(),comm.getPvequiv()));
 
-        // actuator and sensor maps
-        Map<Long,jaxb.Actuator> actuators = new HashMap<>();
-        if(scenario.getActuators()!=null)
-            for(jaxb.Actuator x : scenario.getActuators().getActuator())
-                actuators.put(x.getId(),x);
-
-        Map<Long,jaxb.Sensor> sensors = new HashMap<>();
-        if(scenario.getSensors()!=null)
-            for(jaxb.Sensor x : scenario.getSensors().getSensor())
-                sensors.put(x.getId(),x);
-
-        // controllers
-        if(scenario.getControllers()!=null){
-			for(jaxb.Controller jcnt : scenario.getControllers().getController()){
-				AbstractController cnt = null;
-				switch( jcnt.getType()){
-					case "tod":
-                        cnt = new ControllerRampMeterTOD(jcnt,actuators,sensors,this);
-                        break;
-                    case "alinea":
-						cnt = new ControllerRampMeterAlinea(jcnt,actuators,sensors,this);
-						break;
-                    case "hov":
-                        cnt = new ControllerPolicyHOV(jcnt,actuators,sensors,this);
-                        break;
-                    case "hot":
-                        cnt = new ControllerPolicyHOT(jcnt,actuators,sensors,this);
-                        break;
-					default:
-						throw new Exception("Unkonwn controller type: " + jcnt.getType());
-				}
-				my_fwy_scenario.controller_schedule.add_item(cnt);
-			}
-		}
     }
 
     protected Scenario clone() {

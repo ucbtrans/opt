@@ -1,10 +1,13 @@
 package opt.tests;
 
 import opt.data.ControlFactory;
+import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
 import opt.data.Schedule;
 import opt.data.control.*;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -15,7 +18,7 @@ public class TestControl extends AbstractTest{
 
 	/////////////////////////////////////
 	// create controllers
-	/////////////////////////////////////8
+	/////////////////////////////////////
 
 	@Test
 	public void test_create_controller_alinea(){
@@ -65,6 +68,31 @@ public class TestControl extends AbstractTest{
 			TestData X = new TestData("project2_rm.opt");
 			ControllerPolicyHOT cntrl = ControlFactory.create_controller_hot(X.scenario,dt,start_time,end_time);
 			assertNotNull(cntrl);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/////////////////////////////////////
+	// delete controllers
+	/////////////////////////////////////
+
+	@Test
+	public void test_delete_add_controller(){
+		try {
+			TestData X = new TestData("project2_rm.opt");
+			Schedule schedule = X.scenario.get_controller_schedule();
+			AbstractController c =  schedule.items.get(0);
+			long ramp_link_id = c.get_actuators().values().iterator().next().link_id;
+			assertEquals(2,schedule.items.size());
+			schedule.delete_controller(c);
+
+			assertEquals(1,schedule.items.size());
+			AbstractController n = ControlFactory.create_controller_alinea(X.scenario,1f,2f,3f,false,4f,5f,3l,6f,ramp_link_id,LaneGroupType.gp);
+			schedule.add_item(n);
+
+			assertEquals(2,schedule.items.size());
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
