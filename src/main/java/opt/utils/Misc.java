@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019, Regents of the University of California
+ * Copyright (c) 2020, Regents of the University of California
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -108,7 +108,7 @@ public class Misc {
     }
     
     
-    public static String seconds2timestring(float seconds) {
+    public static String seconds2timestring(float seconds, String divider) {
         String timeStr = "";
         int t = Math.round(seconds);
         if (t < 0) {
@@ -119,11 +119,21 @@ public class Misc {
         DecimalFormat df = new DecimalFormat("00");
         int h = t / 3600;
         int m = (t - 3600*h) / 60; 
-        timeStr += df.format(h) + ":" + df.format(m);
+        timeStr += df.format(h) + divider + df.format(m);
         
         return timeStr;
     }
     
+    
+    public static int timeString2Seconds(String time_str) {
+        String[] comps = time_str.split(":");
+        int seconds = 3600*Integer.parseInt(comps[0]) + 60*Integer.parseInt(comps[1]);
+        
+        if (comps.length > 2)
+            seconds += Integer.parseInt(comps[2]);
+        
+        return seconds;
+    }
     
     
     
