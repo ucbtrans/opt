@@ -24,8 +24,8 @@ public class ControllerRampMeterTOD extends AbstractControllerRampMeter {
 
 	protected List<TODEntry> entries = new ArrayList<>();
 
-	public ControllerRampMeterTOD(FreewayScenario scn, float dt, float start_time, Float end_time, long ramp_link_id, LaneGroupType lgtype) throws Exception {
-		super(scn.new_controller_id(),dt,start_time,end_time,control.AbstractController.Algorithm.tod,false,Float.NaN,Float.NaN);
+	public ControllerRampMeterTOD(FreewayScenario scn, float dt, float start_time, Float end_time, boolean has_queue_control, float min_rate_vph, float max_rate_vph, long ramp_link_id, LaneGroupType lgtype) throws Exception {
+		super(scn.new_controller_id(),dt,start_time,end_time,control.AbstractController.Algorithm.tod,has_queue_control,min_rate_vph,max_rate_vph);
 
 		// ramp meter actuator
 		add_actuator(ControlFactory.create_ramp_meter(scn,ramp_link_id,lgtype,this));

@@ -23,9 +23,9 @@ public class ControlFactory {
 		return new ControllerRampMeterAlinea(fwyscn,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,sensor_link_id,sensor_offset,ramp_link_id,lgtype);
 	}
 
-	public static ControllerRampMeterTOD create_controller_tod(FreewayScenario fwyscn, float dt, float start_time, Float end_time, long ramp_link_id, LaneGroupType lgtype) throws Exception {
+	public static ControllerRampMeterTOD create_controller_tod(FreewayScenario fwyscn, float dt, float start_time, Float end_time, boolean has_queue_control, float min_rate_vph, float max_rate_vph, long ramp_link_id, LaneGroupType lgtype) throws Exception {
 		parameters_check(dt,start_time,end_time);
-		return new ControllerRampMeterTOD(fwyscn,dt,start_time,end_time,ramp_link_id,lgtype);
+		return new ControllerRampMeterTOD(fwyscn,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,ramp_link_id,lgtype);
 	}
 
 	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn, float dt, float start_time, Float end_time) throws Exception {
@@ -102,7 +102,11 @@ public class ControlFactory {
 
 	public static ControllerRampMeterTOD create_controller_tod(FreewayScenario fwyscn,jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool) throws Exception {
 
+
+		boolean has_queue_control = false; // TODO FIX THIS
 		long ramp_link_id = -1l;
+		float min_rate_vph = -1f;
+		float max_rate_vph = -1f;
 		LaneGroupType lgtype = LaneGroupType.gp; // TODO FIX THIS
 
 		// read actuators
@@ -111,11 +115,13 @@ public class ControlFactory {
 			assert(act_ids.size()==1);
 			for(long act_id : act_ids) {
 				jaxb.Actuator jact = actuator_pool.get(act_id);
+				min_rate_vph = jact.getMinValue();
+				max_rate_vph = jact.getMaxValue();
 				ramp_link_id = jact.getActuatorTarget().getId();
 			}
 		}
 
-		return create_controller_tod( fwyscn, jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime(),ramp_link_id,lgtype);
+		return create_controller_tod( fwyscn, jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime(),has_queue_control,min_rate_vph,max_rate_vph,ramp_link_id,lgtype);
 	}
 
 	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,jaxb.Controller jcnt) throws Exception {
