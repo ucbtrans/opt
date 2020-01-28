@@ -89,6 +89,7 @@ import opt.data.LinkOfframp;
 import opt.data.LinkOnramp;
 import opt.data.Schedule;
 import opt.data.control.AbstractController;
+import opt.data.control.AbstractControllerRampMeter;
 import opt.utils.ControlUtils;
 import opt.utils.DoubleSpinnerCell;
 import opt.utils.EditCell;
@@ -2101,10 +2102,14 @@ public class LinkEditorController {
             float start = ctrl.getStartTime();
             float end = ctrl.getEndTime();
             String ct = "";
+            String rm_qc = "";
             if (ctrl instanceof opt.data.control.AbstractControllerRampMeter) {
                 ct = "Ramp meter - ";
+                if (((AbstractControllerRampMeter)ctrl).isHas_queue_control())
+                    rm_qc = " with queue control";
             }
-            String buf = Misc.seconds2timestring(start, ":") + " - " + Misc.seconds2timestring(end, ":") + ": " + ct + ctrl.getAlgorithm();
+            String buf = Misc.seconds2timestring(start, ":") + " - " + Misc.seconds2timestring(end, ":") + ": " + ct + ctrl.getAlgorithm() + rm_qc;
+
             Set<LaneGroupType> lgt_set = ctrl.get_lanegroup_types();
             String lgt_s = "";
             for (LaneGroupType lgt : lgt_set) {
@@ -2194,6 +2199,7 @@ public class LinkEditorController {
             }
             myLink.get_segment().get_scenario().get_controller_schedule().add_item(newController);
         } catch (Exception e) {
+            newController = null;
             opt.utils.Dialogs.ExceptionDialog("Could not create new ramp meter...", e);
         }
     }
