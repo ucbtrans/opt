@@ -23,15 +23,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  **/
+
 package opt.config;
 
-import java.util.ArrayList;
-import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
@@ -40,11 +38,9 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.UserSettings;
 import opt.data.AbstractLink;
-import opt.data.Schedule;
 import opt.data.control.AbstractController;
 import opt.data.control.AbstractControllerRampMeter;
-import opt.data.control.ControllerRampMeterAlinea;
-import opt.utils.ControlUtils;
+import opt.data.control.ControllerRampMeterTOD;
 import opt.utils.Misc;
 import opt.utils.ModifiedDoubleStringConverter;
 import opt.utils.ModifiedIntegerStringConverter;
@@ -55,11 +51,10 @@ import opt.utils.ModifiedIntegerStringConverter;
  * 
  * @author Alex Kurzhanskiy
  */
-public class RampMeterAlinea {
+public class RampMeterTOD {
     private LinkEditorController linkEditorController = null;
     private AbstractLink myLink = null;
     private AbstractController myController = null;
-    private List<AbstractLink> listSensorLinkCandidates = new ArrayList<AbstractLink>();
     private boolean isnew = false;
     private float origStartTime;
     private float origEndTime;
@@ -80,14 +75,14 @@ public class RampMeterAlinea {
     @FXML // fx:id="textEndTime"
     private TextField textEndTime; // Value injected by FXMLLoader
 
-    @FXML // fx:id="labelMinRate"
-    private Label labelMinRate; // Value injected by FXMLLoader
+    @FXML // fx:id="labelRecRate"
+    private Label labelRecRate; // Value injected by FXMLLoader
 
     @FXML // fx:id="labelMaxRate"
     private Label labelMaxRate; // Value injected by FXMLLoader
 
-    @FXML // fx:id="spinnerMinRate"
-    private Spinner<Double> spinnerMinRate; // Value injected by FXMLLoader
+    @FXML // fx:id="spinnerRecRate"
+    private Spinner<Double> spinnerRecRate; // Value injected by FXMLLoader
 
     @FXML // fx:id="spinnerMaxRate"
     private Spinner<Double> spinnerMaxRate; // Value injected by FXMLLoader
@@ -97,9 +92,6 @@ public class RampMeterAlinea {
 
     @FXML // fx:id="cbQueueControl"
     private CheckBox cbQueueControl; // Value injected by FXMLLoader
-
-    @FXML // fx:id="cbSensorLink"
-    private ChoiceBox<String> cbSensorLink; // Value injected by FXMLLoader
 
     
     
@@ -126,7 +118,7 @@ public class RampMeterAlinea {
         
         SpinnerValueFactory<Double> rateSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, cap_step);
         rateSpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter());
-        spinnerMinRate.setValueFactory(rateSpinnerValueFactory);
+        spinnerRecRate.setValueFactory(rateSpinnerValueFactory);
         
         rateSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(10.0, Double.MAX_VALUE, 10.0, cap_step);
         rateSpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter());
@@ -153,34 +145,15 @@ public class RampMeterAlinea {
         double max_rate = ((AbstractControllerRampMeter)ctrl).getMax_rate_vph();
         
         String unitsFlow = UserSettings.unitsFlow;
-        labelMinRate.setText("Minimum Rate per Lane (" + unitsFlow + "):");
+        labelRecRate.setText("Recommended Rate per Lane (" + unitsFlow + "):");
         labelMaxRate.setText("Maximum Rate per Lane (" + unitsFlow + "):");
         min_rate = UserSettings.convertFlow(min_rate, "vph", unitsFlow);
         max_rate = UserSettings.convertFlow(max_rate, "vph", unitsFlow);
-        spinnerMinRate.getValueFactory().setValue(min_rate);
+        spinnerRecRate.getValueFactory().setValue(min_rate);
         spinnerMaxRate.getValueFactory().setValue(max_rate);
         
         controlDt.getValueFactory().setValue(Math.round(ctrl.getDt()));
         cbQueueControl.setSelected(((AbstractControllerRampMeter)ctrl).isHas_queue_control());
-        
-        cbSensorLink.getItems().clear();
-        listSensorLinkCandidates.clear();
-        
-        long sensor_link_id = ((ControllerRampMeterAlinea)ctrl).getSensor_link_id();
-        AbstractLink fwy = myLink.get_dn_link();
-        listSensorLinkCandidates.add(fwy);
-        cbSensorLink.getItems().add(fwy.get_name());
-        fwy = fwy.get_up_link();
-        if (fwy != null) {
-            listSensorLinkCandidates.add(fwy);
-            cbSensorLink.getItems().add(fwy.get_name());
-        }
-        
-        int sz = listSensorLinkCandidates.size();
-        for (int i = 0; i < sz; i++) {
-            if (listSensorLinkCandidates.get(i).get_id() == sensor_link_id)
-                cbSensorLink.getSelectionModel().select(i);
-        }
     }
     
     
@@ -209,10 +182,10 @@ public class RampMeterAlinea {
             return;
         }
         
-        double min_rate = spinnerMinRate.getValue();
+        double rec_rate = spinnerRecRate.getValue();
         double max_rate = spinnerMaxRate.getValue();
-        if (min_rate > max_rate) {
-            opt.utils.Dialogs.ErrorDialog("Minimum rate cannot exceed maximum rate...", "Please, correct the range of metering rates.");
+        if (rec_rate > max_rate) {
+            opt.utils.Dialogs.ErrorDialog("Recommended rate cannot exceed maximum rate...", "Please, correct the metering rates.");
             return;
         }
         
@@ -225,18 +198,17 @@ public class RampMeterAlinea {
             return;
         }
         
-        min_rate = UserSettings.convertFlow(min_rate, UserSettings.unitsFlow, "vph");
-        ((AbstractControllerRampMeter)myController).setMin_rate_vph((float)min_rate);
+
+        rec_rate = UserSettings.convertFlow(rec_rate, UserSettings.unitsFlow, "vph");
+        ((AbstractControllerRampMeter)myController).setMin_rate_vph((float)(0.5*rec_rate));
+        ((ControllerRampMeterTOD)myController).get_entries().clear();
+        ((ControllerRampMeterTOD)myController).add_entry(startSeconds, (float)rec_rate);
         max_rate = UserSettings.convertFlow(max_rate, UserSettings.unitsFlow, "vph");
         ((AbstractControllerRampMeter)myController).setMax_rate_vph((float)max_rate);
         
         myController.setDt(controlDt.getValue());
         ((AbstractControllerRampMeter)myController).setHas_queue_control(cbQueueControl.isSelected());
         
-        AbstractLink sensor_link = listSensorLinkCandidates.get(cbSensorLink.getSelectionModel().getSelectedIndex());
-        ((ControllerRampMeterAlinea)myController).setSensor_link_id(sensor_link.get_id());
-        ((ControllerRampMeterAlinea)myController).setSensor_offset_m(0.5f*sensor_link.get_length_meters());
-
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
     }
