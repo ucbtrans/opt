@@ -42,9 +42,12 @@ public class TestControl extends AbstractTest{
 	public void test_create_controller_tod(){
 		try {
 			TestData X = new TestData("project2_rm.opt");
+			boolean has_queue_control = false;
+			float min_rate_vph = 100f;
+			float max_rate_vph = 900f;
 			long ramp_link_id = 8l;
 			LaneGroupType lgtype = LaneGroupType.gp;
-			ControllerRampMeterTOD cntrl = ControlFactory.create_controller_tod(X.scenario,dt,start_time,end_time,ramp_link_id,lgtype);
+			ControllerRampMeterTOD cntrl = ControlFactory.create_controller_tod(X.scenario,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,ramp_link_id,lgtype);
 			assertNotNull(cntrl);
 		} catch (Exception e) {
 			e.printStackTrace();
