@@ -2144,23 +2144,6 @@ public class LinkEditorController {
         if (rampMeteringAlgorithm == null)
             return;
         
-        int begin_seconds = 0;
-        for (AbstractController ctrl : controlSchedule.items) {
-            boolean skip = true;
-            Set<LaneGroupType> lgt_set = ctrl.get_lanegroup_types();
-            for (LaneGroupType lgt : lgt_set) {
-                if (lgt != newControlLaneGroup) {
-                    skip = false;
-                    break;
-                }
-            }
-            if (skip)
-                continue;
-            int new_bs = Math.round(ctrl.getEndTime());
-            if (new_bs >= begin_seconds)
-                begin_seconds = new_bs;
-        }
-        
         newControlLaneGroup = LaneGroupType.gp;
         double min_rate_vph = opt.UserSettings.minGPRampMeteringRatePerLaneVph;
         double max_rate_vph = opt.UserSettings.maxGPRampMeteringRatePerLaneVph;
@@ -2172,7 +2155,25 @@ public class LinkEditorController {
             max_rate_vph = opt.UserSettings.maxManagedRampMeteringRatePerLaneVph;
         }
         
+        int begin_seconds = 0;
+        for (AbstractController ctrl : controlSchedule.items) {
+            boolean skip = true;
+            Set<LaneGroupType> lgt_set = ctrl.get_lanegroup_types();
+            for (LaneGroupType lgt : lgt_set) {
+                if (lgt == newControlLaneGroup) {
+                    skip = false;
+                    break;
+                }
+            }
+            if (skip)
+                continue;
+            int new_bs = Math.round(ctrl.getEndTime());
+            if (new_bs >= begin_seconds)
+                begin_seconds = new_bs;
+        }
+        
         try {
+            System.err.println("BEGIN SECONDS: " + begin_seconds);
             if (rampMeteringAlgorithm == control.AbstractController.Algorithm.alinea) {
                 AbstractLink sensor_link = myLink.get_dn_link();
                 
