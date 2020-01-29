@@ -27,7 +27,7 @@ public class Sensor {
         j.setDt(myController.dt);
         j.setPosition(offset);
         j.setLinkId(link_id);
-        j.setType("loop");
+        j.setType("fixed");
         return j;
     }
 }

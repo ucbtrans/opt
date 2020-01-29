@@ -106,8 +106,8 @@
                     </actuator>
                 </actuators>
                 <sensors>
-                    <sensor id="22" type="loop" link_id="2" position="0.0" dt="10.0"/>
-                    <sensor id="12" type="loop" link_id="1" position="0.0" dt="10.0"/>
+                    <sensor id="22" type="fixed" link_id="2" position="0.0" dt="10.0"/>
+                    <sensor id="12" type="fixed" link_id="1" position="0.0" dt="10.0"/>
                 </sensors>
             </scenario>
             <ns2:lnks>
