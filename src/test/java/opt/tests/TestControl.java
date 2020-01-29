@@ -4,8 +4,6 @@ import opt.data.*;
 import opt.data.control.*;
 import org.junit.Test;
 
-import java.util.List;
-
 import static org.junit.Assert.*;
 
 public class TestControl extends AbstractTest{
@@ -22,7 +20,7 @@ public class TestControl extends AbstractTest{
 					null,
 					3f,
 					0f,
-					34f,
+					3600f,
 					false,
 					100f,
 					900f,
@@ -38,12 +36,12 @@ public class TestControl extends AbstractTest{
 		}
 	}
 
-
 	@Test
 	public void test_create_controller_tod(){
 		try {
 			TestData X = new TestData("project2_rm.opt");
 			ControllerRampMeterTOD cntrl = ControlFactory.create_controller_tod(X.scenario,
+					null,
 					3f,
 					0f,
 					34f,
@@ -64,6 +62,7 @@ public class TestControl extends AbstractTest{
 		try {
 			TestData X = new TestData("project2_rm.opt");
 			ControllerPolicyHOV cntrl = ControlFactory.create_controller_hov(X.scenario,
+					null,
 					3f,
 					0f,
 					34f);
@@ -78,6 +77,7 @@ public class TestControl extends AbstractTest{
 		try {
 			TestData X = new TestData("project2_rm.opt");
 			ControllerPolicyHOT cntrl = ControlFactory.create_controller_hot(X.scenario,
+					null,
 					3f,
 					0f,
 					34f);
@@ -90,6 +90,49 @@ public class TestControl extends AbstractTest{
 	/////////////////////////////////////
 	// delete controllers
 	/////////////////////////////////////
+
+	@Test
+	public void test_add_controllers(){
+		try {
+			TestData X = new TestData("project2_rm.opt");
+			Schedule schedule = X.scenario.get_controller_schedule();
+
+			schedule.add_item(ControlFactory.create_controller_alinea(X.scenario,
+					null,
+					3f,
+					0f,
+					3600f,
+					false,
+					100f,
+					900f,
+					null,
+					9l,
+					100f,
+					null,
+					13l,
+					LaneGroupType.gp));
+
+			schedule.add_item(ControlFactory.create_controller_alinea(X.scenario,
+					null,
+					3f,
+					3600f,
+					7200f,
+					false,
+					100f,
+					900f,
+					null,
+					9l,
+					100f,
+					null,
+					13l,
+					LaneGroupType.gp));
+
+			assertEquals(4,schedule.items.size());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Test
 	public void test_delete_add_controller(){

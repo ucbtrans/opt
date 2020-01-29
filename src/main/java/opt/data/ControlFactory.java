@@ -18,37 +18,49 @@ public class ControlFactory {
 		return x;
 	}
 
+	/////////////////////
+	// controller
+	/////////////////////
+
 	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn,Long id, float dt, float start_time, float end_time, boolean has_queue_control, float min_rate_vph, float max_rate_vph,Long sensor_id, long sensor_link_id, float sensor_offset,Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
 		parameters_check(dt,start_time,end_time);
 		return new ControllerRampMeterAlinea(fwyscn,id,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,sensor_id,sensor_link_id,sensor_offset,act_id,ramp_link_id,lgtype);
 	}
 
-	public static ControllerRampMeterTOD create_controller_tod(FreewayScenario fwyscn, float dt, float start_time, Float end_time, boolean has_queue_control, float min_rate_vph, float max_rate_vph,Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
+	public static ControllerRampMeterTOD create_controller_tod(FreewayScenario fwyscn,Long id, float dt, float start_time, Float end_time, boolean has_queue_control, float min_rate_vph, float max_rate_vph,Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
 		parameters_check(dt,start_time,end_time);
-		return new ControllerRampMeterTOD(fwyscn,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,act_id,ramp_link_id,lgtype);
+		return new ControllerRampMeterTOD(fwyscn,id,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,act_id,ramp_link_id,lgtype);
 	}
 
-	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn, float dt, float start_time, Float end_time) throws Exception {
+	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,Long id, float dt, float start_time, Float end_time) throws Exception {
 		parameters_check(dt,start_time,end_time);
-		ControllerPolicyHOV ctrl = new ControllerPolicyHOV(fwyscn,dt,start_time,end_time);
+		ControllerPolicyHOV ctrl = new ControllerPolicyHOV(fwyscn,id,dt,start_time,end_time);
 		return ctrl;
 	}
 
-	public static ControllerPolicyHOT create_controller_hot(FreewayScenario fwyscn, float dt, float start_time, Float end_time) throws Exception {
+	public static ControllerPolicyHOT create_controller_hot(FreewayScenario fwyscn,Long id, float dt, float start_time, Float end_time) throws Exception {
 		parameters_check(dt,start_time,end_time);
-		ControllerPolicyHOT ctrl = new ControllerPolicyHOT(fwyscn,dt,start_time,end_time);
+		ControllerPolicyHOT ctrl = new ControllerPolicyHOT(fwyscn,id,dt,start_time,end_time);
 		return ctrl;
 	}
+
+	/////////////////////
+	// sensor
+	/////////////////////
 
 	public static Sensor create_sensor(FreewayScenario fwyscn,Long sensor_id, long link_id, float offset, AbstractController myController){
 		return new Sensor(sensor_id!=null?sensor_id:fwyscn.new_sensor_id(),link_id,offset,myController);
 	}
 
+	/////////////////////
+	// actuator
+	/////////////////////
+
 	public static ActuatorRampMeter create_ramp_meter(FreewayScenario fwyscn,Long act_id,long link_id,LaneGroupType lgtype, AbstractController myController){
 		return new ActuatorRampMeter(act_id!=null?act_id:fwyscn.new_actuator_id(),link_id,lgtype,myController);
 	}
 
-	public static ActuatorPolicy create_policy_actuator(FreewayScenario fwyscn,long link_id,LaneGroupType lgtype, AbstractController myController){
+	public static ActuatorPolicy create_policy_actuator(FreewayScenario fwyscn,Long act_id,long link_id,LaneGroupType lgtype, AbstractController myController){
 		return new ActuatorPolicy(fwyscn.new_actuator_id(),link_id,lgtype,myController);
 	}
 
@@ -130,7 +142,7 @@ public class ControlFactory {
 			}
 //		}
 
-		ControllerRampMeterTOD cntrl = create_controller_tod( fwyscn, jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime(),has_queue_control,min_rate_vph,max_rate_vph,act_id,ramp_link_id,lgtype);
+		ControllerRampMeterTOD cntrl = create_controller_tod(fwyscn,jcnt.getId(),jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime(),has_queue_control,min_rate_vph,max_rate_vph,act_id,ramp_link_id,lgtype);
 
 		cntrl.setId( jcnt.getId() );
 
@@ -139,13 +151,13 @@ public class ControlFactory {
 	}
 
 	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,jaxb.Controller jcnt) throws Exception {
-		ControllerPolicyHOV cntrl = create_controller_hov(fwyscn,jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime());
+		ControllerPolicyHOV cntrl = create_controller_hov(fwyscn,jcnt.getId(),jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime());
 		cntrl.setId( jcnt.getId() );
 		return cntrl;
 	}
 
 	public static ControllerPolicyHOT create_controller_hot(FreewayScenario fwyscn,jaxb.Controller jcnt) throws Exception {
-		ControllerPolicyHOT cntrl = create_controller_hot(fwyscn,jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime());
+		ControllerPolicyHOT cntrl = create_controller_hot(fwyscn,jcnt.getId(),jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime());
 		cntrl.setId( jcnt.getId() );
 		return cntrl;
 	}
