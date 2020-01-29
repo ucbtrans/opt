@@ -89,6 +89,7 @@ import opt.data.LinkOfframp;
 import opt.data.LinkOnramp;
 import opt.data.Schedule;
 import opt.data.control.AbstractController;
+import opt.data.control.AbstractControllerRampMeter;
 import opt.utils.ControlUtils;
 import opt.utils.DoubleSpinnerCell;
 import opt.utils.EditCell;
@@ -120,6 +121,8 @@ public class LinkEditorController {
     private Scene newRampMeterScene = null;
     private RampMeterAlinea rampMeterAlinea = null;
     private Scene rampMeterAlineaScene = null;
+    private RampMeterTOD rampMeterTOD = null;
+    private Scene rampMeterTodScene = null;
     private AbstractLink myLink = null;
     private boolean ignoreChange = true;
     
@@ -132,7 +135,7 @@ public class LinkEditorController {
     private List<Commodity> listVT = new ArrayList<Commodity>();
     
     private Schedule controlSchedule = null;
-    private int max_control_end_time = 0;
+    //private int max_control_end_time = 0;
     private AbstractController newController = null;
     private LaneGroupType newControlLaneGroup = LaneGroupType.gp;
     
@@ -437,6 +440,17 @@ public class LinkEditorController {
         rampMeterAlinea = ctrl;
         rampMeterAlineaScene = scn;
         rampMeterAlineaScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
+    }
+    
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the TOD ramp meter controller that is used to
+     *               edit TOD ramp meter.
+     */
+    public void setRampMeterTodControllerAndScene(RampMeterTOD ctrl, Scene scn) {
+        rampMeterTOD = ctrl;
+        rampMeterTodScene = scn;
+        rampMeterTodScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
     
     
@@ -2088,10 +2102,14 @@ public class LinkEditorController {
             float start = ctrl.getStartTime();
             float end = ctrl.getEndTime();
             String ct = "";
+            String rm_qc = "";
             if (ctrl instanceof opt.data.control.AbstractControllerRampMeter) {
                 ct = "Ramp meter - ";
+                if (((AbstractControllerRampMeter)ctrl).isHas_queue_control())
+                    rm_qc = " with queue control";
             }
-            String buf = Misc.seconds2timestring(start, ":") + " - " + Misc.seconds2timestring(end, ":") + ": " + ct + ctrl.getAlgorithm();
+            String buf = Misc.seconds2timestring(start, ":") + " - " + Misc.seconds2timestring(end, ":") + ": " + ct + ctrl.getAlgorithm() + rm_qc;
+
             Set<LaneGroupType> lgt_set = ctrl.get_lanegroup_types();
             String lgt_s = "";
             for (LaneGroupType lgt : lgt_set) {
@@ -2176,16 +2194,18 @@ public class LinkEditorController {
                                                                     (float)dt,
                                                                     begin_seconds,
                                                                     begin_seconds + 3600f,
-                                                     false,
+                                                                    false,
                                                                     (float)min_rate_vph,
                                                                     (float)max_rate_vph,
                                                                     null,
                                                                     myLink.get_id(),
                                                                     newControlLaneGroup);
             }
+            myLink.get_segment().get_scenario().get_controller_schedule().add_item(newController);
         } catch (Exception e) {
+            newController = null;
             opt.utils.Dialogs.ExceptionDialog("Could not create new ramp meter...", e);
-        }   
+        }
     }
     
     
@@ -2209,6 +2229,10 @@ public class LinkEditorController {
             inputStage.setScene(rampMeterAlineaScene);
             rampMeterAlinea.initWithLinkAndController(myLink, ctrl, isnew);
             inputStage.setTitle("Ramp Meter ALINEA");
+        } else if (ctrl.getAlgorithm().toLowerCase().compareTo("tod") == 0) {
+            inputStage.setScene(rampMeterTodScene);
+            rampMeterTOD.initWithLinkAndController(myLink, ctrl, isnew);
+            inputStage.setTitle("Ramp Meter TOD - Time Of Day Fixed Rate");
         } else {
             // should not end up here...
             opt.utils.Dialogs.ErrorDialog("Ramp meter '" + ctrl.getAlgorithm() + "' is not supported...", "Please, report this problem!");

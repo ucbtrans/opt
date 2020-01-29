@@ -62,6 +62,7 @@ import opt.config.NewLinkController;
 import opt.config.NewRampController;
 import opt.config.NewRampMeterController;
 import opt.config.RampMeterAlinea;
+import opt.config.RampMeterTOD;
 import opt.config.ScenarioEditorController;
 import opt.config.VehicleTypeController;
 import opt.data.*;
@@ -107,6 +108,8 @@ public class AppMainController {
     private NewRampMeterController newRampMeterController = null;
     private GridPane rampMeterAlineaPane = null;
     private RampMeterAlinea rampMeterAlinea = null;
+    private GridPane rampMeterTodPane = null;
+    private RampMeterTOD rampMeterTOD = null;
     
     
     
@@ -313,6 +316,12 @@ public class AppMainController {
             rampMeterAlinea = loader.getController();
             rampMeterAlinea.setLinkEditorController(linkEditorController);
             linkEditorController.setRampMeterAlineaControllerAndScene(rampMeterAlinea, new Scene(rampMeterAlineaPane));
+            
+            loader = new FXMLLoader(getClass().getResource("/rm_tod_editor.fxml"));
+            rampMeterTodPane = loader.load();
+            rampMeterTOD = loader.getController();
+            rampMeterTOD.setLinkEditorController(linkEditorController);
+            linkEditorController.setRampMeterTodControllerAndScene(rampMeterTOD, new Scene(rampMeterTodPane));
             
         } catch (IOException e) {
             opt.utils.Dialogs.ExceptionDialog("Cannot initialize UI modules...", e);
