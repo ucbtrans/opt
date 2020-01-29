@@ -2176,7 +2176,7 @@ public class LinkEditorController {
             if (rampMeteringAlgorithm == control.AbstractController.Algorithm.alinea) {
                 AbstractLink sensor_link = myLink.get_dn_link();
                 newController = ControlFactory.create_controller_alinea(myLink.get_segment().get_scenario(),
-                                                                     null,
+                                                                        null,
                                                                         (float)dt,
                                                                         begin_seconds,
                                                                         begin_seconds + 3600f,
