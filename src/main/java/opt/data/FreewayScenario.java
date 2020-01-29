@@ -195,28 +195,30 @@ public class FreewayScenario {
         }
 
         // assign demands
-        if (jaxb_scenario.getDemands()!=null)
-            for(jaxb.Demand dem : jaxb_scenario.getDemands().getDemand())
+        if (jaxb_scenario.getDemands()!=null) {
+            for (jaxb.Demand dem : jaxb_scenario.getDemands().getDemand())
                 scenario.links.get(dem.getLinkId()).set_demand_vph(
                         dem.getCommodityId(),
                         new Profile1D(
                                 dem.getStartTime(),
                                 dem.getDt(),
                                 OTMUtils.csv2list(dem.getContent())));
+        }
 
         // assign splits
-        if (jaxb_scenario.getSplits()!=null)
-            for(jaxb.SplitNode jsplitnode : jaxb_scenario.getSplits().getSplitNode())
-                for(jaxb.Split split : jsplitnode.getSplit()) {
+        if (jaxb_scenario.getSplits()!=null) {
+            for (jaxb.SplitNode jsplitnode : jaxb_scenario.getSplits().getSplitNode())
+                for (jaxb.Split split : jsplitnode.getSplit()) {
                     AbstractLink link = scenario.links.get(split.getLinkOut());
-                    if( link instanceof LinkOfframp )
-                        ((LinkOfframp)link).set_split(
+                    if (link instanceof LinkOfframp)
+                        ((LinkOfframp) link).set_split(
                                 jsplitnode.getCommodityId(),
                                 new Profile1D(
                                         jsplitnode.getStartTime(),
                                         jsplitnode.getDt(),
                                         OTMUtils.csv2list(split.getContent())));
                 }
+        }
 
         // controller schedule .....................................
         controller_schedule = new Schedule(this);

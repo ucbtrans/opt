@@ -85,10 +85,6 @@ public class Schedule {
 		Collections.sort(items);
 	}
 
-	public void clear(){
-		items.clear();
-	}
-
 	private static boolean interval_overlaps_with(AbstractController a, AbstractController b){
 		return b.getStartTime()<a.getEndTime() && a.getStartTime()<b.getEndTime();
 	}

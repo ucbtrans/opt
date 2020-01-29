@@ -83,41 +83,28 @@
                 </splits>
 
                 <controllers>
-                    <controller id="8" type="alinea" dt="10" start_time="0" end_time="3600">
+                    <controller id="8" type="alinea" dt="10.0" start_time="0.0" end_time="3600.0">
                         <target_actuators ids="8"/>
+                        <feedback_sensors ids="12"/>
                     </controller>
-                    <controller id="11" type="alinea" dt="10" start_time="0" end_time="3600">
+                    <controller id="11" type="alinea" dt="10.0" start_time="0.0" end_time="3600.0">
                         <target_actuators ids="11"/>
+                        <feedback_sensors ids="22"/>
                     </controller>
-<!--                     <controller id="13" type="tod" dt="10" start_time="3600" end_time="7200">
-                        <target_actuators ids="13"/>
-                    </controller> -->
                 </controllers>
 
                 <actuators>
-<!--                     <actuator id="2" type="policy">
-                        <actuator_target id="2" type="link"/>
-                    </actuator>
-                    <actuator id="3" type="policy">
-                        <actuator_target id="3" type="link"/>
-                    </actuator>
-                    <actuator id="4" type="policy">
-                        <actuator_target id="4" type="link"/>
-                    </actuator> -->
-                    <actuator id="8" type="capacity">
+                    <actuator id="8" type="capacity" min_value="100" max_value="900">
                         <actuator_target id="8" type="link"/>
                     </actuator>
-                    <actuator id="11" type="capacity">
+                    <actuator id="11" type="capacity" min_value="100" max_value="900">
                         <actuator_target id="11" type="link"/>
                     </actuator>
-<!--                     <actuator id="13" type="capacity">
-                        <actuator_target id="13" type="link"/>
-                    </actuator> -->
-
-
                 </actuators>
-
-
+                <sensors>
+                    <sensor id="22" type="loop" link_id="2" position="0.0" dt="10.0"/>
+                    <sensor id="12" type="loop" link_id="1" position="0.0" dt="10.0"/>
+                </sensors>
             </scenario>
             <ns2:lnks>
                 <ns2:lnk id="1" name="lA1" is_inner="false"/>

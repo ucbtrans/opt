@@ -2158,14 +2158,17 @@ public class LinkEditorController {
             if (rampMeteringAlgorithm == control.AbstractController.Algorithm.alinea) {
                 AbstractLink sensor_link = myLink.get_dn_link();
                 newController = ControlFactory.create_controller_alinea(myLink.get_segment().get_scenario(),
+                                                                     null,
                                                                         (float)dt,
                                                                         begin_seconds,
                                                                         begin_seconds + 3600f,
                                                                         false,
                                                                         (float)min_rate_vph,
                                                                         (float)max_rate_vph,
+                                                                        null,
                                                                         sensor_link.get_id(),
                                                                         sensor_link.get_length_meters() / 2f,
+                                                                        null,
                                                                         myLink.get_id(),
                                                                         newControlLaneGroup);
             } else if (rampMeteringAlgorithm == control.AbstractController.Algorithm.tod) {
@@ -2176,6 +2179,7 @@ public class LinkEditorController {
                                                      false,
                                                                     (float)min_rate_vph,
                                                                     (float)max_rate_vph,
+                                                                    null,
                                                                     myLink.get_id(),
                                                                     newControlLaneGroup);
             }
