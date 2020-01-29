@@ -86,6 +86,9 @@
                     <controller id="8" type="alinea" dt="10.0" start_time="0.0" end_time="3600.0">
                         <target_actuators ids="8"/>
                         <feedback_sensors ids="12"/>
+                        <parameters>
+                            <parameter name="queue_control" value="true"/>
+                        </parameters>
                     </controller>
                     <controller id="11" type="alinea" dt="10.0" start_time="0.0" end_time="3600.0">
                         <target_actuators ids="11"/>

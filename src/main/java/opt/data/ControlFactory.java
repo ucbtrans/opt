@@ -78,40 +78,48 @@ public class ControlFactory {
 		if(jcnt.getTargetActuators()!=null)
 			assert(jcnt.getTargetActuators().getTargetActuator().isEmpty());
 
-		boolean has_queue_control = false; // TODO FIX THIS
+		LaneGroupType lgtype = LaneGroupType.gp; // TODO FIX THIS
+
+		// read parameters
+		boolean has_queue_control = false;
+		if(jcnt.getParameters()!=null)
+			for(jaxb.Parameter param : jcnt.getParameters().getParameter()){
+				switch(param.getName()){
+					case "queue_control":
+						has_queue_control = param.getValue().equals("true");
+						break;
+					default:
+						throw new Exception("Unknown controller parameter");
+				}
+			}
+
+		// read actuators
 		long act_id = -1l;
 		long ramp_link_id = -1l;
 		float min_rate_vph = -1f;
 		float max_rate_vph = -1f;
+		List<Long> act_ids = OTMUtils.csv2longlist(jcnt.getTargetActuators().getIds());
+		assert(act_ids.size()==1);
+		for(long a : act_ids) {
+			jaxb.Actuator jact = actuator_pool.get(a);
+			act_id = jact.getId();
+			min_rate_vph = jact.getMinValue();
+			max_rate_vph = jact.getMaxValue();
+			ramp_link_id = jact.getActuatorTarget().getId();
+		}
+
+		// read sensors
 		long sensor_id = -1l;
 		long sensor_link_id = -1l;
 		float sensor_offset = -1f;
-		LaneGroupType lgtype = LaneGroupType.gp; // TODO FIX THIS
-
-		// read actuators
-//		if(jcnt.getTargetActuators()!=null){
-			List<Long> act_ids = OTMUtils.csv2longlist(jcnt.getTargetActuators().getIds());
-			assert(act_ids.size()==1);
-			for(long a : act_ids) {
-				jaxb.Actuator jact = actuator_pool.get(a);
-				act_id = jact.getId();
-				min_rate_vph = jact.getMinValue();
-				max_rate_vph = jact.getMaxValue();
-				ramp_link_id = jact.getActuatorTarget().getId();
-			}
-//		}
-
-		// read sensors
-//		if(jcnt.getFeedbackSensors()!=null){
-			List<Long> sens_ids = OTMUtils.csv2longlist(jcnt.getFeedbackSensors().getIds());
-			assert(sens_ids.size()==1);
-			for(long sens_id :sens_ids) {
-				jaxb.Sensor jsns = sensor_pool.get(sens_id);
-				sensor_id = jsns.getId();
-				sensor_link_id = jsns.getLinkId();
-				sensor_offset = jsns.getPosition();
-			}
-//		}
+		List<Long> sens_ids = OTMUtils.csv2longlist(jcnt.getFeedbackSensors().getIds());
+		assert(sens_ids.size()==1);
+		for(long sens_id :sens_ids) {
+			jaxb.Sensor jsns = sensor_pool.get(sens_id);
+			sensor_id = jsns.getId();
+			sensor_link_id = jsns.getLinkId();
+			sensor_offset = jsns.getPosition();
+		}
 
 		ControllerRampMeterAlinea cntrl = create_controller_alinea(fwyscn,jcnt.getId(),jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime(),has_queue_control,min_rate_vph,max_rate_vph,sensor_id,sensor_link_id,sensor_offset,act_id,ramp_link_id,lgtype);
 
@@ -122,25 +130,35 @@ public class ControlFactory {
 
 	public static ControllerRampMeterTOD create_controller_tod(FreewayScenario fwyscn,jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool) throws Exception {
 
-		boolean has_queue_control = false; // TODO FIX THIS
+		LaneGroupType lgtype = LaneGroupType.gp; // TODO FIX THIS
+
+		// read parameters
+		boolean has_queue_control = false;
+		if(jcnt.getParameters()!=null)
+			for(jaxb.Parameter param : jcnt.getParameters().getParameter()){
+				switch(param.getName()){
+					case "queue_control":
+						has_queue_control = param.getValue().equals("true");
+						break;
+					default:
+						throw new Exception("Unknown controller parameter");
+				}
+			}
+
+		// read actuators
 		long act_id = -1l;
 		long ramp_link_id = -1l;
 		float min_rate_vph = -1f;
 		float max_rate_vph = -1f;
-		LaneGroupType lgtype = LaneGroupType.gp; // TODO FIX THIS
-
-		// read actuators
-//		if(jcnt.getTargetActuators()!=null){
-			List<Long> act_ids = OTMUtils.csv2longlist(jcnt.getTargetActuators().getIds());
-			assert(act_ids.size()==1);
-			for(long a : act_ids) {
-				jaxb.Actuator jact = actuator_pool.get(a);
-				act_id = jact.getId();
-				min_rate_vph = jact.getMinValue();
-				max_rate_vph = jact.getMaxValue();
-				ramp_link_id = jact.getActuatorTarget().getId();
-			}
-//		}
+		List<Long> act_ids = OTMUtils.csv2longlist(jcnt.getTargetActuators().getIds());
+		assert(act_ids.size()==1);
+		for(long a : act_ids) {
+			jaxb.Actuator jact = actuator_pool.get(a);
+			act_id = jact.getId();
+			min_rate_vph = jact.getMinValue();
+			max_rate_vph = jact.getMaxValue();
+			ramp_link_id = jact.getActuatorTarget().getId();
+		}
 
 		ControllerRampMeterTOD cntrl = create_controller_tod(fwyscn,jcnt.getId(),jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime(),has_queue_control,min_rate_vph,max_rate_vph,act_id,ramp_link_id,lgtype);
 
