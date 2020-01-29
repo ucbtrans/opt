@@ -15,8 +15,8 @@ public abstract class AbstractController implements Comparable {
 	protected float start_time;
 	protected float end_time;
 	protected control.AbstractController.Algorithm algorithm;
-	protected Map<Long,AbstractActuator> actuators;
-	protected Map<Long,Sensor> sensors;
+	protected Map<Long,AbstractActuator> actuators = new HashMap<>();
+	protected Map<Long,Sensor> sensors = new HashMap<>();
 
 	public AbstractController(long id, float dt, float start_time, Float end_time, control.AbstractController.Algorithm algorithm) throws Exception {
 
@@ -36,14 +36,10 @@ public abstract class AbstractController implements Comparable {
 	}
 
 	protected void add_sensor(Sensor sensor){
-		if(sensors==null)
-			sensors = new HashMap<>();
 		sensors.put(sensor.id,sensor);
 	}
 
 	protected void add_actuator(AbstractActuator actuator){
-		if(actuators==null)
-			actuators = new HashMap<>();
 		actuators.put(actuator.id,actuator);
 	}
 

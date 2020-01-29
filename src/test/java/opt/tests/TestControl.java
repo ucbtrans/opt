@@ -112,7 +112,7 @@ public class TestControl extends AbstractTest{
 					13l,
 					LaneGroupType.gp));
 
-			schedule.add_item(ControlFactory.create_controller_alinea(X.scenario,
+			schedule.add_item(ControlFactory.create_controller_tod(X.scenario,
 					null,
 					3f,
 					3600f,
@@ -121,13 +121,12 @@ public class TestControl extends AbstractTest{
 					100f,
 					900f,
 					null,
-					9l,
-					100f,
-					null,
 					13l,
 					LaneGroupType.gp));
 
 			assertEquals(4,schedule.items.size());
+
+			ProjectFactory.save_project(X.project,get_test_fullpath("project_saved.opt"));
 
 		} catch (Exception e) {
 			e.printStackTrace();
