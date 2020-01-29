@@ -50,6 +50,17 @@ public abstract class AbstractController implements Comparable {
 		j.setStartTime(start_time);
 		j.setEndTime(end_time);
 		j.setType(algorithm.toString());
+		j.setParameters(new jaxb.Parameters());
+
+		// TODO THIS IS TEMPORARY FOR STORING THE ACTUATOR LANE GROUP AS A PARAMETER OF THE CONTROLLER
+		if(actuators!=null && actuators.size()==1){
+			AbstractActuator act = actuators.values().iterator().next();
+
+			jaxb.Parameter param = new jaxb.Parameter();
+			param.setName("lane_group");
+			param.setValue(act.lgtype.toString());
+			j.getParameters().getParameter().add(param);
+		}
 
 		if(actuators!=null && !actuators.isEmpty()){
 			jaxb.TargetActuators tgtacts = new jaxb.TargetActuators();

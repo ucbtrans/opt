@@ -20,14 +20,11 @@ public abstract class AbstractControllerRampMeter extends AbstractController {
     public Controller to_jaxb() {
         Controller cntrl = super.to_jaxb();
 
-        jaxb.Parameters params = new jaxb.Parameters();
-        cntrl.setParameters(params);
-
         // write has_queue_control
         jaxb.Parameter param = new jaxb.Parameter();
         param.setName("queue_control");
         param.setValue(has_queue_control ? "true" : "false");
-        params.getParameter().add(param);
+        cntrl.getParameters().getParameter().add(param);
 
         return cntrl;
     }

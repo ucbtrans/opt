@@ -87,6 +87,7 @@
                         <target_actuators ids="8"/>
                         <feedback_sensors ids="12"/>
                         <parameters>
+                            <parameter name="lane_group" value="aux"/>
                             <parameter name="queue_control" value="true"/>
                         </parameters>
                     </controller>

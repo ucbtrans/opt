@@ -78,15 +78,17 @@ public class ControlFactory {
 		if(jcnt.getTargetActuators()!=null)
 			assert(jcnt.getTargetActuators().getTargetActuator().isEmpty());
 
-		LaneGroupType lgtype = LaneGroupType.gp; // TODO FIX THIS
-
 		// read parameters
 		boolean has_queue_control = false;
+		LaneGroupType lgtype = LaneGroupType.gp;
 		if(jcnt.getParameters()!=null)
 			for(jaxb.Parameter param : jcnt.getParameters().getParameter()){
 				switch(param.getName()){
 					case "queue_control":
 						has_queue_control = param.getValue().equals("true");
+						break;
+					case "lane_group":
+						lgtype = LaneGroupType.valueOf(param.getValue());
 						break;
 					default:
 						throw new Exception("Unknown controller parameter");
@@ -130,15 +132,17 @@ public class ControlFactory {
 
 	public static ControllerRampMeterTOD create_controller_tod(FreewayScenario fwyscn,jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool) throws Exception {
 
-		LaneGroupType lgtype = LaneGroupType.gp; // TODO FIX THIS
-
 		// read parameters
 		boolean has_queue_control = false;
+		LaneGroupType lgtype = LaneGroupType.gp;
 		if(jcnt.getParameters()!=null)
 			for(jaxb.Parameter param : jcnt.getParameters().getParameter()){
 				switch(param.getName()){
 					case "queue_control":
 						has_queue_control = param.getValue().equals("true");
+						break;
+					case "lane_group":
+						lgtype = LaneGroupType.valueOf(param.getValue());
 						break;
 					default:
 						throw new Exception("Unknown controller parameter");
