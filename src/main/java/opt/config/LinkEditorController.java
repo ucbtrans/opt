@@ -1841,14 +1841,14 @@ public class LinkEditorController {
                     lst = new ArrayList<>();
                 }
                 if (lst.size() < 1) {
-                    lst.add(new Double(0));
+                    lst.add(0.0);
                 }
                 numSteps = Math.max(numSteps, lst.size());
                 profiles.add(lst);
             } else {
                 pdt = Math.min(pdt, UserSettings.defaultDemandDtMinutes * 60);
                 List<Double> lst = new ArrayList<>();
-                lst.add(new Double(0));
+                lst.add(0.0);
                 profiles.add(lst);
                 numSteps = Math.max(numSteps, lst.size());
             }
@@ -2002,14 +2002,14 @@ public class LinkEditorController {
                     lst = new ArrayList<>();
                 }
                 if (lst.size() < 1) {
-                    lst.add(new Double(0));
+                    lst.add(0.0);
                 }
                 numSteps = Math.max(numSteps, lst.size());
                 profiles.add(lst);
             } else {
                 pdt = Math.min(pdt, UserSettings.defaultSRDtMinutes * 60);
                 List<Double> lst = new ArrayList<>();
-                lst.add(new Double(0));
+                lst.add(0.0);
                 profiles.add(lst);
                 numSteps = Math.max(numSteps, lst.size());
             }
@@ -2173,7 +2173,6 @@ public class LinkEditorController {
         }
         
         try {
-            System.err.println("BEGIN SECONDS: " + begin_seconds);
             if (rampMeteringAlgorithm == control.AbstractController.Algorithm.alinea) {
                 AbstractLink sensor_link = myLink.get_dn_link();
                 

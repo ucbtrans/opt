@@ -58,6 +58,7 @@ import opt.AppMainController;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
 import opt.simulation.OTMTask;
+import opt.utils.Misc;
 
 
 /**
@@ -116,7 +117,7 @@ public class ScenarioEditorController {
     @FXML // fx:id="timePane"
     private TitledPane timePane; // Value injected by FXMLLoader
     
-     @FXML // fx:id="startTime"
+    @FXML // fx:id="startTime"
     private TextField startTime; // Value injected by FXMLLoader
 
     @FXML // fx:id="sDuration"
@@ -185,8 +186,8 @@ public class ScenarioEditorController {
     @FXML
     void runSimulation(ActionEvent event) {
 
-        float start_time = (float) read_time_in_seconds(startTime.getText());
-        float duration = (float) read_time_in_seconds(sDuration.getText());
+        float start_time = (float) Misc.timeString2Seconds(startTime.getText());
+        float duration = (float) Misc.timeString2Seconds(sDuration.getText());
         int progbar_steps = 50;
 
         Thread th = new Thread(new OTMTask(appMainController,myScenario,start_time,duration,progbar_steps));
@@ -363,7 +364,7 @@ public class ScenarioEditorController {
         if (buf.indexOf(':') == -1)
             return;
 
-        int seconds = read_time_in_seconds(buf);
+        int seconds = Misc.timeString2Seconds(buf);
         
         //TODO: set
     }
@@ -378,17 +379,9 @@ public class ScenarioEditorController {
         if (buf.indexOf(':') == -1)
             return;
 
-        int seconds = read_time_in_seconds(buf);
+        int seconds = Misc.timeString2Seconds(buf);
 
         //TODO: set
-    }
-
-
-    private static int read_time_in_seconds(String buf){
-        String[] hhmm = buf.split(":");
-        int hh = Integer.valueOf(hhmm[0]);
-        int mm = Integer.valueOf(hhmm[1]);
-        return 3600*hh + 60*mm;
     }
     
 }
