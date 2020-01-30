@@ -32,6 +32,11 @@ public class OTMTask  extends Task {
 		// create a runnable OTM scenario
 		try {
 			jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
+
+			// TODO REMOVE THIS ------------------------------------------------
+			remove_bad_stuff(jscenario);
+			// TODO ------------------------------------------------------------
+
 			api.OTM otm = new api.OTM();
 			otm.load_from_jaxb(jscenario,true);
 			this.otmdev = new OTMdev(otm);
@@ -100,6 +105,18 @@ public class OTMTask  extends Task {
 		} catch (OTMException e) {
 			this.exception = e;
 			failed();
+		}
+
+	}
+
+	private static void remove_bad_stuff(jaxb.Scenario scn){
+
+		// remove road geometries (HOV lanes)
+		if(scn.getNetwork().getRoadgeoms()!=null){
+			scn.getNetwork().setRoadgeoms(null);
+			for(jaxb.Link link : scn.getNetwork().getLinks().getLink()){
+				link.setRoadgeom(null);
+			}
 		}
 
 	}
