@@ -28,6 +28,7 @@
 		<xs:complexType>
 			<xs:all>
 				<xs:element ref="otm:scenario" minOccurs="0" maxOccurs="1" />
+				<xs:element ref="opt:sim" minOccurs="0" maxOccurs="1" />
 				<xs:element ref="opt:lnks" minOccurs="0" maxOccurs="1" />
 				<xs:element ref="opt:sgmts" minOccurs="0" maxOccurs="1" />
 			</xs:all>
@@ -37,6 +38,13 @@
 			<!-- Full file name for the scenario. THIS WILL BE REMOVED IN FUTURE VERSIONS -->
 			<xs:attribute name="file" type="xs:string" use="optional" />
 
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="sim">
+		<xs:complexType>
+			<xs:attribute name="starttime" type="xs:float" use="optional" default="0"/>
+			<xs:attribute name="duration" type="xs:float" use="optional" default="86400"/>
 		</xs:complexType>
 	</xs:element>
 

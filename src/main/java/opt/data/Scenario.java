@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.toSet;
 public class Scenario {
 
     protected FreewayScenario my_fwy_scenario;
+
     protected Map<Long, Node> nodes = new HashMap<>();
     protected Map<Long, AbstractLink> links = new HashMap<>();
     protected Map<Long, Commodity> commodities = new HashMap<>();

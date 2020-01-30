@@ -15,7 +15,8 @@ public class Project {
     /////////////////////////////////////
 
     public Project(String scn_name,String scn_description,String sgmt_name,ParametersFreeway params){
-        scenarios.put(scn_name,new FreewayScenario(scn_name,scn_description,sgmt_name,params));
+        FreewayScenario fwyscn = new FreewayScenario(scn_name,scn_description,sgmt_name,params);
+        scenarios.put(scn_name,fwyscn);
     }
 
     public Project(jaxb.Prj project,String folder,boolean validate) throws Exception {
@@ -49,7 +50,7 @@ public class Project {
                 	jaxb_scenario = jaxb_scn.getScenario();
 
                 // build the FreewayScenario and store
-                scenarios.put(scn_name,new FreewayScenario(scn_name,jaxb_scn.getDescription(),jaxb_scn.getLnks(),jaxb_scn.getSgmts(),jaxb_scenario));
+                scenarios.put(scn_name,new FreewayScenario(scn_name,jaxb_scn.getDescription(),jaxb_scn.getSim(),jaxb_scn.getLnks(),jaxb_scn.getSgmts(),jaxb_scenario));
 
             }
 
@@ -131,7 +132,7 @@ public class Project {
     public void create_scenario(String name) throws Exception {
         if( scenarios.containsKey(name))
             throw new Exception("The project already has a scenario by this name.");
-        scenarios.put(name,new FreewayScenario(name,"",null,null,new jaxb.Scenario()));
+        scenarios.put(name,new FreewayScenario(name,"",null,null,null,new jaxb.Scenario()));
     }
 
     /**

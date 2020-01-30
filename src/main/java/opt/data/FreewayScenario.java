@@ -25,6 +25,10 @@ public class FreewayScenario {
     protected Map<Long,Segment> segments = new HashMap<>();
     protected Schedule controller_schedule;
 
+    // simulation parameters
+    protected float sim_start_time = 0f;
+    protected float sim_duration = 86400f;
+
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
@@ -33,7 +37,6 @@ public class FreewayScenario {
     }
 
     public FreewayScenario(String scnname,String description, String segmentname, ParametersFreeway params){
-
         reset_max_ids();
         this.name = scnname;
         this.description = description;
@@ -42,12 +45,17 @@ public class FreewayScenario {
         scenario.commodities.put(0l,new Commodity(0l,"Unnamed commodity",1f));
     }
 
-    public FreewayScenario(String name,String description,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
+    public FreewayScenario(String name,String description,jaxb.Sim sim,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
 
         reset_max_ids();
 
         this.name = name;
         this.description = description;
+
+        if(sim!=null){
+            this.sim_start_time = sim.getStarttime();
+            this.sim_duration = sim.getDuration();
+        }
 
         // create Scenario object
         this.scenario = new Scenario(this,jaxb_scenario);
@@ -303,6 +311,14 @@ public class FreewayScenario {
 
     public Scenario get_scenario(){
         return scenario;
+    }
+
+    public float get_start_time(){
+        return sim_start_time;
+    }
+
+    public float getSim_duration(){
+        return sim_duration;
     }
 
     /////////////////////////////////////
@@ -621,6 +637,11 @@ public class FreewayScenario {
 
         scn.setName(name);
         scn.setDescription(description);
+
+        jaxb.Sim sim = new jaxb.Sim();
+        scn.setSim(sim);
+        sim.setStarttime(sim_start_time);
+        sim.setDuration(sim_duration);
 
         jaxb.Sgmts sgmts = new jaxb.Sgmts();
         scn.setSgmts(sgmts);

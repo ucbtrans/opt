@@ -38,9 +38,9 @@ public class OTMTask  extends Task {
 			jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
 
 			// TODO REMOVE THIS ------------------------------------------------
-			ProjectFactory.save_scenario(jscenario,"/home/gomes/code/opt/before.xml");
+//			ProjectFactory.save_scenario(jscenario,"/home/gomes/code/opt/before.xml");
 			remove_unsimulatable_stuff(jscenario);
-			ProjectFactory.save_scenario(jscenario,"/home/gomes/code/opt/after.xml");
+//			ProjectFactory.save_scenario(jscenario,"/home/gomes/code/opt/after.xml");
 			// TODO ------------------------------------------------------------
 
 			api.OTM otm = new api.OTM();
