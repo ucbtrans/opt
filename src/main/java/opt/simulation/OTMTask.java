@@ -6,6 +6,9 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import opt.AppMainController;
 import opt.data.FreewayScenario;
+import opt.data.ProjectFactory;
+
+import java.util.Iterator;
 
 public class OTMTask  extends Task {
 
@@ -27,14 +30,17 @@ public class OTMTask  extends Task {
 		this.duration = duration;
 
 		// bind the progress bar and make it visible
-		mainController.bindSimProgress(progressProperty());
+		if(mainController!=null)
+			mainController.bindSimProgress(progressProperty());
 
 		// create a runnable OTM scenario
 		try {
 			jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
 
 			// TODO REMOVE THIS ------------------------------------------------
-			remove_bad_stuff(jscenario);
+			ProjectFactory.save_scenario(jscenario,"/home/gomes/code/opt/before.xml");
+			remove_unsimulatable_stuff(jscenario);
+			ProjectFactory.save_scenario(jscenario,"/home/gomes/code/opt/after.xml");
 			// TODO ------------------------------------------------------------
 
 			api.OTM otm = new api.OTM();
@@ -64,7 +70,8 @@ public class OTMTask  extends Task {
 		super.done();
 
 		// unbind progress bar and make it invisible.
-		mainController.unbindSimProgress();
+		if(mainController!=null)
+			mainController.unbindSimProgress();
 	}
 
 	public void run_simulation(){
@@ -93,12 +100,14 @@ public class OTMTask  extends Task {
 				//final AnimationInfo info = otmdev.otm.scenario().get_animation_info();
 
 				// ui manipulations
-				final int ii = steps_taken;
-				Platform.runLater(new Runnable() {
-                    @Override public void run() {
-                        updateProgress(ii, numsteps);
-                    }
-                });
+				if(mainController!=null){
+					final int ii = steps_taken;
+					Platform.runLater(new Runnable() {
+						@Override public void run() {
+							updateProgress(ii, numsteps);
+						}
+					});
+				}
 
 			}
 
@@ -109,13 +118,28 @@ public class OTMTask  extends Task {
 
 	}
 
-	private static void remove_bad_stuff(jaxb.Scenario scn){
+	private static void remove_unsimulatable_stuff(jaxb.Scenario scn){
 
 		// remove road geometries (HOV lanes)
 		if(scn.getNetwork().getRoadgeoms()!=null){
 			scn.getNetwork().setRoadgeoms(null);
 			for(jaxb.Link link : scn.getNetwork().getLinks().getLink()){
 				link.setRoadgeom(null);
+			}
+		}
+
+		// remove controllers on non-gp lanegroups
+		if(scn.getControllers()!=null){
+			Iterator<jaxb.Controller> it = scn.getControllers().getController().iterator();
+			while(it.hasNext()){
+				jaxb.Controller cntrl = it.next();
+				if(cntrl.getParameters()!=null)
+					for(jaxb.Parameter param : cntrl.getParameters().getParameter()){
+						if(param.getName()=="lane_group" && param.getValue()!="gp") {
+							it.remove();
+							continue;
+						}
+					}
 			}
 		}
 

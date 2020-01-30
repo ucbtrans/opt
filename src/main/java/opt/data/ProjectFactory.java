@@ -50,12 +50,18 @@ public class ProjectFactory {
      * @throws Exception
      */
     public static void save_scenario(FreewayScenario scenario,String filePath) throws Exception {
+        create_marshaller(jaxb.Scenario.class).marshal(scenario.scenario.to_jaxb(), (new FileInfo(filePath)).get_scenario_file());
+    }
 
-        // parse the filePath
-        FileInfo file_info = new FileInfo(filePath);
 
-        // save project file
-        create_marshaller(jaxb.Scenario.class).marshal(scenario.scenario.to_jaxb(), file_info.get_scenario_file());
+    /**
+     * Save scenario to xml files
+     * @param scenario
+     * @param filePath Full path and name for the output file. (
+     * @throws Exception
+     */
+    public static void save_scenario(jaxb.Scenario scenario,String filePath) throws Exception {
+        create_marshaller(jaxb.Scenario.class).marshal(scenario, (new FileInfo(filePath)).get_scenario_file());
     }
 
     /**
