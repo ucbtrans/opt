@@ -71,6 +71,9 @@ public class TextFormatting {
                     return String.format("%s:%s", defaultValue.substring(0, 2), defaultValue.substring(2, 4));
                 }
 
+                while (committedText.length() < 4)
+                    committedText = "0" + committedText;
+                
                 if (committedText.length() == 4 && !committedText.matches("\\D+")) {
                     int hh = Integer.valueOf(committedText.substring(0, 2));
                     int mm = Integer.valueOf(committedText.substring(2, 4));
@@ -103,6 +106,9 @@ public class TextFormatting {
                 Matcher m = p.matcher(displayedText);
                 displayedText = m.replaceAll("");
 
+                while (displayedText.length() < 4)
+                    displayedText = "0" + displayedText;
+                
                 if (displayedText.length() != 4) {
                     // user is not done typing the number. Don't commit
                     return null;

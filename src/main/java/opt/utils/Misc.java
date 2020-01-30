@@ -126,11 +126,22 @@ public class Misc {
     
     
     public static int timeString2Seconds(String time_str) {
-        String[] comps = time_str.split(":");
+        String[] comps = (time_str+":00").split(":");
+        if (comps[0].length() < 1)
+            comps[0] = "00";
+        else if (comps[0].length() < 2)
+            comps[0] = "0" + comps[0];
+        
+        if (comps[1].length() < 1)
+            comps[1] = "00";
+        else if (comps[1].length() < 2)
+            comps[1] = "0" + comps[1];
+        
         int seconds = 3600*Integer.parseInt(comps[0]) + 60*Integer.parseInt(comps[1]);
         
         if (comps.length > 2)
-            seconds += Integer.parseInt(comps[2]);
+            if (comps[2].length() > 0)
+                seconds += Integer.parseInt(comps[2]);
         
         return seconds;
     }
