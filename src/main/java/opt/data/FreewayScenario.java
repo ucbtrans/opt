@@ -321,6 +321,15 @@ public class FreewayScenario {
         return sim_duration;
     }
 
+    public void set_start_time(float start_time){
+        this.sim_start_time = start_time;
+    }
+
+    public void setSim_duration(float duration){
+        this.sim_duration = duration;
+    }
+
+
     /////////////////////////////////////
     // API controller
     /////////////////////////////////////
