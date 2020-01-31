@@ -36,6 +36,8 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.adapter.JavaBeanDoublePropertyBuilder;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -786,13 +788,7 @@ public class LinkEditorController {
             }
         });*/
 
-        // TODO GABRIEL DISABLED. THIS WAS THE ONLY COMPILATION ERROR THAT RESULTED FROM GOING TO JAVA11
-//        tableDemand.skinProperty().addListener((obs, oldSkin, newSkin) -> {
-//            final TableHeaderRow header = (TableHeaderRow) tableDemand.lookup("TableHeaderRow");
-//            header.reorderingProperty().addListener((o, oldVal, newVal) -> header.setReordering(false));
-//        });
-        
-
+       
         
         /**
          * Split Ratio pane
@@ -844,14 +840,7 @@ public class LinkEditorController {
         
         tableSR.getSelectionModel().setCellSelectionEnabled(true);
         tableSR.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-        // TODO GABRIEL DISABLED. THIS WAS THE ONLY COMPILATION ERROR THAT RESULTED FROM GOING TO JAVA11
-//        tableSR.skinProperty().addListener((obs, oldSkin, newSkin) -> {
-//            final TableHeaderRow header = (TableHeaderRow) tableSR.lookup("TableHeaderRow");
-//            header.reorderingProperty().addListener((o, oldVal, newVal) -> header.setReordering(false));
-//        });
        
-        
         
         linkEditorCanvas.widthProperty().bind(canvasParent.widthProperty());
         linkEditorCanvas.heightProperty().bind(canvasParent.heightProperty());
@@ -1788,6 +1777,7 @@ public class LinkEditorController {
         colTime.setSortable(false);
         tableDemand.getColumns().add(colTime);
         colTime.prefWidthProperty().bind(tableDemand.widthProperty().multiply(0.09));
+        colTime.setReorderable(false);
         
         Map<Long, Commodity> mapVT = myLink.get_segment().get_scenario().get_commodities();
         mapVT.forEach((k, v) -> {listVT.add(v);});
@@ -1809,6 +1799,7 @@ public class LinkEditorController {
             tableDemand.refresh();
             setDemand();
         });
+        colDemand.setReorderable(false);
         
         List<List<Double>> profiles = new ArrayList<>();
         double pdt = Integer.MAX_VALUE;
@@ -1833,6 +1824,7 @@ public class LinkEditorController {
                 tableDemand.refresh();
                 setDemand();
             });
+            col.setReorderable(false);
             Profile1D cdp = myLink.get_demand_vph(listVT.get(i).getId());
             if (cdp != null) {
                 pdt = Math.min(pdt, cdp.get_dt());
@@ -1966,6 +1958,7 @@ public class LinkEditorController {
         colTime.setSortable(false);
         tableSR.getColumns().add(colTime);
         colTime.prefWidthProperty().bind(tableSR.widthProperty().multiply(0.09));
+        colTime.setReorderable(false);
         
         Map<Long, Commodity> mapVT = myLink.get_segment().get_scenario().get_commodities();
         mapVT.forEach((k, v) -> {listVT.add(v);});
@@ -1994,6 +1987,7 @@ public class LinkEditorController {
                 tableSR.refresh();
                 setSR();
             });
+            col.setReorderable(false);
             Profile1D cdp = ((LinkOfframp)myLink).get_splits(listVT.get(i).getId());
             if (cdp != null) {
                 pdt = Math.min(pdt, cdp.get_dt());
