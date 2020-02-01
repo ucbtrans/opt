@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019, Regents of the University of California
+ * Copyright (c) 2020, Regents of the University of California
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -89,8 +89,8 @@ public class UserSettings {
     public static int defaultSRDtMinutes = 5;
     
     public static int defaultSimulationDtSeconds = 5;
-    public static String defaultStartTime = "0000";
-    public static String defaultSimulationDuration = "2400";
+    public static double defaultStartTime = 0.0;
+    public static double defaultSimulationDuration = 86400.0;
     
     
     public static double minGPRampMeteringRatePerLaneVph = 160;

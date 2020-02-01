@@ -222,12 +222,12 @@ public class ScenarioEditorController {
             onScenarioNameChange(null);
         });
         
-        startTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(opt.UserSettings.defaultStartTime));
+        startTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultStartTime, "")));
         startTime.textProperty().addListener((observable, oldValue, newValue) -> {
             onStartTimeChange(null);
         });
         
-        sDuration.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(opt.UserSettings.defaultSimulationDuration));
+        sDuration.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultSimulationDuration, "")));
         sDuration.textProperty().addListener((observable, oldValue, newValue) -> {
             onDurationChange(null);
         });
@@ -256,9 +256,16 @@ public class ScenarioEditorController {
     
     
     public void initScenarioTiming() {
+        float st = myScenario.get_start_time();
+        if (st == Float.NaN)
+            st = (float)opt.UserSettings.defaultStartTime;
         
-        startTime.setText(opt.UserSettings.defaultStartTime);
-        sDuration.setText(opt.UserSettings.defaultSimulationDuration);
+        float duration = myScenario.getSim_duration();
+        if (duration == Float.NaN)
+            duration = (float)opt.UserSettings.defaultSimulationDuration;
+        
+        startTime.setText(Misc.seconds2timestring(st, ""));
+        sDuration.setText(Misc.seconds2timestring(duration, ""));
         
     }
     
@@ -365,8 +372,8 @@ public class ScenarioEditorController {
             return;
 
         int seconds = Misc.timeString2Seconds(buf);
-        
-        //TODO: set
+        myScenario.set_start_time(seconds);
+        appMainController.setProjectModified(true);
     }
     
     
@@ -380,8 +387,8 @@ public class ScenarioEditorController {
             return;
 
         int seconds = Misc.timeString2Seconds(buf);
-
-        //TODO: set
+        myScenario.setSim_duration(seconds);
+        appMainController.setProjectModified(true);
     }
     
 }

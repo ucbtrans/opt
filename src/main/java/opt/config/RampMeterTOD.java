@@ -109,8 +109,8 @@ public class RampMeterTOD {
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
-        textStartTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(opt.UserSettings.defaultStartTime));
-        textEndTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(opt.UserSettings.defaultStartTime));
+        textStartTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultStartTime, "")));
+        textEndTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultSimulationDuration, "")));
         
         double cap_step = 1;
         if (UserSettings.unitsFlow.equals("vps"))
