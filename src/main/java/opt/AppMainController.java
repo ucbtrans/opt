@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019, Regents of the University of California
+ * Copyright (c) 2020, Regents of the University of California
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,6 @@
  **/
 package opt;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,6 +48,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -110,6 +111,15 @@ public class AppMainController {
     private RampMeterAlinea rampMeterAlinea = null;
     private GridPane rampMeterTodPane = null;
     private RampMeterTOD rampMeterTOD = null;
+    
+    private Image imageLinkFreeway = new Image(getClass().getResourceAsStream("/linkFreeway.gif"));
+    private Image imageLinkOR = new Image(getClass().getResourceAsStream("/linkOR.gif"));
+    private Image imageLinkFR = new Image(getClass().getResourceAsStream("/linkFR.gif"));
+    private Image imageLinkConnector = new Image(getClass().getResourceAsStream("/linkConnector.gif"));
+    private Image imageRoute = new Image(getClass().getResourceAsStream("/Route.gif"));
+    private Image imageScenario = new Image(getClass().getResourceAsStream("/Scenario.gif"));
+    private Image imageFolder = new Image(getClass().getResourceAsStream("/imageFolder.png"));
+ 
     
     
     
@@ -331,8 +341,7 @@ public class AppMainController {
     }
     
     
-    private void populateProjectTree() {
-        
+    private void populateProjectTree() {        
         if (project == null)
             return;
         
@@ -340,15 +349,11 @@ public class AppMainController {
         Collection<FreewayScenario> scenarios = project.get_scenarios();
         for (FreewayScenario scenario : scenarios) {
             String s_nm = "Scenario: " + scenario.name;
-            TreeItem<String> scenario_node = new TreeItem<String>(s_nm);
+            TreeItem<String> scenario_node = new TreeItem<String>(s_nm, new ImageView(imageScenario));
             tree2object.put(scenario_node, scenario);
             object2tree.put(scenario, scenario_node);
             
-            // We'll display vehicle types on scenario level
-            //TreeItem<String> commodities_node = new TreeItem<String>("Traffic Types");
-            //scenario_node.getChildren().add(commodities_node);
-            
-            TreeItem<String> links_node = new TreeItem<String>(roadLinksTreeItem);
+            TreeItem<String> links_node = new TreeItem<String>(roadLinksTreeItem, new ImageView(imageFolder));
             scenario_node.getChildren().add(links_node);
             for (List<Segment> seg_list : scenario.get_linear_freeway_segments()) {
                 for (Segment segment : seg_list) {
@@ -374,7 +379,15 @@ public class AppMainController {
                         if ((link == null) || (object2tree.containsKey(link))) {
                             continue;
                         }
-                        TreeItem<String> link_node = new TreeItem<String>(link.get_name());
+                        ImageView imageView = new ImageView(imageLinkFreeway);
+                        if (link.get_type() == AbstractLink.Type.connector) {
+                            imageView = new ImageView(imageLinkConnector);
+                        } else if (link.get_type() == AbstractLink.Type.onramp) {
+                            imageView = new ImageView(imageLinkOR);
+                        } else if (link.get_type() == AbstractLink.Type.offramp) {
+                            imageView = new ImageView(imageLinkFR);
+                        }
+                        TreeItem<String> link_node = new TreeItem<String>(link.get_name(), imageView);
                         tree2object.put(link_node, link);
                         object2tree.put(link, link_node);
                         links_node.getChildren().add(link_node);
@@ -386,20 +399,20 @@ public class AppMainController {
                 if ((link == null) || (object2tree.containsKey(link))) {
                     continue;
                 }
-                TreeItem<String> link_node = new TreeItem<String>(link.get_name());
+                TreeItem<String> link_node = new TreeItem<String>(link.get_name(), new ImageView(imageLinkConnector));
                 tree2object.put(link_node, link);
                 object2tree.put(link, link_node);
                 links_node.getChildren().add(link_node);
             }
             
             
-            TreeItem<String> routes_node = new TreeItem<String>(routesTreeItem);    
+            TreeItem<String> routes_node = new TreeItem<String>(routesTreeItem, new ImageView(imageFolder));    
             scenario_node.getChildren().add(routes_node);
             
             //TreeItem<String> controllers_node = new TreeItem<String>(controllersTreeItem);    
             //scenario_node.getChildren().add(controllers_node);
             
-            TreeItem<String> events_node = new TreeItem<String>(eventsTreeItem);    
+            TreeItem<String> events_node = new TreeItem<String>(eventsTreeItem, new ImageView(imageFolder));    
             scenario_node.getChildren().add(events_node);
             
             root.getChildren().add(scenario_node);
