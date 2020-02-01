@@ -41,4 +41,8 @@ public class ControllerRampMeterAlinea extends AbstractControllerRampMeter {
 		sensor.offset = sensor_offset_m;
 	}
 
+	@Override
+	public String getAlgorithm() {
+		return "Alinea";
+	}
 }

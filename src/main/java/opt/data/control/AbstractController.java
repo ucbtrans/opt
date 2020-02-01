@@ -18,6 +18,8 @@ public abstract class AbstractController implements Comparable {
 	protected Map<Long,AbstractActuator> actuators = new HashMap<>();
 	protected Map<Long,Sensor> sensors = new HashMap<>();
 
+	abstract public String getAlgorithm();
+
 	public AbstractController(long id, float dt, float start_time, Float end_time, control.AbstractController.Algorithm algorithm) throws Exception {
 
 		// CHECKS
@@ -133,14 +135,6 @@ public abstract class AbstractController implements Comparable {
 
 	public void setEndTime(float end_time) {
 		this.end_time = end_time;
-	}
-
-	public String getAlgorithm() {
-		return algorithm.toString();
-	}
-
-	public void setAlgorithm(String algorithm) {
-		this.algorithm = control.AbstractController.Algorithm.valueOf(algorithm);
 	}
 
 	public Map<Long,AbstractActuator> get_actuators(){

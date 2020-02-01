@@ -8,6 +8,7 @@ import java.util.*;
 
 public class ControllerRampMeterTOD extends AbstractControllerRampMeter {
 
+
 	class TODEntry implements Comparable<TODEntry>{
 		public float time;
 		public float rate_vph;
@@ -26,7 +27,7 @@ public class ControllerRampMeterTOD extends AbstractControllerRampMeter {
 
 	public ControllerRampMeterTOD(FreewayScenario scn,Long id, float dt, float start_time, Float end_time, boolean has_queue_control, float min_rate_vph, float max_rate_vph,Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
 		super(id!=null ? id : scn.new_controller_id(),
-				dt,start_time,end_time,control.AbstractController.Algorithm.tod,has_queue_control,min_rate_vph,max_rate_vph);
+				dt,start_time,end_time,control.AbstractController.Algorithm.fixed_rate,has_queue_control,min_rate_vph,max_rate_vph);
 
 		// ramp meter actuator
 		add_actuator(ControlFactory.create_ramp_meter(scn,act_id,ramp_link_id,lgtype,this));
@@ -58,4 +59,8 @@ public class ControllerRampMeterTOD extends AbstractControllerRampMeter {
 		return entries;
 	}
 
+	@Override
+	public String getAlgorithm() {
+		return "TOD";
+	}
 }

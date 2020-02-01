@@ -14,7 +14,7 @@ public class ControlFactory {
 	public static Set<control.AbstractController.Algorithm> get_available_ramp_metering_algorithms(){
 		Set<control.AbstractController.Algorithm> x = new HashSet<>();
 		x.add(control.AbstractController.Algorithm.alinea);
-		x.add(control.AbstractController.Algorithm.tod);
+		x.add(control.AbstractController.Algorithm.fixed_rate);
 		return x;
 	}
 

@@ -2184,7 +2184,7 @@ public class LinkEditorController {
                                                                         null,
                                                                         myLink.get_id(),
                                                                         newControlLaneGroup);
-            } else if (rampMeteringAlgorithm == control.AbstractController.Algorithm.tod) {
+            } else if (rampMeteringAlgorithm == control.AbstractController.Algorithm.fixed_rate) {
                 newController = ControlFactory.create_controller_tod(myLink.get_segment().get_scenario(),
                                                                     null,
                                                                     (float)dt,
