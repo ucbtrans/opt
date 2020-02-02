@@ -116,10 +116,10 @@ public class AppMainController {
     private GridPane rampMeterTodPane = null;
     private RampMeterTOD rampMeterTOD = null;
     
-    private Image imageLinkFreeway = new Image(getClass().getResourceAsStream("/linkFreeway.gif"));
-    private Image imageLinkOR = new Image(getClass().getResourceAsStream("/linkOR.gif"));
-    private Image imageLinkFR = new Image(getClass().getResourceAsStream("/linkFR.gif"));
-    private Image imageLinkConnector = new Image(getClass().getResourceAsStream("/linkConnector.gif"));
+    private Image imageLinkFreeway = new Image(getClass().getResourceAsStream("/LinkFreeway.gif"));
+    private Image imageLinkOR = new Image(getClass().getResourceAsStream("/LinkOR.gif"));
+    private Image imageLinkFR = new Image(getClass().getResourceAsStream("/LinkFR.gif"));
+    private Image imageLinkConnector = new Image(getClass().getResourceAsStream("/LinkConnector.gif"));
     private Image imageRoute = new Image(getClass().getResourceAsStream("/Route.gif"));
     private Image imageScenario = new Image(getClass().getResourceAsStream("/Scenario.gif"));
     private Image imageFolder = new Image(getClass().getResourceAsStream("/imageFolder.png"));
