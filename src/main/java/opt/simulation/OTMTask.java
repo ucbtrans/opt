@@ -69,11 +69,21 @@ public class OTMTask  extends Task {
 	protected void done() {
 		super.done();
 
+                Platform.runLater(new Runnable() {
+			@Override
+                        public void run() {
+                                // unbind progress bar and make it invisible.
+                                if (mainController!=null) {
+                                        mainController.unbindSimProgress();
+                                        mainController.completeSimulation();
+                                }
+			}
+		});
 		// unbind progress bar and make it invisible.
-		if(mainController!=null) {
+		/*if(mainController!=null) {
 			mainController.unbindSimProgress();
                         mainController.completeSimulation();
-                }
+                }*/
 	}
 
 	public void run_simulation(){

@@ -131,6 +131,10 @@ public class ScenarioEditorController {
     private TitledPane eventPane; // Value injected by FXMLLoader
 
    
+    
+    public Button getRunSimulationButton() {
+        return runSimulationButton;
+    }
 
 
     public void setPrimaryStage(Stage s) {

@@ -289,13 +289,15 @@ public class AppMainController {
         th.setDaemon(true);
         th.start();
         leftStatus.setText("Simulating scenario \"" + selectedScenario.name + "\"...");
+        scenarioEditorController.getRunSimulationButton().setDisable(true);
     }
     
     
     public void completeSimulation() {
-        //leftStatus.setText("Simulation completed!");
+        scenarioEditorController.getRunSimulationButton().setDisable(false);
         reportTabPane.setDisable(false);
-        //actionPane.getSelectionModel().selectLast();
+        leftStatus.setText("Simulation completed!");
+        actionPane.getSelectionModel().selectLast();
     }
 
     
@@ -633,7 +635,8 @@ public class AppMainController {
     
     
     void onSelectTabInActionPane() {
-        leftStatus.setText("");
+        if (actionPane.getSelectionModel().getSelectedItem().equals(configTabPane))
+            leftStatus.setText("");
     }
     
     
