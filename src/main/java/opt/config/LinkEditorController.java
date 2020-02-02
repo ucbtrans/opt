@@ -2263,6 +2263,11 @@ public class LinkEditorController {
         int idx = listControllers.getSelectionModel().getSelectedIndex();
         if ((idx < 0) || (idx >= controlSchedule.get_num_items()))
             return;
+        
+        String header = "You are deleting controller '" + listControllers.getItems().get(idx) + "'...";       
+        if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
+            return;
+        
         myLink.get_segment().get_scenario().get_controller_schedule().delete_controller(controlSchedule.items.get(idx));
         refreshControllerList();
         appMainController.setProjectModified(true);
