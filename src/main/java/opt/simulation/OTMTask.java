@@ -6,7 +6,6 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import opt.AppMainController;
 import opt.data.FreewayScenario;
-import opt.data.ProjectFactory;
 
 import java.util.Iterator;
 
@@ -31,7 +30,7 @@ public class OTMTask  extends Task {
 
 		// bind the progress bar and make it visible
 		if(mainController!=null)
-			mainController.bindSimProgress(progressProperty());
+			mainController.bindProgressBar(progressProperty());
 
 		// create a runnable OTM scenario
 		try {
@@ -68,22 +67,10 @@ public class OTMTask  extends Task {
 	@Override
 	protected void done() {
 		super.done();
-
-                Platform.runLater(new Runnable() {
-			@Override
-                        public void run() {
-                                // unbind progress bar and make it invisible.
-                                if (mainController!=null) {
-                                        mainController.unbindSimProgress();
-                                        mainController.completeSimulation();
-                                }
-			}
+		Platform.runLater(() -> {
+			if (mainController!=null)
+				mainController.completeSimulation();
 		});
-		// unbind progress bar and make it invisible.
-		/*if(mainController!=null) {
-			mainController.unbindSimProgress();
-                        mainController.completeSimulation();
-                }*/
 	}
 
 	public void run_simulation(){

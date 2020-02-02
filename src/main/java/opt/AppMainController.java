@@ -27,14 +27,12 @@ package opt;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
 import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
 import javafx.event.ActionEvent;
@@ -70,7 +68,6 @@ import opt.config.ScenarioEditorController;
 import opt.config.VehicleTypeController;
 import opt.data.*;
 import opt.simulation.OTMTask;
-import opt.utils.Misc;
 
 
 /**
@@ -263,12 +260,12 @@ public class AppMainController {
         leftStatus.setText(status);   
     }
     
-    public void bindSimProgress(ReadOnlyDoubleProperty prop) {
+    public void bindProgressBar(ReadOnlyDoubleProperty prop) {
         simProgressBar.progressProperty().bind(prop);
         simProgressBar.setVisible(true);
     }
 
-    public void unbindSimProgress() {
+    public void unbindProgressBar() {
         simProgressBar.progressProperty().unbind();
         simProgressBar.setVisible(false);
     }
@@ -294,6 +291,7 @@ public class AppMainController {
     
     
     public void completeSimulation() {
+        unbindProgressBar();
         scenarioEditorController.getRunSimulationButton().setDisable(false);
         reportTabPane.setDisable(false);
         leftStatus.setText("Simulation completed!");
