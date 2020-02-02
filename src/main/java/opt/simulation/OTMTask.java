@@ -70,8 +70,10 @@ public class OTMTask  extends Task {
 		super.done();
 
 		// unbind progress bar and make it invisible.
-		if(mainController!=null)
+		if(mainController!=null) {
 			mainController.unbindSimProgress();
+                        mainController.completeSimulation();
+                }
 	}
 
 	public void run_simulation(){

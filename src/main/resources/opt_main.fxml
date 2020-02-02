@@ -14,8 +14,9 @@
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
@@ -90,9 +91,19 @@
             <AnchorPane id="infoAnchorPane" fx:id="infoAnchorPane" minHeight="200.0" minWidth="200.0" />
       </items>
     </SplitPane>
-    <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
-      <children>
-        <Label id="leftStatus" fx:id="leftStatus" maxHeight="1.7976931348623157E308" maxWidth="-1.0" HBox.hgrow="ALWAYS">
+      <GridPane>
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="1012.6666259765625" minWidth="10.0" prefWidth="956.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="590.6666870117188" minWidth="10.0" prefWidth="244.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints />
+        </rowConstraints>
+         <padding>
+            <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
+         </padding>
+         <children>
+        <Label id="leftStatus" fx:id="leftStatus" maxWidth="-1.0" minWidth="950.0" prefHeight="16.0" prefWidth="950.0">
           <font>
             <Font size="11.0" fx:id="x3" />
           </font>
@@ -100,12 +111,8 @@
             <Color blue="0.625" green="0.625" red="0.625" fx:id="x4" />
           </textFill>
         </Label>
-        <Pane prefHeight="18.0" prefWidth="925.0" HBox.hgrow="ALWAYS" />
-            <ProgressBar id="simProgressBar" fx:id="simProgressBar" prefHeight="18.0" prefWidth="239.0" progress="0.0" />
-      </children>
-      <padding>
-        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
-      </padding>
-    </HBox>
+            <ProgressBar id="simProgressBar" fx:id="simProgressBar" minWidth="231.0" prefHeight="18.0" prefWidth="245.0" progress="0.0" GridPane.columnIndex="1" />
+         </children>
+      </GridPane>
   </children>
 </VBox>

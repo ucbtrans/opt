@@ -44,6 +44,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
@@ -185,14 +186,7 @@ public class ScenarioEditorController {
      */
     @FXML
     void runSimulation(ActionEvent event) {
-
-        float start_time = (float) Misc.timeString2Seconds(startTime.getText());
-        float duration = (float) Misc.timeString2Seconds(sDuration.getText());
-        int progbar_steps = 50;
-
-        Thread th = new Thread(new OTMTask(appMainController,myScenario,start_time,duration,progbar_steps));
-        th.setDaemon(true);
-        th.start();
+        appMainController.runSimulation();
     }
 
     
@@ -231,7 +225,6 @@ public class ScenarioEditorController {
         sDuration.textProperty().addListener((observable, oldValue, newValue) -> {
             onDurationChange(null);
         });
-        
     }
     
      

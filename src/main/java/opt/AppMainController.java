@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
 import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -243,6 +245,20 @@ public class AppMainController {
     }
     
     
+    private void setSelectedScenario(TreeItem<String> treeItem) {
+        selectedScenario = null;
+        TreeItem<String> p = treeItem;
+        while (!p.equals(projectTree.getRoot())) {
+            Object obj = tree2object.get(treeItem);
+            if (obj instanceof FreewayScenario) {
+                selectedScenario = (FreewayScenario)obj;
+                return;
+            }
+            p = p.getParent();
+        }
+    }
+    
+    
     public void setLeftStatus(String status) {
         leftStatus.setText(status);   
     }
@@ -272,13 +288,14 @@ public class AppMainController {
         Thread th = new Thread(new OTMTask(this,selectedScenario,start_time,duration,progbar_steps));
         th.setDaemon(true);
         th.start();
+        leftStatus.setText("Simulating scenario \"" + selectedScenario.name + "\"...");
     }
     
     
     public void completeSimulation() {
-        leftStatus.setText("Simulation completed!");
+        //leftStatus.setText("Simulation completed!");
         reportTabPane.setDisable(false);
-        actionPane.getSelectionModel().selectLast();
+        //actionPane.getSelectionModel().selectLast();
     }
 
     
@@ -295,6 +312,10 @@ public class AppMainController {
         // Tree action listener
         projectTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
            processTreeSelection((TreeItem<String>)newValue); 
+        });
+        
+        actionPane.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Tab> observable, Tab oldTab, Tab newTab) -> {
+           onSelectTabInActionPane();
         });
         
         simProgressBar.setVisible(false);
@@ -611,11 +632,20 @@ public class AppMainController {
     }
     
     
+    void onSelectTabInActionPane() {
+        leftStatus.setText("");
+    }
+    
+    
     private void processTreeSelection(TreeItem<String> treeItem) {
+        leftStatus.setText("");
+        selectedScenario = null;
         if (treeItem == null)
             return;
         if (treeItem.equals(projectTree.getRoot()))
             return;
+        
+        setSelectedScenario(treeItem);
         
         Object obj = tree2object.get(treeItem);
         if (obj == null) {
@@ -780,6 +810,7 @@ public class AppMainController {
      ***************************************************************************/
     
     private void reset() {
+        selectedScenario = null;
         setProjectModified(false);
         projectFilePath = null;
         tree2object = new HashMap<TreeItem, Object>();
@@ -788,7 +819,9 @@ public class AppMainController {
         if (projectTree.getRoot() != null)
             projectTree.getRoot().getChildren().clear();
         
+        leftStatus.setText("");
         actionPane.getSelectionModel().select(configTabPane);
+        reportTabPane.setDisable(true);
         configAnchorPane.getChildren().clear();
         infoAnchorPane.getChildren().clear();
 
