@@ -67,6 +67,8 @@ import opt.config.RampMeterTOD;
 import opt.config.ScenarioEditorController;
 import opt.config.VehicleTypeController;
 import opt.data.*;
+import opt.simulation.OTMTask;
+import opt.utils.Misc;
 
 
 /**
@@ -120,7 +122,7 @@ public class AppMainController {
     private Image imageScenario = new Image(getClass().getResourceAsStream("/Scenario.gif"));
     private Image imageFolder = new Image(getClass().getResourceAsStream("/imageFolder.png"));
  
-    
+    private FreewayScenario selectedScenario = null;
     
     
     @FXML // fx:id="topPane"
@@ -158,9 +160,6 @@ public class AppMainController {
     
     @FXML // fx:id="configAnchorPane"
     private AnchorPane configAnchorPane; // Value injected by FXMLLoader
-    
-    @FXML // fx:id="simTabPane"
-    private Tab simTabPane; // Value injected by FXMLLoader
 
     @FXML // fx:id="reportTabPane"
     private Tab reportTabPane; // Value injected by FXMLLoader
@@ -193,6 +192,14 @@ public class AppMainController {
     
     public NewLinkController getNewLinkController() {
         return newLinkController;
+    }
+    
+    public Label getLeftStatus() {
+        return leftStatus;
+    }
+    
+    public Tab getReportTabPane() {
+        return reportTabPane;
     }
 
     
@@ -251,6 +258,28 @@ public class AppMainController {
     }
     
     
+    /**
+     * Start simulation of the selected scenario.
+     */
+    public void runSimulation() {
+        if (selectedScenario == null)
+            return;
+
+        float start_time = selectedScenario.get_start_time();
+        float duration = selectedScenario.getSim_duration();
+        int progbar_steps = 50;
+
+        Thread th = new Thread(new OTMTask(this,selectedScenario,start_time,duration,progbar_steps));
+        th.setDaemon(true);
+        th.start();
+    }
+    
+    
+    public void completeSimulation() {
+        leftStatus.setText("Simulation completed!");
+        reportTabPane.setDisable(false);
+        actionPane.getSelectionModel().selectLast();
+    }
 
     
     
@@ -341,7 +370,12 @@ public class AppMainController {
     }
     
     
-    private void populateProjectTree() {        
+    private void populateProjectTree() {
+        selectedScenario = null;
+        leftStatus.setText("");
+        reportTabPane.setDisable(true);
+        actionPane.getSelectionModel().selectFirst();
+        
         if (project == null)
             return;
         
@@ -360,22 +394,42 @@ public class AppMainController {
                     if (segment == null)
                         continue;
                     
-                    ArrayList<AbstractLink> link_list = new ArrayList<AbstractLink>();
-                    link_list.add(segment.fwy());
-                    int num_ramps = segment.num_out_ors();
-                    for (int i = 0; i < num_ramps; i++)
-                        link_list.add(segment.out_ors(i));
-                    num_ramps = segment.num_in_ors();
-                    for (int i = 0; i < num_ramps; i++)
-                        link_list.add(segment.in_ors(i));
-                    num_ramps = segment.num_out_frs();
-                    for (int i = 0; i < num_ramps; i++)
-                        link_list.add(segment.out_frs(i));
-                    num_ramps = segment.num_in_frs();
-                    for (int i = 0; i < num_ramps; i++)
-                        link_list.add(segment.in_frs(i));
+                    AbstractLink link = segment.fwy();
+                    TreeItem<String> seg_node = new TreeItem<String>(link.get_name(), new ImageView(imageLinkFreeway));
+                    tree2object.put(seg_node, link);
+                    object2tree.put(link, seg_node);
+                    links_node.getChildren().add(seg_node);
+
+                    for (int i = 0; i < segment.num_out_ors(); i++) {
+                        link = segment.out_ors(i);
+                        TreeItem<String> link_node = new TreeItem<String>(link.get_name(), new ImageView(imageLinkOR));
+                        tree2object.put(link_node, link);
+                        object2tree.put(link, link_node);
+                        seg_node.getChildren().add(link_node);
+                    }
+                    for (int i = 0; i < segment.num_in_ors(); i++) {
+                        link = segment.in_ors(i);
+                        TreeItem<String> link_node = new TreeItem<String>(link.get_name(), new ImageView(imageLinkOR));
+                        tree2object.put(link_node, link);
+                        object2tree.put(link, link_node);
+                        seg_node.getChildren().add(link_node);
+                    }
+                    for (int i = 0; i < segment.num_out_frs(); i++) {
+                        link = segment.out_frs(i);
+                        TreeItem<String> link_node = new TreeItem<String>(link.get_name(), new ImageView(imageLinkFR));
+                        tree2object.put(link_node, link);
+                        object2tree.put(link, link_node);
+                        seg_node.getChildren().add(link_node);
+                    }
+                    for (int i = 0; i < segment.num_in_frs(); i++) {
+                        link = segment.in_frs(i);
+                        TreeItem<String> link_node = new TreeItem<String>(link.get_name(), new ImageView(imageLinkFR));
+                        tree2object.put(link_node, link);
+                        object2tree.put(link, link_node);
+                        seg_node.getChildren().add(link_node);
+                    }
                     
-                    for (AbstractLink link : link_list) {
+                    /*for (AbstractLink link : link_list) {
                         if ((link == null) || (object2tree.containsKey(link))) {
                             continue;
                         }
@@ -391,7 +445,7 @@ public class AppMainController {
                         tree2object.put(link_node, link);
                         object2tree.put(link, link_node);
                         links_node.getChildren().add(link_node);
-                    }
+                    }*/
                 }
             }
             
@@ -405,12 +459,8 @@ public class AppMainController {
                 links_node.getChildren().add(link_node);
             }
             
-            
             TreeItem<String> routes_node = new TreeItem<String>(routesTreeItem, new ImageView(imageFolder));    
             scenario_node.getChildren().add(routes_node);
-            
-            //TreeItem<String> controllers_node = new TreeItem<String>(controllersTreeItem);    
-            //scenario_node.getChildren().add(controllers_node);
             
             TreeItem<String> events_node = new TreeItem<String>(eventsTreeItem, new ImageView(imageFolder));    
             scenario_node.getChildren().add(events_node);
@@ -556,7 +606,7 @@ public class AppMainController {
     
     @FXML
     void onClickMenuHelpAbout(ActionEvent event) {
-        String version = "2019-10-21";
+        String version = "2020-02-06";
         opt.utils.Dialogs.InformationDialog(null, "OPT development version " + version);
     }
     
@@ -567,42 +617,45 @@ public class AppMainController {
         if (treeItem.equals(projectTree.getRoot()))
             return;
         
-        if (treeItem.isLeaf()) {
-            if (treeItem.getParent().getValue() == roadLinksTreeItem) { //a link was selected
-                configAnchorPane.getChildren().clear();
-                configAnchorPane.getChildren().setAll(linkEditorPane);
-                configAnchorPane.setTopAnchor(linkEditorPane, 0.0);
-                configAnchorPane.setBottomAnchor(linkEditorPane, 0.0);
-                configAnchorPane.setLeftAnchor(linkEditorPane, 0.0);
-                configAnchorPane.setRightAnchor(linkEditorPane, 0.0);
-                
-                infoAnchorPane.getChildren().clear();
-                infoAnchorPane.getChildren().setAll(linkInfoPane);
-                infoAnchorPane.setTopAnchor(linkInfoPane, 0.0);
-                infoAnchorPane.setBottomAnchor(linkInfoPane, 0.0);
-                infoAnchorPane.setLeftAnchor(linkInfoPane, 0.0);
-                infoAnchorPane.setRightAnchor(linkInfoPane, 0.0);
-
-                AbstractLink lnk = (AbstractLink)tree2object.get(treeItem);
-                if (lnk != null) {
-                    linkEditorController.initWithLinkData(lnk);
-                    linkInfoController.initWithLinkData(lnk);
-                }
-            }
-        } else {
+        Object obj = tree2object.get(treeItem);
+        if (obj == null) {
             configAnchorPane.getChildren().clear();
             infoAnchorPane.getChildren().clear();
-            
-            Object scenario = (FreewayScenario)tree2object.get(treeItem);
-            if (scenario != null) {
-                configAnchorPane.getChildren().clear();
-                configAnchorPane.getChildren().setAll(scenarioEditorPane);
-                configAnchorPane.setTopAnchor(scenarioEditorPane, 0.0);
-                configAnchorPane.setBottomAnchor(scenarioEditorPane, 0.0);
-                configAnchorPane.setLeftAnchor(scenarioEditorPane, 0.0);
-                configAnchorPane.setRightAnchor(scenarioEditorPane, 0.0);
-                scenarioEditorController.initWithScenarioData((FreewayScenario)scenario);
+            return;
+        }
+        
+        if (obj instanceof AbstractLink) {
+            configAnchorPane.getChildren().clear();
+            configAnchorPane.getChildren().setAll(linkEditorPane);
+            configAnchorPane.setTopAnchor(linkEditorPane, 0.0);
+            configAnchorPane.setBottomAnchor(linkEditorPane, 0.0);
+            configAnchorPane.setLeftAnchor(linkEditorPane, 0.0);
+            configAnchorPane.setRightAnchor(linkEditorPane, 0.0);
+                
+            infoAnchorPane.getChildren().clear();
+            infoAnchorPane.getChildren().setAll(linkInfoPane);
+            infoAnchorPane.setTopAnchor(linkInfoPane, 0.0);
+            infoAnchorPane.setBottomAnchor(linkInfoPane, 0.0);
+            infoAnchorPane.setLeftAnchor(linkInfoPane, 0.0);
+            infoAnchorPane.setRightAnchor(linkInfoPane, 0.0);
+
+            AbstractLink lnk = (AbstractLink)obj;
+            if (lnk != null) {
+                linkEditorController.initWithLinkData(lnk);
+                linkInfoController.initWithLinkData(lnk);
             }
+        }
+
+        if (obj instanceof FreewayScenario) {
+            configAnchorPane.getChildren().clear();
+            infoAnchorPane.getChildren().clear();
+            configAnchorPane.getChildren().clear();
+            configAnchorPane.getChildren().setAll(scenarioEditorPane);
+            configAnchorPane.setTopAnchor(scenarioEditorPane, 0.0);
+            configAnchorPane.setBottomAnchor(scenarioEditorPane, 0.0);
+            configAnchorPane.setLeftAnchor(scenarioEditorPane, 0.0);
+            configAnchorPane.setRightAnchor(scenarioEditorPane, 0.0);
+            scenarioEditorController.initWithScenarioData((FreewayScenario)obj);
         }
         
     }
