@@ -247,7 +247,7 @@ public class FreewayScenario {
             for(jaxb.Controller jcnt : jaxb_scenario.getControllers().getController()){
                 AbstractController cnt;
                 switch( jcnt.getType()){
-                    case "tod":
+                    case "fixed_rate":
                         cnt = ControlFactory.create_controller_tod(this, jcnt,actuators);
                         break;
                     case "alinea":
