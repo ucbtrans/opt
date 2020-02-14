@@ -22,6 +22,11 @@ public class TestSimulation extends AbstractTest {
         th.start();
     }
 
+    @Test
+    public void test_get_results(){
+
+    }
+
     private static OTMTask load_task(){
 
         String project_file_name = get_test_fullpath("project_saved.opt");

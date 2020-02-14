@@ -1,12 +1,12 @@
 package opt.simulation;
 
 import api.OTMdev;
+import common.Link;
 import error.OTMException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import opt.AppMainController;
 import opt.data.FreewayScenario;
-import opt.data.ProjectFactory;
 
 import java.util.Iterator;
 
@@ -18,7 +18,7 @@ public class OTMTask  extends Task {
 	private float start_time;
 	private float duration;
 	private int numsteps;
-	private int step_per_update;
+	private int step_per_progbar_update;
 	private AppMainController mainController;
 	private float simdt;
 
@@ -55,7 +55,7 @@ public class OTMTask  extends Task {
 		this.numsteps = (int) Math.ceil(duration/simdt);
 
 		// number of steps per progrbar update
-		this.step_per_update = Math.max( numsteps / progbar_steps , 1);
+		this.step_per_progbar_update = Math.max( numsteps / progbar_steps , 1);
 
 	}
 
@@ -69,50 +69,43 @@ public class OTMTask  extends Task {
 	protected void done() {
 		super.done();
 
-                Platform.runLater(new Runnable() {
+		Platform.runLater(new Runnable() {
 			@Override
-                        public void run() {
-                                // unbind progress bar and make it invisible.
-                                if (mainController!=null) {
-                                        mainController.unbindSimProgress();
-                                        mainController.completeSimulation();
-                                }
+			public void run() {
+				// unbind progress bar and make it invisible.
+				if (mainController!=null) {
+					mainController.unbindSimProgress();
+					mainController.completeSimulation();
+				}
 			}
 		});
-		// unbind progress bar and make it invisible.
-		/*if(mainController!=null) {
-			mainController.unbindSimProgress();
-                        mainController.completeSimulation();
-                }*/
 	}
 
 	public void run_simulation(){
+
+		NetworkData netdata = new NetworkData();
 
 		try {
 
 			otmdev.otm.initialize(start_time);
 
 			int steps_taken = 0;
+			netdata.update(start_time,otmdev.scenario);
 
 			while(steps_taken<numsteps){
 
 				if (isCancelled())
 					break;
 
-//				Thread.sleep(sim_delay);
-
 				// advance otm, get back information
-				int steps_to_take = Math.min( step_per_update , numsteps-steps_taken );
+				otmdev.otm.advance(simdt);
+				steps_taken += 1;
 
+				// retrieve information
+				netdata.update(start_time+simdt*steps_taken,otmdev.scenario);
 
-				otmdev.otm.advance(steps_to_take*simdt);
-				steps_taken += steps_to_take;
-
-				// retrieve animation info
-				//final AnimationInfo info = otmdev.otm.scenario().get_animation_info();
-
-				// ui manipulations
-				if(mainController!=null){
+				// progress bar
+				if(mainController!=null && steps_taken%step_per_progbar_update==0){
 					final int ii = steps_taken;
 					Platform.runLater(new Runnable() {
 						@Override public void run() {
