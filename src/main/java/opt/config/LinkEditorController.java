@@ -2102,7 +2102,7 @@ public class LinkEditorController {
                 if (((AbstractControllerRampMeter)ctrl).isHas_queue_control())
                     rm_qc = " with queue control";
             }
-            String buf = Misc.seconds2timestring(start, ":") + " - " + Misc.seconds2timestring(end, ":") + ": " + ct + ctrl.getAlgorithm() + rm_qc;
+            String buf = Misc.seconds2timestring(start, ":") + " - " + Misc.seconds2timestring(end, ":") + ": " + ct + ctrl.getName() + rm_qc;
 
             Set<LaneGroupType> lgt_set = ctrl.get_lanegroup_types();
             String lgt_s = "";
@@ -2220,20 +2220,24 @@ public class LinkEditorController {
     void launchRampMeterEditor(AbstractController ctrl, boolean isnew) {
         Stage inputStage = new Stage();
         inputStage.initOwner(primaryStage);
-        
-        if (ctrl.getAlgorithm().toLowerCase().compareTo("alinea") == 0) {
-            inputStage.setScene(rampMeterAlineaScene);
-            rampMeterAlinea.initWithLinkAndController(myLink, ctrl, isnew);
-            inputStage.setTitle("Ramp Meter ALINEA");
-        } else if (ctrl.getAlgorithm().toLowerCase().compareTo("tod") == 0) {
-            inputStage.setScene(rampMeterTodScene);
-            rampMeterTOD.initWithLinkAndController(myLink, ctrl, isnew);
-            inputStage.setTitle("Ramp Meter TOD - Time Of Day Fixed Rate");
-        } else {
-            // should not end up here...
-            opt.utils.Dialogs.ErrorDialog("Ramp meter '" + ctrl.getAlgorithm() + "' is not supported...", "Please, report this problem!");
-            return;
+
+        switch(ctrl.getAlgorithm()){
+            case alinea:
+                inputStage.setScene(rampMeterAlineaScene);
+                rampMeterAlinea.initWithLinkAndController(myLink, ctrl, isnew);
+                inputStage.setTitle("Ramp Meter ALINEA");
+                break;
+            case fixed_rate:
+                inputStage.setScene(rampMeterTodScene);
+                rampMeterTOD.initWithLinkAndController(myLink, ctrl, isnew);
+                inputStage.setTitle("Ramp Meter TOD - Time Of Day Fixed Rate");
+                break;
+            default:
+                // should not end up here...
+                opt.utils.Dialogs.ErrorDialog("Ramp meter '" + ctrl.getAlgorithm() + "' is not supported...", "Please, report this problem!");
+                return;
         }
+
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
         inputStage.setResizable(false);

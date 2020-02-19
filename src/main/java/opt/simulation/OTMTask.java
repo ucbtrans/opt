@@ -81,9 +81,9 @@ public class OTMTask  extends Task {
 		});
 	}
 
-	public void run_simulation(){
+	public NetworkData run_simulation(){
 
-		NetworkData netdata = new NetworkData();
+		NetworkData netdata = new NetworkData(otmdev.scenario);
 
 		try {
 
@@ -120,6 +120,8 @@ public class OTMTask  extends Task {
 			this.exception = e;
 			failed();
 		}
+
+		return netdata;
 
 	}
 

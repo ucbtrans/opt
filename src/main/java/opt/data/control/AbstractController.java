@@ -1,6 +1,7 @@
 package opt.data.control;
 
 import error.OTMException;
+import opt.data.ControlFactory;
 import opt.data.LaneGroupType;
 import utils.OTMUtils;
 
@@ -10,6 +11,8 @@ import static java.util.stream.Collectors.toSet;
 
 public abstract class AbstractController implements Comparable {
 
+
+
 	protected long id;
 	protected float dt;
 	protected float start_time;
@@ -17,8 +20,6 @@ public abstract class AbstractController implements Comparable {
 	protected control.AbstractController.Algorithm algorithm;
 	protected Map<Long,AbstractActuator> actuators = new HashMap<>();
 	protected Map<Long,Sensor> sensors = new HashMap<>();
-
-	abstract public String getAlgorithm();
 
 	public AbstractController(long id, float dt, float start_time, Float end_time, control.AbstractController.Algorithm algorithm) throws Exception {
 
@@ -35,6 +36,14 @@ public abstract class AbstractController implements Comparable {
 		this.end_time = end_time==null ? Float.POSITIVE_INFINITY : end_time;
 		this.algorithm = algorithm;
 
+	}
+
+	public final String getName(){
+		return ControlFactory.cntrl_alg_name.AtoB(algorithm);
+	}
+
+	public final control.AbstractController.Algorithm getAlgorithm(){
+		return algorithm;
 	}
 
 	protected void add_sensor(Sensor sensor){

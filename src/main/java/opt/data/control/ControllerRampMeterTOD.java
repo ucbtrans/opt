@@ -59,8 +59,4 @@ public class ControllerRampMeterTOD extends AbstractControllerRampMeter {
 		return entries;
 	}
 
-	@Override
-	public String getAlgorithm() {
-		return "TOD";
-	}
 }
