@@ -1,6 +1,5 @@
 package opt.data;
 
-import opt.data.control.AbstractActuator;
 import profiles.Profile1D;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +24,9 @@ public abstract class AbstractLink implements Comparable {
     protected Map<Long, Profile1D> demands = new HashMap<>();    // commodity -> Profile1D
 
 //    public Map<LaneGroupType,AbstractActuator> actuator = new HashMap<>();
+
+    // simulation data
+    SimDataLink simdata;
 
     /////////////////////////////////////
     // abstract methods
@@ -120,6 +122,10 @@ public abstract class AbstractLink implements Comparable {
 
     }
 
+//    protected void populate_sim_data(runner.Scenario scenario){
+//        simdata = new SimDataLink(this,scenario.network.links.get(id));
+//    }
+
     /////////////////////////////////////
     // basic getters
     /////////////////////////////////////
@@ -146,6 +152,21 @@ public abstract class AbstractLink implements Comparable {
 
     public final Segment get_segment(){
         return mysegment;
+    }
+
+    public final List<LaneGroupType> lane2lgtype(){
+        List<LaneGroupType> x = new ArrayList<>();
+        int lane = 0;
+        if(params.has_mng())
+            for(lane=0;lane<params.mng_lanes;lane++)
+                x.add(LaneGroupType.mng);
+        for(;lane<params.mng_lanes+params.gp_lanes;lane++)
+            x.add(LaneGroupType.gp);
+        if(params.has_aux())
+            for(;lane<params.mng_lanes+params.gp_lanes+params.get_aux_lanes();lane++)
+                x.add(LaneGroupType.aux);
+
+        return x;
     }
 
     /////////////////////////////////////

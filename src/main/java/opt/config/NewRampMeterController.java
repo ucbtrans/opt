@@ -101,7 +101,7 @@ public class NewRampMeterController {
         buttonOK.setDisable(true);
         listRM.getItems().clear();
         
-        Set<control.AbstractController.Algorithm> ctrl_set = ControlFactory.get_available_ramp_metering_algorithms();
+        List<control.AbstractController.Algorithm> ctrl_set = ControlFactory.get_available_ramp_metering_algorithms();
         for (control.AbstractController.Algorithm ctrl : ctrl_set) {
             listRM.getItems().add(ctrl);
         }

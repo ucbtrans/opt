@@ -28,6 +28,7 @@ public class FreewayScenario {
     // simulation parameters
     protected float sim_start_time = 0f;
     protected float sim_duration = 86400f;
+    protected SimDataScenario simData;
 
     /////////////////////////////////////
     // construction
@@ -247,7 +248,7 @@ public class FreewayScenario {
             for(jaxb.Controller jcnt : jaxb_scenario.getControllers().getController()){
                 AbstractController cnt;
                 switch( jcnt.getType()){
-                    case "tod":
+                    case "fixed_rate":
                         cnt = ControlFactory.create_controller_tod(this, jcnt,actuators);
                         break;
                     case "alinea":
@@ -328,7 +329,6 @@ public class FreewayScenario {
     public void setSim_duration(float duration){
         this.sim_duration = duration;
     }
-
 
     /////////////////////////////////////
     // API controller

@@ -30,24 +30,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import api.OTMdev;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -58,7 +50,6 @@ import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
-import opt.simulation.OTMTask;
 import opt.utils.Misc;
 
 

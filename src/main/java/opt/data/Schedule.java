@@ -23,7 +23,7 @@ public class Schedule {
 		String str = "start\tend\ttype\tlink(s)";
 		for(AbstractController cntrl : this.items){
 			String link_ids = OTMUtils.comma_format(cntrl.get_actuators().values().stream().map(act->act.link_id).collect(toList()));
-			str = String.format("%s\n%.1f\t%.1f\t%s\t%s",str,cntrl.getStartTime(),cntrl.getEndTime(),cntrl.getAlgorithm(),link_ids);
+			str = String.format("%s\n%.1f\t%.1f\t%s\t%s",str,cntrl.getStartTime(),cntrl.getEndTime(),cntrl.getName(),link_ids);
 		}
 		return str;
 	}

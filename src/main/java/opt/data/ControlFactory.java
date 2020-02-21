@@ -2,19 +2,31 @@ package opt.data;
 
 import error.OTMException;
 import opt.data.control.*;
+import opt.utils.BijectiveMap;
 import utils.OTMUtils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ControlFactory {
 
-	public static Set<control.AbstractController.Algorithm> get_available_ramp_metering_algorithms(){
-		Set<control.AbstractController.Algorithm> x = new HashSet<>();
+	public static BijectiveMap<control.AbstractController.Algorithm,String> cntrl_alg_name;
+	static{
+		cntrl_alg_name = new BijectiveMap<>();
+		cntrl_alg_name.put(control.AbstractController.Algorithm.alinea,"Alinea");
+		cntrl_alg_name.put(control.AbstractController.Algorithm.fixed_rate,"TOD");
+	}
+
+	public static List<control.AbstractController.Algorithm> get_available_ramp_metering_algorithms(){
+		List<control.AbstractController.Algorithm> x = new ArrayList<>();
 		x.add(control.AbstractController.Algorithm.alinea);
 		x.add(control.AbstractController.Algorithm.fixed_rate);
+		return x;
+	}
+
+	public static List<String> get_available_ramp_metering_names(){
+		List<String> x = new ArrayList<>();
+		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.alinea));
+		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.fixed_rate));
 		return x;
 	}
 
