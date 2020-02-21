@@ -67,7 +67,7 @@ import opt.config.RampMeterTOD;
 import opt.config.ScenarioEditorController;
 import opt.config.VehicleTypeController;
 import opt.data.*;
-import opt.simulation.OTMTask;
+(??)import opt.simulation.OTMTask;
 
 
 /**
@@ -76,6 +76,9 @@ import opt.simulation.OTMTask;
  * @author Alex Kurzhanskiy
  */
 public class AppMainController {
+
+    protected SimDataScenario simdata = null;
+
     private Stage primaryStage = null;
     private Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
     private boolean projectModified = false;
