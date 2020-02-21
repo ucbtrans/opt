@@ -27,14 +27,12 @@ package opt;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
 import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
 import javafx.event.ActionEvent;
@@ -69,8 +67,6 @@ import opt.config.RampMeterTOD;
 import opt.config.ScenarioEditorController;
 import opt.config.VehicleTypeController;
 import opt.data.*;
-import opt.simulation.OTMTask;
-import opt.utils.Misc;
 
 
 /**
@@ -79,6 +75,9 @@ import opt.utils.Misc;
  * @author Alex Kurzhanskiy
  */
 public class AppMainController {
+
+    protected SimDataScenario simdata = null;
+
     private Stage primaryStage = null;
     private Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
     private boolean projectModified = false;

@@ -3,9 +3,8 @@ package opt.tests;
 import opt.data.FreewayScenario;
 import opt.data.Project;
 import opt.data.ProjectFactory;
-import opt.simulation.LaneGroupData;
-import opt.simulation.NetworkData;
-import opt.simulation.OTMTask;
+import opt.data.SimDataScenario;
+import opt.OTMTask;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
@@ -14,7 +13,7 @@ public class TestSimulation extends AbstractTest {
 
     @Test
     public void test_sequential(){
-        NetworkData data = load_task().run_simulation();
+        load_task().run_simulation();
     }
 
     @Test
@@ -27,19 +26,12 @@ public class TestSimulation extends AbstractTest {
     @Test
     public void test_get_results_for_gp_lanes(){
 
-        NetworkData data = load_task().run_simulation();
-        LaneGroupData x = data.get_vehs_for_link(1l);
+        load_task().run_simulation();
 
-        // TODO NEED TO RECORD CELL FLOW FOR THIS TO WORK
-//        LinkData y = data.get_flow_vph_for_link(3l);
-//        LinkData z = data.get_speed_mph_for_link(3l);
-    }
 
-    @Test
-    public void test_get_results_for_managed_lanes(){
 
-        NetworkData data = load_task().run_simulation();
-        LaneGroupData x = data.get_vehs_for_link(1l);
+
+        //        LaneGroupData x = data.get_vehs_for_link(1l);
 
         // TODO NEED TO RECORD CELL FLOW FOR THIS TO WORK
 //        LinkData y = data.get_flow_vph_for_link(3l);

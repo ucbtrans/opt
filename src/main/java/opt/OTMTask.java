@@ -1,12 +1,11 @@
-package opt.simulation;
+package opt;
 
 import api.OTMdev;
-import common.Link;
 import error.OTMException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import opt.AppMainController;
 import opt.data.FreewayScenario;
+import opt.data.SimDataScenario;
 
 import java.util.Iterator;
 
@@ -21,13 +20,14 @@ public class OTMTask  extends Task {
 	private int step_per_progbar_update;
 	private AppMainController mainController;
 	private float simdt;
-
+	private FreewayScenario fwyscenario;
 
 	public OTMTask(AppMainController mainController, FreewayScenario fwyscenario,float start_time, float duration, int progbar_steps){
 
 		this.mainController = mainController;
 		this.start_time = start_time;
 		this.duration = duration;
+		this.fwyscenario = fwyscenario;
 
 		// bind the progress bar and make it visible
 		if(mainController!=null)
@@ -81,16 +81,15 @@ public class OTMTask  extends Task {
 		});
 	}
 
-	public NetworkData run_simulation(){
-
-		NetworkData netdata = new NetworkData(otmdev.scenario);
+	public void run_simulation(){
 
 		try {
 
+			mainController.simdata = new SimDataScenario(fwyscenario,otmdev.scenario);
 			otmdev.otm.initialize(start_time);
 
 			int steps_taken = 0;
-			netdata.update(start_time,otmdev.scenario);
+			mainController.simdata.update(start_time);
 
 			while(steps_taken<numsteps){
 
@@ -102,7 +101,7 @@ public class OTMTask  extends Task {
 				steps_taken += 1;
 
 				// retrieve information
-				netdata.update(start_time+simdt*steps_taken,otmdev.scenario);
+				mainController.simdata.update(start_time+simdt*steps_taken);
 
 				// progress bar
 				if(mainController!=null && steps_taken%step_per_progbar_update==0){
@@ -113,15 +112,12 @@ public class OTMTask  extends Task {
 						}
 					});
 				}
-
 			}
 
 		} catch (OTMException e) {
 			this.exception = e;
 			failed();
 		}
-
-		return netdata;
 
 	}
 
