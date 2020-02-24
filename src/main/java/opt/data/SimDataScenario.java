@@ -22,7 +22,17 @@ public class SimDataScenario {
                 optlink.simdata.update();
     }
 
+    public TimeSeries get_vht_for_network(){
 
+    }
+
+    public TimeSeries get_vmt_for_network(){
+
+    }
+
+    public TimeSeries get_delay_for_network(){
+
+    }
 
 }
 

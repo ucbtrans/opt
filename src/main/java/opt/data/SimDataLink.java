@@ -38,4 +38,8 @@ public class SimDataLink {
         lgData.values().forEach(x->x.update());
     }
 
+    public Times2DSeries get_flow(LaneGroupType lgtype){
+
+    }
+
 }

@@ -5,10 +5,7 @@ import error.OTMException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import opt.data.FreewayScenario;
-<<<<<<< HEAD:src/main/java/opt/simulation/OTMTask.java
-=======
 import opt.data.SimDataScenario;
->>>>>>> 9c6cbc246b863cb7eab97ac760c52dbecb65ce2b:src/main/java/opt/OTMTask.java
 
 import java.util.Iterator;
 
@@ -71,22 +68,16 @@ public class OTMTask  extends Task {
 	@Override
 	protected void done() {
 		super.done();
-<<<<<<< HEAD:src/main/java/opt/simulation/OTMTask.java
-		Platform.runLater(() -> {
-			if (mainController!=null)
-				mainController.completeSimulation();
-=======
 
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				// unbind progress bar and make it invisible.
 				if (mainController!=null) {
-					mainController.unbindSimProgress();
+					mainController.unbindProgressBar();
 					mainController.completeSimulation();
 				}
 			}
->>>>>>> 9c6cbc246b863cb7eab97ac760c52dbecb65ce2b:src/main/java/opt/OTMTask.java
 		});
 	}
 
