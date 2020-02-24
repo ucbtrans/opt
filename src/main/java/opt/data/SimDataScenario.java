@@ -24,15 +24,34 @@ public class SimDataScenario {
 
     public TimeSeries get_vht_for_network(){
 
+        // need at least 2 data points
+        if(time.size()<2)
+            return null;
+
+        double dt = time.get(1) - time.get(0);
+        List<Double> totalvehs = new ArrayList<>();
+        for(int i=0;i<time.size();i++)
+            totalvehs.add(0d);
+        for(AbstractLink link : fwyscenario.get_links()) {
+            List<Double> linkvehs = link.simdata.get_vehs(null).aggregate_cells();
+            for(int i=0;i<linkvehs.size();i++)
+                totalvehs.set(i, totalvehs.get(i) + linkvehs.get(i)*dt );
+        }
+
+        TimeSeries vht = new TimeSeries();
+        vht.time = time;
+        vht.values  = totalvehs;
+
+        return vht;
     }
 
-    public TimeSeries get_vmt_for_network(){
-
-    }
-
-    public TimeSeries get_delay_for_network(){
-
-    }
+//    public TimeSeries get_vmt_for_network(){
+//        XXX
+//    }
+//
+//    public TimeSeries get_delay_for_network(){
+//        XXX
+//    }
 
 }
 

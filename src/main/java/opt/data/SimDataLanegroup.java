@@ -8,8 +8,8 @@ import java.util.List;
 public class SimDataLanegroup {
 
     private models.fluid.LaneGroup lg;
-    List<CellData> celldata;
-    public int num_cells;
+    protected List<CellData> celldata;
+    protected int num_cells;
 
     public SimDataLanegroup(models.fluid.LaneGroup lg){
         this.lg = lg;

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<scenario xmlns="opentrafficmodels">
+    <commodities>
+        <commodity id="0" name="c1" pvequiv="1.0" pathfull="false"/>
+    </commodities>
+    <network>
+        <nodes>
+            <node id="1"/>
+            <node id="2"/>
+            <node id="3"/>
+            <node id="4"/>
+            <node id="5"/>
+            <node id="6"/>
+            <node id="7"/>
+            <node id="8"/>
+            <node id="9"/>
+            <node id="10"/>
+            <node id="11"/>
+            <node id="12"/>
+            <node id="13"/>
+            <node id="14"/>
+            <node id="15"/>
+            <node id="16"/>
+            <node id="17"/>
+            <node id="18"/>
+            <node id="19"/>
+        </nodes>
+        <links>
+            <link id="1" length="1500.0" full_lanes="4" start_node_id="1" end_node_id="2" roadparam="0" road_type="freeway"/>
+            <link id="2" length="500.0" full_lanes="4" start_node_id="2" end_node_id="3" roadparam="0" road_type="freeway"/>
+            <link id="3" length="800.0" full_lanes="5" start_node_id="3" end_node_id="4" roadparam="0" road_type="freeway"/>
+            <link id="4" length="1000.0" full_lanes="4" start_node_id="4" end_node_id="5" roadparam="0" road_type="freeway"/>
+            <link id="5" length="500.0" full_lanes="3" start_node_id="5" end_node_id="6" roadparam="0" road_type="freeway"/>
+            <link id="6" length="800.0" full_lanes="3" start_node_id="6" end_node_id="7" roadparam="0" road_type="freeway"/>
+            <link id="7" length="100.0" full_lanes="1" start_node_id="2" end_node_id="8" roadparam="1" road_type="offramp"/>
+            <link id="8" length="100.0" full_lanes="2" start_node_id="9" end_node_id="3" roadparam="1" road_type="onramp"/>
+            <link id="9" length="100.0" full_lanes="2" start_node_id="4" end_node_id="10" roadparam="1" road_type="offramp"/>
+            <link id="10" length="100.0" full_lanes="2" start_node_id="5" end_node_id="11" roadparam="1" road_type="offramp"/>
+            <link id="11" length="100.0" full_lanes="2" start_node_id="12" end_node_id="6" roadparam="1" road_type="onramp"/>
+            <link id="12" length="200.0" full_lanes="1" start_node_id="8" end_node_id="13" roadparam="1" road_type="connector"/>
+            <link id="13" length="100.0" full_lanes="2" start_node_id="13" end_node_id="15" roadparam="1" road_type="onramp"/>
+            <link id="15" length="500.0" full_lanes="4" start_node_id="15" end_node_id="16" roadparam="1" road_type="freeway"/>
+            <link id="16" length="500.0" full_lanes="4" start_node_id="16" end_node_id="17" roadparam="1" road_type="freeway"/>
+            <link id="17" length="500.0" full_lanes="4" start_node_id="17" end_node_id="18" roadparam="1" road_type="freeway"/>
+            <link id="18" length="500.0" full_lanes="2" start_node_id="17" end_node_id="19" roadparam="1" road_type="offramp"/>
+        </links>
+        <roadgeoms/>
+        <roadparams>
+            <roadparam id="0" capacity="2000.0" speed="100.0" jam_density="100.0"/>
+            <roadparam id="1" capacity="1000.0" speed="40.0" jam_density="100.0"/>
+        </roadparams>
+    </network>
+    <models>
+        <model type="ctm" name="ctm" is_default="true">
+            <model_params sim_dt="2.0" max_cell_length="100.0"/>
+        </model>
+    </models>
+    <demands>
+        <demand commodity_id="0" link_id="1" start_time="0.0" dt="1000.0">1500.0,0.0</demand>
+        <demand commodity_id="0" link_id="8" start_time="0.0" dt="1000.0">1500.0,0.0</demand>
+        <demand commodity_id="0" link_id="11" start_time="0.0" dt="1000.0">1500.0,0.0</demand>
+    </demands>
+    <splits>
+        <split_node node_id="2" commodity_id="0" link_in="1" dt="300.0">
+            <split link_out="2">0.8999999761581421,0.5</split>
+            <split link_out="7">0.1,0.5</split>
+        </split_node>
+        <split_node node_id="4" commodity_id="0" link_in="3" dt="300.0">
+            <split link_out="4">0.8999999761581421,0.5</split>
+            <split link_out="9">0.1,0.5</split>
+        </split_node>
+        <split_node node_id="5" commodity_id="0" link_in="4" dt="300.0">
+            <split link_out="5">0.8999999761581421,0.5</split>
+            <split link_out="10">0.1,0.5</split>
+        </split_node>
+        <split_node node_id="17" commodity_id="0" link_in="16" dt="300.0">
+            <split link_out="17">0.8999999761581421,0.5</split>
+            <split link_out="18">0.1,0.5</split>
+        </split_node>
+    </splits>
+    <controllers>
+        <controller id="8" type="alinea" dt="10.0" start_time="0.0" end_time="3600.0">
+            <target_actuators ids="8"/>
+            <feedback_sensors ids="12"/>
+            <parameters>
+                <parameter name="lane_group" value="aux"/>
+                <parameter name="queue_control" value="true"/>
+            </parameters>
+        </controller>
+        <controller id="11" type="alinea" dt="10.0" start_time="0.0" end_time="3600.0">
+            <target_actuators ids="11"/>
+            <feedback_sensors ids="22"/>
+            <parameters>
+                <parameter name="lane_group" value="gp"/>
+                <parameter name="queue_control" value="false"/>
+            </parameters>
+        </controller>
+    </controllers>
+    <actuators>
+        <actuator id="8" type="capacity" min_value="100.0" max_value="900.0">
+            <actuator_target id="8" type="link"/>
+        </actuator>
+        <actuator id="11" type="capacity" min_value="100.0" max_value="900.0">
+            <actuator_target id="11" type="link"/>
+        </actuator>
+    </actuators>
+    <sensors>
+        <sensor id="22" type="fixed" link_id="2" position="0.0" dt="10.0"/>
+        <sensor id="12" type="fixed" link_id="1" position="0.0" dt="10.0"/>
+    </sensors>
+</scenario>

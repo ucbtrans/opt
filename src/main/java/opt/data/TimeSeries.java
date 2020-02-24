@@ -1,6 +1,9 @@
 package opt.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TimeSeries {
-    double [] time;
-    double [] values;
+    List<Float> time = new ArrayList<>();
+    List<Double>  values = new ArrayList<>();
 }

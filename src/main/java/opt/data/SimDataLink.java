@@ -6,7 +6,6 @@ import java.util.Map;
 public class SimDataLink {
 
     public AbstractLink optlink;
-//    public common.Link otmlink;
     public double link_length_miles;
     public Map<LaneGroupType, SimDataLanegroup> lgData;
 
@@ -38,8 +37,28 @@ public class SimDataLink {
         lgData.values().forEach(x->x.update());
     }
 
-    public Times2DSeries get_flow(LaneGroupType lgtype){
+    public Time2DSeries get_vehs(LaneGroupType lgtype){
 
+        boolean all_lgs = lgtype==null;
+
+        // bad lg type
+        if(!all_lgs && !lgData.containsKey(lgtype))
+            return null;
+
+        Time2DSeries X = new Time2DSeries();
+        X.time = optlink.mysegment.my_fwy_scenario.simData.time;
+
+        if(all_lgs){
+            // TODO G IMPLEMENT THIS 
+//            for(LaneGroupType lgt : lgData.keySet())
+//                for(SimDataLanegroup.CellData celldata : lgData.get(lgt).celldata)
+//                    X.values.add(celldata.vehs);
+        } else {
+            for(SimDataLanegroup.CellData celldata : lgData.get(lgtype).celldata)
+                X.values.add(celldata.vehs);
+        }
+
+        return X;
     }
 
 }
