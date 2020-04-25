@@ -385,6 +385,8 @@ public class AppMainController {
             rampMeterTOD.setLinkEditorController(linkEditorController);
             linkEditorController.setRampMeterTodControllerAndScene(rampMeterTOD, new Scene(rampMeterTodPane));
             
+            // Route editor controller
+            
         } catch (IOException e) {
             opt.utils.Dialogs.ExceptionDialog("Cannot initialize UI modules...", e);
         }
