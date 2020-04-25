@@ -1,17 +1,17 @@
 package opt.data;
 
-import models.fluid.Cell;
+import models.fluid.AbstractCell;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SimDataLanegroup {
 
-    private models.fluid.LaneGroup lg;
+    private models.fluid.FluidLaneGroup lg;
     protected List<CellData> celldata;
     protected int num_cells;
 
-    public SimDataLanegroup(models.fluid.LaneGroup lg){
+    public SimDataLanegroup(models.fluid.FluidLaneGroup lg){
         this.lg = lg;
         celldata = new ArrayList<>();
         for(int i=0;i<num_cells;i++)
@@ -21,7 +21,7 @@ public class SimDataLanegroup {
     protected void update(){
         for(int i=0;i<num_cells;i++) {
             CellData cd = celldata.get(i);
-            Cell cell = lg.cells.get(i);
+            AbstractCell cell = lg.cells.get(i);
             cd.vehs.add(cell.get_vehicles());
         }
     }

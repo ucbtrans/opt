@@ -65,6 +65,5 @@ public class RouteController {
     private void initialize() {
         
     }
-    }
     
 }

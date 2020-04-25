@@ -8,7 +8,7 @@ public class SimDataScenario {
     public FreewayScenario fwyscenario;
     public List<Float> time = new ArrayList<>();
 
-    public SimDataScenario(FreewayScenario fwyscenario, runner.Scenario scenario){
+    public SimDataScenario(FreewayScenario fwyscenario, common.Scenario scenario){
         this.fwyscenario = fwyscenario;
         for(Segment segment : fwyscenario.segments.values())
             for(AbstractLink optlink : segment.get_links())
@@ -21,6 +21,10 @@ public class SimDataScenario {
             for(AbstractLink optlink : segment.get_links())
                 optlink.simdata.update();
     }
+
+    /////////////////////////////////////////////////
+    // API for Alex
+    /////////////////////////////////////////////////
 
     public TimeSeries get_vht_for_network(){
 

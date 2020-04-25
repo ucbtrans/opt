@@ -6,8 +6,8 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 public class Time2DSeries {
-    List<Float> time = new ArrayList<>();
-    List<List<Double>> values = new ArrayList<>();
+    public List<Float> time = new ArrayList<>();
+    public List<List<Double>> values = new ArrayList<>();
 
     public List<Double> aggregate_cells(){
         return values.stream()

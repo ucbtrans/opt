@@ -15,18 +15,18 @@ public class SimDataLink {
         link_length_miles = otmlink.length / 1609.344;
         lgData = new HashMap<>();
 
-        models.fluid.LaneGroup lg;
+        models.fluid.FluidLaneGroup lg;
 
         if(optlink.params.has_mng()){
-            lg = (models.fluid.LaneGroup) otmlink.dnlane2lanegroup.get(0);
+            lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(0);
             lgData.put(LaneGroupType.mng,new SimDataLanegroup(lg));
         }
 
-        lg = (models.fluid.LaneGroup) otmlink.dnlane2lanegroup.get(optlink.get_mng_lanes());
+        lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(optlink.get_mng_lanes());
         lgData.put(LaneGroupType.gp,new SimDataLanegroup(lg));
 
         if(optlink.params.has_aux()){
-            lg = (models.fluid.LaneGroup) otmlink.dnlane2lanegroup.get(
+            lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(
                     optlink.get_mng_lanes() + optlink.get_gp_lanes());
             lgData.put(LaneGroupType.aux,new SimDataLanegroup(lg));
         }
@@ -36,6 +36,10 @@ public class SimDataLink {
     public void update(){
         lgData.values().forEach(x->x.update());
     }
+
+    /////////////////////////////////////////////////
+    // API for Alex
+    /////////////////////////////////////////////////
 
     public Time2DSeries get_vehs(LaneGroupType lgtype){
 
