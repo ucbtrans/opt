@@ -376,6 +376,14 @@ public class FreewayScenario {
         routes.remove(routeid);
     }
 
+    public Collection<Route> get_routes(){
+        return routes.values();
+    }
+
+    public Route get_route(long routeid){
+        return routes.get(routeid);
+    }
+
     /////////////////////////////////////
     // API segment
     /////////////////////////////////////
