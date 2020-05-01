@@ -21,14 +21,14 @@
                 <lnk id="15" name=" -&gt; Buchanan St." managed_lanes="0" managed_lanes_barrier="false" managed_lanes_separated="false" aux_lanes="0" is_inner="false"/>
             </lnks>
             <sgmts>
-                <sgmt type="fwy" name="Richmond -&gt; Buchanan St." fwy="0"/>
-                <sgmt type="fwy" name="Buchanan St. -&gt; Gilman St." fwy="1" out_ors="2,3" out_frs="4"/>
-                <sgmt type="fwy" name="Gilman St. -&gt; Gilman St." fwy="5"/>
-                <sgmt type="fwy" name="Gilman St. -&gt; University Ave." fwy="6" out_ors="10" out_frs="11"/>
-                <sgmt type="fwy" name="University Ave. -&gt; University Ave." fwy="7"/>
-                <sgmt type="fwy" name="University Ave. -&gt; Emeryville" fwy="8" out_ors="9"/>
-                <sgmt type="con" name="I-580 E -&gt; I-80 W" fwy="12"/>
-                <sgmt type="fwy" name="Central Ave. -&gt; I-80 W" fwy="13" out_frs="14,15"/>
+                <sgmt id="0" type="fwy" name="Richmond -&gt; Buchanan St." fwy="0"/>
+                <sgmt id="1" type="fwy" name="Buchanan St. -&gt; Gilman St." fwy="1" out_ors="2,3" out_frs="4"/>
+                <sgmt id="2" type="fwy" name="Gilman St. -&gt; Gilman St." fwy="5"/>
+                <sgmt id="3" type="fwy" name="Gilman St. -&gt; University Ave." fwy="6" out_ors="10" out_frs="11"/>
+                <sgmt id="4" type="fwy" name="University Ave. -&gt; University Ave." fwy="7"/>
+                <sgmt id="5" type="fwy" name="University Ave. -&gt; Emeryville" fwy="8" out_ors="9"/>
+                <sgmt id="6" type="con" name="I-580 E -&gt; I-80 W" fwy="12"/>
+                <sgmt id="7" type="fwy" name="Central Ave. -&gt; I-80 W" fwy="13" out_frs="14,15"/>
             </sgmts>
         </scn>
     </scns>

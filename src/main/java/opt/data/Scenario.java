@@ -118,7 +118,7 @@ public class Scenario {
             for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
                 this.commodities.put(comm.getId(),new Commodity(comm.getId(),comm.getName(),comm.getPvequiv()));
 
-    }
+  }
 
     protected Scenario clone() {
         Scenario jscn_cpy = new Scenario(this.my_fwy_scenario);

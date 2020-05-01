@@ -23,6 +23,7 @@ public class FreewayScenario {
     public String description;
     protected Scenario scenario;
     protected Map<Long,Segment> segments = new HashMap<>();
+    protected Map<Long, Route> routes = new HashMap<>();
     protected Schedule controller_schedule;
 
     // simulation parameters
@@ -46,7 +47,7 @@ public class FreewayScenario {
         scenario.commodities.put(0l,new Commodity(0l,"Unnamed commodity",1f));
     }
 
-    public FreewayScenario(String name,String description,jaxb.Sim sim,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Scenario jaxb_scenario) throws Exception {
+    public FreewayScenario(String name,String description,jaxb.Sim sim,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Routes jaxb_routes,jaxb.Scenario jaxb_scenario) throws Exception {
 
         reset_max_ids();
 
@@ -114,11 +115,17 @@ public class FreewayScenario {
                 }
 
         // create segments
-        long max_sgmt_id = 0;
         if(jaxb_segments!=null)
             for (jaxb.Sgmt sgmt : jaxb_segments.getSgmt()) {
-                Segment segment = new Segment(this,max_sgmt_id++, sgmt);
+                Segment segment = new Segment(this, sgmt);
                 segments.put(segment.id,segment);
+            }
+
+        // create routes
+        if(jaxb_routes!=null)
+            for (jaxb.Route jroute : jaxb_routes.getRoute()) {
+                Route route = new Route(this, jroute);
+                routes.put(route.id,route);
             }
 
         // make link connections
@@ -353,6 +360,23 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
+    // API routes
+    /////////////////////////////////////
+
+    public Route create_route(String name){
+        long newid = routes.keySet().stream().max(Long::compare).get() + 1;
+        Route route = new Route(this,newid,name);
+        routes.put(newid,route);
+        return route;
+    }
+
+    public void delete_route(long routeid) throws Exception {
+        if(!routes.containsKey(routeid))
+            throw new Exception("Tried to delete a non-existent route");
+        routes.remove(routeid);
+    }
+
+    /////////////////////////////////////
     // API segment
     /////////////////////////////////////
 
@@ -435,8 +459,7 @@ public class FreewayScenario {
 
         // create a segment
         Long segment_id = ++max_seg_id;
-        Segment segment = new Segment();
-        segment.id = segment_id;
+        Segment segment = new Segment(segment_id);
         segment.name = segment_name;
         segment.my_fwy_scenario = this;
         segments.put(segment_id,segment);
@@ -656,6 +679,11 @@ public class FreewayScenario {
         scn.setSgmts(sgmts);
         for(Segment segment : segments.values())
             sgmts.getSgmt().add(segment.to_jaxb());
+
+        jaxb.Routes rts = new jaxb.Routes();
+        scn.setRoutes(rts);
+        for(Route rt : routes.values())
+            rts.getRoute().add(rt.to_jaxb());
 
         jaxb.Lnks lnks = new jaxb.Lnks();
         scn.setLnks(lnks);

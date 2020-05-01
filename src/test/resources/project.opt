@@ -21,16 +21,20 @@
 				<lnk id="18" name="lA18"/>
 			</lnks>
 			<sgmts>
-				<sgmt type="fwy" name="sA1" fwy="1" out_frs="7"/>
-				<sgmt type="fwy" name="sA2" fwy="2"/>
-				<sgmt type="fwy" name="sA3" fwy="3" out_ors="8" out_frs="9"/>
-				<sgmt type="fwy" name="sA4" fwy="4" out_frs="10"/>
-				<sgmt type="fwy" name="sA5" fwy="5"/>
-				<sgmt type="fwy" name="sA6" fwy="6" out_ors="11"/>
-				<sgmt type="con" name="sA7" fwy="12"/>
-				<sgmt type="fwy" name="sA8" fwy="15" out_ors="13"/>
-				<sgmt type="fwy" name="sA9" fwy="16" out_frs="18"/>
+				<sgmt id="1" type="fwy" name="sA1" fwy="1" out_frs="7"/>
+				<sgmt id="2" type="fwy" name="sA2" fwy="2"/>
+				<sgmt id="3" type="fwy" name="sA3" fwy="3" out_ors="8" out_frs="9"/>
+				<sgmt id="4" type="fwy" name="sA4" fwy="4" out_frs="10"/>
+				<sgmt id="5" type="fwy" name="sA5" fwy="5"/>
+				<sgmt id="6" type="fwy" name="sA6" fwy="6" out_ors="11"/>
+				<sgmt id="7" type="con" name="sA7" fwy="12"/>
+				<sgmt id="8" type="fwy" name="sA8" fwy="15" out_ors="13"/>
+				<sgmt id="9" type="fwy" name="sA9" fwy="16" out_frs="18"/>
 			</sgmts>
+			<routes>
+				<route id="0" name="Route A" sgmts="1,2,3,4,5,6"/> 
+				<route id="1" name="Route B" sgmts="1,8,9"/> 
+			</routes>
 		</scn>
 	</scns>
 </prj>

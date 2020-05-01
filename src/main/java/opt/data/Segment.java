@@ -9,7 +9,7 @@ import static java.util.stream.Collectors.toSet;
 public final class Segment implements Comparable {
 
     protected FreewayScenario my_fwy_scenario;
-    protected long id;
+    protected final long id;
     public String name;
     protected LinkFreewayOrConnector fwy;
     protected List<LinkOnramp> in_ors = new ArrayList<>();
@@ -21,12 +21,14 @@ public final class Segment implements Comparable {
     // construction
     /////////////////////////////////////
 
-    public Segment(){}
+    public Segment(long id){
+        this.id = id;
+    }
 
     // used by FreewayScenario jaxb constructor
-    public Segment(FreewayScenario my_fwy_scenario, long id, jaxb.Sgmt sgmt) {
+    public Segment(FreewayScenario my_fwy_scenario, jaxb.Sgmt sgmt) {
 
-        this.id = id;
+        this.id = sgmt.getId();
         this.my_fwy_scenario = my_fwy_scenario;
         this.name = sgmt.getName();
 
@@ -55,8 +57,7 @@ public final class Segment implements Comparable {
     }
 
     public Segment clone() {
-        Segment new_seg = new Segment();
-        new_seg.id = id;
+        Segment new_seg = new Segment(this.id);
         new_seg.name = name;
 
         new_seg.fwy = (LinkFreewayOrConnector) fwy.clone();
@@ -393,6 +394,7 @@ public final class Segment implements Comparable {
 
     protected jaxb.Sgmt to_jaxb(){
         jaxb.Sgmt sgmt = new jaxb.Sgmt();
+        sgmt.setId(id);
         sgmt.setName(name);
         sgmt.setType(get_type());
 

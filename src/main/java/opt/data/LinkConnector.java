@@ -128,8 +128,7 @@ public class LinkConnector extends LinkFreewayOrConnector {
 
         // create a segment
         Long segment_id = fwy_scenario.new_seg_id();
-        Segment segment = new Segment();
-        segment.id = segment_id;
+        Segment segment = new Segment(segment_id);
         segment.name = seg_name;
         segment.my_fwy_scenario = fwy_scenario;
         fwy_scenario.segments.put(segment_id,segment);

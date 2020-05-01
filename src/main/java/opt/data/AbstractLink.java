@@ -559,9 +559,8 @@ public abstract class AbstractLink implements Comparable {
         FreewayScenario fwy_scenario = mysegment.my_fwy_scenario;
 
         // create new segment
-        Segment newseg = new Segment();
+        Segment newseg = new Segment(fwy_scenario.new_seg_id());
         newseg.my_fwy_scenario = fwy_scenario;
-        newseg.id = fwy_scenario.new_seg_id();
         newseg.name = seg_name;
         newseg.fwy = fwy;
         fwy.mysegment = newseg;

@@ -31,6 +31,7 @@
 				<xs:element ref="opt:sim" minOccurs="0" maxOccurs="1" />
 				<xs:element ref="opt:lnks" minOccurs="0" maxOccurs="1" />
 				<xs:element ref="opt:sgmts" minOccurs="0" maxOccurs="1" />
+				<xs:element ref="opt:routes" minOccurs="0" maxOccurs="1" />
 			</xs:all>
 			<xs:attribute name="name" type="xs:string" default="unnamed" />
 			<xs:attribute name="description" type="xs:string" default="unnamed" />
@@ -64,6 +65,14 @@
 		</xs:complexType>
 	</xs:element>
 
+	<xs:element name="routes">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="opt:route" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
 	<xs:element name="lnk">
 		<xs:complexType>
 			<xs:attribute name="id" type="xs:long" use="required" />
@@ -79,7 +88,6 @@
 
 	<xs:element name="sgmt">
 		<xs:complexType>
-
 			<xs:attribute name="type" use="required">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -87,12 +95,21 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
+			<xs:attribute name="id" type="xs:long" use="required" />
 			<xs:attribute name="name" type="xs:string" default="unnamed" />
 			<xs:attribute name="fwy" type="xs:string" use="required" />
 			<xs:attribute name="in_ors" type="xs:string"  />
 			<xs:attribute name="out_ors" type="xs:string"  />
 			<xs:attribute name="in_frs" type="xs:string" />
 			<xs:attribute name="out_frs" type="xs:string" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="route">
+		<xs:complexType>
+			<xs:attribute name="id" type="xs:long" use="required" />
+			<xs:attribute name="name" type="xs:string" default="unnamed" />
+			<xs:attribute name="sgmts" type="xs:string" default="" />
 		</xs:complexType>
 	</xs:element>
 
