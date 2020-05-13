@@ -364,7 +364,11 @@ public class FreewayScenario {
     /////////////////////////////////////
 
     public Route create_route(String name){
-        long newid = routes.keySet().stream().max(Long::compare).get() + 1;
+        long newid;
+        if (routes.keySet().isEmpty()) 
+            newid = 1;
+        else
+            newid = routes.keySet().stream().max(Long::compare).get() + 1;
         Route route = new Route(this,newid,name);
         routes.put(newid,route);
         return route;

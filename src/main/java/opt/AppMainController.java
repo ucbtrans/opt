@@ -36,9 +36,12 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ObservableValue;
 
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.scene.control.MenuItem;
@@ -46,16 +49,22 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import javafx.stage.WindowEvent;
+import javafx.util.Callback;
 import opt.config.ConnectController;
 import opt.config.LinkEditorController;
 import opt.config.LinkInfoController;
@@ -64,6 +73,7 @@ import opt.config.NewRampController;
 import opt.config.NewRampMeterController;
 import opt.config.RampMeterAlinea;
 import opt.config.RampMeterTOD;
+import opt.config.RouteController;
 import opt.config.ScenarioEditorController;
 import opt.config.VehicleTypeController;
 import opt.data.*;
@@ -115,6 +125,9 @@ public class AppMainController {
     private GridPane rampMeterTodPane = null;
     private RampMeterTOD rampMeterTOD = null;
     
+    private SplitPane routeEditorPane = null;
+    private RouteController routeController = null;
+    
     private Image imageLinkFreeway = new Image(getClass().getResourceAsStream("/LinkFreeway.gif"));
     private Image imageLinkOR = new Image(getClass().getResourceAsStream("/LinkOR.gif"));
     private Image imageLinkFR = new Image(getClass().getResourceAsStream("/LinkFR.gif"));
@@ -125,6 +138,8 @@ public class AppMainController {
  
     private FreewayScenario selectedScenario = null;
     
+    private ContextMenu routesCM = new ContextMenu(); 
+    private MenuItem cmNewRoute = new MenuItem("New Route");
     
     @FXML // fx:id="topPane"
     private VBox topPane; // Value injected by FXMLLoader
@@ -248,7 +263,7 @@ public class AppMainController {
         selectedScenario = null;
         TreeItem<String> p = treeItem;
         while (!p.equals(projectTree.getRoot())) {
-            Object obj = tree2object.get(treeItem);
+            Object obj = tree2object.get(p);
             if (obj instanceof FreewayScenario) {
                 selectedScenario = (FreewayScenario)obj;
                 return;
@@ -320,6 +335,21 @@ public class AppMainController {
            onSelectTabInActionPane();
         });
         
+        routesCM.getItems().add(cmNewRoute);
+        cmNewRoute.setOnAction(new EventHandler() {
+            public void handle(Event t) {
+                createNewRoute(t);
+            }
+        });
+        
+        projectTree.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
+            @Override
+            public TreeCell<String> call(TreeView<String> arg0) {
+                // custom tree cell that defines a context menu for the root tree item
+                return new MyTreeCell();
+            }
+        });
+        
         simProgressBar.setVisible(false);
         
         // Initialize link editor
@@ -386,6 +416,11 @@ public class AppMainController {
             linkEditorController.setRampMeterTodControllerAndScene(rampMeterTOD, new Scene(rampMeterTodPane));
             
             // Route editor controller
+            loader = new FXMLLoader(getClass().getResource("/route_editor.fxml"));
+            routeEditorPane = loader.load();
+            routeController = loader.getController();
+            routeController.setPrimaryStage(primaryStage);
+            routeController.setAppMainController(this);;
             
         } catch (IOException e) {
             opt.utils.Dialogs.ExceptionDialog("Cannot initialize UI modules...", e);
@@ -400,6 +435,8 @@ public class AppMainController {
         leftStatus.setText("");
         reportTabPane.setDisable(true);
         actionPane.getSelectionModel().selectFirst();
+        tree2object = new HashMap<TreeItem, Object>();
+        object2tree = new HashMap<Object, TreeItem>();
         
         if (project == null)
             return;
@@ -486,6 +523,15 @@ public class AppMainController {
             
             TreeItem<String> routes_node = new TreeItem<String>(routesTreeItem, new ImageView(imageFolder));    
             scenario_node.getChildren().add(routes_node);
+            for (Route route : scenario.get_routes()) {
+                if ((route == null) || (object2tree.containsKey(route))) {
+                    continue;
+                }
+                TreeItem<String> route_node = new TreeItem<String>(route.getName(), new ImageView(imageRoute));
+                tree2object.put(route_node, route);
+                object2tree.put(route, route_node);
+                routes_node.getChildren().add(route_node); 
+            }
             
             TreeItem<String> events_node = new TreeItem<String>(eventsTreeItem, new ImageView(imageFolder));    
             scenario_node.getChildren().add(events_node);
@@ -642,6 +688,23 @@ public class AppMainController {
     }
     
     
+    
+    void createNewRoute(Event event) {
+        if (selectedScenario == null)
+            return;
+        
+        Route route = selectedScenario.create_route("New Route");
+        populateProjectTree();
+        TreeItem item = object2tree.get(route);
+        if (item == null) { 
+            return;
+        }
+        
+        projectTree.getSelectionModel().select(item);  
+    }
+
+    
+    
     private void processTreeSelection(TreeItem<String> treeItem) {
         leftStatus.setText("");
         selectedScenario = null;
@@ -690,7 +753,25 @@ public class AppMainController {
             configAnchorPane.setBottomAnchor(scenarioEditorPane, 0.0);
             configAnchorPane.setLeftAnchor(scenarioEditorPane, 0.0);
             configAnchorPane.setRightAnchor(scenarioEditorPane, 0.0);
-            scenarioEditorController.initWithScenarioData((FreewayScenario)obj);
+            
+            FreewayScenario fws = (FreewayScenario)obj;
+            if (fws != null)
+                scenarioEditorController.initWithScenarioData(fws);
+        }
+        
+        if (obj instanceof Route) {
+            configAnchorPane.getChildren().clear();
+            infoAnchorPane.getChildren().clear();
+            configAnchorPane.getChildren().clear();
+            configAnchorPane.getChildren().setAll(routeEditorPane);
+            configAnchorPane.setTopAnchor(routeEditorPane, 0.0);
+            configAnchorPane.setBottomAnchor(routeEditorPane, 0.0);
+            configAnchorPane.setLeftAnchor(routeEditorPane, 0.0);
+            configAnchorPane.setRightAnchor(routeEditorPane, 0.0);
+            
+            Route route = (Route)obj;
+            if (route != null)
+                routeController.initWithRouteData(route);
         }
         
     }
@@ -710,9 +791,6 @@ public class AppMainController {
         
         if (projectTree.getRoot() != null)
             projectTree.getRoot().getChildren().clear();
-        
-        tree2object = new HashMap<TreeItem, Object>();
-        object2tree = new HashMap<Object, TreeItem>();
         
         //setProjectModified(true);
         populateProjectTree();
@@ -818,8 +896,6 @@ public class AppMainController {
         selectedScenario = null;
         setProjectModified(false);
         projectFilePath = null;
-        tree2object = new HashMap<TreeItem, Object>();
-        object2tree = new HashMap<Object, TreeItem>();
         
         if (projectTree.getRoot() != null)
             projectTree.getRoot().getChildren().clear();
@@ -833,5 +909,28 @@ public class AppMainController {
     }
     
     
+
+
+
+
+
+    class MyTreeCell extends TextFieldTreeCell<String> {
+        public MyTreeCell() {
+            super();
+        }
+        
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+
+            // if the item is not empty and is a Routes folder
+            if (!empty && getTreeItem().getValue().equals(routesTreeItem)) {
+                setContextMenu(routesCM);
+            }
+        }
+
+    }
+
+
     
 }

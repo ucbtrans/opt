@@ -27,13 +27,17 @@ package opt.config;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.AppMainController;
@@ -47,7 +51,36 @@ import opt.utils.ModifiedDoubleStringConverter;
  * @author Alex Kurzhanskiy
  */
 public class RouteController {
+    private Stage primaryStage = null;
     private AppMainController appMainController = null;
+    private Route myRoute = null;
+    private boolean ignoreChange = true;
+    
+    
+    @FXML // fx:id="scenarioEditorMainPane"
+    private SplitPane scenarioEditorMainPane; // Value injected by FXMLLoader
+
+    @FXML // fx:id="canvasParent"
+    private AnchorPane canvasParent; // Value injected by FXMLLoader
+
+    @FXML // fx:id="scenarioEditorCanvas"
+    private Canvas scenarioEditorCanvas; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="deleteRoute"
+    private Button deleteRoute; // Value injected by FXMLLoader
+
+    @FXML // fx:id="routeName"
+    private TextField routeName; // Value injected by FXMLLoader
+
+    @FXML // fx:id="cbOrigin"
+    private ChoiceBox<String> cbOrigin; // Value injected by FXMLLoader
+
+    @FXML // fx:id="cbDestination"
+    private ChoiceBox<String> cbDestination; // Value injected by FXMLLoader
+
+    @FXML // fx:id="listSections"
+    private ListView<String> listSections; // Value injected by FXMLLoader
+
     
     
     /**
@@ -59,11 +92,48 @@ public class RouteController {
         appMainController = ctrl;
     }
     
+    public void setPrimaryStage(Stage s) {
+        primaryStage = s;
+    }
+    
     
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
         
     }
+    
+    
+    /**
+     * This function is called every time one opens a route in the
+     * configuration module.
+     * @param route 
+     */
+    public void initWithRouteData(Route route) {        
+        if (route == null)
+            return;
+        
+        ignoreChange = true;        
+        myRoute = route;
+        
+        appMainController.setLeftStatus("");
+    
+        
+        
+        ignoreChange = false;
+    }
+    
+    
+    
+    
+    /***************************************************************************
+     * Callbacks 
+     **************************************************************************/
+    
+    @FXML
+    void onDeleteRoute(ActionEvent event) {
+
+    }
+    
     
 }
