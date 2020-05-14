@@ -28,7 +28,15 @@ public final class Segment implements Comparable {
     // used by FreewayScenario jaxb constructor
     public Segment(FreewayScenario my_fwy_scenario, jaxb.Sgmt sgmt) {
 
-        this.id = sgmt.getId();
+        long this_id = sgmt.getId();
+
+        // TODO FIX THIS. This is a hack to get backward compatibility with
+        // TODO scenarios that lack segment ids. -923571340 is hard coded in the schema
+        if(this_id==-923571340)
+            this.id = Long.parseLong(sgmt.getFwy());
+        else
+            this.id = this_id;
+
         this.my_fwy_scenario = my_fwy_scenario;
         this.name = sgmt.getName();
 

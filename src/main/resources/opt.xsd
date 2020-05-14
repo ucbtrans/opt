@@ -95,7 +95,7 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
-			<xs:attribute name="id" type="xs:long" use="required" />
+			<xs:attribute name="id" type="xs:long" use="optional" default="-923571340"/>
 			<xs:attribute name="name" type="xs:string" default="unnamed" />
 			<xs:attribute name="fwy" type="xs:string" use="required" />
 			<xs:attribute name="in_ors" type="xs:string"  />
@@ -107,7 +107,7 @@
 
 	<xs:element name="route">
 		<xs:complexType>
-			<xs:attribute name="id" type="xs:long" use="required" />
+			<xs:attribute name="id" type="xs:long" use="required"/>
 			<xs:attribute name="name" type="xs:string" default="unnamed" />
 			<xs:attribute name="sgmts" type="xs:string" default="" />
 		</xs:complexType>
