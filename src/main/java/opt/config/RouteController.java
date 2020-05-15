@@ -54,6 +54,7 @@ public class RouteController {
     private Stage primaryStage = null;
     private AppMainController appMainController = null;
     private Route myRoute = null;
+    private String origRouteName = null;
     private boolean ignoreChange = true;
     
     
@@ -114,9 +115,10 @@ public class RouteController {
             return;
         
         ignoreChange = true;        
-        myRoute = route;
-        
         appMainController.setLeftStatus("");
+        myRoute = route;
+        routeName.setText(route.getName());
+        origRouteName = route.getName();
     
         
         

@@ -30,7 +30,9 @@ public class Route {
         this.name = jroute.getName();
         this.my_fwy_scenario = my_fwy_scenario;
         this.segments = new ArrayList<>();
-        for(Long segid : OTMUtils.csv2longlist(jroute.getSgmts())){
+        if ((jroute.getSgmts() == null) || jroute.getSgmts().equals(""))
+            return;
+        for(Long segid : OTMUtils.csv2longlist(jroute.getSgmts())) {
             if(!my_fwy_scenario.segments.containsKey(segid))
                 throw new Exception("Bad segment id in route");
             segments.add(my_fwy_scenario.segments.get(segid));

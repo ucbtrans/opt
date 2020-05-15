@@ -491,10 +491,12 @@ public class AppMainController {
                         seg_node.getChildren().add(link_node);
                     }
                     
-                    /*for (AbstractLink link : link_list) {
+                    /*List<AbstractLink> link_list = scenario.get_links();
+                    for (AbstractLink lnk : link_list) {
                         if ((link == null) || (object2tree.containsKey(link))) {
                             continue;
                         }
+                        
                         ImageView imageView = new ImageView(imageLinkFreeway);
                         if (link.get_type() == AbstractLink.Type.connector) {
                             imageView = new ImageView(imageLinkConnector);
