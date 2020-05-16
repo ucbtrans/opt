@@ -64,10 +64,14 @@ public class Route {
         return id;
     }
 
+    public List<Segment> get_segments() {
+        return segments.stream().collect(Collectors.toList());
+    }
+
     public List<Long> get_segment_ids() {
         return segments.stream().map(s->s.id).collect(Collectors.toList());
     }
-
+    
     public void add_segment_ids(List<Long> segmentids) {
         for(Long segid : segmentids){
             if(!my_fwy_scenario.segments.containsKey(segid))

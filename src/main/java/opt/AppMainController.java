@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ObservableValue;
 
@@ -431,7 +432,7 @@ public class AppMainController {
     
     
     private void populateProjectTree() {
-        selectedScenario = null;
+        //selectedScenario = null;
         leftStatus.setText("");
         reportTabPane.setDisable(true);
         actionPane.getSelectionModel().selectFirst();
@@ -542,6 +543,8 @@ public class AppMainController {
         }
         
         root.setExpanded(true);
+        if (projectTree.getRoot() != null)
+            projectTree.getRoot().getChildren().clear();
         projectTree.setRoot(root);
         projectTree.setShowRoot(true);
         projectTree.refresh();
@@ -773,7 +776,7 @@ public class AppMainController {
             
             Route route = (Route)obj;
             if (route != null)
-                routeController.initWithRouteData(route);
+                routeController.initWithRouteAndScenarioData(route, selectedScenario);
         }
         
     }
@@ -864,26 +867,38 @@ public class AppMainController {
         }
         
         setProjectModified(true);
-        
-        Object toDisplay = scenario;
-        if (dn_link != null)
-            toDisplay = dn_link;
-        else if (up_link != null)
-            toDisplay = up_link;
-        
-        if (projectTree.getRoot() != null)
-            projectTree.getRoot().getChildren().clear();
-        
-        tree2object = new HashMap<TreeItem, Object>();
-        object2tree = new HashMap<Object, TreeItem>();
-        
         populateProjectTree();
         
-        TreeItem item = object2tree.get(toDisplay);
-        if (item == null) 
+        TreeItem<String> stn = object2tree.get(scenario);
+        TreeItem<String> links_node = stn.getChildren().stream()
+                .filter(ch -> ch.getValue().matches(roadLinksTreeItem))
+                .collect(Collectors.toList()).get(0);
+        projectTree.getSelectionModel().select(links_node);
+        links_node.setExpanded(true);
+    }
+    
+    
+    
+    public void deleteRoute(Route rt, FreewayScenario scenario) {
+        if (rt == null) 
             return;
         
-        projectTree.getSelectionModel().select(item);
+        try {
+            selectedScenario.delete_route(rt.getId());
+        } catch (Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Could not delete route '" + rt.getName() + "'...", e);
+            return;
+        }
+        
+        setProjectModified(true);
+        populateProjectTree();
+        
+        TreeItem<String> stn = object2tree.get(scenario);
+        TreeItem<String> routes_node = stn.getChildren().stream()
+                .filter(ch -> ch.getValue().matches(routesTreeItem))
+                .collect(Collectors.toList()).get(0);
+        projectTree.getSelectionModel().select(routes_node);
+        routes_node.setExpanded(true);
     }
 
 

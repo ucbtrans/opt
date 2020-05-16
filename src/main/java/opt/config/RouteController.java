@@ -25,6 +25,7 @@
  **/
 package opt.config;
 
+import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -54,9 +55,13 @@ public class RouteController {
     private Stage primaryStage = null;
     private AppMainController appMainController = null;
     private Route myRoute = null;
+    private FreewayScenario myScenario = null;
     private String origRouteName = null;
     private boolean ignoreChange = true;
     
+    private List<Segment> routeSegments = null;
+    private Segment firstSegment = null;
+    private Segment lastSegment = null;
     
     @FXML // fx:id="scenarioEditorMainPane"
     private SplitPane scenarioEditorMainPane; // Value injected by FXMLLoader
@@ -101,6 +106,9 @@ public class RouteController {
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
+        routeName.textProperty().addListener((observable, oldValue, newValue) -> {
+            onRouteNameChange(null);
+        });
         
     }
     
@@ -110,15 +118,32 @@ public class RouteController {
      * configuration module.
      * @param route 
      */
-    public void initWithRouteData(Route route) {        
-        if (route == null)
+    public void initWithRouteAndScenarioData(Route route, FreewayScenario scenario) {        
+        if ((route == null) || (scenario == null))
             return;
         
-        ignoreChange = true;        
+        ignoreChange = true;
+        cbOrigin.getItems().clear();
+        cbDestination.getItems().clear();
+        listSections.getItems().clear();
         appMainController.setLeftStatus("");
         myRoute = route;
+        myScenario = scenario;
         routeName.setText(route.getName());
         origRouteName = route.getName();
+        
+        routeSegments = myRoute.get_segments();
+        firstSegment = null;
+        lastSegment = null;
+        int sz = routeSegments.size();
+        if (sz > 0) {
+            firstSegment = routeSegments.get(0);
+            lastSegment = routeSegments.get(sz-1);
+        }
+        for (int i = 0; i < sz; i++) {
+            listSections.getItems().add(routeSegments.get(i) + " (" +
+                    opt.utils.Misc.linkType2String(routeSegments.get(i).fwy().get_type()) + ")");
+        }
     
         
         
@@ -133,8 +158,29 @@ public class RouteController {
      **************************************************************************/
     
     @FXML
+    private void onRouteNameChange(ActionEvent event) {
+        if (ignoreChange)
+            return;
+        
+        String nm = routeName.getText();
+        if (nm.equals(""))
+            nm = origRouteName;
+        
+        myRoute.setName(nm);
+        appMainController.objectNameUpdate(myRoute);
+    }
+    
+    @FXML
     void onDeleteRoute(ActionEvent event) {
+        if (ignoreChange)
+            return;
+        
+        String header = "You are deleting route '" + myRoute.getName() + "'...";
+        String content = "Are you sure?";
+        if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, content))
+            return;
 
+        appMainController.deleteRoute(myRoute, myScenario);
     }
     
     
