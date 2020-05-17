@@ -27,6 +27,7 @@ package opt.config;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javafx.event.ActionEvent;
@@ -60,6 +61,8 @@ public class RouteController {
     private Route myRoute = null;
     private String origRouteName = null;
     private boolean ignoreChange = true;
+    private Set<Segment> visited = new HashSet<Segment>();
+    private int selectedRouteIndex = -1;
     
     private List<Segment> allSegments = new ArrayList<Segment>();
     private Set<Segment> originCandidates = new HashSet<Segment>();
@@ -117,11 +120,91 @@ public class RouteController {
      * Auxiliary 
      **************************************************************************/
     
-    private List<List<Segment>> computeRoutes(Segment origin, Segment destination, boolean back) {
+    private List<List<Segment>> launchDFT(Segment origin, Segment destination, boolean back) {
         List<List<Segment>> result = new ArrayList<List<Segment>>();
+        List<Segment> sub = new ArrayList<Segment>();
+        Segment seg, target;
+        Set<Segment> children;
         
+        if (!back) { // going forward starting from the origin
+            if (origin == null) // nothing to start with, hence return an empty list of lists
+                return result;
+            seg = origin;
+            target = destination;
+            children = seg.get_dnstrm_segments();
+        } else { // going backward starting from the destination
+            if (destination == null) // nothing to start with, hence return an empty list of lists
+                return result;
+            seg = destination;
+            target = origin;
+            children = seg.get_upstrm_segments();
+        }
+        
+        int sz = children.size();
+        
+        while ((sz == 1) && (!visited.contains(seg)) && (!seg.equals(target))) { // traverse the single available path
+            sub.add(seg);
+            visited.add(seg);
+            seg = children.iterator().next();
+            
+            if (!back)
+                children = seg.get_dnstrm_segments();
+            else
+                children = seg.get_upstrm_segments();
+            sz = children.size();
+        }
+        
+        if (seg.equals(target)) {
+            if (!visited.contains(seg)) {
+                sub.add(seg);
+                visited.add(seg);
+            }
+            result.add(sub);
+            return result;
+        }
+        
+        if (visited.contains(seg)) {
+            if (target == null)
+                result.add(sub);
+            return result;
+        }
+        
+        if (sz < 1) {
+            if (target == null) {
+                sub.add(seg);
+                visited.add(seg);
+                result.add(sub);
+            }
+            return result;
+        }
+        
+        // If we reached this point, then the network bifurcates:
+        // there are multiple children.
+        // Here we need to invoke recursion...
+        sub.add(seg);
+        visited.add(seg);
+        Iterator<Segment> it = children.iterator();
+        while (it.hasNext()) {
+            seg = it.next();
+            List<List<Segment>> subres;
+            if (!back)
+                subres = launchDFT(seg, destination, back);
+            else
+                subres = launchDFT(origin, seg, back);
+            
+            for (List<Segment> subroute : subres) {
+                List<Segment> new_rt = new ArrayList<Segment>(sub);
+                subroute.forEach((s) -> { new_rt.add(s); });
+                result.add(new_rt);
+            }
+        }
         
         return result;
+    }
+    
+    private List<List<Segment>> computeRoutes(Segment origin, Segment destination, boolean back) {
+        visited.clear();
+        return launchDFT(origin, destination, back);
     }
     
     private void filterOriginCadidates(List<List<Segment>> seg_lists) {
@@ -208,14 +291,17 @@ public class RouteController {
         return uniqueDescriptions;
     }
     
-    private void setNewRoute() {
+    private void setRoute() {
         if ((firstSegment == null) || (lastSegment == null))
             return;
+        
+        selectedRouteIndex = -1;
         
         List<List<Segment>> seg_sequences = computeRoutes(firstSegment, lastSegment, false);
         if (seg_sequences.size() < 2) {
             routeSegments = seg_sequences.get(0);
         } else {
+            
             List<String> choices = getUniqueRouteDescriptions(seg_sequences);
         }
         
@@ -263,6 +349,8 @@ public class RouteController {
             return;
         
         ignoreChange = true;
+        
+        selectedRouteIndex = -1;
         cbOrigin.getItems().clear();
         cbDestination.getItems().clear();
         appMainController.setLeftStatus("");
@@ -355,9 +443,9 @@ public class RouteController {
         int idx = cbOrigin.getSelectionModel().getSelectedIndex();
         firstSegment = originList.get(idx);
         List<List<Segment>> fromOrigin = computeRoutes(firstSegment, null, false);
-        //filterDestinationCadidates(fromOrigin);
+        filterDestinationCadidates(fromOrigin);
         cbDestinationUpdate();
-        //setNewRoute();
+        setRoute();
         
         ignoreChange = false;
     }
@@ -371,9 +459,9 @@ public class RouteController {
         int idx = cbDestination.getSelectionModel().getSelectedIndex();
         lastSegment = destinationList.get(idx);
         List<List<Segment>> fromDestination = computeRoutes(null, lastSegment, true);
-        //filterOriginCadidates(fromDestination);
+        filterOriginCadidates(fromDestination);
         cbOriginUpdate();
-        //setNewRoute();
+        setRoute();
         
         ignoreChange = false;
     }
