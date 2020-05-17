@@ -432,7 +432,6 @@ public class AppMainController {
     
     
     private void populateProjectTree() {
-        //selectedScenario = null;
         leftStatus.setText("");
         reportTabPane.setDisable(true);
         actionPane.getSelectionModel().selectFirst();
@@ -776,7 +775,7 @@ public class AppMainController {
             
             Route route = (Route)obj;
             if (route != null)
-                routeController.initWithRouteAndScenarioData(route, selectedScenario);
+                routeController.initWithRouteData(route);
         }
         
     }
@@ -879,7 +878,7 @@ public class AppMainController {
     
     
     
-    public void deleteRoute(Route rt, FreewayScenario scenario) {
+    public void deleteRoute(Route rt) {
         if (rt == null) 
             return;
         
@@ -893,7 +892,7 @@ public class AppMainController {
         setProjectModified(true);
         populateProjectTree();
         
-        TreeItem<String> stn = object2tree.get(scenario);
+        TreeItem<String> stn = object2tree.get(rt.get_scenario());
         TreeItem<String> routes_node = stn.getChildren().stream()
                 .filter(ch -> ch.getValue().matches(routesTreeItem))
                 .collect(Collectors.toList()).get(0);

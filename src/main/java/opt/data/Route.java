@@ -63,6 +63,10 @@ public class Route {
     public long getId() {
         return id;
     }
+    
+    public FreewayScenario get_scenario() {
+        return my_fwy_scenario;
+    }
 
     public List<Segment> get_segments() {
         return segments.stream().collect(Collectors.toList());
@@ -70,6 +74,12 @@ public class Route {
 
     public List<Long> get_segment_ids() {
         return segments.stream().map(s->s.id).collect(Collectors.toList());
+    }
+    
+    public void set_segments(List<Segment> segs) {
+        if (segs == null)
+            return;
+        segments = new ArrayList<>(segs);
     }
     
     public void add_segment_ids(List<Long> segmentids) {
