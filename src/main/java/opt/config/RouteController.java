@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -42,8 +43,10 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.UserSettings;
@@ -58,6 +61,8 @@ import opt.utils.ModifiedDoubleStringConverter;
 public class RouteController {
     private Stage primaryStage = null;
     private AppMainController appMainController = null;
+    private RouteChoiceController routeChoiceController = null;
+    private Scene routeChoiceScene = null;
     private Route myRoute = null;
     private String origRouteName = null;
     private boolean ignoreChange = true;
@@ -112,6 +117,23 @@ public class RouteController {
         primaryStage = s;
     }
     
+    
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the route choice controller that is used to choose
+     *               between available routes.
+     */
+    public void setRouteChoiceControllerAndScene(RouteChoiceController ctrl, Scene scn) {
+        routeChoiceController = ctrl;
+        routeChoiceScene = scn;
+        routeChoiceScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
+        routeChoiceController.setRouteController(this);
+    }
+    
+    
+    public void setSelectedRouteIndex(int idx) {
+        selectedRouteIndex = idx;
+    }
     
     
     
@@ -281,7 +303,7 @@ public class RouteController {
                     }
                 }
                 if (unique) {
-                    nm = seg.fwy().get_name();
+                    nm = "Goes through '" + seg.fwy().get_name() + "'";
                     break;
                 }
             }
@@ -301,8 +323,19 @@ public class RouteController {
         if (seg_sequences.size() < 2) {
             routeSegments = seg_sequences.get(0);
         } else {
-            
             List<String> choices = getUniqueRouteDescriptions(seg_sequences);
+            Stage inputStage = new Stage();
+            inputStage.initOwner(primaryStage);
+            inputStage.setScene(routeChoiceScene);
+            String title = "Choose Route";
+            routeChoiceController.initWithRouteChoices(choices);
+            inputStage.setTitle(title);
+            inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+            inputStage.initModality(Modality.APPLICATION_MODAL);
+            inputStage.setResizable(false);
+            inputStage.showAndWait();
+            if ((selectedRouteIndex >= 0) && (selectedRouteIndex < seg_sequences.size()))
+                routeSegments = seg_sequences.get(selectedRouteIndex);
         }
         
         int sz = routeSegments.size();

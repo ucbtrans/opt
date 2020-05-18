@@ -74,6 +74,7 @@ import opt.config.NewRampController;
 import opt.config.NewRampMeterController;
 import opt.config.RampMeterAlinea;
 import opt.config.RampMeterTOD;
+import opt.config.RouteChoiceController;
 import opt.config.RouteController;
 import opt.config.ScenarioEditorController;
 import opt.config.VehicleTypeController;
@@ -128,6 +129,8 @@ public class AppMainController {
     
     private SplitPane routeEditorPane = null;
     private RouteController routeController = null;
+    private GridPane routeChoicePane = null;
+    private RouteChoiceController routeChoiceController = null;
     
     private Image imageLinkFreeway = new Image(getClass().getResourceAsStream("/LinkFreeway.gif"));
     private Image imageLinkOR = new Image(getClass().getResourceAsStream("/LinkOR.gif"));
@@ -421,7 +424,12 @@ public class AppMainController {
             routeEditorPane = loader.load();
             routeController = loader.getController();
             routeController.setPrimaryStage(primaryStage);
-            routeController.setAppMainController(this);;
+            routeController.setAppMainController(this);
+            
+            loader = new FXMLLoader(getClass().getResource("/route_choice.fxml"));
+            routeChoicePane = loader.load();
+            routeChoiceController = loader.getController();
+            routeController.setRouteChoiceControllerAndScene(routeChoiceController, new Scene(routeChoicePane));
             
         } catch (IOException e) {
             opt.utils.Dialogs.ExceptionDialog("Cannot initialize UI modules...", e);
