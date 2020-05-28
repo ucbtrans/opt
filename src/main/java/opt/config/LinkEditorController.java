@@ -765,6 +765,7 @@ public class LinkEditorController {
             
             if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
                 int del_num = demandTableHandler.deleteRows();
+                setDemand();
                 appMainController.setLeftStatus("Deleted " + del_num + " demand entries from '" + myLink.get_name() + "'.");
             }
 
@@ -823,6 +824,7 @@ public class LinkEditorController {
             
             if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
                 int del_num = srTableHandler.deleteRows();
+                setSR();
                 appMainController.setLeftStatus("Deleted " + del_num + " split ratio entries from '" + myLink.get_name() + "'.");
             }
 

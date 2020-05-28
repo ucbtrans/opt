@@ -154,6 +154,12 @@ public class TSTableHandler {
             event.consume();
             return false;
         }
+        
+        if (event.getCode() == KeyCode.DOWN) {
+            moveDown();
+            event.consume();
+            return false;
+        }
               
         return res;
     }
@@ -558,6 +564,25 @@ public class TSTableHandler {
         }
         
         if (row < numRows) {
+             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        }
+        focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
+    }
+    
+    
+    private void moveDown() {
+        int numRows = myTable.getItems().size();
+        int numCols = myTable.getColumns().size();
+        
+        int row = prevFocusedCell.getRow() + 1;
+        int col = prevFocusedCell.getColumn();
+        myTable.getSelectionModel().clearSelection();
+        
+        if (row >= numRows) {
+            row = numRows - 1;
+        }
+        
+        if (col < numCols) {
              myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
         }
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();

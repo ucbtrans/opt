@@ -230,11 +230,13 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
                 //getTableView().getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
 		event.consume();
             } else if (event.getCode() == KeyCode.UP) {
-		getTableView().getSelectionModel().selectAboveCell();
+		//getTableView().getSelectionModel().selectAboveCell();
+                moveUp(getTableView(), focusedCell);
                 getTableView().getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
 		event.consume();
             } else if (event.getCode() == KeyCode.DOWN) {
-		getTableView().getSelectionModel().selectBelowCell();
+		//getTableView().getSelectionModel().selectBelowCell();
+                moveDown(getTableView(), focusedCell);
                 getTableView().getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
 		event.consume();
             }
@@ -297,6 +299,24 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
     }
     
     
+    private void moveUp(TableView<S> myTable, TablePosition<S, ?> focusedCell) {
+        int numRows = myTable.getItems().size();
+        int numCols = myTable.getColumns().size();
+        
+        int row = focusedCell.getRow() - 1;
+        int col = focusedCell.getColumn();
+        myTable.getSelectionModel().clearSelection();
+        
+        if (row < 0) {
+            row = 0;
+        }
+        
+        if (col >= (ignoreFirstCol ? 1 : 0)) {
+             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        }
+    }
+    
+    
     private void moveForward(TableView<S> myTable, TablePosition<S, ?> focusedCell) {
         int numRows = myTable.getItems().size();
         int numCols = myTable.getColumns().size();
@@ -311,6 +331,24 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
         }
         
         if (row < numRows) {
+             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        }
+    }
+    
+    
+    private void moveDown(TableView<S> myTable, TablePosition<S, ?> focusedCell) {
+        int numRows = myTable.getItems().size();
+        int numCols = myTable.getColumns().size();
+        
+        int row = focusedCell.getRow() + 1;
+        int col = focusedCell.getColumn();
+        myTable.getSelectionModel().clearSelection();
+        
+        if (row >= numRows) {
+            row = numRows - 1;
+        }
+        
+        if (col < numCols) {
              myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
         }
     }
