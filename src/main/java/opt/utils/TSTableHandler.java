@@ -57,6 +57,7 @@ import javafx.util.converter.NumberStringConverter;
 public class TSTableHandler {
     private DoubleStringConverter dsc = new DoubleStringConverter();
     private TableView<ObservableList<Object>> myTable = null;
+    TablePosition prevFocusedCell = null;
     TablePosition focusedCell = null;
     private int dt = 5;
     
@@ -105,6 +106,7 @@ public class TSTableHandler {
     
     public boolean onKeyPressed(KeyEvent event) {
         boolean res = false;
+        prevFocusedCell = focusedCell;
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
         
         if ((event.getCode() == KeyCode.C) && event.isControlDown()) {
@@ -451,12 +453,12 @@ public class TSTableHandler {
      ***************************************************************************/
     
     private void selectLeft() {
-        int col = focusedCell.getColumn() - 1;
+        int col = prevFocusedCell.getColumn() - 1;
         
         if (col < 0)
             return;
         
-        if (col < minSelectedColumn) {
+        if (col <= minSelectedColumn) {
             minSelectedColumn = col;
         } else {
             maxSelectedColumn = col;
@@ -467,12 +469,12 @@ public class TSTableHandler {
     }
     
     private void selectRight() {
-        int col = focusedCell.getColumn() + 1;
+        int col = prevFocusedCell.getColumn() + 1;
         
         if (col >= myTable.getColumns().size())
             return;
         
-        if (col > maxSelectedColumn) {
+        if (col >= maxSelectedColumn) {
             maxSelectedColumn = col;
         } else {
             minSelectedColumn = col;
@@ -483,12 +485,12 @@ public class TSTableHandler {
     }
     
     private void selectUp() {
-        int row = focusedCell.getRow() - 1;
+        int row = prevFocusedCell.getRow() - 1;
         
         if (row < 0)
             return;
         
-        if (row < minSelectedRow) {
+        if (row <= minSelectedRow) {
             minSelectedRow = row;
         } else {
             maxSelectedRow = row;
@@ -499,12 +501,12 @@ public class TSTableHandler {
     }
     
     private void selectDown() {
-        int row = focusedCell.getRow() + 1;
+        int row = prevFocusedCell.getRow() + 1;
         
         if (row >= myTable.getItems().size())
             return;
         
-        if (row > maxSelectedRow) {
+        if (row >= maxSelectedRow) {
             maxSelectedRow = row;
         } else {
             minSelectedRow = row;
@@ -526,8 +528,8 @@ public class TSTableHandler {
         int numRows = myTable.getItems().size();
         int numCols = myTable.getColumns().size();
         
-        int row = focusedCell.getRow();
-        int col = focusedCell.getColumn() - 1;
+        int row = prevFocusedCell.getRow();
+        int col = prevFocusedCell.getColumn() - 1;
         myTable.getSelectionModel().clearSelection();
         
         if (col < 1) {
@@ -538,6 +540,7 @@ public class TSTableHandler {
         if (row >= 0) {
              myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
         }
+        focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
     }
     
     
@@ -545,8 +548,8 @@ public class TSTableHandler {
         int numRows = myTable.getItems().size();
         int numCols = myTable.getColumns().size();
         
-        int row = focusedCell.getRow();
-        int col = focusedCell.getColumn() + 1;
+        int row = prevFocusedCell.getRow();
+        int col = prevFocusedCell.getColumn() + 1;
         myTable.getSelectionModel().clearSelection();
         
         if (col >= numCols) {
@@ -557,6 +560,7 @@ public class TSTableHandler {
         if (row < numRows) {
              myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
         }
+        focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
     }
         
     
