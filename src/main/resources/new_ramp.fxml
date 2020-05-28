@@ -51,12 +51,12 @@
             <Tooltip text="Attaches the ramp to the inner side of the freeway section" />
          </tooltip>
       </CheckBox>
-      <Spinner id="numManagedLanes" fx:id="numManagedLanes" prefWidth="200.0" GridPane.halignment="CENTER" GridPane.rowIndex="5">
+      <Spinner id="numManagedLanes" fx:id="numManagedLanes" editable="true" prefWidth="200.0" GridPane.halignment="CENTER" GridPane.rowIndex="5">
          <GridPane.margin>
             <Insets left="20.0" right="20.0" />
          </GridPane.margin>
       </Spinner>
-      <Spinner id="numGPLanes" fx:id="numGPLanes" maxWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+      <Spinner id="numGPLanes" fx:id="numGPLanes" editable="true" maxWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
          <GridPane.margin>
             <Insets left="20.0" right="20.0" />
          </GridPane.margin>
