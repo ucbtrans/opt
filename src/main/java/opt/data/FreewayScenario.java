@@ -45,6 +45,8 @@ public class FreewayScenario {
         scenario = new Scenario(this);
         create_isolated_segment(segmentname,params, AbstractLink.Type.freeway);
         scenario.commodities.put(0l,new Commodity(0l,"Unnamed commodity",1f));
+        controller_schedule = new Schedule(this);
+        reset_max_ids();
     }
 
     public FreewayScenario(String name,String description,jaxb.Sim sim,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Routes jaxb_routes,jaxb.Scenario jaxb_scenario) throws Exception {
