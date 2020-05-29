@@ -465,10 +465,21 @@ public class AppMainController {
                         continue;
                     
                     AbstractLink link = segment.fwy();
-                    TreeItem<String> seg_node = new TreeItem<String>(link.get_name(), new ImageView(imageLinkFreeway));
-                    tree2object.put(seg_node, link);
-                    object2tree.put(link, seg_node);
-                    links_node.getChildren().add(seg_node);
+                    if (object2tree.containsKey(link))
+                        continue;
+                    
+                    TreeItem<String> seg_node;
+                    if (link.get_type() == AbstractLink.Type.connector) {
+                        seg_node = new TreeItem<String>(link.get_name(), new ImageView(imageLinkConnector));
+                        tree2object.put(seg_node, link);
+                        object2tree.put(link, seg_node);
+                        links_node.getChildren().add(seg_node);
+                    } else {
+                        seg_node = new TreeItem<String>(link.get_name(), new ImageView(imageLinkFreeway));
+                        tree2object.put(seg_node, link);
+                        object2tree.put(link, seg_node);
+                        links_node.getChildren().add(seg_node);
+                    }
 
                     for (int i = 0; i < segment.num_out_ors(); i++) {
                         link = segment.out_ors(i);
