@@ -29,7 +29,6 @@ public class FreewayScenario {
     // simulation parameters
     protected float sim_start_time = 0f;
     protected float sim_duration = 86400f;
-    protected SimDataScenario simData;
 
     /////////////////////////////////////
     // construction

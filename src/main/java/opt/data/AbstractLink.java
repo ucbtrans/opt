@@ -26,7 +26,7 @@ public abstract class AbstractLink implements Comparable {
 //    public Map<LaneGroupType,AbstractActuator> actuator = new HashMap<>();
 
     // simulation data
-    public SimDataLink simdata;
+//    public SimDataLink simdata;
 
     /////////////////////////////////////
     // abstract methods

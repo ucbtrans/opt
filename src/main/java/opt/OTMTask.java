@@ -81,15 +81,17 @@ public class OTMTask  extends Task {
 		});
 	}
 
-	public void run_simulation(){
+	public SimDataScenario run_simulation(){
+
+		SimDataScenario simdata = null;
 
 		try {
 
-			mainController.simdata = new SimDataScenario(fwyscenario,otmdev.scenario);
+			simdata = new SimDataScenario(fwyscenario,otmdev.scenario);
 			otmdev.otm.initialize(start_time);
 
 			int steps_taken = 0;
-			mainController.simdata.update(start_time);
+			simdata.update(start_time);
 
 			while(steps_taken<numsteps){
 
@@ -101,7 +103,7 @@ public class OTMTask  extends Task {
 				steps_taken += 1;
 
 				// retrieve information
-				mainController.simdata.update(start_time+simdt*steps_taken);
+				simdata.update(start_time+simdt*steps_taken);
 
 				// progress bar
 				if(mainController!=null && steps_taken%step_per_progbar_update==0){
@@ -117,8 +119,12 @@ public class OTMTask  extends Task {
 		} catch (OTMException e) {
 			this.exception = e;
 			failed();
+		} finally {
+			if(mainController!=null)
+				mainController.simdata = simdata;
 		}
 
+		return simdata;
 	}
 
 	private static void remove_unsimulatable_stuff(jaxb.Scenario scn){

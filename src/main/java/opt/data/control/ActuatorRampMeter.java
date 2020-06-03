@@ -16,7 +16,7 @@ public class ActuatorRampMeter extends AbstractActuator {
 	@Override
 	public Actuator to_jaxb() {
 		jaxb.Actuator j =  super.to_jaxb();
-		j.setType("capacity");
+		j.setType("meter");
 		jaxb.ActuatorTarget jtgt = new jaxb.ActuatorTarget();
 		j.setActuatorTarget(jtgt);
 		jtgt.setType("link");

@@ -1,17 +1,14 @@
 package opt.data;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SimDataLink {
 
-    public AbstractLink optlink;
     public double link_length_miles;
     public Map<LaneGroupType, SimDataLanegroup> lgData;
 
-    public SimDataLink(AbstractLink optlink, common.Link otmlink){
-//        this.otmlink = otmlink;
-        this.optlink = optlink;
+    public SimDataLink(AbstractLink optlink, common.Link otmlink, Set<Long> commids){
+
         link_length_miles = otmlink.length / 1609.344;
         lgData = new HashMap<>();
 
@@ -19,49 +16,57 @@ public class SimDataLink {
 
         if(optlink.params.has_mng()){
             lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(0);
-            lgData.put(LaneGroupType.mng,new SimDataLanegroup(lg));
+            lgData.put(LaneGroupType.mng,new SimDataLanegroup(lg,commids));
         }
 
-        lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(optlink.get_mng_lanes());
-        lgData.put(LaneGroupType.gp,new SimDataLanegroup(lg));
+        lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(optlink.get_mng_lanes()+1);
+        lgData.put(LaneGroupType.gp,new SimDataLanegroup(lg,commids));
 
         if(optlink.params.has_aux()){
             lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(
-                    optlink.get_mng_lanes() + optlink.get_gp_lanes());
-            lgData.put(LaneGroupType.aux,new SimDataLanegroup(lg));
+                    optlink.get_mng_lanes() + optlink.get_gp_lanes() + 1);
+            lgData.put(LaneGroupType.aux,new SimDataLanegroup(lg,commids));
         }
 
     }
 
-    public void update(){
-        lgData.values().forEach(x->x.update());
+    /////////////////////////////////////////////////
+    // API
+    /////////////////////////////////////////////////
+
+    /** NOT IMPLEMENTED **/
+    public TimeSeries get_veh(LaneGroupType lgtype,Long commid){
+        TimeSeries X = null;
+        return X;
     }
 
-    /////////////////////////////////////////////////
-    // API for Alex
-    /////////////////////////////////////////////////
+    /** NOT IMPLEMENTED **/
+    public TimeSeries get_flw(LaneGroupType lgtype,Long commid){
+        TimeSeries X = null;
+        return X;
+    }
 
-    public Time2DSeries get_vehs(LaneGroupType lgtype){
+    /** NOT IMPLEMENTED **/
+    public TimeSeries get_speed(LaneGroupType lgtype,Long commid){
+        TimeSeries X = null;
+        return X;
+    }
 
-        boolean all_lgs = lgtype==null;
+    /** NOT IMPLEMENTED **/
+    public Time2DSeries get_veh_cell(LaneGroupType lgtype,Long commid){
+        Time2DSeries X = null;
+        return X;
+    }
 
-        // bad lg type
-        if(!all_lgs && !lgData.containsKey(lgtype))
-            return null;
+    /** NOT IMPLEMENTED **/
+    public Time2DSeries get_flw_cell(LaneGroupType lgtype,Long commid){
+        Time2DSeries X = null;
+        return X;
+    }
 
-        Time2DSeries X = new Time2DSeries();
-        X.time = optlink.mysegment.my_fwy_scenario.simData.time;
-
-        if(all_lgs){
-            // TODO G IMPLEMENT THIS 
-//            for(LaneGroupType lgt : lgData.keySet())
-//                for(SimDataLanegroup.CellData celldata : lgData.get(lgt).celldata)
-//                    X.values.add(celldata.vehs);
-        } else {
-            for(SimDataLanegroup.CellData celldata : lgData.get(lgtype).celldata)
-                X.values.add(celldata.vehs);
-        }
-
+    /** NOT IMPLEMENTED **/
+    public Time2DSeries get_speed_cell(LaneGroupType lgtype,Long commid){
+        Time2DSeries X = null;
         return X;
     }
 
