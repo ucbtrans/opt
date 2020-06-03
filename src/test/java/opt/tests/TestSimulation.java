@@ -16,7 +16,7 @@ public class TestSimulation extends AbstractTest {
         SimDataScenario simdata = task.run_simulation();
 
 
-        TimeSeries X = simdata.get_vht_for_network();
+        TimeSeries X = simdata.get_vht_for_network(null);
 
         System.out.println(X);
 
