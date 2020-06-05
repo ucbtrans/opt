@@ -8,6 +8,8 @@ import opt.data.FreewayScenario;
 import opt.data.SimDataScenario;
 
 import java.util.Iterator;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class OTMTask  extends Task {
 
@@ -83,15 +85,20 @@ public class OTMTask  extends Task {
 
 	public SimDataScenario run_simulation(){
 
-		SimDataScenario simdata = null;
+		SimDataScenario simdata;
 
 		try {
 
-			simdata = new SimDataScenario(fwyscenario,otmdev.scenario);
+			Set<Long> linkids = fwyscenario.get_links().stream().map(x->x.id).collect(Collectors.toSet());
+
+			for(Long commid : otmdev.scenario.commodities.keySet()){
+				otmdev.otm.output().request_cell_flw(commid,linkids,simdt);
+				otmdev.otm.output().request_cell_veh(commid,linkids,simdt);
+			}
+
 			otmdev.otm.initialize(start_time);
 
 			int steps_taken = 0;
-			simdata.update(start_time);
 
 			while(steps_taken<numsteps){
 
@@ -101,9 +108,6 @@ public class OTMTask  extends Task {
 				// advance otm, get back information
 				otmdev.otm.advance(simdt);
 				steps_taken += 1;
-
-				// retrieve information
-				simdata.update(start_time+simdt*steps_taken);
 
 				// progress bar
 				if(mainController!=null && steps_taken%step_per_progbar_update==0){
@@ -120,6 +124,7 @@ public class OTMTask  extends Task {
 			this.exception = e;
 			failed();
 		} finally {
+			simdata = new SimDataScenario(fwyscenario,otmdev);
 			if(mainController!=null)
 				mainController.simdata = simdata;
 		}

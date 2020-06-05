@@ -4,33 +4,28 @@ import java.util.*;
 
 public class SimCellData {
 
-    // for each commodity id, a list over time
-    public Map<Long, List<Double>> vehs;
+    public Map<Long, List<Double>> vehs;    // commid->vehs over time
+    public Map<Long, List<Double>> flws;    // commid->flw over time
 
     public SimCellData(Set<Long> commids){
         vehs = new HashMap<>();
-        for(Long commid : commids)
-            vehs.put(commid,new ArrayList<>());
+        flws = new HashMap<>();
+        for(Long commid : commids) {
+            vehs.put(commid, new ArrayList<>());
+            flws.put(commid, new ArrayList<>());
+        }
     }
 
-    public List<Double> get_vehs_for_commid(Long commid) {
-        if (vehs.isEmpty())
-            return null;
-        if (vehs.values().iterator().next().isEmpty())
-            return null;
-        if (commid == null) {
-            List<Double> X = new ArrayList<>();
-            int numtime = vehs.values().iterator().next().size();
-            for (int k = 0; k < numtime; k++) {
-                int finalK = k;
-                X.add(vehs.values().stream().mapToDouble(v -> v.get(finalK)).sum());
-            }
-            return X;
-        } else if (vehs.containsKey(commid)) {
-            return vehs.get(commid);
-        } else {
-            return null;
-        }
+    public void set_flws(long commid,List<Double> cummvalues,float dt_sec){
+        List<Double> flw = new ArrayList<>();
+        double alpha = 3600d/dt_sec;
+        for(int i = 1; i < cummvalues.size(); ++i)
+            flw.add((cummvalues.get(i)-cummvalues.get(i-1))*alpha);
+        flws.put(commid,flw);
+    }
+
+    public void set_vehs(long commid,List<Double> values){
+        vehs.put(commid,values);
     }
 
 }

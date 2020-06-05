@@ -138,4 +138,44 @@ public class Route {
     public String getName() {
         return name;
     }
+
+    public List<AbstractLink> get_link_sequence(){
+
+        List<AbstractLink> links = new ArrayList<>();
+
+        if(segments==null || segments.isEmpty())
+            return links;
+
+        // first link is the freeway|connector link
+        links.add(segments.get(0).fwy);
+        AbstractLink prevlink = links.get(0);
+
+        for(int i=1;i<segments.size();i++){
+            Segment prevseg = segments.get(i-1);
+            Segment currseg = segments.get(i);
+
+            // fwy -> conn
+            // prevsegment.offramps contains currseg.fwy.uplink
+            if(prevseg.get_frs().contains(currseg.fwy.up_link))
+                links.add(currseg.fwy.up_link);
+
+            // conn -> fwy
+            // currseg.onramps contains prevseg.fwy.dnlink
+            else if(currseg.get_ors().contains(prevseg.fwy.dn_link))
+                links.add(prevseg.fwy.dn_link);
+
+            // the only remaining legal case is fwy->fwy.
+            // if that is not the case, we have a problem.
+            // fwy -> fwy
+            else assert(prevlink.dn_link==currseg.fwy);
+
+            links.add(currseg.fwy);
+            prevlink = currseg.fwy;
+
+        }
+
+
+        return links;
+    }
+
 }
