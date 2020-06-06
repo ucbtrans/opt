@@ -63,6 +63,8 @@ public class TimeSeries {
 
     public XYSeries get_XYSeries(String label){
         XYSeries series = new XYSeries(label);
+        if(values==null)
+            return series;
         for(int k=0;k<time.size();k++)
             series.add(time.get(k),values.get(k));
         return series;

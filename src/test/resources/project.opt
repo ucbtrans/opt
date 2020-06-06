@@ -9,6 +9,7 @@
                 </commodities>
                 <network>
                     <nodes>
+                        <node id="0"/>
                         <node id="1"/>
                         <node id="2"/>
                         <node id="3"/>
@@ -30,6 +31,7 @@
                         <node id="19"/>
                     </nodes>
                     <links>
+                        <link id="0" length="100.0" full_lanes="4" start_node_id="0" end_node_id="1" roadparam="0" road_type="freeway"/>
                         <link id="1" length="1500.0" full_lanes="4" start_node_id="1" end_node_id="2" roadparam="0" road_type="freeway"/>
                         <link id="2" length="500.0" full_lanes="4" start_node_id="2" end_node_id="3" roadparam="0" road_type="freeway"/>
                         <link id="3" length="800.0" full_lanes="4" start_node_id="3" end_node_id="4" roadparam="0" road_type="freeway"/>
@@ -60,8 +62,8 @@
                     </model>
                 </models>
                 <demands>
-                    <demand commodity_id="0" link_id="1" start_time="0.0" dt="1800.0">750.0,0.0</demand>
-                    <demand commodity_id="1" link_id="1" start_time="0.0" dt="1800.0">750.0,0.0</demand>
+                    <demand commodity_id="0" link_id="0" start_time="0.0" dt="1800.0">750.0,0.0</demand>
+                    <demand commodity_id="1" link_id="0" start_time="0.0" dt="1800.0">750.0,0.0</demand>
                     <demand commodity_id="0" link_id="8" start_time="0.0" dt="1800.0">750.0,0.0</demand>
                     <demand commodity_id="1" link_id="8" start_time="0.0" dt="1800.0">750.0,0.0</demand>
                     <demand commodity_id="0" link_id="11" start_time="0.0" dt="1800.0">750.0,0.0</demand>
@@ -108,6 +110,7 @@
             </scenario>
             <ns2:sim starttime="0.0" duration="86400.0"/>
             <ns2:lnks>
+                <ns2:lnk id="0" name="lA0" is_inner="false"/>
                 <ns2:lnk id="1" name="lA1" is_inner="false"/>
                 <ns2:lnk id="2" name="lA2" is_inner="false"/>
                 <ns2:lnk id="3" name="lA3" is_inner="false"/>
@@ -126,6 +129,7 @@
                 <ns2:lnk id="18" name="lA18" is_inner="false"/>
             </ns2:lnks>
             <ns2:sgmts>
+                <ns2:sgmt type="fwy" id="0" name="sA1" fwy="0" />
                 <ns2:sgmt type="fwy" id="1" name="sA1" fwy="1" out_frs="7"/>
                 <ns2:sgmt type="fwy" id="2" name="sA2" fwy="2"/>
                 <ns2:sgmt type="fwy" id="3" name="sA3" fwy="3" out_ors="8" out_frs="9"/>
@@ -137,8 +141,8 @@
                 <ns2:sgmt type="fwy" id="9" name="sA9" fwy="16" out_frs="18"/>
             </ns2:sgmts>
             <ns2:routes>
-                <ns2:route id="2" name="Route B" sgmts="1,7,8,9"/>
-                <ns2:route id="3" name="Route A" sgmts="1,2,3,4,5,6"/>
+                <ns2:route id="2" name="Route B" sgmts="0,1,7,8,9"/>
+                <ns2:route id="3" name="Route A" sgmts="0,1,2,3,4,5,6"/>
             </ns2:routes>
         </ns2:scn>
     </ns2:scns>

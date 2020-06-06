@@ -355,7 +355,7 @@ public class Scenario {
                         value -= fr_prof.get_ith_value(i);
                     if(value<0)
                         throw new Exception(String.format("One node %d, commodity %d, offramp splits add up to more than 1.0",node.id,comm_id));
-                    ml_prof.add(value);
+                    ml_prof.add_entry(value);
                 }
                 outlink2Profile.put(dn_ml.id,ml_prof);
 
