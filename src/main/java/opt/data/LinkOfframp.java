@@ -92,7 +92,7 @@ public class LinkOfframp extends AbstractLink {
     public final void set_split(Long comm_id,float dt, double[] values) throws Exception {
         Profile1D profile = new Profile1D(0f,dt);
         for(double v : values)
-            profile.add(v);
+            profile.add_entry(v);
         this.splits.put(comm_id, profile);
     }
 

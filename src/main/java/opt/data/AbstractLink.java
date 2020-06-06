@@ -372,7 +372,7 @@ public abstract class AbstractLink implements Comparable {
     public final void set_demand_vph(Long comm_id,float dt, double[] values) throws Exception {
         Profile1D profile = new Profile1D(0f,dt);
         for(double v : values)
-            profile.add(v);
+            profile.add_entry(v);
         this.demands.put(comm_id, profile);
     }
 
