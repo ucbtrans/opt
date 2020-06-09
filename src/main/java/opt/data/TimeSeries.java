@@ -3,11 +3,19 @@ package opt.data;
 import org.jfree.data.xy.XYSeries;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TimeSeries {
     public List<Float> time;
     public List<Double> values;
+
+    public TimeSeries(List<Float> time,double [] v){
+        this.time = time;
+        this.values = Arrays.stream(v).boxed().collect(Collectors.toList());
+    }
+
 
     public TimeSeries(List<Float> time,List<Double> v){
         this.time = time;

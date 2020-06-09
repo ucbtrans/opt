@@ -57,133 +57,150 @@ public class SimDataScenario {
 
     }
 
-    protected List<Double> zeros(){
-        List<Double> list = new ArrayList<>();
-        time.forEach(t->list.add(0d));
-        return list;
+    protected double [] nan(){
+        double [] X = new double[numtime()];
+        for(int k=0;k<X.length;k++)
+            X[k] = Double.NaN;
+        return X;
     }
 
-    protected List<Double> get_vehs_for_network_list(Long commid){
-
-        List<Double> vehs = new ArrayList<>(time.size()); // list over time
-        time.forEach(t->vehs.add(0d));
-
-        for(SimDataLink simlink : linkdata.values())
-            for (SimDataLanegroup simlg : simlink.lgData.values())
-                for (SimCellData simcell : simlg.celldata) {
+    protected double[] get_vehs_for_network_array(Long commid){
+        double[] vehs = new double[numtime()];
+        for(SimDataLink lkdata : linkdata.values())
+            for (SimDataLanegroup lgdata : lkdata.lgData.values())
+                for (SimCellData celldata : lgdata.celldata) {
                     if(commid==null){
-                        for(List<Double> list : simcell.vehs.values()){
+                        for(List<Double> list : celldata.vehs.values()){
                             for (int k = 0; k < list.size(); k++)
-                                vehs.set(k, vehs.get(k) + list.get(k));
+                                vehs[k] += list.get(k);
                         }
                     } else {
-                        if (simcell.vehs.containsKey(commid)) {
-                            List<Double> list = simcell.vehs.get(commid);
+                        if (celldata.vehs.containsKey(commid)) {
+                            List<Double> list = celldata.vehs.get(commid);
                             for (int k = 0; k < list.size(); k++)
-                                vehs.set(k, vehs.get(k) + list.get(k));
+                                vehs[k] += list.get(k);
                         }
                     }
                 }
-
         return vehs;
     }
 
-    protected List<Double> get_flws_for_network_list(Long commid){
-
-        List<Double> flws = new ArrayList<>(time.size()); // list over time
-        time.forEach(t->flws.add(0d));
-
-        for(SimDataLink simlink : linkdata.values())
-            for (SimDataLanegroup simlg : simlink.lgData.values())
-                for (SimCellData simcell : simlg.celldata) {
-                    if(commid==null){
-                        for(List<Double> list : simcell.flws.values()){
-                            for (int k = 0; k < list.size(); k++)
-                                flws.set(k, flws.get(k) + list.get(k));
-                        }
-                    } else {
-                        if (simcell.vehs.containsKey(commid)) {
-                            List<Double> list = simcell.flws.get(commid);
-                            for (int k = 0; k < list.size(); k++)
-                                flws.set(k, flws.get(k) + list.get(k));
-                        }
-                    }
-                }
-
-        return flws;
-    }
-
-    protected List<Double> get_vehs_for_route_list(List<AbstractLink> links,LaneGroupType globallgtype,Long commid){
-        List<Double> route_vehs = null;
+    protected double[] get_vehs_for_route_array(List<AbstractLink> links,LaneGroupType globallgtype,Long commid){
+        double [] route_vehs = new double[numtime()];
         for(AbstractLink link : links){
             SimDataLink lkdata = linkdata.get(link.id);
             LaneGroupType lgtype = lkdata.lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
-            List<Double> link_veh = lkdata.get_veh_list(lgtype,commid);
-            if(route_vehs==null)
-                route_vehs = link_veh;
-            else
-                for(int i=0;i<route_vehs.size();i++)
-                    route_vehs.set(i,route_vehs.get(i)+link_veh.get(i));
+            double [] link_veh = lkdata.get_veh_array(lgtype,commid);
+            for(int k=0;k<numtime();k++)
+                route_vehs[k] += link_veh[k];
         }
         return route_vehs;
     }
 
-    protected List<Double> get_flws_for_route_list(List<AbstractLink> links,LaneGroupType globallgtype,Long commid){
-        List<Double> route_flws = null;
-        for(AbstractLink link : links){
-            SimDataLink lkdata = linkdata.get(link.id);
-            LaneGroupType lgtype = lkdata.lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
-            List<Double> links_flws = linkdata.get(link.id).get_flw_list(lgtype,commid);
-            if(route_flws==null)
-                route_flws = links_flws;
-            else
-                for(int i=0;i<route_flws.size();i++)
-                    route_flws.set(i,route_flws.get(i)+links_flws.get(i));
+    protected double[] get_speed_for_network_array(){
+
+        double[] vehs = new double[numtime()];
+        double[] flw_length = new double[numtime()];
+
+        for(SimDataLink lkdata : linkdata.values()) {
+            if(lkdata.is_source)
+                continue;
+            double cell_length_miles = lkdata.cell_length();
+            for (SimDataLanegroup lgdata : lkdata.lgData.values()) {
+                for (SimCellData celldata : lgdata.celldata) {
+                    for (List<Double> v : celldata.vehs.values())
+                        for (int k = 0; k < numtime() ; k++)
+                            vehs[k] += v.get(k);
+
+                    for (List<Double> f : celldata.flws.values())
+                        for (int k = 0; k < numtime() ; k++)
+                            flw_length[k] += f.get(k) * cell_length_miles;
+                }
+            }
         }
-        return route_flws;
+
+        double[] speed = new double[numtime()];
+        for (int k = 0; k < numtime(); k++)
+            speed[k] = vehs[k]<1 || flw_length[k]<1 ? Double.NaN : flw_length[k]/vehs[k];
+
+        return speed;
+    }
+
+    protected double[] get_speed_for_route_array(List<AbstractLink> links,LaneGroupType globallgtype){
+
+        double[] vehs = new double[numtime()];
+        double[] flw_length = new double[numtime()];
+
+        for(AbstractLink link : links) {
+            if(link.is_source())
+                continue;
+            SimDataLink lkdata = linkdata.get(link.id);
+
+            double cell_length_miles = lkdata.cell_length();
+
+            if(globallgtype==null){
+                for (SimDataLanegroup lgdata : lkdata.lgData.values()) {
+                    for (SimCellData celldata : lgdata.celldata) {
+                        for (List<Double> v : celldata.vehs.values())
+                            for (int k = 0; k < numtime() ; k++)
+                                vehs[k] += v.get(k);
+
+                        for (List<Double> f : celldata.flws.values())
+                            for (int k = 0; k < numtime() ; k++)
+                                flw_length[k] += f.get(k) * cell_length_miles;
+                    }
+                }
+            } else {
+                LaneGroupType lgtype = lkdata.lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
+                for (SimCellData celldata : lkdata.lgData.get(lkdata.lgtype2id.get(lgtype)).celldata) {
+                    for (List<Double> v : celldata.vehs.values())
+                        for (int k = 0; k < numtime() ; k++)
+                            vehs[k] += v.get(k);
+
+                    for (List<Double> f : celldata.flws.values())
+                        for (int k = 0; k < numtime() ; k++)
+                            flw_length[k] += f.get(k) * cell_length_miles;
+                }
+            }
+        }
+
+        double[] speed = new double[numtime()];
+        for (int k = 0; k < numtime(); k++)
+            speed[k] = vehs[k]<1 || flw_length[k]<1 ? Double.NaN : flw_length[k]/vehs[k];
+
+        return speed;
     }
 
     /////////////////////////////////////////////////
     // API
     /////////////////////////////////////////////////
 
-    /** To get VHT just apply X.mult(X.get_dt()) to this **/
-    public TimeSeries get_vehs_for_network(Long commid){
-        return new TimeSeries(time,get_vehs_for_network_list(commid));
+    public int numtime(){
+        return time.size();
     }
 
-    /** NOT TESTED **/
-    public TimeSeries get_speed_for_network(){
-        List<Double> vehs = get_vehs_for_network_list(null);
-        List<Double> flws = get_flws_for_network_list(null);
-        List<Double> spds = new ArrayList<>();
-        for(int i=0;i<time.size();i++){
-            double speed = vehs.get(i) > 0 ? flws.get(i) / vehs.get(i) : 0d;    // TODO CHANGE DEFAULT SPEED
-            spds.add(speed);
-        }
-        return new TimeSeries(time,spds);
+    /** To get VHT just apply X.mult(X.get_dt()) to this **/
+    public TimeSeries get_vehs_for_network(Long commid){
+        return new TimeSeries(time,get_vehs_for_network_array(commid));
     }
 
     /** NOT TESTED **/
     /** To get VHT just apply X.mult(X.get_dt()) to this **/
     public TimeSeries get_vehs_for_route(long routeid,LaneGroupType lgtype,Long commid){
         List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
-        return new TimeSeries(time,get_vehs_for_route_list(routelinks,lgtype,commid));
+        return new TimeSeries(time,get_vehs_for_route_array(routelinks,lgtype,commid));
     }
 
     /** NOT TESTED **/
-    public TimeSeries get_speed_for_route(long routeid,LaneGroupType globallgtype){
-        List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
-        List<Double> vehs = get_vehs_for_route_list(routelinks,globallgtype,null);
-        List<Double> flws = get_flws_for_route_list(routelinks,globallgtype,null);
-        List<Double> spds = new ArrayList<>();
-        for(int i=0;i<time.size();i++){
-            double speed = vehs.get(i) > 0 ? flws.get(i) / vehs.get(i) : 0d;    // TODO CHANGE DEFAULT SPEED
-            spds.add(speed);
-        }
-        return new TimeSeries(time,spds);
+    public TimeSeries get_speed_for_network(){
+        return new TimeSeries(time,get_speed_for_network_array());
     }
 
+    /** NOT TESTED **/
+    public TimeSeries get_speed_for_route(long routeid,LaneGroupType lgtype){
+        List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
+        return new TimeSeries(time,get_speed_for_route_array(routelinks,lgtype));
+    }
 
 }
 
