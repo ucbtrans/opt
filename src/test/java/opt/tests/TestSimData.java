@@ -32,8 +32,9 @@ public class TestSimData extends AbstractTest {
             FreewayScenario fwy_scenario = project.get_scenarios().iterator().next();
             float start_time = 0f;
             float duration = 3600;
+            int outsteps = 300;
             int progbar_steps = 10;
-            task = new OTMTask(null,fwy_scenario,start_time,duration,progbar_steps);
+            task = new OTMTask(null,fwy_scenario,start_time,duration,outsteps,progbar_steps);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -122,9 +123,11 @@ public class TestSimData extends AbstractTest {
 
     @Test
     public void route_contour(){
-        TimeSeriesList tsl = simdata.get_speed_contour_for_route(routeA,LaneGroupType.gp);
+        TimeSeriesList X = simdata.get_speed_contour_for_route(routeA,LaneGroupType.gp);
 
-        System.out.println(tsl);
+        System.out.println(X.print_time());
+        System.out.println(X.print_space());
+        System.out.println(X.print_values());
     }
 
     /////////////////////////////////

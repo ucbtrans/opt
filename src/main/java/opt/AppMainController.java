@@ -56,15 +56,12 @@ import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
-import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import opt.config.ConnectController;
 import opt.config.LinkEditorController;
@@ -299,15 +296,26 @@ public class AppMainController {
         if (selectedScenario == null)
             return;
 
-        float start_time = selectedScenario.get_start_time();
-        float duration = selectedScenario.getSim_duration();
-        int progbar_steps = 50;
+        try{
+            float start_time = selectedScenario.get_start_time();
+            float duration = selectedScenario.get_sim_duration();
 
-        Thread th = new Thread(new OTMTask(this,selectedScenario,start_time,duration,progbar_steps));
-        th.setDaemon(true);
-        th.start();
-        leftStatus.setText("Simulating scenario \"" + selectedScenario.name + "\"...");
-        scenarioEditorController.getRunSimulationButton().setDisable(true);
+            // Set the number of divisions of the progress bar
+            int progbar_steps = 50;
+
+            // Set the number of time steps in the reported values
+            int output_steps = 100;
+
+            Thread th = new Thread(new OTMTask(this,selectedScenario,start_time,duration,output_steps,progbar_steps));
+            th.setDaemon(true);
+            th.start();
+            leftStatus.setText("Simulating scenario \"" + selectedScenario.name + "\"...");
+            scenarioEditorController.getRunSimulationButton().setDisable(true);
+        }
+        catch(Exception e){
+            opt.utils.Dialogs.ExceptionDialog("Error running OPT project", e);
+        }
+
     }
     
     

@@ -9,18 +9,13 @@ public class SimDataLanegroup {
     protected List<SimCellData> celldata;
 
     public SimDataLanegroup(models.fluid.FluidLaneGroup lg, Set<Long> commids){
-
         celldata = new ArrayList<>();
         for(int i=0;i<lg.cells.size();i++)
             celldata.add(new SimCellData(commids));
     }
 
-    protected int get_num_time(){
-        return celldata.get(0).vehs.values().iterator().next().size();
-    }
-
-    protected double [] get_veh(Long commid){
-        double [] X = new double[get_num_time()];
+    protected double [] get_veh(Long commid,int numtime){
+        double [] X = new double[numtime];
         for (SimCellData simcell : celldata) {
             if(commid==null){
                 for(List<Double> list : simcell.vehs.values()){
@@ -38,8 +33,8 @@ public class SimDataLanegroup {
         return X;
     }
 
-    protected double [] get_flw_exiting(Long commid){
-        double [] X = new double[get_num_time()];
+    protected double [] get_flw_exiting(Long commid,int numtime){
+        double [] X = new double[numtime];
         SimCellData lastcell = celldata.get(celldata.size()-1);
         if(commid==null){
             X = lastcell.get_total_flw();

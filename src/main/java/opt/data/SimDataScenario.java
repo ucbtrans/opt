@@ -205,12 +205,12 @@ public class SimDataScenario {
         assert(globallgtype!=null);
 
         List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
-        TimeSeriesList tsl = new TimeSeriesList(time);
+        TimeSeriesList X = new TimeSeriesList(time);
 
         for(AbstractLink link : routelinks) {
 
             if(link.is_source()){
-                tsl.add_entry(link,LaneGroupType.gp,0,nan());
+                X.add_entry(link,LaneGroupType.gp,0,nan());
                 continue;
             }
 
@@ -220,14 +220,13 @@ public class SimDataScenario {
             SimDataLanegroup lg = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
             double cell_length_miles = lkdata.link_length_miles/lg.celldata.size();
 
-            List<double []> zzz =  lg.get_cell_speeds(lkdata.ffspeed_mph,cell_length_miles);
+            List<double []> cell_speeds =  lg.get_cell_speeds(lkdata.ffspeed_mph,cell_length_miles);
 
-            for(int i=0;i<zzz.size();i++)
-                tsl.add_entry(link,lgtype,i,zzz.get(i));
+            for(int i=0;i<cell_speeds.size();i++)
+                X.add_entry(link,lgtype,i,cell_speeds.get(i));
         }
 
-
-        return tsl;
+        return X;
     }
 
 }

@@ -29,6 +29,7 @@ public class FreewayScenario {
     // simulation parameters
     protected float sim_start_time = 0f;
     protected float sim_duration = 86400f;
+    protected float sim_dt = 2f;
 
     /////////////////////////////////////
     // construction
@@ -326,16 +327,24 @@ public class FreewayScenario {
         return sim_start_time;
     }
 
-    public float getSim_duration(){
+    public float get_sim_duration(){
         return sim_duration;
+    }
+
+    public float get_sim_dt_sec(){
+        return sim_dt;
     }
 
     public void set_start_time(float start_time){
         this.sim_start_time = start_time;
     }
 
-    public void setSim_duration(float duration){
+    public void set_sim_duration(float duration){
         this.sim_duration = duration;
+    }
+
+    public void set_sim_dt_sec(float sim_dt){
+        this.sim_dt = sim_dt;
     }
 
     /////////////////////////////////////

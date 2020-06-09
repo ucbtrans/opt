@@ -1,18 +1,17 @@
 package opt.data;
-
-import models.fluid.AbstractFluidModel;
-
 import java.util.*;
 
 public class SimDataLink {
 
     private SimDataScenario scndata;
     public long id;
+
+    public Map<LaneGroupType,Long> lgtype2id;
+    public Map<Long, SimDataLanegroup> lgData;
+
     public double link_length_miles;
     public boolean is_source;
     protected float ffspeed_mph;
-    public Map<LaneGroupType,Long> lgtype2id;
-    public Map<Long, SimDataLanegroup> lgData;
 
     public SimDataLink(SimDataScenario scndata,AbstractLink optlink, common.Link otmlink, Set<Long> commids){
 
@@ -20,8 +19,6 @@ public class SimDataLink {
         this.scndata = scndata;
         this.is_source = otmlink.is_source;
         this.link_length_miles = otmlink.length / 1609.344;
-
-        float dt_hr = ((AbstractFluidModel)otmlink.model).dt_sec / 3600f;
 
         lgData = new HashMap<>();
         lgtype2id = new HashMap<>();
@@ -38,7 +35,9 @@ public class SimDataLink {
         int numcells = lg.cells.size();
         lgtype2id.put(LaneGroupType.gp,lg.id);
         lgData.put(lg.id,new SimDataLanegroup(lg,commids));
-        ffspeed_mph = (float) (lg.ffspeed_cell_per_dt * link_length_miles/numcells / dt_hr);
+
+        float simdt_hr = scndata.fwyscenario.get_sim_dt_sec() / 3600f;
+        ffspeed_mph = (float) (lg.ffspeed_cell_per_dt * link_length_miles/numcells/simdt_hr);
 
         if(optlink.params.has_aux()){
             lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(
@@ -47,6 +46,10 @@ public class SimDataLink {
             lgData.put(lg.id,new SimDataLanegroup(lg,commids));
         }
 
+    }
+
+    private int numtime(){
+        return scndata.time.size();
     }
 
     protected double get_length_lg_miles(){
@@ -62,13 +65,13 @@ public class SimDataLink {
         if(lgtype==null){
             double [] X = new double[scndata.numtime()];
             for(SimDataLanegroup data : lgData.values()){
-                double [] XX = data.get_veh(commid);
+                double [] XX = data.get_veh(commid,numtime());
                 for(int k=0;k<X.length;k++)
                     X[k] += XX[k];
             }
             return X;
         } else {
-            return lgData.get(lgtype2id.get(lgtype)).get_veh(commid);
+            return lgData.get(lgtype2id.get(lgtype)).get_veh(commid,numtime());
         }
     }
 
@@ -77,13 +80,13 @@ public class SimDataLink {
         if(lgtype==null){
             double [] X = new double[scndata.numtime()];
             for(SimDataLanegroup data : lgData.values()){
-                double [] XX = data.get_flw_exiting(commid);
+                double [] XX = data.get_flw_exiting(commid,numtime());
                 for(int k=0;k<X.length;k++)
                     X[k] += XX[k];
             }
             return X;
         } else {
-            return lgData.get(lgtype2id.get(lgtype)).get_flw_exiting(commid);
+            return lgData.get(lgtype2id.get(lgtype)).get_flw_exiting(commid,numtime());
         }
     }
 
@@ -133,14 +136,6 @@ public class SimDataLink {
 
     }
 
-//    protected List<double []> get_cell_speeds(LaneGroupType globallgtype){
-//        assert(globallgtype!=null);
-//        LaneGroupType lgtype = lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
-//        SimDataLanegroup lg = lgData.get(lgtype);
-//        double cell_length_miles = link_length_miles/lg.celldata.size();
-//        return lg.get_cell_speeds(ffspeed_mph,cell_length_miles);
-//    }
-
     /////////////////////////////////////////////////
     // API
     /////////////////////////////////////////////////
@@ -174,23 +169,5 @@ public class SimDataLink {
     public TimeSeries get_speed(LaneGroupType lgtype){
         return new TimeSeries(scndata.time,lgtype2id.containsKey(lgtype)||lgtype==null ? get_spd_array(lgtype) : scndata.nan());
     }
-
-//    /** NOT IMPLEMENTED **/
-//    public Time2DSeries get_veh_cell(LaneGroupType lgtype,Long commid){
-//        Time2DSeries X = null;
-//        return X;
-//    }
-//
-//    /** NOT IMPLEMENTED **/
-//    public Time2DSeries get_flw_cell(LaneGroupType lgtype,Long commid){
-//        Time2DSeries X = null;
-//        return X;
-//    }
-//
-//    /** NOT IMPLEMENTED **/
-//    public Time2DSeries get_speed_cell(LaneGroupType lgtype,Long commid){
-//        Time2DSeries X = null;
-//        return X;
-//    }
 
 }

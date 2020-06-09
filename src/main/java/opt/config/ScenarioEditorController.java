@@ -248,7 +248,7 @@ public class ScenarioEditorController {
         if (st == Float.NaN)
             st = (float)opt.UserSettings.defaultStartTime;
         
-        float duration = myScenario.getSim_duration();
+        float duration = myScenario.get_sim_duration();
         if (duration == Float.NaN)
             duration = (float)opt.UserSettings.defaultSimulationDuration;
         
@@ -376,7 +376,7 @@ public class ScenarioEditorController {
             return;
 
         int seconds = Misc.timeString2Seconds(buf);
-        myScenario.setSim_duration(seconds);
+        myScenario.set_sim_duration(seconds);
         appMainController.setProjectModified(true);
     }
     

@@ -64,12 +64,34 @@ public class TimeSeriesList {
         return null;
     }
 
+    public String print_time(){
+        String str = "";
+        for(float t : time)
+            str += String.format("%.2f\n",t);
+        return str;
+    }
 
+    public String print_space(){
+        String str = "";
+        for(LinkLaneGroupCell s : space)
+            str += String.format("%d\t%s\t%d\n",s.link,s.lg,s.cell);
+        return str;
+    }
+
+    public String print_values(){
+        String str = "";
+        for(double[] v : values){
+            for(int i = 0; i < v.length - 1; ++i)
+                str += String.format("%.2f,",v[i]);
+            str += String.format("%.2f;\n",v[v.length-1]);
+        }
+        return str;
+    }
 
     public class LinkLaneGroupCell{
-        long link;
-        LaneGroupType lg;
-        int cell;
+        final long link;
+        final LaneGroupType lg;
+        final int cell;
         public LinkLaneGroupCell(long link,LaneGroupType lg,int cell){
             this.link=link;
             this.lg = lg;
@@ -77,4 +99,8 @@ public class TimeSeriesList {
         }
     }
 
+    @Override
+    public String toString() {
+        return print_values();
+    }
 }
