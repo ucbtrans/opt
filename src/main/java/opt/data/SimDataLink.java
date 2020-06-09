@@ -133,6 +133,14 @@ public class SimDataLink {
 
     }
 
+//    protected List<double []> get_cell_speeds(LaneGroupType globallgtype){
+//        assert(globallgtype!=null);
+//        LaneGroupType lgtype = lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
+//        SimDataLanegroup lg = lgData.get(lgtype);
+//        double cell_length_miles = link_length_miles/lg.celldata.size();
+//        return lg.get_cell_speeds(ffspeed_mph,cell_length_miles);
+//    }
+
     /////////////////////////////////////////////////
     // API
     /////////////////////////////////////////////////

@@ -46,4 +46,20 @@ public class SimCellData {
                 X[k] += c.get(k);
         return X;
     }
+
+    public double[] get_speed(float ffspeed_mph,double cell_length_miles){
+        int numtime = vehs.values().iterator().next().size();
+        double [] speeds = new double[numtime];
+        for(int k=0;k<numtime;k++) {
+            double sumflw = 0d;
+            double sumveh = 0d;
+            for (long commid : vehs.keySet()) {
+                sumflw += flws.get(commid).get(k);
+                sumveh += vehs.get(commid).get(k);
+            }
+            speeds[k] = sumveh<1 || sumflw<1 ? ffspeed_mph : cell_length_miles*sumflw/sumveh;
+        }
+        return speeds;
+    }
+
 }

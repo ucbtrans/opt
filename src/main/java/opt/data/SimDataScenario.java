@@ -184,22 +184,50 @@ public class SimDataScenario {
         return new TimeSeries(time,get_vehs_for_network_array(commid));
     }
 
-    /** NOT TESTED **/
     /** To get VHT just apply X.mult(X.get_dt()) to this **/
     public TimeSeries get_vehs_for_route(long routeid,LaneGroupType lgtype,Long commid){
         List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
         return new TimeSeries(time,get_vehs_for_route_array(routelinks,lgtype,commid));
     }
 
-    /** NOT TESTED **/
+    /** ....... **/
     public TimeSeries get_speed_for_network(){
         return new TimeSeries(time,get_speed_for_network_array());
     }
 
-    /** NOT TESTED **/
+    /** ....... **/
     public TimeSeries get_speed_for_route(long routeid,LaneGroupType lgtype){
         List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
         return new TimeSeries(time,get_speed_for_route_array(routelinks,lgtype));
+    }
+
+    public TimeSeriesList get_speed_contour_for_route(long routeid,LaneGroupType globallgtype) {
+        assert(globallgtype!=null);
+
+        List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
+        TimeSeriesList tsl = new TimeSeriesList(time);
+
+        for(AbstractLink link : routelinks) {
+
+            if(link.is_source()){
+                tsl.add_entry(link,LaneGroupType.gp,0,nan());
+                continue;
+            }
+
+            SimDataLink lkdata = linkdata.get(link.id);
+
+            LaneGroupType lgtype = lkdata.lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
+            SimDataLanegroup lg = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
+            double cell_length_miles = lkdata.link_length_miles/lg.celldata.size();
+
+            List<double []> zzz =  lg.get_cell_speeds(lkdata.ffspeed_mph,cell_length_miles);
+
+            for(int i=0;i<zzz.size();i++)
+                tsl.add_entry(link,lgtype,i,zzz.get(i));
+        }
+
+
+        return tsl;
     }
 
 }

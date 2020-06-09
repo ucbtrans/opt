@@ -1,7 +1,5 @@
 package opt.data;
 
-import models.fluid.AbstractFluidModel;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -55,5 +53,11 @@ public class SimDataLanegroup {
         return X;
     }
 
+    protected List<double[]> get_cell_speeds(float ffspeed_mph,double cell_length_miles){
+        List<double[]> speeds = new ArrayList<>();
+        for(SimCellData cd : celldata)
+            speeds.add(cd.get_speed(ffspeed_mph,cell_length_miles));
+        return speeds;
+    }
 
 }

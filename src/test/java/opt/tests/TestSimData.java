@@ -120,6 +120,13 @@ public class TestSimData extends AbstractTest {
                 "temp/routeA_speed_all.png");
     }
 
+    @Test
+    public void route_contour(){
+        TimeSeriesList tsl = simdata.get_speed_contour_for_route(routeA,LaneGroupType.gp);
+
+        System.out.println(tsl);
+    }
+
     /////////////////////////////////
     // link level
     /////////////////////////////////
