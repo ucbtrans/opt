@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+
+<TabPane id="linkPerformanceMainPane" fx:id="linkPerformanceMainPane" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="600.0" prefHeight="820.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.performance.LinkPerformanceController">
+  <tabs>
+    <Tab id="tabTimeSeries" fx:id="tabTimeSeries" text="Time Series">
+         <content>
+            <ScrollPane id="spTimeSeries" fx:id="spTimeSeries" prefHeight="200.0" prefWidth="200.0" />
+         </content>
+    </Tab>
+    <Tab id="tabAggregates" fx:id="tabAggregates" text="Aggregates">
+         <content>
+            <ScrollPane id="spAggregates" fx:id="spAggregates" prefHeight="200.0" prefWidth="200.0" />
+         </content>
+    </Tab>
+      <Tab id="tabEmissions" fx:id="tabEmissions" disable="true" text="Emissions">
+         <content>
+            <ScrollPane id="spEmissions" fx:id="spEmissions" prefHeight="200.0" prefWidth="200.0" />
+         </content>
+      </Tab>
+  </tabs>
+</TabPane>

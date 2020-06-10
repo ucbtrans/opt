@@ -76,6 +76,7 @@ import opt.config.RouteController;
 import opt.config.ScenarioEditorController;
 import opt.config.VehicleTypeController;
 import opt.data.*;
+import opt.performance.LinkPerformanceController;
 
 
 /**
@@ -84,8 +85,6 @@ import opt.data.*;
  * @author Alex Kurzhanskiy
  */
 public class AppMainController {
-
-    protected SimDataScenario simdata = null;
 
     private Stage primaryStage = null;
     private Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
@@ -109,6 +108,8 @@ public class AppMainController {
     
     private SplitPane linkEditorPane = null;
     private LinkEditorController linkEditorController = null;
+    private TabPane linkPerformancePane = null;
+    private LinkPerformanceController linkPerformanceController = null;
     private GridPane linkInfoPane = null;
     private LinkInfoController linkInfoController = null;
     private GridPane newLinkPane = null;
@@ -138,6 +139,8 @@ public class AppMainController {
     private Image imageFolder = new Image(getClass().getResourceAsStream("/imageFolder.png"));
  
     private FreewayScenario selectedScenario = null;
+    protected SimDataScenario simdata = null;
+    private Map<FreewayScenario, SimDataScenario> scenario2simData = new HashMap<FreewayScenario, SimDataScenario>();
     
     private ContextMenu routesCM = new ContextMenu(); 
     private MenuItem cmNewRoute = new MenuItem("New Route");
@@ -180,6 +183,9 @@ public class AppMainController {
 
     @FXML // fx:id="reportTabPane"
     private Tab reportTabPane; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="reportAnchorPane"
+    private AnchorPane reportAnchorPane; // Value injected by FXMLLoader
     
     @FXML // fx:id="infoAnchorPane"
     private AnchorPane infoAnchorPane; // Value injected by FXMLLoader
@@ -271,6 +277,14 @@ public class AppMainController {
             }
             p = p.getParent();
         }
+        if ((selectedScenario != null) &&
+            (scenario2simData.containsKey(selectedScenario)) &&
+            (scenario2simData.get(selectedScenario) != null)) {
+            reportTabPane.setDisable(false);
+        } else {
+            actionPane.getSelectionModel().selectFirst();
+            reportTabPane.setDisable(true);
+        } 
     }
     
     
@@ -296,6 +310,9 @@ public class AppMainController {
         if (selectedScenario == null)
             return;
 
+        if (scenario2simData.containsKey(selectedScenario) && (scenario2simData.get(selectedScenario) != null))
+            scenario2simData.remove(selectedScenario);
+        
         try{
             float start_time = selectedScenario.get_start_time();
             float duration = selectedScenario.get_sim_duration();
@@ -315,8 +332,17 @@ public class AppMainController {
         catch(Exception e){
             opt.utils.Dialogs.ExceptionDialog("Error running OPT project", e);
         }
-
+        
     }
+    
+    
+    public void attachSimDataToScenario(SimDataScenario d) {
+        if (d == null)
+            return;
+        System.err.println("Recording data!");
+        scenario2simData.put(d.fwyscenario, d);
+    }
+    
     
     
     public void completeSimulation() {
@@ -324,7 +350,14 @@ public class AppMainController {
         scenarioEditorController.getRunSimulationButton().setDisable(false);
         reportTabPane.setDisable(false);
         leftStatus.setText("Simulation completed!");
-        actionPane.getSelectionModel().selectLast();
+        if ((selectedScenario != null) &&
+            (scenario2simData.containsKey(selectedScenario)) &&
+            (scenario2simData.get(selectedScenario) != null)) {
+            actionPane.getSelectionModel().selectLast();
+            processTreeSelection(object2tree.get(selectedScenario));
+        } else {
+            reportTabPane.setDisable(true);
+        }
     }
 
     
@@ -385,6 +418,12 @@ public class AppMainController {
             linkEditorController.setPrimaryStage(primaryStage);
             linkEditorController.setAppMainController(this);
             //linkEditorController.initWithLinkData(null);
+            
+            loader = new FXMLLoader(getClass().getResource("/link_performance.fxml"));
+            linkPerformancePane = loader.load();
+            linkPerformanceController = loader.getController();
+            linkPerformanceController.setPrimaryStage(primaryStage);
+            linkPerformanceController.setAppMainController(this);
             
             loader = new FXMLLoader(getClass().getResource("/link_info.fxml"));
             linkInfoPane = loader.load();
@@ -760,6 +799,13 @@ public class AppMainController {
             configAnchorPane.setBottomAnchor(linkEditorPane, 0.0);
             configAnchorPane.setLeftAnchor(linkEditorPane, 0.0);
             configAnchorPane.setRightAnchor(linkEditorPane, 0.0);
+            
+            reportAnchorPane.getChildren().clear();
+            reportAnchorPane.getChildren().setAll(linkPerformancePane);
+            reportAnchorPane.setTopAnchor(linkPerformancePane, 0.0);
+            reportAnchorPane.setBottomAnchor(linkPerformancePane, 0.0);
+            reportAnchorPane.setLeftAnchor(linkPerformancePane, 0.0);
+            reportAnchorPane.setRightAnchor(linkPerformancePane, 0.0);
                 
             infoAnchorPane.getChildren().clear();
             infoAnchorPane.getChildren().setAll(linkInfoPane);
@@ -772,6 +818,11 @@ public class AppMainController {
             if (lnk != null) {
                 linkEditorController.initWithLinkData(lnk);
                 linkInfoController.initWithLinkData(lnk);
+                if ((selectedScenario != null) &&
+                    (scenario2simData.containsKey(selectedScenario)) &&
+                    (scenario2simData.get(selectedScenario) != null)) { 
+                    linkPerformanceController.initWithLinkData(lnk, scenario2simData.get(selectedScenario));
+                }
             }
         }
 
@@ -939,6 +990,8 @@ public class AppMainController {
         selectedScenario = null;
         setProjectModified(false);
         projectFilePath = null;
+        
+        scenario2simData.clear();
         
         if (projectTree.getRoot() != null)
             projectTree.getRoot().getChildren().clear();

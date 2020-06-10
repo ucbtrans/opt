@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019, Regents of the University of California
+ * Copyright (c) 2020, Regents of the University of California
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -866,7 +866,7 @@ public class LinkEditorController {
     
     
     
-     /**
+    /**
      * This function is called every time one opens a link in the
      * configuration module.
      * @param lnk 

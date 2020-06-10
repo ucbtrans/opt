@@ -122,7 +122,7 @@ public class OTMTask  extends Task {
 		} finally {
 			simdata = new SimDataScenario(fwyscenario,otmdev);
 			if(mainController!=null)
-				mainController.simdata = simdata;
+				mainController.attachSimDataToScenario(simdata);
 		}
 
 		return simdata;
