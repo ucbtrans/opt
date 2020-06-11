@@ -576,7 +576,7 @@ public class FreewayScenario {
         for(AbstractLink link : segment.get_links()) {
             link.demands = null;
             if(link instanceof LinkOfframp)
-                ((LinkOfframp)link).splits = null;
+                ((LinkOfframp)link).delete_splits();
             scenario.links.remove(link.id);
         }
 

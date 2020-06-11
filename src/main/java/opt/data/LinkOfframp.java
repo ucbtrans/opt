@@ -4,13 +4,11 @@ import jaxb.Link;
 import jaxb.Roadparam;
 import profiles.Profile1D;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class LinkOfframp extends AbstractLink {
 
-    protected Map<Long, Profile1D> splits = new HashMap<>();     // commodity -> Profile1D
+    private Map<Long, Profile1D> splits = new HashMap<>();     // commodity -> Profile1D
 
     /////////////////////////////////////
     // construction
@@ -32,6 +30,7 @@ public class LinkOfframp extends AbstractLink {
                 mng_fd==null ? Float.NaN : mng_fd.capacity_vphpl,
                 mng_fd==null ? Float.NaN : mng_fd.jam_density_vpkpl,
                 mng_fd==null ? Float.NaN : mng_fd.ff_speed_kph);
+
     }
 
     public LinkOfframp(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, ParametersRamp params) {
@@ -85,8 +84,16 @@ public class LinkOfframp extends AbstractLink {
     // splits
     /////////////////////////////////////
 
-    public final Profile1D get_splits(Long comm_id){
-        return splits.get(comm_id);
+    public final Profile1D get_splits(Long comm_id,double default_dt){
+        if(splits.containsKey(comm_id))
+            return splits.get(comm_id);
+        else {
+            List<Double> list = new ArrayList<>();
+            list.add(0d);
+            Profile1D prof = new Profile1D(0f,(float)default_dt,list);
+            splits.put(comm_id,prof);
+            return prof;
+        }
     }
 
     public final void set_split(Long comm_id,float dt, double[] values) throws Exception {
@@ -98,6 +105,10 @@ public class LinkOfframp extends AbstractLink {
 
     public final void set_split(Long comm_id,Profile1D profile) throws Exception {
         this.splits.put(comm_id,profile);
+    }
+
+    public final void delete_splits(){
+        splits = null;
     }
 
     /////////////////////////////////////

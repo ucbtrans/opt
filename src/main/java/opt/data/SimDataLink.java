@@ -26,7 +26,7 @@ public class SimDataLink {
         models.fluid.FluidLaneGroup lg;
 
         if(optlink.params.has_mng()){
-            lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(0);
+            lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(1);
             lgtype2id.put(LaneGroupType.mng,lg.id);
             lgData.put(lg.id,new SimDataLanegroup(lg,commids));
         }

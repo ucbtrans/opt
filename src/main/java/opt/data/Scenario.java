@@ -4,6 +4,7 @@ import geometry.Side;
 import jaxb.ModelParams;
 import jaxb.Roadgeom;
 import jaxb.Roadparam;
+import opt.UserSettings;
 import opt.data.control.*;
 import profiles.Profile1D;
 import utils.OTMUtils;
@@ -322,23 +323,24 @@ public class Scenario {
 
             LinkFreeway dn_ml = outfreeway.isEmpty() ? null : outfreeway.iterator().next();
 
-            Set<Long> comm_ids = frs.stream()
-                    .flatMap(fr->fr.splits.keySet().stream())
-                    .collect(toSet());
+//            Set<Long> comm_ids = frs.stream()
+//                    .flatMap(fr->fr.splits.keySet().stream())
+//                    .collect(toSet());
 
-            for(Long comm_id : comm_ids){
+            for(Commodity comm : commodities.values()){
 
                 // collect the split profiles we have
                 Map<Long,Profile1D> outlink2Profile = new HashMap<>();
                 Set<Float> dts = new HashSet<>();
                 Set<Integer> prof_sizes = new HashSet<>();
-                for(LinkOfframp fr : frs)
-                    if(fr.splits.containsKey(comm_id)) {
-                        Profile1D prof = fr.splits.get(comm_id);
-                        outlink2Profile.put(fr.id,prof);
+                for(LinkOfframp fr : frs) {
+//                    if (fr.splits.containsKey(comm_id)) {
+                        Profile1D prof = fr.get_splits(comm.id, UserSettings.defaultSRDtMinutes*60);
+                        outlink2Profile.put(fr.id, prof);
                         dts.add(prof.dt);
                         prof_sizes.add(prof.get_length());
-                    }
+//                    }
+                }
 
                 if(dts.size()!=1)
                     System.err.println("RG)@J$G 2-43j");
@@ -354,7 +356,7 @@ public class Scenario {
                     for(Profile1D fr_prof : outlink2Profile.values())
                         value -= fr_prof.get_ith_value(i);
                     if(value<0)
-                        throw new Exception(String.format("One node %d, commodity %d, offramp splits add up to more than 1.0",node.id,comm_id));
+                        throw new Exception(String.format("One node %d, commodity %d, offramp splits add up to more than 1.0",node.id,comm.id));
                     ml_prof.add_entry(value);
                 }
                 outlink2Profile.put(dn_ml.id,ml_prof);
@@ -362,7 +364,7 @@ public class Scenario {
                 // to jaxb
                 jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
                 jsplits.getSplitNode().add(jsplitnode);
-                jsplitnode.setCommodityId(comm_id);
+                jsplitnode.setCommodityId(comm.id);
                 jsplitnode.setNodeId(node.id);
                 jsplitnode.setLinkIn(up_ml.id);
                 jsplitnode.setDt(dt);

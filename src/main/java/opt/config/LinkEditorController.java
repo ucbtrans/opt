@@ -1990,7 +1990,8 @@ public class LinkEditorController {
                 setSR();
             });
             col.setReorderable(false);
-            Profile1D cdp = ((LinkOfframp)myLink).get_splits(listVT.get(i).getId());
+            Profile1D cdp = ((LinkOfframp)myLink).get_splits(listVT.get(i).getId(),
+                    Math.min(pdt, UserSettings.defaultSRDtMinutes * 60));
             if (cdp != null) {
                 pdt = Math.min(pdt, cdp.get_dt());
                 List<Double> lst = cdp.get_values();
@@ -2003,6 +2004,7 @@ public class LinkEditorController {
                 numSteps = Math.max(numSteps, lst.size());
                 profiles.add(lst);
             } else {
+                assert(false); //GG this should never happen
                 pdt = Math.min(pdt, UserSettings.defaultSRDtMinutes * 60);
                 List<Double> lst = new ArrayList<>();
                 lst.add(0.0);
