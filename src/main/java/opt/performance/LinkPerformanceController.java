@@ -54,6 +54,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
@@ -148,6 +149,7 @@ public class LinkPerformanceController {
         makeListVT(myLink.get_segment().get_scenario().get_commodities());
         fillTabTimeseries();
         fillTabAggregates();
+
              
     }
     
