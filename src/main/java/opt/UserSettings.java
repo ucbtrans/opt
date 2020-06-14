@@ -98,6 +98,8 @@ public class UserSettings {
     public static double maxGPRampMeteringRatePerLaneVph = 1200;
     public static double maxManagedRampMeteringRatePerLaneVph = 1400;
     public static double defaultControlDtSeconds = 30;
+    
+    public static double reportingPeriodSeconds = 300; // 5 minutes
             
     
     

@@ -167,9 +167,9 @@ public class LinkPerformanceController {
         
         float start = myLink.get_segment().get_scenario().get_start_time();
         
-        label_gp = "Speed in GP Lanes";
-        label_mng = "Speed in Managed Lanes";
-        label_aux = "Speed in Aux Lanes";
+        label_gp = "GP Lanes";
+        label_mng = "Managed Lanes";
+        label_aux = "Aux Lanes";
         label_units = UserSettings.unitsSpeed;
         cc = UserSettings.speedConversionMap.get("mph"+label_units);
         
@@ -209,7 +209,7 @@ public class LinkPerformanceController {
             }
             if (i < sz_mng) {
                 xy = xydata_mng.get(i);
-                dataSeries_mng.getData().add(new XYChart.Data(Misc.seconds2timestring(start+(float)xy.getXValue(), ":"), cc*xy.getYValue()*0.5));
+                dataSeries_mng.getData().add(new XYChart.Data(Misc.seconds2timestring(start+(float)xy.getXValue(), ":"), cc*xy.getYValue()));
             } else {
                 float dt = mySimData.get_speed(LaneGroupType.mng).get_dt();
                 dataSeries_mng.getData().add(new XYChart.Data(Misc.seconds2timestring(start+i*dt, ":"), 0));

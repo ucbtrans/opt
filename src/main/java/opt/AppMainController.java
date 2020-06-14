@@ -325,7 +325,7 @@ public class AppMainController {
             int progbar_steps = 50;
 
             // Set the number of time steps in the reported values
-            int output_steps = 100;
+            int output_steps = (int)Math.abs((double)selectedScenario.get_sim_duration() / UserSettings.reportingPeriodSeconds);
 
             Thread th = new Thread(new OTMTask(this,selectedScenario,start_time,duration,output_steps,progbar_steps));
             th.setDaemon(true);
@@ -760,6 +760,8 @@ public class AppMainController {
     void onSelectTabInActionPane() {
         if (actionPane.getSelectionModel().getSelectedItem().equals(configTabPane))
             leftStatus.setText("");
+        else
+            processTreeSelection(selectedTreeItem);
     }
     
     
@@ -834,6 +836,15 @@ public class AppMainController {
             linkInfoController.initWithLinkData(lnk);
             if (Misc.myMapGet(scenario2simData, selectedScenario) != null) { 
                 linkPerformanceController.initWithLinkData(lnk, (SimDataScenario)Misc.myMapGet(scenario2simData, selectedScenario));
+                if (actionPane.getSelectionModel().getSelectedItem().equals(reportTabPane)) {
+                    String ln = "(" + lnk.get_gp_lanes() + " GP";
+                    if (lnk.get_mng_lanes() > 0)
+                        ln += ", " + lnk.get_mng_lanes() + " managed";
+                    if (lnk.get_aux_lanes() > 0)
+                        ln += ", " + lnk.get_aux_lanes() + " aux";
+                    ln += " lanes)";
+                    leftStatus.setText("Report for section\"" + lnk.get_name() + "\" " + ln);
+                }
             }
         }
 
