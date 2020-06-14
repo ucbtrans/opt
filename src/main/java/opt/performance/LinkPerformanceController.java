@@ -63,7 +63,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 /**
- * This class serves to display plots of simulation data for a given link
+ * This class serves to display plots of simulation data for a given link.
  * 
  * @author Alex Kurzhanskiy
  */
@@ -72,9 +72,9 @@ public class LinkPerformanceController {
     private AppMainController appMainController = null;
     
     private AbstractLink myLink = null;
-    SimDataLink mySimData = null;
+    private SimDataLink mySimData = null;
     
-    private List<Commodity> listVT = new ArrayList<Commodity>();
+    private List<Commodity> listVT = null;
             
     
     @FXML // fx:id="linkPerformanceMainPane"
@@ -144,22 +144,12 @@ public class LinkPerformanceController {
         myLink = lnk;
         mySimData = sdata.linkdata.get(myLink.id);
         
-        System.err.println("Link " + myLink.id + ":\t \"" + myLink.get_name() + "\"");
-        
-        makeListVT(myLink.get_segment().get_scenario().get_commodities());
+        listVT = Misc.makeListVT(myLink.get_segment().get_scenario().get_commodities());
         fillTabTimeseries();
         fillTabAggregates();
-
-             
+        //fillTabEmissions();
     }
     
-    
-    private void makeListVT(Map<Long, Commodity> mapVT) {
-        listVT.clear();
-        mapVT.forEach((k, v) -> {
-            listVT.add(v);
-        });
-    }
     
     
     public void fillTabTimeseries() {
@@ -523,8 +513,6 @@ public class LinkPerformanceController {
 
         vbAggregates.getChildren().add(speedChart);
 
-        
-        //spTimeSeries.setContent(vbTimeSeries);
         
     }
         

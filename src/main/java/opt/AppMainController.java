@@ -78,6 +78,8 @@ import opt.config.ScenarioEditorController;
 import opt.config.VehicleTypeController;
 import opt.data.*;
 import opt.performance.LinkPerformanceController;
+import opt.performance.RoutePerformanceController;
+import opt.performance.ScenarioPerformanceController;
 import opt.utils.Misc;
 
 
@@ -105,6 +107,8 @@ public class AppMainController {
     
     private SplitPane scenarioEditorPane = null;
     private ScenarioEditorController scenarioEditorController = null;
+    private TabPane scenarioPerformancePane = null;
+    private ScenarioPerformanceController scenarioPerformanceController = null;
     private GridPane vehicleTypePane = null;
     private VehicleTypeController vehicleTypeController = null;
     
@@ -129,6 +133,8 @@ public class AppMainController {
     
     private SplitPane routeEditorPane = null;
     private RouteController routeController = null;
+    private TabPane routePerformancePane = null;
+    private RoutePerformanceController routePerformanceController = null;
     private GridPane routeChoicePane = null;
     private RouteChoiceController routeChoiceController = null;
     
@@ -410,6 +416,13 @@ public class AppMainController {
             scenarioEditorController.setPrimaryStage(primaryStage);
             scenarioEditorController.setAppMainController(this);
             
+            loader = new FXMLLoader(getClass().getResource("/scenario_performance.fxml"));
+            scenarioPerformancePane = loader.load();
+            scenarioPerformanceController = loader.getController();
+            scenarioPerformanceController.setPrimaryStage(primaryStage);
+            scenarioPerformanceController.setAppMainController(this);
+            
+            
             loader = new FXMLLoader(getClass().getResource("/vehicle_type.fxml"));
             vehicleTypePane = loader.load();
             vehicleTypeController = loader.getController();
@@ -422,7 +435,6 @@ public class AppMainController {
             linkEditorController = loader.getController();
             linkEditorController.setPrimaryStage(primaryStage);
             linkEditorController.setAppMainController(this);
-            //linkEditorController.initWithLinkData(null);
             
             loader = new FXMLLoader(getClass().getResource("/link_performance.fxml"));
             linkPerformancePane = loader.load();
@@ -471,12 +483,18 @@ public class AppMainController {
             rampMeterTOD.setLinkEditorController(linkEditorController);
             linkEditorController.setRampMeterTodControllerAndScene(rampMeterTOD, new Scene(rampMeterTodPane));
             
-            // Route editor controller
+            // Route controllers
             loader = new FXMLLoader(getClass().getResource("/route_editor.fxml"));
             routeEditorPane = loader.load();
             routeController = loader.getController();
             routeController.setPrimaryStage(primaryStage);
             routeController.setAppMainController(this);
+            
+            loader = new FXMLLoader(getClass().getResource("/route_performance.fxml"));
+            routePerformancePane = loader.load();
+            routePerformanceController = loader.getController();
+            routePerformanceController.setPrimaryStage(primaryStage);
+            routePerformanceController.setAppMainController(this);
             
             loader = new FXMLLoader(getClass().getResource("/route_choice.fxml"));
             routeChoicePane = loader.load();
@@ -809,22 +827,23 @@ public class AppMainController {
             return;
         }
         
+        configAnchorPane.getChildren().clear();
+        reportAnchorPane.getChildren().clear();
+        infoAnchorPane.getChildren().clear();
+        
         if (obj instanceof AbstractLink) {
-            configAnchorPane.getChildren().clear();
             configAnchorPane.getChildren().setAll(linkEditorPane);
             configAnchorPane.setTopAnchor(linkEditorPane, 0.0);
             configAnchorPane.setBottomAnchor(linkEditorPane, 0.0);
             configAnchorPane.setLeftAnchor(linkEditorPane, 0.0);
             configAnchorPane.setRightAnchor(linkEditorPane, 0.0);
             
-            reportAnchorPane.getChildren().clear();
             reportAnchorPane.getChildren().setAll(linkPerformancePane);
             reportAnchorPane.setTopAnchor(linkPerformancePane, 0.0);
             reportAnchorPane.setBottomAnchor(linkPerformancePane, 0.0);
             reportAnchorPane.setLeftAnchor(linkPerformancePane, 0.0);
             reportAnchorPane.setRightAnchor(linkPerformancePane, 0.0);
                 
-            infoAnchorPane.getChildren().clear();
             infoAnchorPane.getChildren().setAll(linkInfoPane);
             infoAnchorPane.setTopAnchor(linkInfoPane, 0.0);
             infoAnchorPane.setBottomAnchor(linkInfoPane, 0.0);
@@ -849,33 +868,51 @@ public class AppMainController {
         }
 
         if (obj instanceof FreewayScenario) {
-            configAnchorPane.getChildren().clear();
-            infoAnchorPane.getChildren().clear();
-            configAnchorPane.getChildren().clear();
             configAnchorPane.getChildren().setAll(scenarioEditorPane);
             configAnchorPane.setTopAnchor(scenarioEditorPane, 0.0);
             configAnchorPane.setBottomAnchor(scenarioEditorPane, 0.0);
             configAnchorPane.setLeftAnchor(scenarioEditorPane, 0.0);
             configAnchorPane.setRightAnchor(scenarioEditorPane, 0.0);
             
+            reportAnchorPane.getChildren().setAll(scenarioPerformancePane);
+            reportAnchorPane.setTopAnchor(scenarioPerformancePane, 0.0);
+            reportAnchorPane.setBottomAnchor(scenarioPerformancePane, 0.0);
+            reportAnchorPane.setLeftAnchor(scenarioPerformancePane, 0.0);
+            reportAnchorPane.setRightAnchor(scenarioPerformancePane, 0.0);
+            
             FreewayScenario fws = (FreewayScenario)obj;
             if (fws != null)
                 scenarioEditorController.initWithScenarioData(fws);
+            if (Misc.myMapGet(scenario2simData, selectedScenario) != null) {
+                scenarioPerformanceController.initWithScenarioData((SimDataScenario)Misc.myMapGet(scenario2simData, selectedScenario));
+                if (actionPane.getSelectionModel().getSelectedItem().equals(reportTabPane)) {
+                    leftStatus.setText("Report for scenario \"" + selectedScenario.name + "\"");
+                }
+            }
         }
         
         if (obj instanceof Route) {
-            configAnchorPane.getChildren().clear();
-            infoAnchorPane.getChildren().clear();
-            configAnchorPane.getChildren().clear();
             configAnchorPane.getChildren().setAll(routeEditorPane);
             configAnchorPane.setTopAnchor(routeEditorPane, 0.0);
             configAnchorPane.setBottomAnchor(routeEditorPane, 0.0);
             configAnchorPane.setLeftAnchor(routeEditorPane, 0.0);
             configAnchorPane.setRightAnchor(routeEditorPane, 0.0);
             
+            reportAnchorPane.getChildren().setAll(routePerformancePane);
+            reportAnchorPane.setTopAnchor(routePerformancePane, 0.0);
+            reportAnchorPane.setBottomAnchor(routePerformancePane, 0.0);
+            reportAnchorPane.setLeftAnchor(routePerformancePane, 0.0);
+            reportAnchorPane.setRightAnchor(routePerformancePane, 0.0);
+            
             Route route = (Route)obj;
             if (route != null)
                 routeController.initWithRouteData(route);
+            if (Misc.myMapGet(scenario2simData, selectedScenario) != null) {
+                routePerformanceController.initWithRouteData(route, (SimDataScenario)Misc.myMapGet(scenario2simData, selectedScenario));
+                if (actionPane.getSelectionModel().getSelectedItem().equals(reportTabPane)) {
+                    leftStatus.setText("Report for route \"" + route.getName() + "\"");
+                }
+            }
         }
         
     }

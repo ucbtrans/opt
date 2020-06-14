@@ -26,7 +26,9 @@
 package opt.utils;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import opt.data.AbstractLink.Type;
 import opt.data.Commodity;
@@ -50,6 +52,16 @@ public class Misc {
             return "Off-Ramp";
         
         return "Unknown";
+    }
+    
+    
+    
+    public static List<Commodity> makeListVT(Map<Long, Commodity> mapVT) {
+        List<Commodity> listVT = new ArrayList<Commodity>();
+        mapVT.forEach((k, v) -> {
+            listVT.add(v);
+        });
+        return listVT;
     }
     
     

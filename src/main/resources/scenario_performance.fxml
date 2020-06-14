@@ -6,13 +6,13 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<TabPane id="linkPerformanceMainPane" fx:id="linkPerformanceMainPane" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.performance.LinkPerformanceController">
+<TabPane id="scenarioPerformanceMainPane" fx:id="scenarioPerformanceMainPane" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.performance.ScenarioPerformanceController">
   <tabs>
-    <Tab id="tabTimeSeries" fx:id="tabTimeSeries" text="Time Series">
+    <Tab id="tabSummary" fx:id="tabSummary" text="Summary">
          <content>
-            <ScrollPane id="spTimeSeries" fx:id="spTimeSeries" fitToHeight="true" fitToWidth="true" vbarPolicy="ALWAYS">
+            <ScrollPane id="spSummary" fx:id="spSummary" fitToHeight="true" fitToWidth="true" vbarPolicy="ALWAYS">
                <content>
-                  <VBox id="vbTimeSeries" fx:id="vbTimeSeries" />
+                  <VBox id="vbSummary" fx:id="vbSummary" />
                </content></ScrollPane>
          </content>
     </Tab>
