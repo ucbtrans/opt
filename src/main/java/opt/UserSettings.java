@@ -102,7 +102,7 @@ public class UserSettings {
     
     
     // Length conversion
-    private static Map<String, Double> lengthConversionMap = new HashMap<String, Double>();
+    public static Map<String, Double> lengthConversionMap = new HashMap<String, Double>();
     static {
         lengthConversionMap.put("metersmeters", 1.0);
         lengthConversionMap.put("metersfeet", 3.28084);
@@ -124,7 +124,7 @@ public class UserSettings {
 
 
     // Speed conversion
-    private static Map<String, Double> speedConversionMap = new HashMap<String, Double>();
+    public static Map<String, Double> speedConversionMap = new HashMap<String, Double>();
     static {
         speedConversionMap.put("mpsmps", 1.0);
         speedConversionMap.put("mpsfps", new Double(3.28084));
@@ -146,7 +146,7 @@ public class UserSettings {
     
     
     // Flow conversion (vehicles per <unit of time>: vps, vpm, vp5m, vp15m, vph)
-    private static Map<String, Double> flowConversionMap = new HashMap<String, Double>();
+    public static Map<String, Double> flowConversionMap = new HashMap<String, Double>();
     static {
         flowConversionMap.put("vpsvps", 1.0);
         flowConversionMap.put("vpsvpm", 60.0);
@@ -177,7 +177,7 @@ public class UserSettings {
     
     
     // Density conversion (vehicles per <unit of length>: vpmtr, vpf, vpm, vpkm)
-    private static Map<String, Double> densityConversionMap = new HashMap<String, Double>();
+    public static Map<String, Double> densityConversionMap = new HashMap<String, Double>();
     static {
         densityConversionMap.put("vpmtrvpmtr", 1.0); // mtr = meter => vpmtr = vehicles per meter
         densityConversionMap.put("vpmtrvpf", 0.3048);

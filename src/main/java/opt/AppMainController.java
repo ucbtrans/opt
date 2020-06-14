@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
@@ -77,6 +78,7 @@ import opt.config.ScenarioEditorController;
 import opt.config.VehicleTypeController;
 import opt.data.*;
 import opt.performance.LinkPerformanceController;
+import opt.utils.Misc;
 
 
 /**
@@ -138,9 +140,11 @@ public class AppMainController {
     private Image imageScenario = new Image(getClass().getResourceAsStream("/Scenario.gif"));
     private Image imageFolder = new Image(getClass().getResourceAsStream("/imageFolder.png"));
  
+    private TreeItem<String> selectedTreeItem = null;
     private FreewayScenario selectedScenario = null;
+    private FreewayScenario mySimScenario = null;
     protected SimDataScenario simdata = null;
-    private Map<FreewayScenario, SimDataScenario> scenario2simData = new HashMap<FreewayScenario, SimDataScenario>();
+    private Map<Object, Object> scenario2simData = new HashMap<Object, Object>();
     
     private ContextMenu routesCM = new ContextMenu(); 
     private MenuItem cmNewRoute = new MenuItem("New Route");
@@ -273,18 +277,15 @@ public class AppMainController {
             Object obj = tree2object.get(p);
             if (obj instanceof FreewayScenario) {
                 selectedScenario = (FreewayScenario)obj;
+                if (Misc.myMapGet(scenario2simData, selectedScenario) != null) {
+                    reportTabPane.setDisable(false);
+                }
                 return;
             }
             p = p.getParent();
         }
-        if ((selectedScenario != null) &&
-            (scenario2simData.containsKey(selectedScenario)) &&
-            (scenario2simData.get(selectedScenario) != null)) {
-            reportTabPane.setDisable(false);
-        } else {
-            actionPane.getSelectionModel().selectFirst();
-            reportTabPane.setDisable(true);
-        } 
+        actionPane.getSelectionModel().selectFirst();
+        reportTabPane.setDisable(true);
     }
     
     
@@ -310,10 +311,13 @@ public class AppMainController {
         if (selectedScenario == null)
             return;
 
-        if (scenario2simData.containsKey(selectedScenario) && (scenario2simData.get(selectedScenario) != null))
-            scenario2simData.remove(selectedScenario);
+        if (Misc.myMapGet(scenario2simData, selectedScenario) != null) {
+            scenario2simData = Misc.myMapRemove(scenario2simData, selectedScenario);
+            actionPane.getSelectionModel().selectFirst();
+            reportTabPane.setDisable(true);
+        }
         
-        try{
+        try {
             float start_time = selectedScenario.get_start_time();
             float duration = selectedScenario.get_sim_duration();
 
@@ -339,8 +343,9 @@ public class AppMainController {
     public void attachSimDataToScenario(SimDataScenario d) {
         if (d == null)
             return;
-        System.err.println("Recording data!");
         scenario2simData.put(d.fwyscenario, d);
+        mySimScenario = d.fwyscenario;
+        simdata = d;
     }
     
     
@@ -354,7 +359,7 @@ public class AppMainController {
             (scenario2simData.containsKey(selectedScenario)) &&
             (scenario2simData.get(selectedScenario) != null)) {
             actionPane.getSelectionModel().selectLast();
-            processTreeSelection(object2tree.get(selectedScenario));
+            processTreeSelection(selectedTreeItem);
         } else {
             reportTabPane.setDisable(true);
         }
@@ -780,14 +785,24 @@ public class AppMainController {
         selectedScenario = null;
         if (treeItem == null)
             return;
+        selectedTreeItem = treeItem;
         if (treeItem.equals(projectTree.getRoot()))
             return;
         
         setSelectedScenario(treeItem);
         
+        if ((selectedScenario != null) &&
+            (Misc.myMapGet(scenario2simData, selectedScenario) != null)) {
+            reportTabPane.setDisable(false);
+        } else {
+            actionPane.getSelectionModel().selectFirst();
+            reportTabPane.setDisable(true);
+        }
+        
         Object obj = tree2object.get(treeItem);
         if (obj == null) {
             configAnchorPane.getChildren().clear();
+            reportAnchorPane.getChildren().clear();
             infoAnchorPane.getChildren().clear();
             return;
         }
@@ -815,14 +830,10 @@ public class AppMainController {
             infoAnchorPane.setRightAnchor(linkInfoPane, 0.0);
 
             AbstractLink lnk = (AbstractLink)obj;
-            if (lnk != null) {
-                linkEditorController.initWithLinkData(lnk);
-                linkInfoController.initWithLinkData(lnk);
-                if ((selectedScenario != null) &&
-                    (scenario2simData.containsKey(selectedScenario)) &&
-                    (scenario2simData.get(selectedScenario) != null)) { 
-                    linkPerformanceController.initWithLinkData(lnk, scenario2simData.get(selectedScenario));
-                }
+            linkEditorController.initWithLinkData(lnk);
+            linkInfoController.initWithLinkData(lnk);
+            if (Misc.myMapGet(scenario2simData, selectedScenario) != null) { 
+                linkPerformanceController.initWithLinkData(lnk, (SimDataScenario)Misc.myMapGet(scenario2simData, selectedScenario));
             }
         }
 

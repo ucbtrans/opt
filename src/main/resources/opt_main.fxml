@@ -6,6 +6,7 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
@@ -72,26 +73,32 @@
       </menus>
     </MenuBar>
       <ToolBar prefHeight="40.0" prefWidth="200.0" visible="false" />
-    <SplitPane dividerPositions="0.19492656875834447, 0.7983978638184246" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <SplitPane dividerPositions="0.2287145242070117, 0.7979966611018364" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+            <AnchorPane>
                <children>
                   <TreeView id="projectTree" fx:id="projectTree" prefHeight="911.0" prefWidth="289.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
-            <TabPane id="actionPane" fx:id="actionPane" tabClosingPolicy="UNAVAILABLE">
-              <tabs>
-                <Tab id="configTabPane" fx:id="configTabPane" text="Configuration">
-                     <content>
-                        <AnchorPane id="configAnchorPane" fx:id="configAnchorPane" minHeight="200.0" minWidth="200.0" prefHeight="900.0" />
-                     </content></Tab>
-                  <Tab id="reportTabPane" fx:id="reportTabPane" disable="true" text="Reports">
-                     <content>
-                        <AnchorPane id="reportAnchorPane" fx:id="reportAnchorPane" prefHeight="200.0" prefWidth="200.0" />
-                     </content></Tab>
-              </tabs>
-            </TabPane>
-            <AnchorPane id="infoAnchorPane" fx:id="infoAnchorPane" minHeight="200.0" minWidth="200.0" />
+            <ScrollPane fitToHeight="true" fitToWidth="true" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0">
+               <content>
+                  <TabPane id="actionPane" fx:id="actionPane" tabClosingPolicy="UNAVAILABLE">
+                    <tabs>
+                      <Tab id="configTabPane" fx:id="configTabPane" text="Configuration">
+                           <content>
+                              <AnchorPane id="configAnchorPane" fx:id="configAnchorPane" />
+                           </content>
+                        </Tab>
+                        <Tab id="reportTabPane" fx:id="reportTabPane" disable="true" text="Reports">
+                           <content>
+                              <AnchorPane id="reportAnchorPane" fx:id="reportAnchorPane" prefHeight="200.0" prefWidth="200.0" />
+                           </content>
+                        </Tab>
+                    </tabs>
+                  </TabPane>
+               </content>
+            </ScrollPane>
+            <AnchorPane id="infoAnchorPane" fx:id="infoAnchorPane" />
       </items>
     </SplitPane>
       <GridPane>

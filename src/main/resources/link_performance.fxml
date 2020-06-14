@@ -3,17 +3,29 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 
-<TabPane id="linkPerformanceMainPane" fx:id="linkPerformanceMainPane" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="600.0" prefHeight="820.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.performance.LinkPerformanceController">
+<TabPane id="linkPerformanceMainPane" fx:id="linkPerformanceMainPane" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.performance.LinkPerformanceController">
   <tabs>
     <Tab id="tabTimeSeries" fx:id="tabTimeSeries" text="Time Series">
          <content>
-            <ScrollPane id="spTimeSeries" fx:id="spTimeSeries" prefHeight="200.0" prefWidth="200.0" />
+            <ScrollPane id="spTimeSeries" fx:id="spTimeSeries" fitToHeight="true" fitToWidth="true" vbarPolicy="ALWAYS">
+               <content>
+                  <VBox id="vbTimeSeries" fx:id="vbTimeSeries" />
+               </content></ScrollPane>
          </content>
     </Tab>
     <Tab id="tabAggregates" fx:id="tabAggregates" text="Aggregates">
          <content>
-            <ScrollPane id="spAggregates" fx:id="spAggregates" prefHeight="200.0" prefWidth="200.0" />
+            <ScrollPane id="spAggregates" fx:id="spAggregates" prefHeight="200.0" prefWidth="200.0" vbarPolicy="ALWAYS">
+               <content>
+                  <AnchorPane>
+                     <children>
+                        <VBox id="vbAggregates" fx:id="vbAggregates" prefHeight="397.0" prefWidth="237.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+               </content></ScrollPane>
          </content>
     </Tab>
       <Tab id="tabEmissions" fx:id="tabEmissions" disable="true" text="Emissions">

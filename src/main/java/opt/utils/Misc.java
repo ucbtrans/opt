@@ -26,6 +26,7 @@
 package opt.utils;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.Map;
 import opt.data.AbstractLink.Type;
 import opt.data.Commodity;
@@ -144,6 +145,23 @@ public class Misc {
                 seconds += Integer.parseInt(comps[2]);
         
         return seconds;
+    }
+    
+    
+    public static Object myMapGet(Map<Object, Object> map, Object key) {
+        for (Map.Entry<Object, Object> e : map.entrySet())
+            if (e.getKey().equals(key))
+                return e.getValue();
+        return null;
+    }
+    
+    public static Map<Object, Object> myMapRemove(Map<Object, Object> map, Object key) {
+        Map<Object, Object> new_map = new HashMap<Object, Object>();
+        for (Map.Entry<Object, Object> e : map.entrySet())
+            if (!e.getKey().equals(key)) {
+                new_map.put(e.getKey(), e.getValue());
+            }
+        return new_map;
     }
     
     
