@@ -345,6 +345,7 @@ public class RouteController {
         }
         myRoute.set_segments(routeSegments);
         updateSectionList();
+        appMainController.setProjectModified(true);
     }
     
     

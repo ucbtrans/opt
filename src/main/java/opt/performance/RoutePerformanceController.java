@@ -26,21 +26,38 @@
 
 package opt.performance;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Point;
+import java.awt.RadialGradientPaint;
+import java.awt.geom.Point2D;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.embed.swing.SwingNode;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 import opt.AppMainController;
 import opt.data.AbstractLink;
 import opt.data.SimDataLink;
@@ -51,17 +68,33 @@ import opt.utils.Misc;
 import opt.UserSettings;
 import opt.data.Commodity;
 import opt.data.Route;
+import opt.utils.UtilGUI;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.AxisLocation;
+import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.fx.interaction.ChartMouseListenerFX;
+import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.LookupPaintScale;
+import org.jfree.chart.renderer.xy.XYBlockRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.title.PaintScaleLegend;
+import org.jfree.chart.title.TextTitle;
+import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.general.PieDataset;
+import org.jfree.data.xy.DefaultXYZDataset;
 import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.HorizontalAlignment;
+import org.jfree.ui.RectangleAnchor;
+import org.jfree.ui.RectangleEdge;
+import org.jfree.ui.RectangleInsets;
 
 /**
  * This class serves to display plots of simulation data for a given route.
@@ -75,6 +108,50 @@ public class RoutePerformanceController {
     //private AbstractLink myLink = null;
     private Route myRoute = null;
     private SimDataScenario mySimData = null;
+    private float start = 0;
+    
+    private double[][] speedDataGP = null;
+    private double[][] speedDataManaged = null;
+    private double[][] speedDataAux = null;
+    private double[][] flowDataGP = null;
+    private double[][] flowDataManaged = null;
+    private double[][] flowDataAux = null;
+    private double[][] vehDataGP = null;
+    private double[][] vehDataManaged = null;
+    private double[][] vehDataAux = null;
+    
+    private double maxLinkLength = 0;
+    private double routeLength = 0;
+    
+    private double minSpeed = Double.MAX_VALUE;
+    private double maxSpeed = 0;
+    private double minFlow = Double.MAX_VALUE;
+    private double maxFlow = 0;
+    private double minVeh = Double.MAX_VALUE;
+    private double maxVeh = 0;
+    
+    private boolean hasManagedLanes = false;
+    private boolean hasAuxLanes = false;
+    
+    private DefaultXYZDataset speedGPDS = null;
+    private DefaultXYZDataset speedManagedDS = null;
+    private DefaultXYZDataset speedAuxDS = null;
+    private DefaultXYZDataset flowGPDS = null;
+    private DefaultXYZDataset flowManagedDS = null;
+    private DefaultXYZDataset flowAuxDS = null;
+    private DefaultXYZDataset vehGPDS = null;
+    private DefaultXYZDataset vehManagedDS = null;
+    private DefaultXYZDataset vehAuxDS = null;
+    
+    private JFreeChart speedGPChart;
+    private JFreeChart speedManagedChart;
+    private JFreeChart speedAuxChart;
+    private JFreeChart flowGPChart;
+    private JFreeChart flowManagedChart;
+    private JFreeChart flowAuxChart;
+    private JFreeChart vehGPChart;
+    private JFreeChart vehManagedChart;
+    private JFreeChart vehAuxChart;
     
     private List<Commodity> listVT = null;
             
@@ -88,8 +165,8 @@ public class RoutePerformanceController {
     @FXML // fx:id="spContous"
     private ScrollPane spContous; // Value injected by FXMLLoader
     
-    @FXML // fx:id="vbContous"
-    private VBox vbContous; // Value injected by FXMLLoader
+    @FXML // fx:id="vbContours"
+    private VBox vbContours; // Value injected by FXMLLoader
 
     @FXML // fx:id="tabAggregates"
     private Tab tabAggregates; // Value injected by FXMLLoader
@@ -149,16 +226,251 @@ public class RoutePerformanceController {
         System.err.println("Route " + myRoute.getId() + ":\t \"" + myRoute.getName() + "\"");
         
         listVT = Misc.makeListVT(mySimData.fwyscenario.get_commodities());
+        start = mySimData.fwyscenario.get_start_time();
+        
+        processLinkSequence();
         fillTabContours();
 
              
     }
 
     
-    
-    private void fillTabContours() {
+    private void processLinkSequence() {
+        maxLinkLength = 0;
+        routeLength = 0;
+        minSpeed = Double.MAX_VALUE;
+        maxSpeed = 0;
+        minFlow = Double.MAX_VALUE;
+        maxFlow = 0;
+        minVeh = Double.MAX_VALUE;
+        maxVeh = 0;
+        hasManagedLanes = false;
+        hasAuxLanes = false;
+        List<AbstractLink> links = myRoute.get_link_sequence();
+        int xSize = links.size();
+        int ySize = 0;
+        double lcc = UserSettings.lengthConversionMap.get("meters"+UserSettings.unitsLength);
+        double scc = UserSettings.speedConversionMap.get("mph"+UserSettings.unitsSpeed);
+        double fcc = UserSettings.flowConversionMap.get("vph"+UserSettings.unitsFlow);
+        SimDataLink[] sdl = new SimDataLink[xSize];
+        
+        for (int i = 0; i < xSize; i++) {
+            AbstractLink l = links.get(i);
+            maxLinkLength = Math.max(maxLinkLength, lcc*l.get_length_meters());
+            routeLength += lcc*l.get_length_meters();
+            sdl[i] = mySimData.linkdata.get(l.id);
+            ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.gp).time.size());
+            
+            if (l.get_mng_lanes() > 0) {
+                hasManagedLanes = true;
+                ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.mng).time.size());
+            }
+            if (l.get_aux_lanes() > 0) {
+                hasAuxLanes = true;
+                ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.aux).time.size());
+            }
+        }
+        
+        float dt = sdl[0].get_speed(LaneGroupType.gp).get_dt();
+        speedDataGP = new double[3][xSize*ySize];
+        speedDataManaged = new double[3][xSize*ySize];
+        speedDataAux = new double[3][xSize*ySize];
+        flowDataGP = new double[3][xSize*ySize];
+        flowDataManaged = new double[3][xSize*ySize];
+        flowDataAux = new double[3][xSize*ySize];
+        vehDataGP = new double[3][xSize*ySize];
+        vehDataManaged = new double[3][xSize*ySize];
+        vehDataAux = new double[3][xSize*ySize];
+        
+        for (int j = 0; j < ySize; j++) {
+            double dd = 0.0;
+            float hour = (start+j*dt) / (float)3600.0;
+            for (int i = 0; i < xSize; i++) {
+                double v = scc*sdl[i].get_speed(LaneGroupType.gp).values.get(j);
+                if (!Double.isNaN(v)) {
+                    minSpeed = Math.min(minSpeed, v);
+                    maxSpeed = Math.max(maxSpeed, v);
+                }
+                speedDataGP[0][j * xSize + i] = dd;
+                speedDataGP[1][j * xSize + i] = hour;
+                speedDataGP[2][j * xSize + i] = v;
+                flowDataGP[0][j * xSize + i] = dd;
+                flowDataGP[1][j * xSize + i] = hour;
+                vehDataGP[0][j * xSize + i] = dd;
+                vehDataGP[1][j * xSize + i] = hour;
+                
+                if (hasManagedLanes) {
+                    v = Double.NaN;
+                    if (links.get(i).get_mng_lanes() > 0) {
+                        v = scc*sdl[i].get_speed(LaneGroupType.mng).values.get(j);
+                        if (!Double.isNaN(v)) {
+                            minSpeed = Math.min(minSpeed, v);
+                            maxSpeed = Math.max(maxSpeed, v);
+                        }
+                    }
+                    speedDataManaged[0][j * xSize + i] = dd;
+                    speedDataManaged[1][j * xSize + i] = hour;
+                    speedDataManaged[2][j * xSize + i] = v;
+                    flowDataManaged[0][j * xSize + i] = dd;
+                    flowDataManaged[1][j * xSize + i] = hour;
+                    vehDataManaged[0][j * xSize + i] = dd;
+                    vehDataManaged[1][j * xSize + i] = hour;
+                }
+                
+                if (hasAuxLanes) {
+                    speedDataAux[0][j * xSize + i] = dd;
+                    speedDataAux[1][j * xSize + i] = hour;
+                    flowDataAux[0][j * xSize + i] = dd;
+                    flowDataAux[1][j * xSize + i] = hour;
+                    vehDataAux[0][j * xSize + i] = dd;
+                    vehDataAux[1][j * xSize + i] = hour;
+                }
+                
+                dd += lcc*links.get(i).get_length_meters();
+            }
+	}
         
     }
+    
+    
+    private void fillTabContours() {
+        vbContours.getChildren().clear();
+        speedGPDS = new DefaultXYZDataset();
+        speedGPDS.addSeries("Speed in GP Lanes", speedDataGP);
+        speedManagedDS = new DefaultXYZDataset();
+        speedGPDS.addSeries("Speed in Managed Lanes", speedDataManaged);
+        speedAuxDS = new DefaultXYZDataset();
+        flowGPDS = new DefaultXYZDataset();
+        flowManagedDS = new DefaultXYZDataset();
+        flowAuxDS = new DefaultXYZDataset();
+        vehGPDS = new DefaultXYZDataset();
+        vehManagedDS = new DefaultXYZDataset();
+        vehAuxDS = new DefaultXYZDataset();
+        
+        XYPlot plot;
+        XYBlockRenderer renderer;
+        LookupPaintScale paintScale;
+        PaintScaleLegend psl;
+        org.jfree.chart.axis.NumberAxis distAxis;
+        org.jfree.chart.axis.NumberAxis timeAxis;
+        org.jfree.chart.axis.NumberAxis scaleAxis;
+        ChartViewer viewer;
+        
+        distAxis = new org.jfree.chart.axis.NumberAxis("Distance (" + UserSettings.unitsLength + ")");
+	distAxis.setRange(0.0, routeLength);
+        distAxis.setLowerMargin(0.0);
+        distAxis.setUpperMargin(0.0);
+        timeAxis = new org.jfree.chart.axis.NumberAxis("Hours");
+        timeAxis.setUpperMargin(0.0);
+        timeAxis.setRange(start/3600.0, (start + mySimData.fwyscenario.get_sim_duration()) / 3600.0);
+        renderer = new XYBlockRenderer();
+        renderer.setBlockWidth(maxLinkLength);
+        renderer.setBlockAnchor(RectangleAnchor.BOTTOM_LEFT);
+        paintScale = speedPaintScale();
+        renderer.setPaintScale(paintScale);
+        plot = new XYPlot(speedGPDS, distAxis, timeAxis, renderer);
+        plot.setAxisOffset(new RectangleInsets(5, 5, 5, 5));
+        speedGPChart = new JFreeChart("Speed in GP Lanes", plot);
+        speedGPChart.removeLegend();
+        scaleAxis = new org.jfree.chart.axis.NumberAxis("Speed (" + UserSettings.unitsSpeed + ")");
+        scaleAxis.setRange(minSpeed, maxSpeed);
+        psl = new PaintScaleLegend(paintScale, scaleAxis);
+        psl.setMargin(new RectangleInsets(3, 10, 3, 10));
+        psl.setPosition(RectangleEdge.BOTTOM);
+        psl.setAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+        psl.setAxisOffset(5.0);
+        psl.setPosition(RectangleEdge.RIGHT);
+        psl.setFrame(new BlockBorder(Color.GRAY));
+        speedGPChart.addSubtitle(psl);
+        viewer = new ChartViewer(speedGPChart);
+        viewer.setEventDispatcher(null);
+        vbContours.getWidth();
+        viewer.setMinWidth(300);
+        viewer.setMinHeight(150);
+        double prefWidth = routePerformanceMainPane.getPrefWidth();
+        double prefHeight = routePerformanceMainPane.getPrefHeight()/3;
+        viewer.setPrefSize(prefWidth, prefHeight);
+        vbContours.getChildren().add(viewer);
+        
+        if (hasManagedLanes) {
+            distAxis = new org.jfree.chart.axis.NumberAxis("Distance (" + UserSettings.unitsLength + ")");
+            distAxis.setRange(0.0, routeLength);
+            distAxis.setLowerMargin(0.0);
+            distAxis.setUpperMargin(0.0);
+            timeAxis = new org.jfree.chart.axis.NumberAxis("Hours");
+            timeAxis.setUpperMargin(0.0);
+            timeAxis.setRange(start/3600.0, (start + mySimData.fwyscenario.get_sim_duration()) / 3600.0);
+            renderer = new XYBlockRenderer();
+            renderer.setBlockWidth(maxLinkLength);
+            renderer.setBlockAnchor(RectangleAnchor.BOTTOM_LEFT);
+            paintScale = speedPaintScale();
+            renderer.setPaintScale(paintScale);
+            plot = new XYPlot(speedGPDS, distAxis, timeAxis, renderer);
+            plot.setAxisOffset(new RectangleInsets(5, 5, 5, 5));
+            speedManagedChart = new JFreeChart("Speed in Managed Lanes", plot);
+            speedManagedChart.removeLegend();
+            scaleAxis = new org.jfree.chart.axis.NumberAxis("Speed (" + UserSettings.unitsSpeed + ")");
+            scaleAxis.setRange(minSpeed, maxSpeed);
+            psl = new PaintScaleLegend(paintScale, scaleAxis);
+            psl.setMargin(new RectangleInsets(3, 10, 3, 10));
+            psl.setPosition(RectangleEdge.BOTTOM);
+            psl.setAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+            psl.setAxisOffset(5.0);
+            psl.setPosition(RectangleEdge.RIGHT);
+            psl.setFrame(new BlockBorder(Color.GRAY));
+            speedManagedChart.addSubtitle(psl);
+            viewer = new ChartViewer(speedManagedChart);
+            viewer.setEventDispatcher(null);
+            vbContours.getWidth();
+            viewer.setMinWidth(300);
+            viewer.setMinHeight(150);
+            prefWidth = routePerformanceMainPane.getPrefWidth();
+            prefHeight = routePerformanceMainPane.getPrefHeight()/3;
+            viewer.setPrefSize(prefWidth, prefHeight);
+            vbContours.getChildren().add(viewer);
+        }
+        
+        
+        
+        
+    }
+    
+    
+    
+    
+    /**
+     * Generates paint scale for the speed contour plot.
+     */
+    private LookupPaintScale speedPaintScale() {
+        if (minSpeed >= maxSpeed)
+            if (minSpeed < 1.0)
+                maxSpeed = minSpeed + 1.0;
+            else
+                minSpeed = maxSpeed - 1.0;
+            LookupPaintScale pScale = new LookupPaintScale(minSpeed, maxSpeed, Color.white);
+        Color[] clr = UtilGUI.krygColorScale();
+        double delta = (maxSpeed - minSpeed)/(clr.length - 1);
+        double value = minSpeed;
+        pScale.add(value, clr[0]);
+        value += Double.MIN_VALUE;
+        for (int i = 1; i < clr.length; i++) {
+            pScale.add(value, clr[i]);
+            value += delta;
+        }
+        return pScale;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     

@@ -75,12 +75,12 @@
       <ToolBar prefHeight="40.0" prefWidth="200.0" visible="false" />
     <SplitPane dividerPositions="0.2287145242070117, 0.7979966611018364" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
-            <AnchorPane>
+            <AnchorPane minHeight="200.0" minWidth="200.0">
                <children>
                   <TreeView id="projectTree" fx:id="projectTree" prefHeight="911.0" prefWidth="289.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
-            <ScrollPane fitToHeight="true" fitToWidth="true" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0">
+            <ScrollPane fitToHeight="true" fitToWidth="true">
                <content>
                   <TabPane id="actionPane" fx:id="actionPane" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
@@ -98,7 +98,7 @@
                   </TabPane>
                </content>
             </ScrollPane>
-            <AnchorPane id="infoAnchorPane" fx:id="infoAnchorPane" />
+            <AnchorPane id="infoAnchorPane" fx:id="infoAnchorPane" minHeight="200.0" minWidth="200.0" />
       </items>
     </SplitPane>
       <GridPane>

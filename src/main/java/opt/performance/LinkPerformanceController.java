@@ -30,6 +30,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.chart.CategoryAxis;
@@ -39,6 +40,10 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import opt.AppMainController;
@@ -50,6 +55,7 @@ import opt.data.LaneGroupType;
 import opt.utils.Misc;
 import opt.UserSettings;
 import opt.data.Commodity;
+import opt.utils.jfxutils.chart.JFXChartUtil;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -73,6 +79,7 @@ public class LinkPerformanceController {
     
     private AbstractLink myLink = null;
     private SimDataLink mySimData = null;
+    private float start = 0;
     
     private List<Commodity> listVT = null;
             
@@ -145,6 +152,7 @@ public class LinkPerformanceController {
         mySimData = sdata.linkdata.get(myLink.id);
         
         listVT = Misc.makeListVT(myLink.get_segment().get_scenario().get_commodities());
+        start = myLink.get_segment().get_scenario().get_start_time();
         fillTabTimeseries();
         fillTabAggregates();
         //fillTabEmissions();
@@ -157,8 +165,6 @@ public class LinkPerformanceController {
         double cc;
         vbTimeSeries.getChildren().clear();
         
-        float start = myLink.get_segment().get_scenario().get_start_time();
-        
         label_gp = "GP Lanes";
         label_mng = "Managed Lanes";
         label_aux = "Aux Lanes";
@@ -166,6 +172,7 @@ public class LinkPerformanceController {
         cc = UserSettings.speedConversionMap.get("mph"+label_units);
         
         CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis xxAxis = new NumberAxis();
         xAxis.setLabel("Time");
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Speed (" + label_units + ")");
@@ -195,6 +202,7 @@ public class LinkPerformanceController {
             if (i < sz_gp) {
                 xy = xydata_gp.get(i);
                 dataSeries_gp.getData().add(new XYChart.Data(Misc.seconds2timestring(start+(float)xy.getXValue(), ":"), cc*xy.getYValue()));
+                //dataSeries_gp.getData().add(new XYChart.Data(start+(float)xy.getXValue(), cc*xy.getYValue()));
             } else {
                 float dt = mySimData.get_speed(LaneGroupType.gp).get_dt();
                 dataSeries_gp.getData().add(new XYChart.Data(Misc.seconds2timestring(start+i*dt, ":"), 0));
@@ -223,7 +231,34 @@ public class LinkPerformanceController {
         speedChart.setCreateSymbols(false);
         speedChart.setLegendSide(Side.RIGHT);
         speedChart.setMinHeight(200);
+        
+        /*final double SCALE_DELTA = 1.1;
+        final StackPane zoomPane = new StackPane(speedChart);
+        zoomPane.setOnScroll(new EventHandler<ScrollEvent>() {
+            @Override public void handle(ScrollEvent event) {
+                event.consume();
+                if (event.getDeltaY() == 0) {
+                    return;
+                }
+
+                double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA : 1/SCALE_DELTA;
+
+                speedChart.setScaleX(speedChart.getScaleX() * scaleFactor);
+                speedChart.setScaleY(speedChart.getScaleY() * scaleFactor);
+            }
+        });*/
+        
+        
         vbTimeSeries.getChildren().add(speedChart);
+        
+        //Zooming works only via primary mouse button without ctrl held down
+        /*JFXChartUtil.setupZooming(speedChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+        });
+
+        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(speedChart);*/
         
         
         label_gp = "Flow in GP Lanes";
