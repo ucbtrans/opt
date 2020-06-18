@@ -130,14 +130,6 @@ public class OTMTask  extends Task {
 
 	private static void remove_unsimulatable_stuff(jaxb.Scenario scn){
 
-		// remove road geometries (HOV lanes)
-		if(scn.getNetwork().getRoadgeoms()!=null){
-			scn.getNetwork().setRoadgeoms(null);
-			for(jaxb.Link link : scn.getNetwork().getLinks().getLink()){
-				link.setRoadgeom(null);
-			}
-		}
-
 		// remove controllers on non-gp lanegroups
 		// remove alinra controllers
 		if(scn.getControllers()!=null){

@@ -262,6 +262,57 @@ public class Scenario {
                 jaxbLink.setRoadgeom(geom2id.get(x.roadGeom));
         }
 
+        // road connections .....................................
+        jaxb.Roadconnections jRCs = new jaxb.Roadconnections();
+        jNet.setRoadconnections(jRCs);
+
+        // for each link, generate road connections leaving
+        for(AbstractLink link : links.values()){
+
+            Segment segment = link.get_segment();
+
+            // case fwy
+            if(link instanceof LinkFreeway){
+
+                // if there is a dwnstream fwy link,
+                //  + connect gp lanes
+                //  + if dnstr link has mng lane, connect mng lane
+                //  + if dnstr link has aux lane, connect aux lane
+
+                // connect gp lanes to gp lanes of downstream fwy link
+
+
+                // connect mng lanes to mng lanes of downstream fwy link
+
+
+            }
+
+            // case connector
+            if(link instanceof LinkConnector){
+
+            }
+
+            // case offramp
+            if(link instanceof  LinkOfframp){
+
+            }
+
+
+            // case onramp
+            if(link instanceof LinkOnramp){
+
+
+            }
+
+            if(link.params.has_mng()){
+
+            }
+
+            if(link.params.has_aux()){
+
+            }
+        }
+
         /////////////////////////////////////////////////////
         // demands
         jaxb.Demands jdemands = new jaxb.Demands();
