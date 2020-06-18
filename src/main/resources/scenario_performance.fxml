@@ -12,7 +12,7 @@
          <content>
             <ScrollPane id="spSummary" fx:id="spSummary" fitToHeight="true" fitToWidth="true" vbarPolicy="ALWAYS">
                <content>
-                  <VBox id="vbSummary" fx:id="vbSummary" />
+                  <VBox id="vbSummary" fx:id="vbSummary" prefHeight="820.0" prefWidth="900.0" />
                </content></ScrollPane>
          </content>
     </Tab>

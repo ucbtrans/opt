@@ -223,8 +223,6 @@ public class RoutePerformanceController {
         myRoute = rt;
         mySimData = sdata;
         
-        System.err.println("Route " + myRoute.getId() + ":\t \"" + myRoute.getName() + "\"");
-        
         listVT = Misc.makeListVT(mySimData.fwyscenario.get_commodities());
         start = mySimData.fwyscenario.get_start_time();
         
@@ -384,7 +382,6 @@ public class RoutePerformanceController {
         speedGPChart.addSubtitle(psl);
         viewer = new ChartViewer(speedGPChart);
         viewer.setEventDispatcher(null);
-        vbContours.getWidth();
         viewer.setMinWidth(300);
         viewer.setMinHeight(150);
         double prefWidth = routePerformanceMainPane.getPrefWidth();

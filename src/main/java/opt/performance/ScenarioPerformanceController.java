@@ -30,11 +30,14 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
@@ -145,8 +148,6 @@ public class ScenarioPerformanceController {
         mySimData = sdata;
         myScenario = mySimData.fwyscenario;
         
-        System.err.println("Scenario: \"" + myScenario.name + "\"");
-        
         listVT = Misc.makeListVT(myScenario.get_commodities());
         fillTabSummary();
 
@@ -156,6 +157,47 @@ public class ScenarioPerformanceController {
     
     
     private void fillTabSummary() {
+        vbSummary.getChildren().clear();
+        
+        PieChart chart;
+        ObservableList<PieChart.Data> vehPieData = FXCollections.observableArrayList();
+        
+        int sz = listVT.size();
+        String[] labels = new String[sz];
+        double[] counts = new double[sz];
+        int[] prcts = new int[sz];
+        double total_count = 0;
+        
+        for (int i = 0; i < sz; i++) {
+            double total_c = 0;
+            List<Double> veh_s = mySimData.get_vehs_for_network(listVT.get(i).getId()).values;
+            for (double v : veh_s) 
+                total_c += v;
+            total_count += total_c;
+            counts[i] = total_c;
+        }
+        
+        int total_prct = 0;
+        for (int i = 0; i < sz; i++) {
+            int p = (int) Math.round(100 * counts[i] / total_count);
+            if (i == sz - 1)
+                p = Math.max(0, 100 - total_prct);
+            else
+                total_prct += p;
+            String l = listVT.get(i).get_name() + " = " + (int)Math.round(counts[i]) + " (" + p + "%)";
+            vehPieData.add(new PieChart.Data(l, counts[i]));
+        }
+        
+        chart = new PieChart(vehPieData);
+        chart.setTitle("Total Vehicles (" + (int)Math.round(total_count) + ")");
+        chart.setLegendSide(Side.RIGHT);
+        chart.setMinWidth(300);
+        chart.setMinHeight(200);
+        double prefWidth = scenarioPerformanceMainPane.getPrefWidth();
+        double prefHeight = scenarioPerformanceMainPane.getPrefHeight()/3;
+        chart.setPrefSize(prefWidth, prefHeight);
+        
+        vbSummary.getChildren().add(chart);
         
     }
     
