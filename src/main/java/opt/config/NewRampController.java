@@ -328,6 +328,7 @@ public class NewRampController {
         else
             myLink.get_segment().add_fr(params);
 
+        appMainController.clearSimData();
         appMainController.objectNameUpdate(myLink);
 
         Stage stage = (Stage) topPane.getScene().getWindow();

@@ -173,6 +173,7 @@ public class LinkPerformanceController {
     public void fillTabTimeseries() {
         String label_gp, label_mng, label_aux, label_units;
         double cc;
+        XYChart.Series dataSeries_total;
         vbTimeSeries.getChildren().clear();
         
         label_gp = "GP Lanes";
@@ -287,6 +288,9 @@ public class LinkPerformanceController {
         for (Commodity c : listVT) {
             max_sz = Math.max(max_sz, mySimData.get_flw_exiting(LaneGroupType.gp, c.getId()).values.size());
         }
+        double[] total = new double[max_sz];
+        for (int i = 0; i < max_sz; i++)
+            total[i] = 0;
         for (Commodity c : listVT) {
             dt = mySimData.get_flw_exiting(LaneGroupType.gp, c.getId()).get_dt();
             dataSeries_gp = new XYChart.Series();
@@ -299,12 +303,20 @@ public class LinkPerformanceController {
                 if (i < sz_gp) {
                     xy = xydata_gp.get(i);
                     dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, cc*xy.getYValue()));
+                    total[i] += cc*xy.getYValue();
                 } else {
                     dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
                 }
             }
             flowChart.getData().add(dataSeries_gp);
         }
+        
+        dataSeries_total = new XYChart.Series();
+        dataSeries_total.setName("Total");
+        for (int i = 0; i < max_sz; i++)
+            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+        flowChart.getData().add(dataSeries_total);
+        
         flowChart.setCreateSymbols(false);
         flowChart.setLegendSide(Side.RIGHT);
         flowChart.setMinHeight(200);
@@ -329,6 +341,8 @@ public class LinkPerformanceController {
             for (Commodity c : listVT) {
                 max_sz = Math.max(max_sz, mySimData.get_flw_exiting(LaneGroupType.mng, c.getId()).values.size());
             }
+            for (int i = 0; i < max_sz; i++)
+                total[i] = 0;
             for (Commodity c : listVT) {
                 dataSeries_mng = new XYChart.Series();
                 dataSeries_mng.setName(c.get_name());
@@ -340,12 +354,20 @@ public class LinkPerformanceController {
                     if (i < sz_mng) {
                         xy = xydata_mng.get(i);
                         dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, cc*xy.getYValue()));
+                        total[i] += cc*xy.getYValue();
                     } else {
                         dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
                     }
                 }
                 flowChart.getData().add(dataSeries_mng);
             }
+            
+            dataSeries_total = new XYChart.Series();
+            dataSeries_total.setName("Total");
+            for (int i = 0; i < max_sz; i++)
+                dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+            flowChart.getData().add(dataSeries_total);
+        
             flowChart.setCreateSymbols(false);
             flowChart.setLegendSide(Side.RIGHT);
             flowChart.setMinHeight(200);
@@ -371,6 +393,8 @@ public class LinkPerformanceController {
             for (Commodity c : listVT) {
                 max_sz = Math.max(max_sz, mySimData.get_flw_exiting(LaneGroupType.aux, c.getId()).values.size());
             }
+            for (int i = 0; i < max_sz; i++)
+                total[i] = 0;
             for (Commodity c : listVT) {
                 dataSeries_aux = new XYChart.Series();
                 dataSeries_aux.setName(c.get_name());
@@ -382,12 +406,20 @@ public class LinkPerformanceController {
                     if (i < sz_aux) {
                         xy = xydata_aux.get(i);
                         dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, cc*xy.getYValue()));
+                        total[i] += cc*xy.getYValue();
                     } else {
                         dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
                     }
                 }
                 flowChart.getData().add(dataSeries_aux);
             }
+            
+            dataSeries_total = new XYChart.Series();
+            dataSeries_total.setName("Total");
+            for (int i = 0; i < max_sz; i++)
+                dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+            flowChart.getData().add(dataSeries_total);
+            
             flowChart.setCreateSymbols(false);
             flowChart.setLegendSide(Side.RIGHT);
             flowChart.setMinHeight(200);
@@ -421,6 +453,8 @@ public class LinkPerformanceController {
         for (Commodity c : listVT) {
             max_sz = Math.max(max_sz, mySimData.get_veh(LaneGroupType.gp, c.getId()).values.size());
         }
+        for (int i = 0; i < max_sz; i++)
+            total[i] = 0;
         for (Commodity c : listVT) {
             dataSeries_gp = new XYChart.Series();
             dataSeries_gp.setName(c.get_name());
@@ -432,12 +466,20 @@ public class LinkPerformanceController {
                 if (i < sz_gp) {
                     xy = xydata_gp.get(i);
                     dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                    total[i] += xy.getYValue();
                 } else {
                     dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
                 }
             }
             vehChart.getData().add(dataSeries_gp);
         }
+        
+        dataSeries_total = new XYChart.Series();
+        dataSeries_total.setName("Total");
+        for (int i = 0; i < max_sz; i++)
+            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+        vehChart.getData().add(dataSeries_total);
+            
         vehChart.setCreateSymbols(false);
         vehChart.setLegendSide(Side.RIGHT);
         vehChart.setMinHeight(200);
@@ -462,6 +504,8 @@ public class LinkPerformanceController {
             for (Commodity c : listVT) {
                 max_sz = Math.max(max_sz, mySimData.get_veh(LaneGroupType.mng, c.getId()).values.size());
             }
+            for (int i = 0; i < max_sz; i++)
+                total[i] = 0;
             for (Commodity c : listVT) {
                 dataSeries_mng = new XYChart.Series();
                 dataSeries_mng.setName(c.get_name());
@@ -473,12 +517,20 @@ public class LinkPerformanceController {
                     if (i < sz_mng) {
                         xy = xydata_mng.get(i);
                         dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                        total[i] += xy.getYValue();
                     } else {
                         dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
                     }
                 }
                 vehChart.getData().add(dataSeries_mng);
             }
+            
+            dataSeries_total = new XYChart.Series();
+            dataSeries_total.setName("Total");
+            for (int i = 0; i < max_sz; i++)
+                dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+            vehChart.getData().add(dataSeries_total);
+            
             vehChart.setCreateSymbols(false);
             vehChart.setLegendSide(Side.RIGHT);
             vehChart.setMinHeight(200);
@@ -504,6 +556,8 @@ public class LinkPerformanceController {
             for (Commodity c : listVT) {
                 max_sz = Math.max(max_sz, mySimData.get_veh(LaneGroupType.aux, c.getId()).values.size());
             }
+            for (int i = 0; i < max_sz; i++)
+                total[i] = 0;
             for (Commodity c : listVT) {
                 dataSeries_aux = new XYChart.Series();
                 dataSeries_aux.setName(c.get_name());
@@ -515,12 +569,20 @@ public class LinkPerformanceController {
                     if (i < sz_aux) {
                         xy = xydata_aux.get(i);
                         dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                        total[i] += xy.getYValue();
                     } else {
                         dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
                     }
                 }
                 vehChart.getData().add(dataSeries_aux);
             }
+            
+            dataSeries_total = new XYChart.Series();
+            dataSeries_total.setName("Total");
+            for (int i = 0; i < max_sz; i++)
+                dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+            vehChart.getData().add(dataSeries_total);
+            
             vehChart.setCreateSymbols(false);
             vehChart.setLegendSide(Side.RIGHT);
             vehChart.setMinHeight(200);

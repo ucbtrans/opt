@@ -358,6 +358,7 @@ public class NewLinkController {
             new_link.set_mng_barrier(myLink.get_mng_barrier());
             new_link.set_mng_separated(myLink.get_mng_separated());
         }
+        appMainController.clearSimData();
         appMainController.objectNameUpdate(new_link);
 
         Stage stage = (Stage) topPane.getScene().getWindow();

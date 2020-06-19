@@ -310,10 +310,7 @@ public class AppMainController {
     }
     
     
-    /**
-     * Start simulation of the selected scenario.
-     */
-    public void runSimulation() {
+    public void clearSimData() {
         if (selectedScenario == null)
             return;
 
@@ -322,6 +319,17 @@ public class AppMainController {
             actionPane.getSelectionModel().selectFirst();
             reportTabPane.setDisable(true);
         }
+    }
+    
+    
+    /**
+     * Start simulation of the selected scenario.
+     */
+    public void runSimulation() {
+        if (selectedScenario == null)
+            return;
+
+        clearSimData();
         
         try {
             float start_time = selectedScenario.get_start_time();
@@ -770,7 +778,7 @@ public class AppMainController {
     
     @FXML
     void onClickMenuHelpAbout(ActionEvent event) {
-        String version = "2020-02-06";
+        String version = "2020-06-22";
         opt.utils.Dialogs.InformationDialog(null, "OPT development version " + version);
     }
     
@@ -787,6 +795,8 @@ public class AppMainController {
     void createNewRoute(Event event) {
         if (selectedScenario == null)
             return;
+        
+        clearSimData();
         
         Route route = selectedScenario.create_route("New Route");
         populateProjectTree();
