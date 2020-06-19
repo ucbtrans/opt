@@ -6,7 +6,7 @@ import java.util.Set;
 
 public class SimDataLanegroup {
 
-    protected List<SimCellData> celldata;
+    public List<SimCellData> celldata;
 
     public SimDataLanegroup(models.fluid.FluidLaneGroup lg, Set<Long> commids){
         celldata = new ArrayList<>();
