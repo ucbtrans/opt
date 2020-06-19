@@ -40,11 +40,10 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.UserSettings;
 import opt.data.AbstractLink;
-import opt.data.Schedule;
-import opt.data.control.AbstractController;
 import opt.data.control.AbstractControllerRampMeter;
+import opt.data.control.ControlSchedule;
 import opt.data.control.ControllerRampMeterAlinea;
-import opt.utils.ControlUtils;
+import opt.data.control.ScheduleEntry;
 import opt.utils.Misc;
 import opt.utils.ModifiedDoubleStringConverter;
 import opt.utils.ModifiedIntegerStringConverter;
@@ -58,12 +57,13 @@ import opt.utils.ModifiedIntegerStringConverter;
 public class RampMeterAlinea {
     private LinkEditorController linkEditorController = null;
     private AbstractLink myLink = null;
-    private AbstractController myController = null;
+    private ControlSchedule mySchedule;
+    private ControllerRampMeterAlinea myController = null;
     private List<AbstractLink> listSensorLinkCandidates = new ArrayList<AbstractLink>();
-    private boolean isnew = false;
     private float origStartTime;
-    private float origEndTime;
-    
+//    private float origEndTime;
+    private boolean isnew;
+
 
     @FXML // fx:id="topPane"
     private GridPane topPane; // Value injected by FXMLLoader
@@ -117,6 +117,9 @@ public class RampMeterAlinea {
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
+
+        System.out.println("RampMeterAlinea initialize");
+
         textStartTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultStartTime, "")));
         textEndTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultSimulationDuration, "")));
         
@@ -139,18 +142,23 @@ public class RampMeterAlinea {
     
     
     
-    public void initWithLinkAndController(AbstractLink lnk, AbstractController ctrl, boolean isnew) {
+    public void initWithLinkAndController(AbstractLink lnk, ControlSchedule schedule, ScheduleEntry entry,boolean isnew) {
+
+
+        System.out.println("RampMeterAlinea initWithLinkAndController");
         myLink = lnk;
-        myController = ctrl;
+        mySchedule = schedule;
+        myController = (ControllerRampMeterAlinea) entry.get_cntrl();
         this.isnew = isnew;
-        origStartTime = ctrl.getStartTime();
-        origEndTime = ctrl.getEndTime();
+
+        origStartTime = entry.get_start_time();
+//        origEndTime = Integer.MAX_VALUE;
         
         textStartTime.setText(Misc.seconds2timestring(origStartTime, ""));
-        textEndTime.setText(Misc.seconds2timestring(origEndTime, ""));
+//        textEndTime.setText(Misc.seconds2timestring(origEndTime, ""));
         
-        double min_rate = ((AbstractControllerRampMeter)ctrl).getMin_rate_vph();
-        double max_rate = ((AbstractControllerRampMeter)ctrl).getMax_rate_vph();
+        double min_rate = myController.getMin_rate_vph();
+        double max_rate = myController.getMax_rate_vph();
         
         String unitsFlow = UserSettings.unitsFlow;
         labelMinRate.setText("Minimum Rate per Lane (" + unitsFlow + "):");
@@ -160,13 +168,13 @@ public class RampMeterAlinea {
         spinnerMinRate.getValueFactory().setValue(min_rate);
         spinnerMaxRate.getValueFactory().setValue(max_rate);
         
-        controlDt.getValueFactory().setValue(Math.round(ctrl.getDt()));
-        cbQueueControl.setSelected(((AbstractControllerRampMeter)ctrl).isHas_queue_control());
+        controlDt.getValueFactory().setValue(Math.round(myController.getDt()));
+        cbQueueControl.setSelected(myController.isHas_queue_control());
         
         cbSensorLink.getItems().clear();
         listSensorLinkCandidates.clear();
         
-        long sensor_link_id = ((ControllerRampMeterAlinea)ctrl).getSensor_link_id();
+        long sensor_link_id = myController.getSensor_link_id();
         AbstractLink fwy = myLink.get_dn_link();
         listSensorLinkCandidates.add(fwy);
         cbSensorLink.getItems().add(fwy.get_name());
@@ -192,22 +200,23 @@ public class RampMeterAlinea {
 
     @FXML
     void onCancel(ActionEvent event) {
-        if (isnew) {
-            myLink.get_segment().get_scenario().get_controller_schedule().delete_controller(myController);
-        }
+        System.out.println("RampMeterAlinea onCancel");
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
     }
 
     @FXML
     void onOK(ActionEvent event) {
+
+        System.out.println("RampMeterAlinea onOk");
+
         int startSeconds = Misc.timeString2Seconds(textStartTime.getText());
-        int endSeconds = Misc.timeString2Seconds(textEndTime.getText());
+//        int endSeconds = Misc.timeString2Seconds(textEndTime.getText());
         
-        if (endSeconds <= startSeconds) {
-            opt.utils.Dialogs.ErrorDialog("Start time must be smaller than end time...", "Please, correct the time range.");
-            return;
-        }
+//        if (endSeconds <= startSeconds) {
+//            opt.utils.Dialogs.ErrorDialog("Start time must be smaller than end time...", "Please, correct the time range.");
+//            return;
+//        }
         
         double min_rate = spinnerMinRate.getValue();
         double max_rate = spinnerMaxRate.getValue();
@@ -215,27 +224,36 @@ public class RampMeterAlinea {
             opt.utils.Dialogs.ErrorDialog("Minimum rate cannot exceed maximum rate...", "Please, correct the range of metering rates.");
             return;
         }
-        
-        myController.setStartTime(startSeconds);
-        myController.setEndTime(endSeconds);
-        if (linkEditorController.checkControllerOverlap(myController)) {
-            myController.setStartTime(origStartTime);
-            myController.setEndTime(origEndTime);
-            opt.utils.Dialogs.ErrorDialog("Time range overlaps with other ramp meters in the schedule...", "Please, correct the time range.");
-            return;
-        }
+
+        // TODO
+//        myController.setStartTime(startSeconds);
+//        myController.setEndTime(endSeconds);
+//        if (linkEditorController.checkControllerOverlap(myController)) {
+//            myController.setStartTime(origStartTime);
+//            myController.setEndTime(origEndTime);
+//            opt.utils.Dialogs.ErrorDialog("Time range overlaps with other ramp meters in the schedule...", "Please, correct the time range.");
+//            return;
+//        }
         
         min_rate = UserSettings.convertFlow(min_rate, UserSettings.unitsFlow, "vph");
-        ((AbstractControllerRampMeter)myController).setMin_rate_vph((float)min_rate);
+        myController.setMin_rate_vph((float)min_rate);
         max_rate = UserSettings.convertFlow(max_rate, UserSettings.unitsFlow, "vph");
-        ((AbstractControllerRampMeter)myController).setMax_rate_vph((float)max_rate);
+        myController.setMax_rate_vph((float)max_rate);
         
         myController.setDt(controlDt.getValue());
-        ((AbstractControllerRampMeter)myController).setHas_queue_control(cbQueueControl.isSelected());
+        myController.setHas_queue_control(cbQueueControl.isSelected());
         
         AbstractLink sensor_link = listSensorLinkCandidates.get(cbSensorLink.getSelectionModel().getSelectedIndex());
-        ((ControllerRampMeterAlinea)myController).setSensor_link_id(sensor_link.get_id());
-        ((ControllerRampMeterAlinea)myController).setSensor_offset_m(0.5f*sensor_link.get_length_meters());
+        myController.setSensor_link_id(sensor_link.get_id());
+        myController.setSensor_offset_m(0.5f*sensor_link.get_length_meters());
+
+        try {
+            if(isnew)
+                mySchedule.add_entry(startSeconds,myController);
+        } catch (Exception e) {
+            opt.utils.Dialogs.ErrorDialog("Error adding the controller to the schedule", e.getMessage());
+            return;
+        }
 
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();

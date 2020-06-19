@@ -434,37 +434,38 @@ public class Scenario {
         /////////////////////////////////////////////////////
         // controllers, actuators, sensors
 
-        jaxb.Controllers jcntrls = new jaxb.Controllers();
-        if(my_fwy_scenario.controller_schedule!=null){
-            List<AbstractController> controllers = my_fwy_scenario.controller_schedule.items;
-
-            // controllers
-            if(!controllers.isEmpty())
-                jScn.setControllers(jcntrls);
-            for(AbstractController cntrl : controllers)
-                jcntrls.getController().add(cntrl.to_jaxb());
-
-            // actuators
-            jaxb.Actuators jacts = new jaxb.Actuators();
-            Set<AbstractActuator> actuators = controllers.stream()
-                    .flatMap(x->x.get_actuators().values().stream())
-                    .collect(toSet());
-
-            if(!actuators.isEmpty())
-                jScn.setActuators(jacts);
-            for(AbstractActuator act : actuators)
-                jacts.getActuator().add(act.to_jaxb());
-
-            // sensors
-            jaxb.Sensors jsens = new jaxb.Sensors();
-            Set<Sensor> sensors = controllers.stream()
-                    .flatMap(x->x.get_sensors().values().stream())
-                    .collect(toSet());
-            if(!sensors.isEmpty())
-                jScn.setSensors(jsens);
-            for(Sensor sns : sensors)
-                jsens.getSensor().add(sns.to_jaxb());
-        }
+        // TODO
+//        jaxb.Controllers jcntrls = new jaxb.Controllers();
+//        if(my_fwy_scenario.controller_schedule!=null){
+//            List<AbstractController> controllers = my_fwy_scenario.controller_schedule.items;
+//
+//            // controllers
+//            if(!controllers.isEmpty())
+//                jScn.setControllers(jcntrls);
+//            for(AbstractController cntrl : controllers)
+//                jcntrls.getController().add(cntrl.to_jaxb());
+//
+//            // actuators
+//            jaxb.Actuators jacts = new jaxb.Actuators();
+//            Set<AbstractActuator> actuators = controllers.stream()
+//                    .flatMap(x->x.get_actuators().values().stream())
+//                    .collect(toSet());
+//
+//            if(!actuators.isEmpty())
+//                jScn.setActuators(jacts);
+//            for(AbstractActuator act : actuators)
+//                jacts.getActuator().add(act.to_jaxb());
+//
+//            // sensors
+//            jaxb.Sensors jsens = new jaxb.Sensors();
+//            Set<Sensor> sensors = controllers.stream()
+//                    .flatMap(x->x.get_sensors().values().stream())
+//                    .collect(toSet());
+//            if(!sensors.isEmpty())
+//                jScn.setSensors(jsens);
+//            for(Sensor sns : sensors)
+//                jsens.getSensor().add(sns.to_jaxb());
+//        }
 
         return jScn;
     }

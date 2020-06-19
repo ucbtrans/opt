@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
@@ -71,7 +70,7 @@ import opt.config.NewLinkController;
 import opt.config.NewRampController;
 import opt.config.NewRampMeterController;
 import opt.config.RampMeterAlinea;
-import opt.config.RampMeterTOD;
+import opt.config.RampMeterFixed;
 import opt.config.RouteChoiceController;
 import opt.config.RouteController;
 import opt.config.ScenarioEditorController;
@@ -129,7 +128,7 @@ public class AppMainController {
     private GridPane rampMeterAlineaPane = null;
     private RampMeterAlinea rampMeterAlinea = null;
     private GridPane rampMeterTodPane = null;
-    private RampMeterTOD rampMeterTOD = null;
+    private RampMeterFixed rampMeterFixed = null;
     
     private SplitPane routeEditorPane = null;
     private RouteController routeController = null;
@@ -479,9 +478,9 @@ public class AppMainController {
             
             loader = new FXMLLoader(getClass().getResource("/rm_tod_editor.fxml"));
             rampMeterTodPane = loader.load();
-            rampMeterTOD = loader.getController();
-            rampMeterTOD.setLinkEditorController(linkEditorController);
-            linkEditorController.setRampMeterTodControllerAndScene(rampMeterTOD, new Scene(rampMeterTodPane));
+            rampMeterFixed = loader.getController();
+            rampMeterFixed.setLinkEditorController(linkEditorController);
+            linkEditorController.setRampMeterTodControllerAndScene(rampMeterFixed, new Scene(rampMeterTodPane));
             
             // Route controllers
             loader = new FXMLLoader(getClass().getResource("/route_editor.fxml"));

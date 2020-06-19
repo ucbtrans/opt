@@ -8,13 +8,20 @@ public abstract class AbstractControllerRampMeter extends AbstractController {
     protected float min_rate_vph;
     protected float max_rate_vph;
 
-    // factory
-    public AbstractControllerRampMeter(long id, float dt, float start_time, Float end_time, control.AbstractController.Algorithm  algorithm,boolean has_queue_control,float min_rate_vph,float max_rate_vph) throws Exception {
-        super(id, dt, start_time, end_time, algorithm);
+    ////////////////////////////////
+    // construction
+    ////////////////////////////////
+
+    public AbstractControllerRampMeter(long id, float dt, control.AbstractController.Algorithm  algorithm,boolean has_queue_control,float min_rate_vph,float max_rate_vph) throws Exception {
+        super(id, Type.RampMetering, dt, algorithm);
         this.has_queue_control = has_queue_control;
         this.min_rate_vph = min_rate_vph;
         this.max_rate_vph = max_rate_vph;
     }
+
+    ////////////////////////////////
+    // to jaxb
+    ////////////////////////////////
 
     @Override
     public Controller to_jaxb() {

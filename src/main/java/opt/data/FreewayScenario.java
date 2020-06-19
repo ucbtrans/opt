@@ -24,7 +24,7 @@ public class FreewayScenario {
     protected Scenario scenario;
     protected Map<Long,Segment> segments = new HashMap<>();
     protected Map<Long, Route> routes = new HashMap<>();
-    protected Schedule controller_schedule;
+//    protected Schedule controller_schedule;
 
     // simulation parameters
     protected float sim_start_time = 0f;
@@ -45,7 +45,7 @@ public class FreewayScenario {
         scenario = new Scenario(this);
         create_isolated_segment(segmentname,params, AbstractLink.Type.freeway);
         scenario.commodities.put(0l,new Commodity(0l,"Unnamed commodity",1f));
-        controller_schedule = new Schedule(this);
+//        controller_schedule = new Schedule(this);
         reset_max_ids();
     }
 
@@ -239,7 +239,7 @@ public class FreewayScenario {
         }
 
         // controller schedule .....................................
-        controller_schedule = new Schedule(this);
+//        controller_schedule = new Schedule(this);
 
         // create actuator and sensor maps
         Map<Long,jaxb.Actuator> actuators = new HashMap<>();
@@ -258,7 +258,7 @@ public class FreewayScenario {
                 AbstractController cnt;
                 switch( jcnt.getType()){
                     case "fixed_rate":
-                        cnt = ControlFactory.create_controller_tod(this, jcnt,actuators);
+                        cnt = ControlFactory.create_controller_fixed_rate(this, jcnt,actuators);
                         break;
                     case "alinea":
                         cnt = ControlFactory.create_controller_alinea(this,jcnt,actuators,sensors);
@@ -272,7 +272,7 @@ public class FreewayScenario {
                     default:
                         throw new Exception("Unkonwn controller type: " + jcnt.getType());
                 }
-                controller_schedule.add_item(cnt);
+//                controller_schedule.add_item(cnt);
             }
         }
 
@@ -309,8 +309,8 @@ public class FreewayScenario {
                 new_link.dn_link = scn_cpy.scenario.links.get(link.dn_link.id);
         }
 
-        for(AbstractController ctrl : controller_schedule.items)
-            scn_cpy.controller_schedule.items.add(ctrl);
+//        for(AbstractController ctrl : controller_schedule.items)
+//            scn_cpy.controller_schedule.items.add(ctrl);
 
         return scn_cpy;
     }
@@ -351,9 +351,9 @@ public class FreewayScenario {
     // API controller
     /////////////////////////////////////
 
-    public Schedule get_controller_schedule(){
-        return controller_schedule;
-    }
+//    public Schedule get_controller_schedule(){
+//        return controller_schedule;
+//    }
 
     /////////////////////////////////////
     // API network
@@ -763,23 +763,25 @@ public class FreewayScenario {
                 .max(Comparator.comparing(Long::valueOf));
         max_seg_id = opt_max_seg_id.isPresent() ? opt_max_seg_id.get() : 0l;
 
-        // controller
-        Optional<Long> opt_max_cntrl_id = controller_schedule.items.stream()
-                .map(c->c.getId())
-                .max(Comparator.comparing(Long::valueOf));
-        max_controller_id = opt_max_cntrl_id.isPresent() ? opt_max_cntrl_id.get() : 0l;
 
-        // actuator
-        Optional<Long> opt_max_act_id = controller_schedule.items.stream()
-                .flatMap(c->c.get_actuator_ids().stream())
-                .max(Comparator.comparing(Long::valueOf));
-        max_actuator_id = opt_max_act_id.isPresent() ? opt_max_act_id.get() : 0l;
-
-        // sensor
-        Optional<Long> opt_max_sens_id = controller_schedule.items.stream()
-                .flatMap(c->c.get_sensor_ids().stream())
-                .max(Comparator.comparing(Long::valueOf));
-        max_sensor_id = opt_max_sens_id.isPresent() ? opt_max_sens_id.get() : 0l;
+        // TODO
+//        // controller
+//        Optional<Long> opt_max_cntrl_id = controller_schedule.items.stream()
+//                .map(c->c.getId())
+//                .max(Comparator.comparing(Long::valueOf));
+//        max_controller_id = opt_max_cntrl_id.isPresent() ? opt_max_cntrl_id.get() : 0l;
+//
+//        // actuator
+//        Optional<Long> opt_max_act_id = controller_schedule.items.stream()
+//                .flatMap(c->c.get_actuator_ids().stream())
+//                .max(Comparator.comparing(Long::valueOf));
+//        max_actuator_id = opt_max_act_id.isPresent() ? opt_max_act_id.get() : 0l;
+//
+//        // sensor
+//        Optional<Long> opt_max_sens_id = controller_schedule.items.stream()
+//                .flatMap(c->c.get_sensor_ids().stream())
+//                .max(Comparator.comparing(Long::valueOf));
+//        max_sensor_id = opt_max_sens_id.isPresent() ? opt_max_sens_id.get() : 0l;
     }
 
     protected long new_link_id(){

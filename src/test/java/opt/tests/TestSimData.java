@@ -123,7 +123,7 @@ public class TestSimData extends AbstractTest {
 
     @Test
     public void route_contour(){
-        TimeSeriesList X = simdata.get_speed_contour_for_route(routeA,LaneGroupType.gp);
+        TimeSeriesList X = simdata.get_speed_contour_for_route(routeA,LaneGroupType.mng);
 
         System.out.println(X.print_time());
         System.out.println(X.print_space());

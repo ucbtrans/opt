@@ -13,13 +13,17 @@ public class ControlFactory {
 	static{
 		cntrl_alg_name = new BijectiveMap<>();
 		cntrl_alg_name.put(control.AbstractController.Algorithm.alinea,"Alinea");
-		cntrl_alg_name.put(control.AbstractController.Algorithm.fixed_rate,"TOD");
+		cntrl_alg_name.put(control.AbstractController.Algorithm.fixed_rate,"Fixed rate");
+		cntrl_alg_name.put(control.AbstractController.Algorithm.open,"Open");
+		cntrl_alg_name.put(control.AbstractController.Algorithm.closed,"Closed");
 	}
 
 	public static List<control.AbstractController.Algorithm> get_available_ramp_metering_algorithms(){
 		List<control.AbstractController.Algorithm> x = new ArrayList<>();
 		x.add(control.AbstractController.Algorithm.alinea);
 		x.add(control.AbstractController.Algorithm.fixed_rate);
+		x.add(control.AbstractController.Algorithm.open);
+		x.add(control.AbstractController.Algorithm.closed);
 		return x;
 	}
 
@@ -27,32 +31,51 @@ public class ControlFactory {
 		List<String> x = new ArrayList<>();
 		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.alinea));
 		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.fixed_rate));
+		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.open));
+		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.closed));
 		return x;
 	}
+
+	/////////////////////
+	// schedule
+	/////////////////////
+
+	public static ControlSchedule create_empty_controller_schedule(AbstractLink link, LaneGroupType lgtype, AbstractController.Type cntrl_type){
+		return new ControlSchedule(link,lgtype,cntrl_type);
+	}
+
 
 	/////////////////////
 	// controller
 	/////////////////////
 
-	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn,Long id, float dt, float start_time, float end_time, boolean has_queue_control, float min_rate_vph, float max_rate_vph,Long sensor_id, long sensor_link_id, float sensor_offset,Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
-		parameters_check(dt,start_time,end_time);
-		return new ControllerRampMeterAlinea(fwyscn,id,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,sensor_id,sensor_link_id,sensor_offset,act_id,ramp_link_id,lgtype);
+	public static ControllerRampMeterOpen create_controller_open(FreewayScenario fwyscn,Long id,Long act_id,long ramp_link_id, LaneGroupType lgtype) throws Exception {
+		return new ControllerRampMeterOpen(fwyscn,id,act_id,ramp_link_id,lgtype);
 	}
 
-	public static ControllerRampMeterTOD create_controller_tod(FreewayScenario fwyscn,Long id, float dt, float start_time, Float end_time, boolean has_queue_control, float min_rate_vph, float max_rate_vph,Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
-		parameters_check(dt,start_time,end_time);
-		return new ControllerRampMeterTOD(fwyscn,id,dt,start_time,end_time,has_queue_control,min_rate_vph,max_rate_vph,act_id,ramp_link_id,lgtype);
+	public static ControllerRampMeterClosed create_controller_closed(FreewayScenario fwyscn,Long id,Long act_id,long ramp_link_id, LaneGroupType lgtype) throws Exception {
+		return new ControllerRampMeterClosed(fwyscn,id,act_id,ramp_link_id,lgtype);
 	}
 
-	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,Long id, float dt, float start_time, Float end_time) throws Exception {
-		parameters_check(dt,start_time,end_time);
-		ControllerPolicyHOV ctrl = new ControllerPolicyHOV(fwyscn,id,dt,start_time,end_time);
+	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn,Long id, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl,Long sensor_id, long sensor_link_id, float sensor_offset,Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
+		parameters_check(dt);
+		return new ControllerRampMeterAlinea(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset,act_id,ramp_link_id,lgtype);
+	}
+
+	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn, Long id, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl, float rate_vphpl,Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
+		parameters_check(dt);
+		return new ControllerRampMeterFixedRate(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,rate_vphpl,act_id,ramp_link_id,lgtype);
+	}
+
+	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,Long id, float dt) throws Exception {
+		parameters_check(dt);
+		ControllerPolicyHOV ctrl = new ControllerPolicyHOV(fwyscn,id,dt);
 		return ctrl;
 	}
 
-	public static ControllerPolicyHOT create_controller_hot(FreewayScenario fwyscn,Long id, float dt, float start_time, Float end_time) throws Exception {
-		parameters_check(dt,start_time,end_time);
-		ControllerPolicyHOT ctrl = new ControllerPolicyHOT(fwyscn,id,dt,start_time,end_time);
+	public static ControllerPolicyHOT create_controller_hot(FreewayScenario fwyscn,Long id, float dt) throws Exception {
+		parameters_check(dt);
+		ControllerPolicyHOT ctrl = new ControllerPolicyHOT(fwyscn,id,dt);
 		return ctrl;
 	}
 
@@ -135,16 +158,17 @@ public class ControlFactory {
 			sensor_offset = jsns.getPosition();
 		}
 
-		ControllerRampMeterAlinea cntrl = create_controller_alinea(fwyscn,jcnt.getId(),jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime(),has_queue_control,min_rate_vph,max_rate_vph,sensor_id,sensor_link_id,sensor_offset,act_id,ramp_link_id,lgtype);
+		ControllerRampMeterAlinea cntrl = create_controller_alinea(fwyscn,jcnt.getId(),jcnt.getDt(),has_queue_control,min_rate_vph,max_rate_vph,sensor_id,sensor_link_id,sensor_offset,act_id,ramp_link_id,lgtype);
 
 		cntrl.setId( jcnt.getId() );
 
 		return cntrl;
 	}
 
-	public static ControllerRampMeterTOD create_controller_tod(FreewayScenario fwyscn,jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool) throws Exception {
+	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn, jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool) throws Exception {
 
 		// read parameters
+		float rate_vphpl = 0f;
 		boolean has_queue_control = false;
 		LaneGroupType lgtype = LaneGroupType.gp;
 		if(jcnt.getParameters()!=null)
@@ -155,6 +179,9 @@ public class ControlFactory {
 						break;
 					case "lane_group":
 						lgtype = LaneGroupType.valueOf(param.getValue());
+						break;
+					case "rate_vphpl":
+						rate_vphpl = Float.parseFloat(param.getValue());
 						break;
 					default:
 						throw new Exception("Unknown controller parameter");
@@ -176,7 +203,7 @@ public class ControlFactory {
 			ramp_link_id = jact.getActuatorTarget().getId();
 		}
 
-		ControllerRampMeterTOD cntrl = create_controller_tod(fwyscn,jcnt.getId(),jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime(),has_queue_control,min_rate_vph,max_rate_vph,act_id,ramp_link_id,lgtype);
+		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(fwyscn,jcnt.getId(),jcnt.getDt(),has_queue_control,min_rate_vph,max_rate_vph,rate_vphpl,act_id,ramp_link_id,lgtype);
 
 		cntrl.setId( jcnt.getId() );
 
@@ -185,13 +212,13 @@ public class ControlFactory {
 	}
 
 	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,jaxb.Controller jcnt) throws Exception {
-		ControllerPolicyHOV cntrl = create_controller_hov(fwyscn,jcnt.getId(),jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime());
+		ControllerPolicyHOV cntrl = create_controller_hov(fwyscn,jcnt.getId(),jcnt.getDt());
 		cntrl.setId( jcnt.getId() );
 		return cntrl;
 	}
 
 	public static ControllerPolicyHOT create_controller_hot(FreewayScenario fwyscn,jaxb.Controller jcnt) throws Exception {
-		ControllerPolicyHOT cntrl = create_controller_hot(fwyscn,jcnt.getId(),jcnt.getDt(),jcnt.getStartTime(),jcnt.getEndTime());
+		ControllerPolicyHOT cntrl = create_controller_hot(fwyscn,jcnt.getId(),jcnt.getDt());
 		cntrl.setId( jcnt.getId() );
 		return cntrl;
 	}
@@ -200,13 +227,9 @@ public class ControlFactory {
 	// private
 	/////////////////////////
 
-	private static void parameters_check(float dt,float start_time,Float end_time) throws OTMException {
+	private static void parameters_check(float dt) throws OTMException {
 		if(dt<=0f)
 			throw new OTMException("dt<=0f");
-		if(start_time<0)
-			throw new OTMException("start_time<0");
-		if(end_time!=null && end_time<=start_time)
-			throw new OTMException("end_time!=null && end_time<=start_time");
 	}
 
 }

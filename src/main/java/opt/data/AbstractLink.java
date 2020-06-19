@@ -1,5 +1,7 @@
 package opt.data;
 
+import opt.data.control.AbstractController;
+import opt.data.control.ControlSchedule;
 import profiles.Profile1D;
 
 import java.lang.reflect.InvocationTargetException;
@@ -19,6 +21,9 @@ public abstract class AbstractLink implements Comparable {
     protected long end_node_id;
 
     public AbstractParameters params;
+
+    // for each lane group there is a map from control type to TOD schedule.
+    public Map<LaneGroupType,Map<AbstractController.Type, ControlSchedule>> schedules;
 
     // Demands for LinkOnramp and LinkFreeway types only
     protected Map<Long, Profile1D> demands = new HashMap<>();    // commodity -> Profile1D
@@ -45,6 +50,7 @@ public abstract class AbstractLink implements Comparable {
 
     public AbstractLink(jaxb.Link link){
         this.id = link.getId();
+        this.schedules = new HashMap<>();
         this.start_node_id = link.getStartNodeId();
         this.end_node_id = link.getEndNodeId();
     }
@@ -52,6 +58,7 @@ public abstract class AbstractLink implements Comparable {
     // used by clone
     public AbstractLink(long id, Long start_node_id, Long end_node_id, AbstractParameters params){
         this.id = id;
+        this.schedules = new HashMap<>();
         this.mysegment = null;
         this.up_link = null;
         this.dn_link = null;
@@ -62,6 +69,7 @@ public abstract class AbstractLink implements Comparable {
 
     public AbstractLink(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, AbstractParameters params){
         this.id = id;
+        this.schedules = new HashMap<>();
         this.mysegment = mysegment;
         this.up_link = up_link;
         this.dn_link = dn_link;
@@ -378,6 +386,27 @@ public abstract class AbstractLink implements Comparable {
 
     public final void set_demand_vph(Long comm_id, Profile1D profile) throws Exception {
         this.demands.put(comm_id,profile);
+    }
+
+    /////////////////////////////////////
+    // controllers
+    /////////////////////////////////////
+
+    public final ControlSchedule get_controller_schedule(LaneGroupType lgtype, AbstractController.Type cntrl_type){
+        if(!schedules.containsKey(lgtype)) {
+            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(this, lgtype, cntrl_type);
+            Map<AbstractController.Type, ControlSchedule> X  = new HashMap<>();
+            X.put(cntrl_type,newschedule);
+            schedules.put(lgtype,X);
+            return newschedule;
+        }
+        Map<AbstractController.Type, ControlSchedule> X  = schedules.get(lgtype);
+        if(!X.containsKey(cntrl_type)) {
+            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(this, lgtype, cntrl_type);
+            X.put(cntrl_type,newschedule);
+            return newschedule;
+        }
+        return X.get(cntrl_type);
     }
 
     /////////////////////////////////////
