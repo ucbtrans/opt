@@ -82,7 +82,9 @@ public class LinkPerformanceController {
     private float start = 0;
     
     private List<Commodity> listVT = null;
-            
+     
+    private String timeLabel;
+    private double timeDivider;
     
     @FXML // fx:id="linkPerformanceMainPane"
     private TabPane linkPerformanceMainPane; // Value injected by FXMLLoader
@@ -153,6 +155,14 @@ public class LinkPerformanceController {
         
         listVT = Misc.makeListVT(myLink.get_segment().get_scenario().get_commodities());
         start = myLink.get_segment().get_scenario().get_start_time();
+        
+        timeLabel = "Time (hours)";
+        timeDivider = 3600.0;
+        if (sdata.fwyscenario.get_sim_duration() <= 7200) {
+            timeLabel = "Time (minutes)";
+            timeDivider = 60.0;
+        }
+        
         fillTabTimeseries();
         fillTabAggregates();
         //fillTabEmissions();
@@ -171,9 +181,9 @@ public class LinkPerformanceController {
         label_units = UserSettings.unitsSpeed;
         cc = UserSettings.speedConversionMap.get("mph"+label_units);
         
-        CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis xxAxis = new NumberAxis();
-        xAxis.setLabel("Time");
+        //CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis xAxis = new NumberAxis();
+        xAxis.setLabel(timeLabel);
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Speed (" + label_units + ")");
 
@@ -198,28 +208,27 @@ public class LinkPerformanceController {
         int max_sz = Math.max(Math.max(sz_gp, sz_mng), sz_aux);
         
         XYDataItem xy;
+        float dt = mySimData.get_speed(LaneGroupType.gp).get_dt();
         for (int i = 0; i < max_sz; i++) {
             if (i < sz_gp) {
                 xy = xydata_gp.get(i);
-                dataSeries_gp.getData().add(new XYChart.Data(Misc.seconds2timestring(start+(float)xy.getXValue(), ":"), cc*xy.getYValue()));
-                //dataSeries_gp.getData().add(new XYChart.Data(start+(float)xy.getXValue(), cc*xy.getYValue()));
+                //dataSeries_gp.getData().add(new XYChart.Data(Misc.seconds2timestring(start+(float)xy.getXValue(), ":"), cc*xy.getYValue()));
+                dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, cc*xy.getYValue()));
             } else {
-                float dt = mySimData.get_speed(LaneGroupType.gp).get_dt();
-                dataSeries_gp.getData().add(new XYChart.Data(Misc.seconds2timestring(start+i*dt, ":"), 0));
+                //dataSeries_gp.getData().add(new XYChart.Data(Misc.seconds2timestring(start+i*dt, ":"), 0));
+                dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
             }
             if (i < sz_mng) {
                 xy = xydata_mng.get(i);
-                dataSeries_mng.getData().add(new XYChart.Data(Misc.seconds2timestring(start+(float)xy.getXValue(), ":"), cc*xy.getYValue()));
+                dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, cc*xy.getYValue()));
             } else {
-                float dt = mySimData.get_speed(LaneGroupType.mng).get_dt();
-                dataSeries_mng.getData().add(new XYChart.Data(Misc.seconds2timestring(start+i*dt, ":"), 0));
+                dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
             }
             if (i < sz_aux) {
                 xy = xydata_aux.get(i);
-                dataSeries_aux.getData().add(new XYChart.Data(Misc.seconds2timestring(start+(float)xy.getXValue(), ":"), cc*xy.getYValue()));
+                dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, cc*xy.getYValue()));
             } else {
-                float dt = mySimData.get_speed(LaneGroupType.aux).get_dt();
-                dataSeries_aux.getData().add(new XYChart.Data(Misc.seconds2timestring(start+i*dt, ":"), 0));
+                dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
             }
         }
 
@@ -248,17 +257,16 @@ public class LinkPerformanceController {
             }
         });*/
         
-        
-        vbTimeSeries.getChildren().add(speedChart);
+        if (myLink.get_up_link() != null) // source links have no speed display
+            vbTimeSeries.getChildren().add(speedChart);
         
         //Zooming works only via primary mouse button without ctrl held down
-        /*JFXChartUtil.setupZooming(speedChart, (MouseEvent mouseEvent) -> {
+        JFXChartUtil.setupZooming(speedChart, (MouseEvent mouseEvent) -> {
             if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
                     mouseEvent.isShortcutDown() )
                 mouseEvent.consume();
         });
-
-        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(speedChart);*/
+        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(speedChart);
         
         
         label_gp = "Flow in GP Lanes";
@@ -267,8 +275,8 @@ public class LinkPerformanceController {
         label_units = UserSettings.unitsFlow;
         cc = UserSettings.flowConversionMap.get("vph"+label_units);
         
-        xAxis = new CategoryAxis();
-        xAxis.setLabel("Time");
+        xAxis = new NumberAxis();
+        xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("Flow (" + label_units + ")");
 
@@ -280,6 +288,7 @@ public class LinkPerformanceController {
             max_sz = Math.max(max_sz, mySimData.get_flw_exiting(LaneGroupType.gp, c.getId()).values.size());
         }
         for (Commodity c : listVT) {
+            dt = mySimData.get_flw_exiting(LaneGroupType.gp, c.getId()).get_dt();
             dataSeries_gp = new XYChart.Series();
             dataSeries_gp.setName(c.get_name());
             xydata_gp = mySimData.get_flw_exiting(LaneGroupType.gp, c.getId()).get_XYSeries(c.get_name()).getItems();
@@ -289,10 +298,9 @@ public class LinkPerformanceController {
             for (int i = 0; i < max_sz; i++) {
                 if (i < sz_gp) {
                     xy = xydata_gp.get(i);
-                    dataSeries_gp.getData().add(new XYChart.Data(Misc.seconds2timestring(start+(float)xy.getXValue(), ":"), cc*xy.getYValue()));
+                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, cc*xy.getYValue()));
                 } else {
-                    float dt = mySimData.get_flw_exiting(LaneGroupType.gp, c.getId()).get_dt();
-                    dataSeries_gp.getData().add(new XYChart.Data(Misc.seconds2timestring(start+i*dt, ":"), 0));
+                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
                 }
             }
             flowChart.getData().add(dataSeries_gp);
@@ -301,10 +309,16 @@ public class LinkPerformanceController {
         flowChart.setLegendSide(Side.RIGHT);
         flowChart.setMinHeight(200);
         vbTimeSeries.getChildren().add(flowChart);
+        JFXChartUtil.setupZooming(flowChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+        });
+        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(flowChart);
         
         if (myLink.get_mng_lanes() > 0) {
-            xAxis = new CategoryAxis();
-            xAxis.setLabel("Time");
+            xAxis = new NumberAxis();
+            xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("Flow (" + label_units + ")");
 
@@ -325,10 +339,9 @@ public class LinkPerformanceController {
                 for (int i = 0; i < max_sz; i++) {
                     if (i < sz_mng) {
                         xy = xydata_mng.get(i);
-                        dataSeries_mng.getData().add(new XYChart.Data(Misc.seconds2timestring(start+(float)xy.getXValue(), ":"), cc*xy.getYValue()));
+                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, cc*xy.getYValue()));
                     } else {
-                        float dt = mySimData.get_flw_exiting(LaneGroupType.mng, c.getId()).get_dt();
-                        dataSeries_mng.getData().add(new XYChart.Data(Misc.seconds2timestring(start+i*dt, ":"), 0));
+                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
                     }
                 }
                 flowChart.getData().add(dataSeries_mng);
@@ -337,11 +350,17 @@ public class LinkPerformanceController {
             flowChart.setLegendSide(Side.RIGHT);
             flowChart.setMinHeight(200);
             vbTimeSeries.getChildren().add(flowChart);
+            JFXChartUtil.setupZooming(flowChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+            });
+            JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(flowChart);
         }
         
         if (myLink.get_aux_lanes() > 0) {
-            xAxis = new CategoryAxis();
-            xAxis.setLabel("Time");
+            xAxis = new NumberAxis();
+            xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("Flow (" + label_units + ")");
 
@@ -362,10 +381,9 @@ public class LinkPerformanceController {
                 for (int i = 0; i < max_sz; i++) {
                     if (i < sz_aux) {
                         xy = xydata_aux.get(i);
-                        dataSeries_aux.getData().add(new XYChart.Data(Misc.seconds2timestring(start+(float)xy.getXValue(), ":"), cc*xy.getYValue()));
+                        dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, cc*xy.getYValue()));
                     } else {
-                        float dt = mySimData.get_flw_exiting(LaneGroupType.aux, c.getId()).get_dt();
-                        dataSeries_aux.getData().add(new XYChart.Data(Misc.seconds2timestring(start+i*dt, ":"), 0));
+                        dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
                     }
                 }
                 flowChart.getData().add(dataSeries_aux);
@@ -374,15 +392,25 @@ public class LinkPerformanceController {
             flowChart.setLegendSide(Side.RIGHT);
             flowChart.setMinHeight(200);
             vbTimeSeries.getChildren().add(flowChart);
+            JFXChartUtil.setupZooming(flowChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+            });
+            JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(flowChart);
         }
 
         
         label_gp = "Vehicles in GP Lanes";
         label_mng = "Vehicles in Managed Lanes";
         label_aux = "Vehicles in Aux Lanes";
+        if (myLink.get_up_link() == null) { // source link
+            label_gp = "GP Lane Vehicle Queue";
+            label_mng = "Managed Lane Vehicle Queue";
+        }
         
-        xAxis = new CategoryAxis();
-        xAxis.setLabel("Time");
+        xAxis = new NumberAxis();
+        xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("Number of Vehicles");
 
@@ -403,10 +431,9 @@ public class LinkPerformanceController {
             for (int i = 0; i < max_sz; i++) {
                 if (i < sz_gp) {
                     xy = xydata_gp.get(i);
-                    dataSeries_gp.getData().add(new XYChart.Data(Misc.seconds2timestring(start+(float)xy.getXValue(), ":"), cc*xy.getYValue()));
+                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
                 } else {
-                    float dt = mySimData.get_veh(LaneGroupType.gp, c.getId()).get_dt();
-                    dataSeries_gp.getData().add(new XYChart.Data(Misc.seconds2timestring(start+i*dt, ":"), 0));
+                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
                 }
             }
             vehChart.getData().add(dataSeries_gp);
@@ -415,10 +442,16 @@ public class LinkPerformanceController {
         vehChart.setLegendSide(Side.RIGHT);
         vehChart.setMinHeight(200);
         vbTimeSeries.getChildren().add(vehChart);
+        JFXChartUtil.setupZooming(vehChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+        });
+        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vehChart);
         
         if (myLink.get_mng_lanes() > 0) {
-            xAxis = new CategoryAxis();
-            xAxis.setLabel("Time");
+            xAxis = new NumberAxis();
+            xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("Number of Vehicles");
 
@@ -439,10 +472,9 @@ public class LinkPerformanceController {
                 for (int i = 0; i < max_sz; i++) {
                     if (i < sz_mng) {
                         xy = xydata_mng.get(i);
-                        dataSeries_mng.getData().add(new XYChart.Data(Misc.seconds2timestring(start+(float)xy.getXValue(), ":"), cc*xy.getYValue()));
+                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
                     } else {
-                        float dt = mySimData.get_veh(LaneGroupType.mng, c.getId()).get_dt();
-                        dataSeries_mng.getData().add(new XYChart.Data(Misc.seconds2timestring(start+i*dt, ":"), 0));
+                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
                     }
                 }
                 vehChart.getData().add(dataSeries_mng);
@@ -451,11 +483,17 @@ public class LinkPerformanceController {
             vehChart.setLegendSide(Side.RIGHT);
             vehChart.setMinHeight(200);
             vbTimeSeries.getChildren().add(vehChart);
+            JFXChartUtil.setupZooming(vehChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+            });
+            JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vehChart);
         }
 
         if (myLink.get_aux_lanes() > 0) {
-            xAxis = new CategoryAxis();
-            xAxis.setLabel("Time");
+            xAxis = new NumberAxis();
+            xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("Number of Vehicles");
 
@@ -476,10 +514,9 @@ public class LinkPerformanceController {
                 for (int i = 0; i < max_sz; i++) {
                     if (i < sz_aux) {
                         xy = xydata_aux.get(i);
-                        dataSeries_aux.getData().add(new XYChart.Data(Misc.seconds2timestring(start+(float)xy.getXValue(), ":"), cc*xy.getYValue()));
+                        dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
                     } else {
-                        float dt = mySimData.get_veh(LaneGroupType.aux, c.getId()).get_dt();
-                        dataSeries_aux.getData().add(new XYChart.Data(Misc.seconds2timestring(start+i*dt, ":"), 0));
+                        dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
                     }
                 }
                 vehChart.getData().add(dataSeries_aux);
@@ -488,6 +525,12 @@ public class LinkPerformanceController {
             vehChart.setLegendSide(Side.RIGHT);
             vehChart.setMinHeight(200);
             vbTimeSeries.getChildren().add(vehChart);
+            JFXChartUtil.setupZooming(vehChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+            });
+            JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vehChart);
         }
     }
      

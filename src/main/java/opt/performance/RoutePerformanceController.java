@@ -237,7 +237,7 @@ public class RoutePerformanceController {
         timeDivider = 3600.0;
         if (mySimData.fwyscenario.get_sim_duration() <= 7200) {
             timeLabel = "Time (minutes)";
-            timeDivider = 60;
+            timeDivider = 60.0;
         }
         
         processLinkSequence();
