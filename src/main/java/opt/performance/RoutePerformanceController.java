@@ -368,6 +368,7 @@ public class RoutePerformanceController {
                                 maxSpeed = Math.max(maxSpeed, v);
                             }
                         }
+                    
                         speedDataManaged[0][j * xSize + begCellIdx[i] + k] = dd;
                         speedDataManaged[1][j * xSize + begCellIdx[i] + k] = hour;
                         speedDataManaged[2][j * xSize + begCellIdx[i] + k] = v;
@@ -399,7 +400,7 @@ public class RoutePerformanceController {
         speedGPDS = new DefaultXYZDataset();
         speedGPDS.addSeries("Speed in GP Lanes", speedDataGP);
         speedManagedDS = new DefaultXYZDataset();
-        speedGPDS.addSeries("Speed in Managed Lanes", speedDataManaged);
+        speedManagedDS.addSeries("Speed in Managed Lanes", speedDataManaged);
         speedAuxDS = new DefaultXYZDataset();
         flowGPDS = new DefaultXYZDataset();
         flowManagedDS = new DefaultXYZDataset();
@@ -467,7 +468,7 @@ public class RoutePerformanceController {
             renderer.setBlockAnchor(RectangleAnchor.BOTTOM_LEFT);
             paintScale = speedPaintScale();
             renderer.setPaintScale(paintScale);
-            plot = new XYPlot(speedGPDS, distAxis, timeAxis, renderer);
+            plot = new XYPlot(speedManagedDS, distAxis, timeAxis, renderer);
             plot.setAxisOffset(new RectangleInsets(5, 5, 5, 5));
             speedManagedChart = new JFreeChart("Speed in Managed Lanes", plot);
             speedManagedChart.removeLegend();
