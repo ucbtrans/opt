@@ -1,6 +1,6 @@
 package opt.data.control;
 
-import opt.data.ControlFactory;
+import jaxb.Controller;
 import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
 
@@ -28,4 +28,16 @@ public class ControllerRampMeterFixedRate extends AbstractControllerRampMeter {
         this.rate_vphpl = new_rate;
     }
 
+    @Override
+    public Controller to_jaxb() {
+        jaxb.Controller j = super.to_jaxb();
+
+        // write rate
+        jaxb.Parameter p = new jaxb.Parameter();
+        p.setName("rate_vphpl");
+        p.setValue(String.format("%.0f",rate_vphpl));
+        j.getParameters().getParameter().add(p);
+
+        return j;
+    }
 }

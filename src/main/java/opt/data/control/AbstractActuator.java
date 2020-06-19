@@ -4,18 +4,15 @@ import opt.data.LaneGroupType;
 
 public abstract class AbstractActuator {
 
-	public long id;
-	public long link_id;
-	public LaneGroupType lgtype;
-	public AbstractController myController;
+	protected long id;
+	protected long link_id;
+	protected LaneGroupType lgtype;
 
-	public AbstractActuator(long id,long link_id,LaneGroupType lgtype,AbstractController myController){
+	public AbstractActuator(long id,long link_id,LaneGroupType lgtype){
 		this.id = id;
 		this.lgtype = lgtype;
 		this.link_id = link_id;
-		this.myController = myController;
 	}
-
 
 	// TODO READ AND WRITE LANE GROUP TYPE TO XML
 
@@ -35,4 +32,7 @@ public abstract class AbstractActuator {
 		return j;
 	}
 
+	public long getId(){
+		return id;
+	}
 }

@@ -1,7 +1,5 @@
 package opt.data.control;
 
-import jaxb.Controller;
-
 public abstract class AbstractControllerRampMeter extends AbstractController {
 
     protected boolean has_queue_control;
@@ -24,16 +22,59 @@ public abstract class AbstractControllerRampMeter extends AbstractController {
     ////////////////////////////////
 
     @Override
-    public Controller to_jaxb() {
-        Controller cntrl = super.to_jaxb();
+    public jaxb.Controller to_jaxb(){
+        jaxb.Controller j = super.to_jaxb();
+
+        boolean write_quecontrol = has_queue_control;
+        boolean write_min_rate = Float.isFinite(min_rate_vph);
+        boolean write_max_rate = Float.isFinite(max_rate_vph);
+
+        if(write_quecontrol || write_min_rate || write_max_rate)
+            j.setParameters(new jaxb.Parameters());
 
         // write has_queue_control
-        jaxb.Parameter param = new jaxb.Parameter();
-        param.setName("queue_control");
-        param.setValue(has_queue_control ? "true" : "false");
-        cntrl.getParameters().getParameter().add(param);
+        if(write_quecontrol){
+            jaxb.Parameter p = new jaxb.Parameter();
+            p.setName("queue_control");
+            p.setValue(has_queue_control ? "true" : "false");
+            j.getParameters().getParameter().add(p);
+        }
 
-        return cntrl;
+        // write min rate
+        if(write_min_rate){
+            jaxb.Parameter p = new jaxb.Parameter();
+            p.setName("min_rate_vphpl");
+            p.setValue(String.format("%.0f",min_rate_vph));
+            j.getParameters().getParameter().add(p);
+        }
+
+        // write max rate
+        if(write_max_rate){
+            jaxb.Parameter p = new jaxb.Parameter();
+            p.setName("max_rate_vphpl");
+            p.setValue(String.format("%.0f",max_rate_vph));
+            j.getParameters().getParameter().add(p);
+        }
+
+        return j;
+
+        // TODO THIS IS TEMPORARY FOR STORING THE ACTUATOR LANE GROUP AS A PARAMETER OF THE CONTROLLER
+//		if(actuators!=null && actuators.size()==1){
+//			AbstractActuator act = actuators.values().iterator().next();
+//
+//			jaxb.Parameter param = new jaxb.Parameter();
+//			param.setName("lane_group");
+//			param.setValue(act.lgtype.toString());
+//			j.getParameters().getParameter().add(param);
+//		}
+//
+//		if(actuators!=null && !actuators.isEmpty()){
+//			jaxb.TargetActuators tgtacts = new jaxb.TargetActuators();
+//			j.setTargetActuators(tgtacts);
+//			tgtacts.setIds(OTMUtils.comma_format(actuators.values().stream().map(x->x.id).collect(toSet())));
+//		}
+
+
     }
 
     ////////////////////////////////

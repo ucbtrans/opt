@@ -7,6 +7,7 @@ import jaxb.Roadparam;
 import opt.UserSettings;
 import opt.data.control.*;
 import profiles.Profile1D;
+import sensor.AbstractSensor;
 import utils.OTMUtils;
 
 import java.util.*;
@@ -433,15 +434,63 @@ public class Scenario {
 
         /////////////////////////////////////////////////////
         // controllers, actuators, sensors
+        jaxb.Controllers jcntrls = new jaxb.Controllers();
+        jScn.setControllers(jcntrls);
 
-        // TODO
-//        jaxb.Controllers jcntrls = new jaxb.Controllers();
+        jaxb.Actuators jacts = new jaxb.Actuators();
+        jScn.setActuators(jacts);
+
+        jaxb.Sensors jsnss = new jaxb.Sensors();
+        jScn.setSensors(jsnss);
+
+        for(AbstractLink link : links.values()){
+
+            if(link.schedules==null)
+                continue;
+
+            for(Map.Entry<LaneGroupType,Map<AbstractController.Type, ControlSchedule>> e1 : link.schedules.entrySet()){
+                LaneGroupType lgtype = e1.getKey();
+                for(Map.Entry<AbstractController.Type, ControlSchedule> e2 : e1.getValue().entrySet()){
+                    AbstractController.Type cntrltype = e2.getKey();
+                    ControlSchedule schedule = e2.getValue();
+                    AbstractActuator actuator = schedule.get_actuator();
+
+                    // actuator
+                    jacts.getActuator().add(actuator.to_jaxb());
+
+                    for(ScheduleEntry entry : schedule.get_entries()){
+                        AbstractController cntrl = entry.get_cntrl();
+                        float start_time = entry.get_start_time();
+                        float end_time = entry.get_end_time();
+
+                        // controller
+                        jaxb.Controller jcntrl = cntrl.to_jaxb();
+                        jcntrls.getController().add(jcntrl);
+                        jcntrl.setStartTime(start_time);
+                        if(Float.isFinite(end_time))
+                            jcntrl.setEndTime(end_time);
+
+                        // target actuator
+                        jaxb.TargetActuators jtacts = new jaxb.TargetActuators();
+                        jtacts.setIds(String.format("%d",actuator.getId()));
+                        jcntrl.setTargetActuators(jtacts);
+
+                        // sensors
+                        for(Sensor sensor : cntrl.get_sensors().values())
+                            jsnss.getSensor().add(sensor.to_jaxb());
+
+                    }
+
+                }
+            }
+        }
+
+
 //        if(my_fwy_scenario.controller_schedule!=null){
 //            List<AbstractController> controllers = my_fwy_scenario.controller_schedule.items;
 //
 //            // controllers
 //            if(!controllers.isEmpty())
-//                jScn.setControllers(jcntrls);
 //            for(AbstractController cntrl : controllers)
 //                jcntrls.getController().add(cntrl.to_jaxb());
 //

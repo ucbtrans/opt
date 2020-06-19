@@ -70,9 +70,6 @@ public class RampMeterFixed {
     @FXML // fx:id="textStartTime"
     private TextField textStartTime; // Value injected by FXMLLoader
 
-//    @FXML // fx:id="textEndTime"
-//    private TextField textEndTime; // Value injected by FXMLLoader
-
     @FXML // fx:id="labelRecRate"
     private Label labelRecRate; // Value injected by FXMLLoader
 
@@ -108,8 +105,7 @@ public class RampMeterFixed {
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
         textStartTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultStartTime, "")));
-//        textEndTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultSimulationDuration, "")));
-        
+
         double cap_step = 1;
         if (UserSettings.unitsFlow.equals("vps"))
             cap_step = 0.01;
@@ -169,12 +165,6 @@ public class RampMeterFixed {
     @FXML
     void onOK(ActionEvent event) {
         int startSeconds = Misc.timeString2Seconds(textStartTime.getText());
-//        int endSeconds = Misc.timeString2Seconds(textEndTime.getText());
-        
-//        if (endSeconds <= startSeconds) {
-//            opt.utils.Dialogs.ErrorDialog("Start time must be smaller than end time...", "Please, correct the time range.");
-//            return;
-//        }
         
         double rec_rate = spinnerRecRate.getValue();
         double max_rate = spinnerMaxRate.getValue();
@@ -183,15 +173,6 @@ public class RampMeterFixed {
             return;
         }
 
-        // TODO
-//        myController.setStartTime(startSeconds);
-//        myController.setEndTime(endSeconds);
-//        if (linkEditorController.checkControllerOverlap(myController)) {
-//            myController.setStartTime(origStartTime);
-//            myController.setEndTime(origEndTime);
-//            opt.utils.Dialogs.ErrorDialog("Time range overlaps with other ramp meters in the schedule...", "Please, correct the time range.");
-//            return;
-//        }
         rec_rate = UserSettings.convertFlow(rec_rate, UserSettings.unitsFlow, "vph");
         myController.setMin_rate_vph((float)(0.5*rec_rate));
         myController.set_rate_vph((float)rec_rate);

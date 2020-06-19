@@ -60,7 +60,6 @@ public class RampMeterAlinea {
     private ControllerRampMeterAlinea myController = null;
     private List<AbstractLink> listSensorLinkCandidates = new ArrayList<AbstractLink>();
     private float origStartTime;
-//    private float origEndTime;
     private boolean isnew;
 
 
@@ -75,9 +74,6 @@ public class RampMeterAlinea {
 
     @FXML // fx:id="textStartTime"
     private TextField textStartTime; // Value injected by FXMLLoader
-
-//    @FXML // fx:id="textEndTime"
-//    private TextField textEndTime; // Value injected by FXMLLoader
 
     @FXML // fx:id="labelMinRate"
     private Label labelMinRate; // Value injected by FXMLLoader
@@ -147,11 +143,8 @@ public class RampMeterAlinea {
         this.isnew = isnew;
 
         origStartTime = entry.get_start_time();
-//        origEndTime = Integer.MAX_VALUE;
-        
         textStartTime.setText(Misc.seconds2timestring(origStartTime, ""));
-//        textEndTime.setText(Misc.seconds2timestring(origEndTime, ""));
-        
+
         double min_rate = myController.getMin_rate_vph();
         double max_rate = myController.getMax_rate_vph();
         

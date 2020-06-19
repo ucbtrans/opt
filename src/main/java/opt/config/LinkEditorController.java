@@ -25,12 +25,9 @@
  **/
 package opt.config;
 
-//import com.sun.javafx.scene.control.skin.TableHeaderRow;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -107,8 +104,10 @@ public class LinkEditorController {
 
     private RampMeterAlinea rampMeterAlinea = null;
     private Scene rampMeterAlineaScene = null;
+
     private RampMeterFixed rampMeterFixed = null;
     private Scene rampMeterFixedScene = null;
+
     private AbstractLink myLink = null;
     private boolean ignoreChange = true;
     
@@ -121,14 +120,12 @@ public class LinkEditorController {
     private List<Commodity> listVT = new ArrayList<Commodity>();
 
     // control -- ramp metering and policies
+    private LaneGroupType controlLgType = LaneGroupType.gp; // TODO This comes from pull down
+    private AbstractController.Type controlType = AbstractController.Type.RampMetering; // TODO This comes from pull down
+    private control.AbstractController.Algorithm controlAlgorithm;
     private ControlSchedule controlSchedule = null;
     private ScheduleEntry controlEntry = null;
-    //private int max_control_end_time = 0;
 
-//    private int newStartTime = 0;
-//    private AbstractController newController = null;
-//    private LaneGroupType newControlLaneGroup = LaneGroupType.gp;
-    
     private SpinnerValueFactory<Double> mergePrioritySpinnerValueFactory = null;
     private SpinnerValueFactory<Double> lengthSpinnerValueFactory = null;
     
@@ -2105,18 +2102,16 @@ public class LinkEditorController {
     
     private void refreshControllerList() {
 
+        read_controlType_and_lanegroup();
+
         listControllers.getItems().clear();
-
-        // TODO We are temporarily hard coding gp and ramp metering. This should be selected in the UI
-        controlSchedule = myLink.get_controller_schedule(LaneGroupType.gp, AbstractController.Type.RampMetering);
-
         for (ScheduleEntry entry : controlSchedule.get_entries()) {
             float start_time = entry.get_start_time();
             float end_time = entry.get_end_time();
             AbstractController cntrl = entry.get_cntrl();
             String ct = "";
             String rm_qc = "";
-            if (cntrl instanceof opt.data.control.AbstractControllerRampMeter) {
+            if (controlType==AbstractController.Type.RampMetering) {
                 ct = "Ramp meter - ";
                 if (((AbstractControllerRampMeter)cntrl).isHas_queue_control())
                     rm_qc = " with queue control";
@@ -2129,21 +2124,16 @@ public class LinkEditorController {
                 buf += " - 24:00";
             buf += ": " + ct + cntrl.getName() + rm_qc;
 
-            // GG REMOVED THIS TEMPORARILY UNTIL LANE GROUP CONTROL IS RESOLVED
-//            Set<LaneGroupType> lgt_set = cntrl.get_lanegroup_types();
-//            String lgt_s = "";
-//            for (LaneGroupType lgt : lgt_set) {
-//                if (lgt == LaneGroupType.mng) {
-//                    lgt_s = " (managed lanes)";
-//                    break;
-//                }
-//            }
-//            buf += lgt_s;
+            // extra for managed lanes
+            if(controlLgType==LaneGroupType.mng)
+                buf += " (managed lanes)";
+
             listControllers.getItems().add(buf);
         }
+
     }
-    
-    
+
+    /** called iff a link is selected in the tree **/
     private void initControllers() {
         if (myLink.get_type() == AbstractLink.Type.onramp) {
             linkControllerPane.setDisable(false);
@@ -2153,117 +2143,131 @@ public class LinkEditorController {
                 laneProperties.setExpanded(true);
             return;
         }
-        
         refreshControllerList();
-        
     }
-    
-    
-    public void prepareNewRampMeter(control.AbstractController.Algorithm rampMeteringAlgorithm, boolean managedLanes) {
+
+    private void read_controlType_and_lanegroup(){
+        this.controlType = AbstractController.Type.RampMetering;
+        this.controlLgType = LaneGroupType.gp;
+        this.controlSchedule = myLink.get_controller_schedule(controlLgType,controlType);
+    }
+
+    /** called onOk and onCancel in NewRampMeterController **/
+    public void prepareNewController(control.AbstractController.Algorithm ca) {
+
         controlEntry = null;
-        if (rampMeteringAlgorithm == null)
+        if (ca==null)
             return;
 
-        LaneGroupType lanegroup;
-        float min_rate_vphpl,max_rate_vphpl,dt;
-        if(!managedLanes) {
-            lanegroup = LaneGroupType.gp;
-            min_rate_vphpl = (float)opt.UserSettings.minGPRampMeteringRatePerLaneVph;
-            max_rate_vphpl = (float)opt.UserSettings.maxGPRampMeteringRatePerLaneVph;
-            dt = (float)opt.UserSettings.defaultControlDtSeconds;
-        }
-        else {
-            lanegroup = LaneGroupType.mng;
-            min_rate_vphpl = (float)opt.UserSettings.minManagedRampMeteringRatePerLaneVph;
-            max_rate_vphpl = (float)opt.UserSettings.maxManagedRampMeteringRatePerLaneVph;
-            dt = (float)opt.UserSettings.defaultControlDtSeconds;
-        }
-
-        float rate_vphpl = max_rate_vphpl;
+        controlAlgorithm = ca;
+        read_controlType_and_lanegroup();
 
         float start_time = controlSchedule.num_entries()==0 ? 0 :
                 Math.round(controlSchedule.get_largest_start_time()) + 3600;
-        
-        try {
 
-            AbstractControllerRampMeter newController;
-            switch(rampMeteringAlgorithm){
+        // Ramp metering
+        if( controlType==AbstractController.Type.RampMetering){
 
-                case open:
-                    newController = ControlFactory.create_controller_open(myLink.get_segment().get_scenario(),
-                            null,
-                            null,
-                            myLink.get_id(),
-                            lanegroup);
+            float min_rate_vphpl,max_rate_vphpl,dt;
+            switch(controlLgType){
+                case gp:
+                    min_rate_vphpl = (float)opt.UserSettings.minGPRampMeteringRatePerLaneVph;
+                    max_rate_vphpl = (float)opt.UserSettings.maxGPRampMeteringRatePerLaneVph;
+                    dt = (float)opt.UserSettings.defaultControlDtSeconds;
                     break;
 
-                case closed:
-                    newController = ControlFactory.create_controller_closed(myLink.get_segment().get_scenario(),
-                            null,
-                            null,
-                            myLink.get_id(),
-                            lanegroup);
-                    break;
-
-                case alinea:
-                    AbstractLink sensor_link = myLink.get_dn_link();
-                    newController = ControlFactory.create_controller_alinea(myLink.get_segment().get_scenario(),
-                            null,
-                            dt,
-                            false,
-                            min_rate_vphpl,
-                            max_rate_vphpl,
-                            null,
-                            sensor_link.get_id(),
-                            sensor_link.get_length_meters() / 2f,
-                            null,
-                            myLink.get_id(),
-                            lanegroup);
-                    break;
-
-                case fixed_rate:
-                    newController = ControlFactory.create_controller_fixed_rate(myLink.get_segment().get_scenario(),
-                            null,
-                            dt,
-                            false,
-                            min_rate_vphpl,
-                            max_rate_vphpl,
-                            rate_vphpl,
-                            null,
-                            myLink.get_id(),
-                            lanegroup);
-
+                case mng:
+                    min_rate_vphpl = (float)opt.UserSettings.minManagedRampMeteringRatePerLaneVph;
+                    max_rate_vphpl = (float)opt.UserSettings.maxManagedRampMeteringRatePerLaneVph;
+                    dt = (float)opt.UserSettings.defaultControlDtSeconds;
                     break;
 
                 default:
-                    throw new Exception("Bad controller type");
-
+                    min_rate_vphpl = (float)opt.UserSettings.minGPRampMeteringRatePerLaneVph;
+                    max_rate_vphpl = (float)opt.UserSettings.maxGPRampMeteringRatePerLaneVph;
+                    dt = (float)opt.UserSettings.defaultControlDtSeconds;
+                    break;
             }
 
-            controlEntry = new ScheduleEntry(start_time,newController);
+            float rate_vphpl = max_rate_vphpl;
 
-        } catch (Exception e) {
-            controlEntry = null;
-            opt.utils.Dialogs.ExceptionDialog("Could not create new ramp meter...", e);
+
+            try {
+
+                AbstractControllerRampMeter newController;
+                switch(controlAlgorithm){
+
+                    case open:
+                        newController = ControlFactory.create_controller_open(myLink.get_segment().get_scenario(),
+                                null,
+                                null,
+                                myLink.get_id());
+                        break;
+
+                    case closed:
+                        newController = ControlFactory.create_controller_closed(myLink.get_segment().get_scenario(),
+                                null,
+                                null,
+                                myLink.get_id());
+                        break;
+
+                    case alinea:
+                        AbstractLink sensor_link = myLink.get_dn_link();
+                        newController = ControlFactory.create_controller_alinea(myLink.get_segment().get_scenario(),
+                                null,
+                                dt,
+                                false,
+                                min_rate_vphpl,
+                                max_rate_vphpl,
+                                null,
+                                sensor_link.get_id(),
+                                sensor_link.get_length_meters() / 2f,
+                                null,
+                                myLink.get_id(),
+                                controlLgType);
+                        break;
+
+                    case fixed_rate:
+                        newController = ControlFactory.create_controller_fixed_rate(myLink.get_segment().get_scenario(),
+                                null,
+                                dt,
+                                false,
+                                min_rate_vphpl,
+                                max_rate_vphpl,
+                                rate_vphpl,
+                                null,
+                                myLink.get_id(),
+                                controlLgType);
+
+                        break;
+
+                    default:
+                        throw new Exception("Bad controller type");
+
+                }
+
+                controlEntry = new ScheduleEntry(start_time,newController);
+
+            } catch (Exception e) {
+                controlEntry = null;
+                opt.utils.Dialogs.ExceptionDialog("Could not create new ramp meter...", e);
+            }
+
+
         }
+
+        // HOV policy
+        if( controlType==AbstractController.Type.HOVpolicy){
+            // ...
+        }
+
+        // HOT policy
+        if( controlType==AbstractController.Type.HOTpolicy){
+            // ...
+        }
+
     }
-    
-    
-//    public boolean checkControllerOverlap(AbstractController ctrl) {
-////
-//        return false;
-//
-//        // TODO
-////        boolean res = false;
-////        for (AbstractController c : controlSchedule.items) {
-////            if (ControlUtils.controllerOverlap(ctrl, c))
-////                return true;
-////        }
-////        appMainController.setProjectModified(true);
-////        return res;
-//    }
-    
-    
+
     
     void launchRampMeterEditor(ScheduleEntry entry,boolean isnew) {
         Stage inputStage = new Stage();

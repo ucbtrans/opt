@@ -46,7 +46,7 @@ public class ControlFactory {
 		if(cntrl_type==AbstractController.Type.RampMetering){
 			try {
 				FreewayScenario fwyscn = link.mysegment.my_fwy_scenario;
-				schedule.update(0f,ControlFactory.create_controller_open(fwyscn, null, null, link.id, lgtype));
+				schedule.update(0f,ControlFactory.create_controller_open(fwyscn, null, null, link.id));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -61,12 +61,12 @@ public class ControlFactory {
 	// controller
 	/////////////////////
 
-	public static ControllerRampMeterOpen create_controller_open(FreewayScenario fwyscn, Long id, Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
-		return new ControllerRampMeterOpen(fwyscn,id,act_id,ramp_link_id,lgtype);
+	public static ControllerRampMeterOpen create_controller_open(FreewayScenario fwyscn, Long id, Long act_id, long ramp_link_id) throws Exception {
+		return new ControllerRampMeterOpen(fwyscn,id,act_id,ramp_link_id);
 	}
 
-	public static ControllerRampMeterClosed create_controller_closed(FreewayScenario fwyscn, Long id, Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
-		return new ControllerRampMeterClosed(fwyscn,id,act_id,ramp_link_id,lgtype);
+	public static ControllerRampMeterClosed create_controller_closed(FreewayScenario fwyscn, Long id, Long act_id, long ramp_link_id) throws Exception {
+		return new ControllerRampMeterClosed(fwyscn,id,act_id,ramp_link_id);
 	}
 
 	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn,Long id, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl,Long sensor_id, long sensor_link_id, float sensor_offset,Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
@@ -103,12 +103,16 @@ public class ControlFactory {
 	// actuator
 	/////////////////////
 
-	public static ActuatorRampMeter create_ramp_meter(FreewayScenario fwyscn,Long act_id,long link_id,LaneGroupType lgtype, AbstractController myController){
-		return new ActuatorRampMeter(act_id!=null?act_id:fwyscn.new_actuator_id(),link_id,lgtype,myController);
+	public static ActuatorRampMeter create_actuator_ramp_meter(FreewayScenario fwyscn, Long act_id, long link_id, LaneGroupType lgtype){
+		return new ActuatorRampMeter(act_id!=null?act_id:fwyscn.new_actuator_id(),link_id,lgtype);
 	}
 
-	public static ActuatorPolicy create_policy_actuator(FreewayScenario fwyscn,Long act_id,long link_id,LaneGroupType lgtype, AbstractController myController){
-		return new ActuatorPolicy(fwyscn.new_actuator_id(),link_id,lgtype,myController);
+	public static ActuatorHOVPolicy create_actuator_hov_policy(FreewayScenario fwyscn, Long act_id, long link_id, LaneGroupType lgtype){
+		return new ActuatorHOVPolicy(act_id!=null?act_id:fwyscn.new_actuator_id(),link_id,lgtype);
+	}
+
+	public static ActuatorHOTPolicy create_actuator_hot_policy(FreewayScenario fwyscn, Long act_id, long link_id, LaneGroupType lgtype){
+		return new ActuatorHOTPolicy(act_id!=null?act_id:fwyscn.new_actuator_id(),link_id,lgtype);
 	}
 
 	/////////////////////////

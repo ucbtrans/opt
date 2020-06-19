@@ -395,7 +395,7 @@ public abstract class AbstractLink implements Comparable {
 
     public final ControlSchedule get_controller_schedule(LaneGroupType lgtype, AbstractController.Type cntrl_type){
         if(!schedules.containsKey(lgtype)) {
-            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(this, lgtype, cntrl_type);
+            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(this,lgtype,cntrl_type);
             Map<AbstractController.Type, ControlSchedule> X  = new HashMap<>();
             X.put(cntrl_type,newschedule);
             schedules.put(lgtype,X);
@@ -403,7 +403,7 @@ public abstract class AbstractLink implements Comparable {
         }
         Map<AbstractController.Type, ControlSchedule> X  = schedules.get(lgtype);
         if(!X.containsKey(cntrl_type)) {
-            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(this, lgtype, cntrl_type);
+            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(this,lgtype, cntrl_type);
             X.put(cntrl_type,newschedule);
             return newschedule;
         }
@@ -425,7 +425,7 @@ public abstract class AbstractLink implements Comparable {
         Set<Long> ids = new HashSet<>();
         for(Map<AbstractController.Type,ControlSchedule> e1 : schedules.values())
             for (ControlSchedule sch : e1.values())
-                ids.add(sch.get_actuator().id);
+                ids.add(sch.get_actuator().getId());
         return ids;
     }
 

@@ -2,21 +2,18 @@ package opt.data.control;
 
 import opt.data.AbstractLink;
 import opt.data.ControlFactory;
+import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
-import opt.data.control.AbstractActuator;
-import opt.data.control.AbstractController;
-import opt.data.control.ScheduleEntry;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ControlSchedule {
 
     protected AbstractLink link;
-    protected LaneGroupType lgtype;
+    protected AbstractController.Type controlType;
     protected List<ScheduleEntry> entries;
     protected AbstractActuator actuator;
 
@@ -24,10 +21,23 @@ public class ControlSchedule {
     // construction
     ////////////////////////////////
 
-    public ControlSchedule(AbstractLink link, LaneGroupType lgtype, AbstractController.Type cntrl_type){
+    public ControlSchedule(AbstractLink link, LaneGroupType lgtype, AbstractController.Type controlType){
         this.link = link;
-        this.lgtype = lgtype;
+        this.controlType = controlType;
         this.entries = new ArrayList<>();
+
+        FreewayScenario fwyscn = link.get_segment().get_scenario();
+        switch(controlType){
+            case RampMetering:
+                actuator = ControlFactory.create_actuator_ramp_meter(fwyscn,null,link.get_id(),lgtype);
+                break;
+            case HOTpolicy:
+                actuator = ControlFactory.create_actuator_hot_policy(fwyscn,null,link.get_id(),lgtype);
+                break;
+            case HOVpolicy:
+                actuator = ControlFactory.create_actuator_hov_policy(fwyscn,null,link.get_id(),lgtype);
+                break;
+        }
     }
 
     ////////////////////////////////
@@ -50,7 +60,7 @@ public class ControlSchedule {
         if(!entries.stream().anyMatch(e->e.start_time==0f)) {
             try {
                 entries.add(new ScheduleEntry(0f,
-                        ControlFactory.create_controller_open(link.get_segment().get_scenario(), null, null, link.get_id(), lgtype)));
+                        ControlFactory.create_controller_open(link.get_segment().get_scenario(), null, null, link.get_id())));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -81,6 +91,9 @@ public class ControlSchedule {
         return entries.get(entries.size()-1).start_time;
     }
 
+    ////////////////////////////////
+    // private
+    ////////////////////////////////
 
     private void update_end_times(){
         for(int i=0;i<entries.size()-1;i++)
