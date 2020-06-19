@@ -6,6 +6,7 @@ import profiles.Profile1D;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class AbstractLink implements Comparable {
 
@@ -407,6 +408,36 @@ public abstract class AbstractLink implements Comparable {
             return newschedule;
         }
         return X.get(cntrl_type);
+    }
+
+    public final Set<Long> get_controller_ids(){
+        Set<Long> ids = new HashSet<>();
+        for(Map<AbstractController.Type,ControlSchedule> e1 : schedules.values())
+            for(ControlSchedule sch : e1.values())
+                ids.addAll( sch.get_entries().stream()
+                        .map(e->e.get_cntrl().getId())
+                        .collect(Collectors.toSet()));
+
+        return ids;
+    }
+
+    public final Set<Long> get_actuator_ids(){
+        Set<Long> ids = new HashSet<>();
+        for(Map<AbstractController.Type,ControlSchedule> e1 : schedules.values())
+            for (ControlSchedule sch : e1.values())
+                ids.add(sch.get_actuator().id);
+        return ids;
+    }
+
+    public final Set<Long> get_sensor_ids(){
+        Set<Long> ids = new HashSet<>();
+        for(Map<AbstractController.Type,ControlSchedule> e1 : schedules.values())
+            for(ControlSchedule sch : e1.values())
+                ids.addAll( sch.get_entries().stream()
+                        .flatMap(e->e.get_cntrl().get_sensor_ids().stream())
+                        .collect(Collectors.toSet()));
+
+        return ids;
     }
 
     /////////////////////////////////////

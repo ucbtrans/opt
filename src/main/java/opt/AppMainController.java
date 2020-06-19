@@ -63,18 +63,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
-import opt.config.ConnectController;
-import opt.config.LinkEditorController;
-import opt.config.LinkInfoController;
-import opt.config.NewLinkController;
-import opt.config.NewRampController;
-import opt.config.NewRampMeterController;
-import opt.config.RampMeterAlinea;
-import opt.config.RampMeterFixed;
-import opt.config.RouteChoiceController;
-import opt.config.RouteController;
-import opt.config.ScenarioEditorController;
-import opt.config.VehicleTypeController;
+import opt.config.*;
 import opt.data.*;
 import opt.performance.LinkPerformanceController;
 import opt.performance.RoutePerformanceController;
@@ -125,9 +114,17 @@ public class AppMainController {
     private ConnectController connectController = null;
     private GridPane newRampMeterPane = null;
     private NewRampMeterController newRampMeterController = null;
+
+    private GridPane rampMeterClosedPane = null;
+    private RampMeterClosed rampMeterClosed = null;
+
+    private GridPane rampMeterOpenPane = null;
+    private RampMeterOpen rampMeterOpen = null;
+
     private GridPane rampMeterAlineaPane = null;
     private RampMeterAlinea rampMeterAlinea = null;
-    private GridPane rampMeterTodPane = null;
+
+    private GridPane rampMeterFixedRatePane = null;
     private RampMeterFixed rampMeterFixed = null;
     
     private SplitPane routeEditorPane = null;
@@ -469,18 +466,31 @@ public class AppMainController {
             newRampMeterController = loader.getController();
             newRampMeterController.setLinkEditorController(linkEditorController);
             linkEditorController.setNewRampMeterControllerAndScene(newRampMeterController, new Scene(newRampMeterPane));
-            
+
+            loader = new FXMLLoader(getClass().getResource("/rm_open_editor.fxml"));
+            rampMeterOpenPane = loader.load();
+            rampMeterOpen = loader.getController();
+            rampMeterOpen.setLinkEditorController(linkEditorController);
+            linkEditorController.setRampMeterOpenControllerAndScene(rampMeterOpen, new Scene(rampMeterOpenPane));
+
+
+            loader = new FXMLLoader(getClass().getResource("/rm_closed_editor.fxml"));
+            rampMeterClosedPane = loader.load();
+            rampMeterClosed = loader.getController();
+            rampMeterClosed.setLinkEditorController(linkEditorController);
+            linkEditorController.setRampMeterClosedControllerAndScene(rampMeterClosed, new Scene(rampMeterClosedPane));
+
             loader = new FXMLLoader(getClass().getResource("/rm_alinea_editor.fxml"));
             rampMeterAlineaPane = loader.load();
             rampMeterAlinea = loader.getController();
             rampMeterAlinea.setLinkEditorController(linkEditorController);
             linkEditorController.setRampMeterAlineaControllerAndScene(rampMeterAlinea, new Scene(rampMeterAlineaPane));
             
-            loader = new FXMLLoader(getClass().getResource("/rm_tod_editor.fxml"));
-            rampMeterTodPane = loader.load();
+            loader = new FXMLLoader(getClass().getResource("/rm_fixedrate_editor.fxml"));
+            rampMeterFixedRatePane = loader.load();
             rampMeterFixed = loader.getController();
             rampMeterFixed.setLinkEditorController(linkEditorController);
-            linkEditorController.setRampMeterTodControllerAndScene(rampMeterFixed, new Scene(rampMeterTodPane));
+            linkEditorController.setRampMeterFixedRateControllerAndScene(rampMeterFixed, new Scene(rampMeterFixedRatePane));
             
             // Route controllers
             loader = new FXMLLoader(getClass().getResource("/route_editor.fxml"));

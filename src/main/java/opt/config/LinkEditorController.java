@@ -98,10 +98,17 @@ public class LinkEditorController {
     private Scene connectScene = null;
     private NewRampMeterController newRampMeterController = null;
     private Scene newRampMeterScene = null;
+
+    private RampMeterOpen rampMeterOpen = null;
+    private Scene rampMeterOpenScene = null;
+
+    private RampMeterClosed rampMeterClosed = null;
+    private Scene rampMeterClosedScene = null;
+
     private RampMeterAlinea rampMeterAlinea = null;
     private Scene rampMeterAlineaScene = null;
     private RampMeterFixed rampMeterFixed = null;
-    private Scene rampMeterTodScene = null;
+    private Scene rampMeterFixedScene = null;
     private AbstractLink myLink = null;
     private boolean ignoreChange = true;
     
@@ -413,7 +420,30 @@ public class LinkEditorController {
         newRampMeterScene = scn;
         newRampMeterScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
-    
+
+
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the Open ramp meter controller that is used to
+     *               edit Open ramp meter.
+     */
+    public void setRampMeterOpenControllerAndScene(RampMeterOpen ctrl, Scene scn) {
+        rampMeterOpen = ctrl;
+        rampMeterOpenScene = scn;
+        rampMeterOpenScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
+    }
+
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the Closed ramp meter controller that is used to
+     *               edit Closed ramp meter.
+     */
+    public void setRampMeterClosedControllerAndScene(RampMeterClosed ctrl, Scene scn) {
+        rampMeterClosed = ctrl;
+        rampMeterClosedScene = scn;
+        rampMeterClosedScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
+    }
+
     /**
      * This function should be called once: during the initialization.
      * @param ctrl - pointer to the ALINEA ramp meter controller that is used to
@@ -427,13 +457,13 @@ public class LinkEditorController {
     
     /**
      * This function should be called once: during the initialization.
-     * @param ctrl - pointer to the TOD ramp meter controller that is used to
-     *               edit TOD ramp meter.
+     * @param ctrl - pointer to the Fixed rate ramp meter controller that is used to
+     *               edit Fixed rate ramp meter.
      */
-    public void setRampMeterTodControllerAndScene(RampMeterFixed ctrl, Scene scn) {
+    public void setRampMeterFixedRateControllerAndScene(RampMeterFixed ctrl, Scene scn) {
         rampMeterFixed = ctrl;
-        rampMeterTodScene = scn;
-        rampMeterTodScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
+        rampMeterFixedScene = scn;
+        rampMeterFixedScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
     
     
@@ -2075,8 +2105,6 @@ public class LinkEditorController {
     
     private void refreshControllerList() {
 
-        System.out.println("refreshControllerList");
-
         listControllers.getItems().clear();
 
         // TODO We are temporarily hard coding gp and ramp metering. This should be selected in the UI
@@ -2101,24 +2129,22 @@ public class LinkEditorController {
                 buf += " - 24:00";
             buf += ": " + ct + cntrl.getName() + rm_qc;
 
-            Set<LaneGroupType> lgt_set = cntrl.get_lanegroup_types();
-            String lgt_s = "";
-            for (LaneGroupType lgt : lgt_set) {
-                if (lgt == LaneGroupType.mng) {
-                    lgt_s = " (managed lanes)";
-                    break;
-                }
-            }
-            buf += lgt_s;
+            // GG REMOVED THIS TEMPORARILY UNTIL LANE GROUP CONTROL IS RESOLVED
+//            Set<LaneGroupType> lgt_set = cntrl.get_lanegroup_types();
+//            String lgt_s = "";
+//            for (LaneGroupType lgt : lgt_set) {
+//                if (lgt == LaneGroupType.mng) {
+//                    lgt_s = " (managed lanes)";
+//                    break;
+//                }
+//            }
+//            buf += lgt_s;
             listControllers.getItems().add(buf);
         }
     }
     
     
     private void initControllers() {
-
-        System.out.println("initControllers");
-
         if (myLink.get_type() == AbstractLink.Type.onramp) {
             linkControllerPane.setDisable(false);
         } else {
@@ -2134,9 +2160,6 @@ public class LinkEditorController {
     
     
     public void prepareNewRampMeter(control.AbstractController.Algorithm rampMeteringAlgorithm, boolean managedLanes) {
-
-        System.out.println("prepareNewRampMeter");
-
         controlEntry = null;
         if (rampMeteringAlgorithm == null)
             return;
@@ -2227,9 +2250,7 @@ public class LinkEditorController {
     
     
 //    public boolean checkControllerOverlap(AbstractController ctrl) {
-//
-//        System.out.println("checkControllerOverlap");
-//
+////
 //        return false;
 //
 //        // TODO
@@ -2245,25 +2266,20 @@ public class LinkEditorController {
     
     
     void launchRampMeterEditor(ScheduleEntry entry,boolean isnew) {
-
-        System.out.println("launchRampMeterEditor");
-
         Stage inputStage = new Stage();
         inputStage.initOwner(primaryStage);
 
         switch(entry.get_cntrl().getAlgorithm()){
             case open:
-                // TODO FIX THIS
-//                inputStage.setScene(rampMeterScene);
-//                rampMeterScene.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
-//                inputStage.setTitle("Open ramp");
+                inputStage.setScene(rampMeterOpenScene);
+                rampMeterOpen.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
+                inputStage.setTitle("Open ramp");
                 break;
 
             case closed:
-                // TODO FIX THIS
-//                inputStage.setScene(rampMeterScene);
-//                rampMeterScene.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
-//                inputStage.setTitle("Close ramp");
+                inputStage.setScene(rampMeterClosedScene);
+                rampMeterClosed.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
+                inputStage.setTitle("Close ramp");
                 break;
 
             case alinea:
@@ -2271,8 +2287,9 @@ public class LinkEditorController {
                 rampMeterAlinea.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
                 inputStage.setTitle("Ramp Meter ALINEA");
                 break;
+
             case fixed_rate:
-                inputStage.setScene(rampMeterTodScene);
+                inputStage.setScene(rampMeterFixedScene);
                 rampMeterFixed.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
                 inputStage.setTitle("Ramp Meter Fixed Rate");
                 break;

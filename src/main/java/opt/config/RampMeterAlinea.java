@@ -40,7 +40,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.UserSettings;
 import opt.data.AbstractLink;
-import opt.data.control.AbstractControllerRampMeter;
 import opt.data.control.ControlSchedule;
 import opt.data.control.ControllerRampMeterAlinea;
 import opt.data.control.ScheduleEntry;
@@ -77,8 +76,8 @@ public class RampMeterAlinea {
     @FXML // fx:id="textStartTime"
     private TextField textStartTime; // Value injected by FXMLLoader
 
-    @FXML // fx:id="textEndTime"
-    private TextField textEndTime; // Value injected by FXMLLoader
+//    @FXML // fx:id="textEndTime"
+//    private TextField textEndTime; // Value injected by FXMLLoader
 
     @FXML // fx:id="labelMinRate"
     private Label labelMinRate; // Value injected by FXMLLoader
@@ -118,10 +117,8 @@ public class RampMeterAlinea {
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
 
-        System.out.println("RampMeterAlinea initialize");
-
         textStartTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultStartTime, "")));
-        textEndTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultSimulationDuration, "")));
+//        textEndTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultSimulationDuration, "")));
         
         double cap_step = 1;
         if (UserSettings.unitsFlow.equals("vps"))
@@ -144,8 +141,6 @@ public class RampMeterAlinea {
     
     public void initWithLinkAndController(AbstractLink lnk, ControlSchedule schedule, ScheduleEntry entry,boolean isnew) {
 
-
-        System.out.println("RampMeterAlinea initWithLinkAndController");
         myLink = lnk;
         mySchedule = schedule;
         myController = (ControllerRampMeterAlinea) entry.get_cntrl();
@@ -200,7 +195,6 @@ public class RampMeterAlinea {
 
     @FXML
     void onCancel(ActionEvent event) {
-        System.out.println("RampMeterAlinea onCancel");
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
     }
@@ -208,15 +202,7 @@ public class RampMeterAlinea {
     @FXML
     void onOK(ActionEvent event) {
 
-        System.out.println("RampMeterAlinea onOk");
-
         int startSeconds = Misc.timeString2Seconds(textStartTime.getText());
-//        int endSeconds = Misc.timeString2Seconds(textEndTime.getText());
-        
-//        if (endSeconds <= startSeconds) {
-//            opt.utils.Dialogs.ErrorDialog("Start time must be smaller than end time...", "Please, correct the time range.");
-//            return;
-//        }
         
         double min_rate = spinnerMinRate.getValue();
         double max_rate = spinnerMaxRate.getValue();
@@ -225,16 +211,6 @@ public class RampMeterAlinea {
             return;
         }
 
-        // TODO
-//        myController.setStartTime(startSeconds);
-//        myController.setEndTime(endSeconds);
-//        if (linkEditorController.checkControllerOverlap(myController)) {
-//            myController.setStartTime(origStartTime);
-//            myController.setEndTime(origEndTime);
-//            opt.utils.Dialogs.ErrorDialog("Time range overlaps with other ramp meters in the schedule...", "Please, correct the time range.");
-//            return;
-//        }
-        
         min_rate = UserSettings.convertFlow(min_rate, UserSettings.unitsFlow, "vph");
         myController.setMin_rate_vph((float)min_rate);
         max_rate = UserSettings.convertFlow(max_rate, UserSettings.unitsFlow, "vph");
@@ -247,13 +223,7 @@ public class RampMeterAlinea {
         myController.setSensor_link_id(sensor_link.get_id());
         myController.setSensor_offset_m(0.5f*sensor_link.get_length_meters());
 
-        try {
-            if(isnew)
-                mySchedule.add_entry(startSeconds,myController);
-        } catch (Exception e) {
-            opt.utils.Dialogs.ErrorDialog("Error adding the controller to the schedule", e.getMessage());
-            return;
-        }
+        mySchedule.update(startSeconds,myController);
 
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();

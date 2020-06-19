@@ -19,8 +19,8 @@ public class ControllerRampMeterAlinea extends AbstractControllerRampMeter {
 		add_sensor(sns);
 
 		// ramp meter actuator
-		ActuatorRampMeter rm = ControlFactory.create_ramp_meter(scn,act_id,ramp_link_id,lgtype,this);
-		add_actuator(rm);
+//		ActuatorRampMeter rm = ControlFactory.create_ramp_meter(scn,act_id,ramp_link_id,lgtype,this);
+//		add_actuator(rm);
 	}
 
 	////////////////////////////////

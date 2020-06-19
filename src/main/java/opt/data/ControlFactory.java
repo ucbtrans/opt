@@ -41,7 +41,19 @@ public class ControlFactory {
 	/////////////////////
 
 	public static ControlSchedule create_empty_controller_schedule(AbstractLink link, LaneGroupType lgtype, AbstractController.Type cntrl_type){
-		return new ControlSchedule(link,lgtype,cntrl_type);
+		ControlSchedule schedule = new ControlSchedule(link,lgtype,cntrl_type);
+
+		if(cntrl_type==AbstractController.Type.RampMetering){
+			try {
+				FreewayScenario fwyscn = link.mysegment.my_fwy_scenario;
+				schedule.update(0f,ControlFactory.create_controller_open(fwyscn, null, null, link.id, lgtype));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			// TODO CREATE THE ACTUATOR ACCORDIG TO  cntrl_type
+		}
+
+		return schedule;
 	}
 
 
@@ -49,11 +61,11 @@ public class ControlFactory {
 	// controller
 	/////////////////////
 
-	public static ControllerRampMeterOpen create_controller_open(FreewayScenario fwyscn,Long id,Long act_id,long ramp_link_id, LaneGroupType lgtype) throws Exception {
+	public static ControllerRampMeterOpen create_controller_open(FreewayScenario fwyscn, Long id, Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
 		return new ControllerRampMeterOpen(fwyscn,id,act_id,ramp_link_id,lgtype);
 	}
 
-	public static ControllerRampMeterClosed create_controller_closed(FreewayScenario fwyscn,Long id,Long act_id,long ramp_link_id, LaneGroupType lgtype) throws Exception {
+	public static ControllerRampMeterClosed create_controller_closed(FreewayScenario fwyscn, Long id, Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
 		return new ControllerRampMeterClosed(fwyscn,id,act_id,ramp_link_id,lgtype);
 	}
 

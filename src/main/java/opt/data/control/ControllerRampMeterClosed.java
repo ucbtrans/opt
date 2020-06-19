@@ -1,22 +1,22 @@
 package opt.data.control;
 
-import control.AbstractController;
 import opt.data.ControlFactory;
 import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
 
 public class ControllerRampMeterClosed extends AbstractControllerRampMeter {
 
-    public ControllerRampMeterClosed(FreewayScenario scn, Long id,Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
+    public ControllerRampMeterClosed(FreewayScenario scn, Long id, Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
         super(id!=null ? id : scn.new_controller_id(),
                 Float.POSITIVE_INFINITY,
-                AbstractController.Algorithm.closed,
+                control.AbstractController.Algorithm.closed,
                 false,
-                Float.POSITIVE_INFINITY,
+                0f,
                 Float.POSITIVE_INFINITY);
 
         // ramp meter actuator
-        ActuatorRampMeter rm = ControlFactory.create_ramp_meter(scn,act_id,ramp_link_id,lgtype,this);
-        add_actuator(rm);
+//        ActuatorRampMeter rm = ControlFactory.create_ramp_meter(scn,act_id,ramp_link_id,lgtype,this);
+//        add_actuator(rm);
     }
+
 }

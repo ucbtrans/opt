@@ -70,8 +70,8 @@ public class RampMeterFixed {
     @FXML // fx:id="textStartTime"
     private TextField textStartTime; // Value injected by FXMLLoader
 
-    @FXML // fx:id="textEndTime"
-    private TextField textEndTime; // Value injected by FXMLLoader
+//    @FXML // fx:id="textEndTime"
+//    private TextField textEndTime; // Value injected by FXMLLoader
 
     @FXML // fx:id="labelRecRate"
     private Label labelRecRate; // Value injected by FXMLLoader
@@ -108,7 +108,7 @@ public class RampMeterFixed {
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
         textStartTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultStartTime, "")));
-        textEndTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultSimulationDuration, "")));
+//        textEndTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultSimulationDuration, "")));
         
         double cap_step = 1;
         if (UserSettings.unitsFlow.equals("vps"))
@@ -201,13 +201,7 @@ public class RampMeterFixed {
         myController.setDt(controlDt.getValue());
         myController.setHas_queue_control(cbQueueControl.isSelected());
 
-        try {
-            if(isnew)
-                mySchedule.add_entry(startSeconds,myController);
-        } catch (Exception e) {
-            opt.utils.Dialogs.ErrorDialog("Error adding the controller to the schedule", e.getMessage());
-            return;
-        }
+        mySchedule.update(startSeconds,myController);
 
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();

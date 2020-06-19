@@ -16,7 +16,7 @@ public abstract class AbstractController {
 	protected Type type;
 	protected float dt;
 	protected control.AbstractController.Algorithm algorithm;
-	protected Map<Long,AbstractActuator> actuators;
+//	protected Map<Long,AbstractActuator> actuators;
 	protected Map<Long,Sensor> sensors;
 
 	////////////////////////////////
@@ -28,7 +28,7 @@ public abstract class AbstractController {
 		this.type = type;
 		this.dt = dt;
 		this.algorithm = algorithm;
-		this.actuators = new HashMap<>();
+//		this.actuators = new HashMap<>();
 		this.sensors = new HashMap<>();
 	}
 
@@ -36,9 +36,9 @@ public abstract class AbstractController {
 		sensors.put(sensor.id,sensor);
 	}
 
-	protected void add_actuator(AbstractActuator actuator){
-		actuators.put(actuator.id,actuator);
-	}
+//	protected void add_actuator(AbstractActuator actuator){
+//		actuators.put(actuator.id,actuator);
+//	}
 
 	////////////////////////////////
 	// to jaxb
@@ -54,20 +54,20 @@ public abstract class AbstractController {
 		j.setParameters(new jaxb.Parameters());
 
 		// TODO THIS IS TEMPORARY FOR STORING THE ACTUATOR LANE GROUP AS A PARAMETER OF THE CONTROLLER
-		if(actuators!=null && actuators.size()==1){
-			AbstractActuator act = actuators.values().iterator().next();
-
-			jaxb.Parameter param = new jaxb.Parameter();
-			param.setName("lane_group");
-			param.setValue(act.lgtype.toString());
-			j.getParameters().getParameter().add(param);
-		}
-
-		if(actuators!=null && !actuators.isEmpty()){
-			jaxb.TargetActuators tgtacts = new jaxb.TargetActuators();
-			j.setTargetActuators(tgtacts);
-			tgtacts.setIds(OTMUtils.comma_format(actuators.values().stream().map(x->x.id).collect(toSet())));
-		}
+//		if(actuators!=null && actuators.size()==1){
+//			AbstractActuator act = actuators.values().iterator().next();
+//
+//			jaxb.Parameter param = new jaxb.Parameter();
+//			param.setName("lane_group");
+//			param.setValue(act.lgtype.toString());
+//			j.getParameters().getParameter().add(param);
+//		}
+//
+//		if(actuators!=null && !actuators.isEmpty()){
+//			jaxb.TargetActuators tgtacts = new jaxb.TargetActuators();
+//			j.setTargetActuators(tgtacts);
+//			tgtacts.setIds(OTMUtils.comma_format(actuators.values().stream().map(x->x.id).collect(toSet())));
+//		}
 
 		if(sensors!=null && !sensors.isEmpty()){
 			jaxb.FeedbackSensors fbsensors = new jaxb.FeedbackSensors();
@@ -108,17 +108,17 @@ public abstract class AbstractController {
 	// API
 	////////////////////////////////
 
-	public Set<LaneGroupType> get_lanegroup_types(){
-		return new HashSet<>(actuators.values().stream().map(a->a.lgtype).collect(toSet()));
-	}
+//	public Set<LaneGroupType> get_lanegroup_types(){
+//		return new HashSet<>(actuators.values().stream().map(a->a.lgtype).collect(toSet()));
+//	}
 
-	public Set<Long> get_link_ids(){
-		return new HashSet<>(actuators.values().stream().map(a->a.link_id).collect(toSet()));
-	}
+//	public Set<Long> get_link_ids(){
+//		return new HashSet<>(actuators.values().stream().map(a->a.link_id).collect(toSet()));
+//	}
 
-	public Set<Long>get_actuator_ids(){
-		return new HashSet<>(actuators.keySet());
-	}
+//	public Set<Long>get_actuator_ids(){
+//		return new HashSet<>(actuators.keySet());
+//	}
 
 	public Set<Long>get_sensor_ids(){
 		return sensors.keySet();
@@ -136,9 +136,9 @@ public abstract class AbstractController {
 		this.dt = dt;
 	}
 
-	public Map<Long,AbstractActuator> get_actuators(){
-		return actuators;
-	}
+//	public Map<Long,AbstractActuator> get_actuators(){
+//		return actuators;
+//	}
 
 	public Map<Long,Sensor> get_sensors(){
 		return sensors;
