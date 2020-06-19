@@ -315,7 +315,8 @@ public class LinkPerformanceController {
         dataSeries_total.setName("Total");
         for (int i = 0; i < max_sz; i++)
             dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-        flowChart.getData().add(dataSeries_total);
+        if (listVT.size() > 1)
+            flowChart.getData().add(dataSeries_total);
         
         flowChart.setCreateSymbols(false);
         flowChart.setLegendSide(Side.RIGHT);
@@ -366,7 +367,8 @@ public class LinkPerformanceController {
             dataSeries_total.setName("Total");
             for (int i = 0; i < max_sz; i++)
                 dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-            flowChart.getData().add(dataSeries_total);
+            if (listVT.size() > 1)
+                flowChart.getData().add(dataSeries_total);
         
             flowChart.setCreateSymbols(false);
             flowChart.setLegendSide(Side.RIGHT);
@@ -418,7 +420,8 @@ public class LinkPerformanceController {
             dataSeries_total.setName("Total");
             for (int i = 0; i < max_sz; i++)
                 dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-            flowChart.getData().add(dataSeries_total);
+            if (listVT.size() > 1)
+                flowChart.getData().add(dataSeries_total);
             
             flowChart.setCreateSymbols(false);
             flowChart.setLegendSide(Side.RIGHT);
@@ -478,7 +481,8 @@ public class LinkPerformanceController {
         dataSeries_total.setName("Total");
         for (int i = 0; i < max_sz; i++)
             dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-        vehChart.getData().add(dataSeries_total);
+        if (listVT.size() > 1)
+            vehChart.getData().add(dataSeries_total);
             
         vehChart.setCreateSymbols(false);
         vehChart.setLegendSide(Side.RIGHT);
@@ -529,7 +533,8 @@ public class LinkPerformanceController {
             dataSeries_total.setName("Total");
             for (int i = 0; i < max_sz; i++)
                 dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-            vehChart.getData().add(dataSeries_total);
+            if (listVT.size() > 1)
+                vehChart.getData().add(dataSeries_total);
             
             vehChart.setCreateSymbols(false);
             vehChart.setLegendSide(Side.RIGHT);
@@ -581,7 +586,8 @@ public class LinkPerformanceController {
             dataSeries_total.setName("Total");
             for (int i = 0; i < max_sz; i++)
                 dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-            vehChart.getData().add(dataSeries_total);
+            if (listVT.size() > 1)
+                vehChart.getData().add(dataSeries_total);
             
             vehChart.setCreateSymbols(false);
             vehChart.setLegendSide(Side.RIGHT);
