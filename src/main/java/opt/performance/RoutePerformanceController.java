@@ -77,7 +77,8 @@ import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.block.BlockBorder;
-import org.jfree.chart.fx.ChartViewer;
+//import org.jfree.chart.fx.ChartViewer;
+import opt.utils.jfreechart.ChartViewer;
 import org.jfree.chart.fx.interaction.ChartMouseListenerFX;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
@@ -473,7 +474,7 @@ public class RoutePerformanceController {
         psl.setFrame(new BlockBorder(Color.GRAY));
         speedGPChart.addSubtitle(psl);
         viewer = new ChartViewer(speedGPChart);
-        viewer.setEventDispatcher(null);
+        //viewer.setEventDispatcher(null);
         viewer.setMinWidth(300);
         viewer.setMinHeight(200);
         double prefWidth = routePerformanceMainPane.getPrefWidth();
@@ -510,7 +511,7 @@ public class RoutePerformanceController {
             psl.setFrame(new BlockBorder(Color.GRAY));
             speedManagedChart.addSubtitle(psl);
             viewer = new ChartViewer(speedManagedChart);
-            viewer.setEventDispatcher(null);
+            //viewer.setEventDispatcher(null);
             vbContours.getWidth();
             viewer.setMinWidth(300);
             viewer.setMinHeight(200);
@@ -551,7 +552,7 @@ public class RoutePerformanceController {
         psl.setFrame(new BlockBorder(Color.GRAY));
         flowGPChart.addSubtitle(psl);
         viewer = new ChartViewer(flowGPChart);
-        viewer.setEventDispatcher(null);
+        //viewer.setEventDispatcher(null);
         viewer.setMinWidth(300);
         viewer.setMinHeight(200);
         prefWidth = routePerformanceMainPane.getPrefWidth();
@@ -588,7 +589,7 @@ public class RoutePerformanceController {
             psl.setFrame(new BlockBorder(Color.GRAY));
             flowManagedChart.addSubtitle(psl);
             viewer = new ChartViewer(flowManagedChart);
-            viewer.setEventDispatcher(null);
+            //viewer.setEventDispatcher(null);
             vbContours.getWidth();
             viewer.setMinWidth(300);
             viewer.setMinHeight(200);
