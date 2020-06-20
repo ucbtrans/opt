@@ -12,13 +12,13 @@
          <content>
             <ScrollPane id="spContours" fx:id="spContours" fitToHeight="true" fitToWidth="true" vbarPolicy="ALWAYS">
                <content>
-                  <VBox id="vbContours" fx:id="vbContours" minHeight="400.0" minWidth="300.0" />
+                  <VBox id="vbContours" fx:id="vbContours" />
                </content></ScrollPane>
          </content>
     </Tab>
     <Tab id="tabAggregates" fx:id="tabAggregates" disable="true" text="Aggregates">
          <content>
-            <ScrollPane id="spAggregates" fx:id="spAggregates" prefHeight="200.0" prefWidth="200.0" vbarPolicy="ALWAYS">
+            <ScrollPane id="spAggregates" fx:id="spAggregates" fitToHeight="true" fitToWidth="true" vbarPolicy="ALWAYS">
                <content>
                   <AnchorPane>
                      <children>
