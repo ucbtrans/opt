@@ -67,6 +67,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import profiles.Profile1D;
 
 /**
  * This class serves to display plots of simulation data for a given link.
@@ -270,6 +271,68 @@ public class LinkPerformanceController {
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(speedChart);
         
         
+        LineChart flowChart;
+        
+        if (myLink.get_up_link() == null) { // source link
+            label_gp = "Demand";
+            label_units = UserSettings.unitsFlow;
+            cc = UserSettings.flowConversionMap.get("vph"+label_units);
+            
+            xAxis = new NumberAxis();
+            xAxis.setLabel(timeLabel);
+            yAxis = new NumberAxis();
+            yAxis.setLabel("Demand (" + label_units + ")");
+
+            flowChart = new LineChart(xAxis, yAxis);
+            flowChart.setTitle(label_gp);
+            
+            max_sz = 0;
+            for (Commodity c : listVT) {
+                max_sz = Math.max(max_sz, mySimData.get_flw_exiting(LaneGroupType.gp, c.getId()).values.size());
+            }
+            dt = mySimData.get_flw_exiting(LaneGroupType.gp, listVT.get(0).getId()).get_dt();
+            double[] total = new double[max_sz];
+            for (int i = 0; i < max_sz; i++)
+                total[i] = 0;
+            for (Commodity c : listVT) {
+                dataSeries_gp = new XYChart.Series();
+                dataSeries_gp.setName(c.get_name());
+                Profile1D demand = myLink.get_demand_vph(c.getId());
+                
+                for (int i = 0; i < max_sz; i++) {
+                    float ts = start + i*dt;
+                    double val = 0;
+                    if (demand != null)
+                        val = demand.get_value_for_time(ts);
+                    if (Double.isNaN(val))
+                        val = 0;
+                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, cc*val));
+                    total[i] += cc*val;
+                }
+                flowChart.getData().add(dataSeries_gp);
+            }
+            
+            dataSeries_total = new XYChart.Series();
+            dataSeries_total.setName("Total");
+            for (int i = 0; i < max_sz; i++)
+                dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+            if (listVT.size() > 1)
+                flowChart.getData().add(dataSeries_total);
+
+            flowChart.setCreateSymbols(false);
+            flowChart.setLegendSide(Side.RIGHT);
+            flowChart.setMinHeight(200);
+            vbTimeSeries.getChildren().add(flowChart);
+            JFXChartUtil.setupZooming(flowChart, (MouseEvent mouseEvent) -> {
+                if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                        mouseEvent.isShortcutDown() )
+                    mouseEvent.consume();
+            });
+            JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(flowChart); 
+            
+        }
+        
+        
         label_gp = "Flow in GP Lanes";
         label_mng = "Flow in Managed Lanes";
         label_aux = "Flow in Aux Lanes";
@@ -281,7 +344,7 @@ public class LinkPerformanceController {
         yAxis = new NumberAxis();
         yAxis.setLabel("Flow (" + label_units + ")");
 
-        LineChart flowChart = new LineChart(xAxis, yAxis);
+        flowChart = new LineChart(xAxis, yAxis);
         flowChart.setTitle(label_gp);
         
         max_sz = 0;

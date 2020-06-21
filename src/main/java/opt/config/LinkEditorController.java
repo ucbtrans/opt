@@ -1850,6 +1850,8 @@ public class LinkEditorController {
         
         int dtD = (int)Math.round(pdt / 60);
         
+        double fcc = UserSettings.flowConversionMap.get("vph" + UserSettings.unitsFlow);
+        
         for (int i = 0; i < numSteps; i++) {
             ObservableList<Object> row = FXCollections.observableArrayList();
             row.add(opt.utils.Misc.minutes2timeString(i*dtD));
@@ -1872,7 +1874,7 @@ public class LinkEditorController {
                 row.set(j+2, val);
             }
             
-            row.set(1, total);
+            row.set(1, fcc*total);
             tableDemand.getItems().add(row);
         }
         tableDemand.refresh();
@@ -1910,6 +1912,8 @@ public class LinkEditorController {
             demandTableHandler.setColumnValue(2, 100);
         }
         
+        double fcc = UserSettings.flowConversionMap.get(UserSettings.unitsFlow + "vph");
+        
         for (int j = 0; j < num_vt; j++) {
             double[] values = new double[numSteps];
             
@@ -1918,7 +1922,7 @@ public class LinkEditorController {
                 for (int jj = 0; jj < num_vt; jj++) {
                     total_prct += (Double)myItems.get(i).get(jj+2);
                 }
-                values[i] = (Double)myItems.get(i).get(1) * (Double)myItems.get(i).get(j+2) / total_prct;
+                values[i] = fcc * (Double)myItems.get(i).get(1) * (Double)myItems.get(i).get(j+2) / total_prct;
             }
             
             try {
