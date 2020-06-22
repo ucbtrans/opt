@@ -25,7 +25,11 @@ public class ControllerRampMeterFixedRate extends AbstractControllerRampMeter {
         this.rate_vphpl = rate_vphpl;
     }
 
-    public void set_rate_vph(float new_rate){
+    public float get_rate_vphpl(){
+        return rate_vphpl;
+    }
+
+    public void set_rate_vphpl(float new_rate){
         this.rate_vphpl = new_rate;
     }
 

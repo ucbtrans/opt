@@ -134,15 +134,15 @@ public class RampMeterFixed {
         origStartTime = entry.get_start_time();
         textStartTime.setText(Misc.seconds2timestring(origStartTime, ""));
 
-        double min_rate = myController.getMin_rate_vph();
+        double rate_vphpl = myController.get_rate_vphpl();
         double max_rate = myController.getMax_rate_vph();
         
         String unitsFlow = UserSettings.unitsFlow;
-        labelRecRate.setText("Metering Rate per Lane (" + unitsFlow + "):");
-        labelMaxRate.setText("Queue override Rate per Lane (" + unitsFlow + "):");
-        min_rate = UserSettings.convertFlow(min_rate, "vph", unitsFlow);
+        labelRecRate.setText("Metering rate per Lane (" + unitsFlow + "):");
+        labelMaxRate.setText("Queue override rate per Lane (" + unitsFlow + "):");
+//        min_rate = UserSettings.convertFlow(min_rate, "vph", unitsFlow);
         max_rate = UserSettings.convertFlow(max_rate, "vph", unitsFlow);
-        spinnerRecRate.getValueFactory().setValue(min_rate);
+        spinnerRecRate.getValueFactory().setValue(rate_vphpl);
         spinnerMaxRate.getValueFactory().setValue(max_rate);
 
         controlDt.getValueFactory().setValue(Math.round(myController.getDt()));
@@ -166,16 +166,16 @@ public class RampMeterFixed {
     void onOK(ActionEvent event) {
         int startSeconds = Misc.timeString2Seconds(textStartTime.getText());
         
-        double rec_rate = spinnerRecRate.getValue();
+        double rate_vphpl = spinnerRecRate.getValue();
         double max_rate = spinnerMaxRate.getValue();
-        if (rec_rate > max_rate) {
+        if (rate_vphpl > max_rate) {
             opt.utils.Dialogs.ErrorDialog("Recommended rate cannot exceed maximum rate...", "Please, correct the metering rates.");
             return;
         }
 
-        rec_rate = UserSettings.convertFlow(rec_rate, UserSettings.unitsFlow, "vph");
-        myController.setMin_rate_vph((float)(0.5*rec_rate));
-        myController.set_rate_vph((float)rec_rate);
+        rate_vphpl = UserSettings.convertFlow(rate_vphpl, UserSettings.unitsFlow, "vph");
+//        myController.setMin_rate_vph((float)(0.5*rec_rate));
+        myController.set_rate_vphpl((float)rate_vphpl);
         max_rate = UserSettings.convertFlow(max_rate, UserSettings.unitsFlow, "vph");
         myController.setMax_rate_vph((float)max_rate);
         myController.setHas_queue_control(cbQueueControl.isSelected());

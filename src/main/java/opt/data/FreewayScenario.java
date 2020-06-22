@@ -266,7 +266,8 @@ public class FreewayScenario {
                 // TODO FIX THIS WHEN WE GET TO HOV/HOT POLICIES
                 AbstractController.Type cntr_type = AbstractController.Type.RampMetering;
 
-                ControlSchedule sch = new ControlSchedule(jcnt.getId(),link,lgtype,cntr_type,jact.getId());
+//                ControlSchedule sch = new ControlSchedule(jcnt.getId(),link,lgtype,cntr_type,jact.getId());
+                ControlSchedule sch = link.get_controller_schedule(lgtype,cntr_type);
 
                 for(jaxb.Entry jentry : jcnt.getSchedule().getEntry()){
                     control.AbstractController.Algorithm  algorithm = control.AbstractController.Algorithm.valueOf(jentry.getType());

@@ -257,7 +257,7 @@ public class ControlFactory {
 				}
 			}
 
-		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(null,null,
+		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(null,0l,
 				jentry.getDt(),has_queue_control,min_rate_vphpl,max_rate_vphpl,rate_vphpl);
 
 		return cntrl;
@@ -265,45 +265,45 @@ public class ControlFactory {
 	}
 
 
-	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn, jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool) throws Exception {
-
-		// read parameters
-		float rate_vphpl = 0f;
-		boolean has_queue_control = false;
-		LaneGroupType lgtype = LaneGroupType.gp;
-		if(jcnt.getParameters()!=null)
-			for(jaxb.Parameter param : jcnt.getParameters().getParameter()){
-				switch(param.getName()){
-					case "queue_control":
-						has_queue_control = param.getValue().equals("true");
-						break;
-					case "lane_group":
-						lgtype = LaneGroupType.valueOf(param.getValue());
-						break;
-					case "rate_vphpl":
-						rate_vphpl = Float.parseFloat(param.getValue());
-						break;
-					default:
-						throw new Exception("Unknown controller parameter");
-				}
-			}
-
-		// read actuators
-		float min_rate_vph = -1f;
-		float max_rate_vph = -1f;
-		List<Long> act_ids = OTMUtils.csv2longlist(jcnt.getTargetActuators().getIds());
-		assert(act_ids.size()==1);
-		for(long a : act_ids) {
-			jaxb.Actuator jact = actuator_pool.get(a);
-			min_rate_vph = jact.getMinValue();
-			max_rate_vph = jact.getMaxValue();
-		}
-
-		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(fwyscn,jcnt.getId(),jcnt.getDt(),has_queue_control,min_rate_vph,max_rate_vph,rate_vphpl);
-		cntrl.setId( jcnt.getId() );
-		return cntrl;
-
-	}
+//	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn, jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool) throws Exception {
+//
+//		// read parameters
+//		float rate_vphpl = 0f;
+//		boolean has_queue_control = false;
+//		LaneGroupType lgtype = LaneGroupType.gp;
+//		if(jcnt.getParameters()!=null)
+//			for(jaxb.Parameter param : jcnt.getParameters().getParameter()){
+//				switch(param.getName()){
+//					case "queue_control":
+//						has_queue_control = param.getValue().equals("true");
+//						break;
+//					case "lane_group":
+//						lgtype = LaneGroupType.valueOf(param.getValue());
+//						break;
+//					case "rate_vphpl":
+//						rate_vphpl = Float.parseFloat(param.getValue());
+//						break;
+//					default:
+//						throw new Exception("Unknown controller parameter");
+//				}
+//			}
+//
+//		// read actuators
+//		float min_rate_vph = -1f;
+//		float max_rate_vph = -1f;
+//		List<Long> act_ids = OTMUtils.csv2longlist(jcnt.getTargetActuators().getIds());
+//		assert(act_ids.size()==1);
+//		for(long a : act_ids) {
+//			jaxb.Actuator jact = actuator_pool.get(a);
+//			min_rate_vph = jact.getMinValue();
+//			max_rate_vph = jact.getMaxValue();
+//		}
+//
+//		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(fwyscn,jcnt.getId(),jcnt.getDt(),has_queue_control,min_rate_vph,max_rate_vph,rate_vphpl);
+//		cntrl.setId( jcnt.getId() );
+//		return cntrl;
+//
+//	}
 
 	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,jaxb.Controller jcnt) throws Exception {
 		ControllerPolicyHOV cntrl = create_controller_hov(fwyscn,jcnt.getId(),jcnt.getDt());

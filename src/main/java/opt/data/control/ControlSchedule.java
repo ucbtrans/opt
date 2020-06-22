@@ -28,7 +28,6 @@ public class ControlSchedule {
         this.controlType = controlType;
         this.entries = new ArrayList<>();
 
-//        long act_id = link.get_segment().get_scenario().new_actuator_id();
         switch(controlType){
             case RampMetering:
                 actuator = ControlFactory.create_actuator_ramp_meter(act_id,link,lgtype);
@@ -127,15 +126,18 @@ public class ControlSchedule {
     ////////////////////////////////
 
     public void update(float start_time, AbstractController cntrl) {
-        boolean have_controller = entries.stream().anyMatch(e->e.get_cntrl()==cntrl);
 
-        if(!have_controller){
-            // remove entries with coinciding start time
-            entries = entries.stream().filter(e->e.start_time!=start_time).collect(Collectors.toList());
-            entries.add(new ScheduleEntry(start_time,cntrl));
-        } else {
-            ScheduleEntry entry = entries.stream().filter(e->e.get_cntrl()==cntrl).findFirst().get();
-            entry.start_time = start_time;
+        if(cntrl!=null){
+            boolean have_controller = entries.stream().anyMatch(e->e.get_cntrl()==cntrl);
+
+            if(!have_controller){
+                // remove entries with coinciding start time
+                entries = entries.stream().filter(e->e.start_time!=start_time).collect(Collectors.toList());
+                entries.add(new ScheduleEntry(start_time,cntrl));
+            } else {
+                ScheduleEntry entry = entries.stream().filter(e->e.get_cntrl()==cntrl).findFirst().get();
+                entry.start_time = start_time;
+            }
         }
 
         // If there is no controller starting at midnight, then add Open
@@ -147,7 +149,6 @@ public class ControlSchedule {
                 e.printStackTrace();
             }
         }
-
 
         Collections.sort(entries);
         update_end_times();
@@ -163,6 +164,8 @@ public class ControlSchedule {
 
     public void delete_entry(int index){
         entries.remove(index);
+
+        update(0f,null);
     }
 
     public AbstractActuator get_actuator(){
