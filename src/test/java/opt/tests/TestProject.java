@@ -1,6 +1,8 @@
 package opt.tests;
 
 import opt.data.FreewayScenario;
+import opt.data.Project;
+import opt.data.ProjectFactory;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -9,6 +11,19 @@ import java.util.Collection;
 import static org.junit.Assert.*;
 
 public class TestProject extends AbstractTest {
+
+
+    @Test
+    @Ignore
+    public void test_load(){
+        try {
+            String optfile = "/home/gomes/Desktop/101/uuu.opt";
+            Project project = ProjectFactory.load_project(optfile,true);
+//            FreewayScenario scenario = project.get_scenario_with_name("scenarioA");
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
 
     /////////////////////////////////////
     // run

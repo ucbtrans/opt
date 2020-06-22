@@ -5,8 +5,8 @@ import opt.data.LaneGroupType;
 
 public class ActuatorHOVPolicy extends AbstractActuator  {
 
-    public ActuatorHOVPolicy(long id, long link_id, LaneGroupType lgtype){
-        super(id,link_id,lgtype);
+    public ActuatorHOVPolicy(long id, long link_id,int [] lanes, LaneGroupType lgtype){
+        super(id,link_id,lanes,lgtype);
     }
 
     public ActuatorHOVPolicy(Actuator j) {

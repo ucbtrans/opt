@@ -2198,17 +2198,11 @@ public class LinkEditorController {
                 switch(controlAlgorithm){
 
                     case open:
-                        newController = ControlFactory.create_controller_open(myLink.get_segment().get_scenario(),
-                                null,
-                                null,
-                                myLink.get_id());
+                        newController = ControlFactory.create_controller_open(myLink.get_segment().get_scenario(),null);
                         break;
 
                     case closed:
-                        newController = ControlFactory.create_controller_closed(myLink.get_segment().get_scenario(),
-                                null,
-                                null,
-                                myLink.get_id());
+                        newController = ControlFactory.create_controller_closed(myLink.get_segment().get_scenario(),null);
                         break;
 
                     case alinea:
@@ -2221,10 +2215,7 @@ public class LinkEditorController {
                                 max_rate_vphpl,
                                 null,
                                 sensor_link.get_id(),
-                                sensor_link.get_length_meters() / 2f,
-                                null,
-                                myLink.get_id(),
-                                controlLgType);
+                                sensor_link.get_length_meters() / 2f );
                         break;
 
                     case fixed_rate:
@@ -2234,10 +2225,7 @@ public class LinkEditorController {
                                 false,
                                 min_rate_vphpl,
                                 max_rate_vphpl,
-                                rate_vphpl,
-                                null,
-                                myLink.get_id(),
-                                controlLgType);
+                                rate_vphpl);
 
                         break;
 

@@ -144,7 +144,7 @@ public class RampMeterFixed {
         max_rate = UserSettings.convertFlow(max_rate, "vph", unitsFlow);
         spinnerRecRate.getValueFactory().setValue(min_rate);
         spinnerMaxRate.getValueFactory().setValue(max_rate);
-        
+
         controlDt.getValueFactory().setValue(Math.round(myController.getDt()));
         cbQueueControl.setSelected(myController.isHas_queue_control());
     }
@@ -178,8 +178,6 @@ public class RampMeterFixed {
         myController.set_rate_vph((float)rec_rate);
         max_rate = UserSettings.convertFlow(max_rate, UserSettings.unitsFlow, "vph");
         myController.setMax_rate_vph((float)max_rate);
-        
-        myController.setDt(controlDt.getValue());
         myController.setHas_queue_control(cbQueueControl.isSelected());
 
         mySchedule.update(startSeconds,myController);

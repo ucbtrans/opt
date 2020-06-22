@@ -209,7 +209,7 @@ public class RampMeterAlinea {
         max_rate = UserSettings.convertFlow(max_rate, UserSettings.unitsFlow, "vph");
         myController.setMax_rate_vph((float)max_rate);
         
-        myController.setDt(controlDt.getValue());
+        myController.setDt((float) controlDt.getValue());
         myController.setHas_queue_control(cbQueueControl.isSelected());
         
         AbstractLink sensor_link = listSensorLinkCandidates.get(cbSensorLink.getSelectionModel().getSelectedIndex());

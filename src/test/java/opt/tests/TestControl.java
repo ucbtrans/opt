@@ -24,10 +24,7 @@ public class TestControl extends AbstractTest{
 					900f,
 					null,
 					9l,
-					100f,
-					null,
-					8l,
-					LaneGroupType.gp);
+					100);
 			assertNotNull(cntrl);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -44,10 +41,7 @@ public class TestControl extends AbstractTest{
 					false,
 					100f,
 					900f,
-					500f,
-					null,
-					9l,
-					LaneGroupType.gp);
+					500f);
 			assertNotNull(cntrl);
 		} catch (Exception e) {
 			e.printStackTrace();

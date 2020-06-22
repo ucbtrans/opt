@@ -440,8 +440,7 @@ public class Scenario {
         jaxb.Actuators jacts = new jaxb.Actuators();
         jScn.setActuators(jacts);
 
-        jaxb.Sensors jsnss = new jaxb.Sensors();
-        jScn.setSensors(jsnss);
+        Set<Sensor> all_sensors = new HashSet<>();
 
         for(AbstractLink link : links.values()){
 
@@ -449,72 +448,29 @@ public class Scenario {
                 continue;
 
             for(Map.Entry<LaneGroupType,Map<AbstractController.Type, ControlSchedule>> e1 : link.schedules.entrySet()){
-                LaneGroupType lgtype = e1.getKey();
+//                LaneGroupType lgtype = e1.getKey();
                 for(Map.Entry<AbstractController.Type, ControlSchedule> e2 : e1.getValue().entrySet()){
-                    AbstractController.Type cntrltype = e2.getKey();
+//                    AbstractController.Type cntrltype = e2.getKey();
                     ControlSchedule schedule = e2.getValue();
+
+                    jcntrls.getController().add(schedule.to_jaxb());
                     AbstractActuator actuator = schedule.get_actuator();
 
                     // actuator
                     jacts.getActuator().add(actuator.to_jaxb());
 
-                    for(ScheduleEntry entry : schedule.get_entries()){
-                        AbstractController cntrl = entry.get_cntrl();
-                        float start_time = entry.get_start_time();
-                        float end_time = entry.get_end_time();
-
-                        // controller
-                        jaxb.Controller jcntrl = cntrl.to_jaxb();
-                        jcntrls.getController().add(jcntrl);
-                        jcntrl.setStartTime(start_time);
-                        if(Float.isFinite(end_time))
-                            jcntrl.setEndTime(end_time);
-
-                        // target actuator
-                        jaxb.TargetActuators jtacts = new jaxb.TargetActuators();
-                        jtacts.setIds(String.format("%d",actuator.getId()));
-                        jcntrl.setTargetActuators(jtacts);
-
-                        // sensors
-                        for(Sensor sensor : cntrl.get_sensors().values())
-                            jsnss.getSensor().add(sensor.to_jaxb());
-
-                    }
-
+                    // sensors
+                    all_sensors.addAll(schedule.get_sensors());
                 }
             }
         }
 
 
-//        if(my_fwy_scenario.controller_schedule!=null){
-//            List<AbstractController> controllers = my_fwy_scenario.controller_schedule.items;
-//
-//            // controllers
-//            if(!controllers.isEmpty())
-//            for(AbstractController cntrl : controllers)
-//                jcntrls.getController().add(cntrl.to_jaxb());
-//
-//            // actuators
-//            jaxb.Actuators jacts = new jaxb.Actuators();
-//            Set<AbstractActuator> actuators = controllers.stream()
-//                    .flatMap(x->x.get_actuators().values().stream())
-//                    .collect(toSet());
-//
-//            if(!actuators.isEmpty())
-//                jScn.setActuators(jacts);
-//            for(AbstractActuator act : actuators)
-//                jacts.getActuator().add(act.to_jaxb());
-//
-//            // sensors
-//            jaxb.Sensors jsens = new jaxb.Sensors();
-//            Set<Sensor> sensors = controllers.stream()
-//                    .flatMap(x->x.get_sensors().values().stream())
-//                    .collect(toSet());
-//            if(!sensors.isEmpty())
-//                jScn.setSensors(jsens);
-//            for(Sensor sns : sensors)
-//                jsens.getSensor().add(sns.to_jaxb());
-//        }
+        jaxb.Sensors jsnss = new jaxb.Sensors();
+        jScn.setSensors(jsnss);
+        for(Sensor sensor : all_sensors)
+            jsnss.getSensor().add(sensor.to_jaxb());
+
 
         return jScn;
     }

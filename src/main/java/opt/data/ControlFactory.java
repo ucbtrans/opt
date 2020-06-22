@@ -40,13 +40,19 @@ public class ControlFactory {
 	// schedule
 	/////////////////////
 
-	public static ControlSchedule create_empty_controller_schedule(AbstractLink link, LaneGroupType lgtype, AbstractController.Type cntrl_type){
-		ControlSchedule schedule = new ControlSchedule(link,lgtype,cntrl_type);
+	public static ControlSchedule create_empty_controller_schedule(Long id,AbstractLink link, LaneGroupType lgtype, AbstractController.Type cntrl_type){
+		ControlSchedule schedule = new ControlSchedule(
+				id==null ? link.mysegment.my_fwy_scenario.new_controller_id() : id,
+				link,
+				lgtype,
+				cntrl_type,
+				link.mysegment.my_fwy_scenario.new_actuator_id()
+				);
 
 		if(cntrl_type==AbstractController.Type.RampMetering){
 			try {
 				FreewayScenario fwyscn = link.mysegment.my_fwy_scenario;
-				schedule.update(0f,ControlFactory.create_controller_open(fwyscn, null, null, link.id));
+				schedule.update(0f,ControlFactory.create_controller_open(fwyscn,null));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -56,27 +62,26 @@ public class ControlFactory {
 		return schedule;
 	}
 
-
 	/////////////////////
 	// controller
 	/////////////////////
 
-	public static ControllerRampMeterOpen create_controller_open(FreewayScenario fwyscn, Long id, Long act_id, long ramp_link_id) throws Exception {
-		return new ControllerRampMeterOpen(fwyscn,id,act_id,ramp_link_id);
+	public static ControllerRampMeterOpen create_controller_open(FreewayScenario fwyscn, Long id) throws Exception {
+		return new ControllerRampMeterOpen(fwyscn,id);
 	}
 
-	public static ControllerRampMeterClosed create_controller_closed(FreewayScenario fwyscn, Long id, Long act_id, long ramp_link_id) throws Exception {
-		return new ControllerRampMeterClosed(fwyscn,id,act_id,ramp_link_id);
+	public static ControllerRampMeterClosed create_controller_closed(FreewayScenario fwyscn, Long id) throws Exception {
+		return new ControllerRampMeterClosed(fwyscn,id);
 	}
 
-	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn,Long id, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl,Long sensor_id, long sensor_link_id, float sensor_offset,Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
+	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn, Long id, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl, float rate_vphpl) throws Exception {
 		parameters_check(dt);
-		return new ControllerRampMeterAlinea(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset,act_id,ramp_link_id,lgtype);
+		return new ControllerRampMeterFixedRate(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,rate_vphpl);
 	}
 
-	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn, Long id, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl, float rate_vphpl,Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
+	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn,Long id, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl,Long sensor_id, long sensor_link_id, float sensor_offset) throws Exception {
 		parameters_check(dt);
-		return new ControllerRampMeterFixedRate(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,rate_vphpl,act_id,ramp_link_id,lgtype);
+		return new ControllerRampMeterAlinea(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
 	}
 
 	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,Long id, float dt) throws Exception {
@@ -103,83 +108,162 @@ public class ControlFactory {
 	// actuator
 	/////////////////////
 
-	public static ActuatorRampMeter create_actuator_ramp_meter(FreewayScenario fwyscn, Long act_id, long link_id, LaneGroupType lgtype){
-		return new ActuatorRampMeter(act_id!=null?act_id:fwyscn.new_actuator_id(),link_id,lgtype);
+	public static ActuatorRampMeter create_actuator_ramp_meter(long id,AbstractLink link, LaneGroupType lgtype){
+		return new ActuatorRampMeter(
+				id,
+				link.get_id(),
+				link.lgtype2lanes(lgtype),
+				lgtype);
 	}
 
-	public static ActuatorHOVPolicy create_actuator_hov_policy(FreewayScenario fwyscn, Long act_id, long link_id, LaneGroupType lgtype){
-		return new ActuatorHOVPolicy(act_id!=null?act_id:fwyscn.new_actuator_id(),link_id,lgtype);
+	public static ActuatorHOVPolicy create_actuator_hov_policy(long id, AbstractLink link, LaneGroupType lgtype){
+		return new ActuatorHOVPolicy(
+				id,
+				link.get_id(),
+				link.lgtype2lanes(lgtype),
+				lgtype);
 	}
 
-	public static ActuatorHOTPolicy create_actuator_hot_policy(FreewayScenario fwyscn, Long act_id, long link_id, LaneGroupType lgtype){
-		return new ActuatorHOTPolicy(act_id!=null?act_id:fwyscn.new_actuator_id(),link_id,lgtype);
+	public static ActuatorHOTPolicy create_actuator_hot_policy(long id,AbstractLink link, LaneGroupType lgtype){
+		return new ActuatorHOTPolicy(
+				id,
+				link.get_id(),
+				link.lgtype2lanes(lgtype),
+				lgtype);
 	}
 
 	/////////////////////////
 	// jaxb
 	/////////////////////////
 
-	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn, jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool, Map<Long,jaxb.Sensor> sensor_pool) throws Exception {
 
-		// complex sensors : check that there are none
-		if(jcnt.getFeedbackSensors()!=null)
-			assert(jcnt.getFeedbackSensors().getFeedbackSensor().isEmpty());
-
-		// complex actuators : check that there are none
-		if(jcnt.getTargetActuators()!=null)
-			assert(jcnt.getTargetActuators().getTargetActuator().isEmpty());
+	public static ControllerRampMeterAlinea create_controller_alinea(jaxb.Entry jentry,jaxb.Sensor jsn) throws Exception {
 
 		// read parameters
 		boolean has_queue_control = false;
-		LaneGroupType lgtype = LaneGroupType.gp;
-		if(jcnt.getParameters()!=null)
-			for(jaxb.Parameter param : jcnt.getParameters().getParameter()){
+		float min_rate_vphpl = Float.NaN;
+		float max_rate_vphpl = Float.NaN;
+		if(jentry.getParameters()!=null)
+			for(jaxb.Parameter param : jentry.getParameters().getParameter()){
 				switch(param.getName()){
 					case "queue_control":
 						has_queue_control = param.getValue().equals("true");
 						break;
-					case "lane_group":
-						lgtype = LaneGroupType.valueOf(param.getValue());
+					case "min_rate_vphpl":
+						min_rate_vphpl = Float.parseFloat(param.getValue());
+						break;
+					case "max_rate_vphpl":
+						max_rate_vphpl = Float.parseFloat(param.getValue());
 						break;
 					default:
 						throw new Exception("Unknown controller parameter");
 				}
 			}
 
-		// read actuators
-		long act_id = -1l;
-		long ramp_link_id = -1l;
-		float min_rate_vph = -1f;
-		float max_rate_vph = -1f;
-		List<Long> act_ids = OTMUtils.csv2longlist(jcnt.getTargetActuators().getIds());
-		assert(act_ids.size()==1);
-		for(long a : act_ids) {
-			jaxb.Actuator jact = actuator_pool.get(a);
-			act_id = jact.getId();
-			min_rate_vph = jact.getMinValue();
-			max_rate_vph = jact.getMaxValue();
-			ramp_link_id = jact.getActuatorTarget().getId();
-		}
-
-		// read sensors
-		long sensor_id = -1l;
-		long sensor_link_id = -1l;
-		float sensor_offset = -1f;
-		List<Long> sens_ids = OTMUtils.csv2longlist(jcnt.getFeedbackSensors().getIds());
-		assert(sens_ids.size()==1);
-		for(long sens_id :sens_ids) {
-			jaxb.Sensor jsns = sensor_pool.get(sens_id);
-			sensor_id = jsns.getId();
-			sensor_link_id = jsns.getLinkId();
-			sensor_offset = jsns.getPosition();
-		}
-
-		ControllerRampMeterAlinea cntrl = create_controller_alinea(fwyscn,jcnt.getId(),jcnt.getDt(),has_queue_control,min_rate_vph,max_rate_vph,sensor_id,sensor_link_id,sensor_offset,act_id,ramp_link_id,lgtype);
-
-		cntrl.setId( jcnt.getId() );
+		ControllerRampMeterAlinea cntrl = create_controller_alinea(null,0l,
+				jentry.getDt(),
+				has_queue_control,
+				min_rate_vphpl,
+				max_rate_vphpl,
+				jsn.getId(),
+				jsn.getLinkId(),
+				jsn.getPosition());
 
 		return cntrl;
 	}
+
+
+//		public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn, jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool, Map<Long,jaxb.Sensor> sensor_pool) throws Exception {
+//
+//		// complex sensors : check that there are none
+//		if(jcnt.getFeedbackSensors()!=null)
+//			assert(jcnt.getFeedbackSensors().getFeedbackSensor().isEmpty());
+//
+//		// complex actuators : check that there are none
+//		if(jcnt.getTargetActuators()!=null)
+//			assert(jcnt.getTargetActuators().getTargetActuator().isEmpty());
+//
+//		// read parameters
+//		boolean has_queue_control = false;
+//		LaneGroupType lgtype = LaneGroupType.gp;
+//		if(jcnt.getParameters()!=null)
+//			for(jaxb.Parameter param : jcnt.getParameters().getParameter()){
+//				switch(param.getName()){
+//					case "queue_control":
+//						has_queue_control = param.getValue().equals("true");
+//						break;
+//					case "lane_group":
+//						lgtype = LaneGroupType.valueOf(param.getValue());
+//						break;
+//					default:
+//						throw new Exception("Unknown controller parameter");
+//				}
+//			}
+//
+//		float min_rate_vph = -1f;
+//		float max_rate_vph = -1f;
+//		List<Long> act_ids = OTMUtils.csv2longlist(jcnt.getTargetActuators().getIds());
+//		assert(act_ids.size()==1);
+//		for(long a : act_ids) {
+//			jaxb.Actuator jact = actuator_pool.get(a);
+//			min_rate_vph = jact.getMinValue();
+//			max_rate_vph = jact.getMaxValue();
+//		}
+//
+//		// read sensors
+//		long sensor_id = -1l;
+//		long sensor_link_id = -1l;
+//		float sensor_offset = -1f;
+//		List<Long> sens_ids = OTMUtils.csv2longlist(jcnt.getFeedbackSensors().getIds());
+//		assert(sens_ids.size()==1);
+//		for(long sens_id :sens_ids) {
+//			jaxb.Sensor jsns = sensor_pool.get(sens_id);
+//			sensor_id = jsns.getId();
+//			sensor_link_id = jsns.getLinkId();
+//			sensor_offset = jsns.getPosition();
+//		}
+//
+//		ControllerRampMeterAlinea cntrl = create_controller_alinea(fwyscn,jcnt.getId(),jcnt.getDt(),has_queue_control,min_rate_vph,max_rate_vph,sensor_id,sensor_link_id,sensor_offset);
+//		cntrl.setId( jcnt.getId() );
+//		return cntrl;
+//	}
+
+
+	public static ControllerRampMeterFixedRate create_controller_fixed_rate(jaxb.Entry jentry) throws Exception {
+
+
+		// read parameters
+		boolean has_queue_control = false;
+		float min_rate_vphpl = Float.NaN;
+		float max_rate_vphpl = Float.NaN;
+		float rate_vphpl = Float.NaN;
+		if(jentry.getParameters()!=null)
+			for(jaxb.Parameter param : jentry.getParameters().getParameter()){
+				switch(param.getName()){
+					case "queue_control":
+						has_queue_control = param.getValue().equals("true");
+						break;
+					case "min_rate_vphpl":
+						min_rate_vphpl = Float.parseFloat(param.getValue());
+						break;
+					case "max_rate_vphpl":
+						max_rate_vphpl = Float.parseFloat(param.getValue());
+						break;
+					case "rate_vphpl":
+						rate_vphpl = Float.parseFloat(param.getValue());
+						break;
+					default:
+						throw new Exception("Unknown controller parameter");
+				}
+			}
+
+		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(null,null,
+				jentry.getDt(),has_queue_control,min_rate_vphpl,max_rate_vphpl,rate_vphpl);
+
+		return cntrl;
+
+	}
+
 
 	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn, jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool) throws Exception {
 
@@ -205,24 +289,18 @@ public class ControlFactory {
 			}
 
 		// read actuators
-		long act_id = -1l;
-		long ramp_link_id = -1l;
 		float min_rate_vph = -1f;
 		float max_rate_vph = -1f;
 		List<Long> act_ids = OTMUtils.csv2longlist(jcnt.getTargetActuators().getIds());
 		assert(act_ids.size()==1);
 		for(long a : act_ids) {
 			jaxb.Actuator jact = actuator_pool.get(a);
-			act_id = jact.getId();
 			min_rate_vph = jact.getMinValue();
 			max_rate_vph = jact.getMaxValue();
-			ramp_link_id = jact.getActuatorTarget().getId();
 		}
 
-		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(fwyscn,jcnt.getId(),jcnt.getDt(),has_queue_control,min_rate_vph,max_rate_vph,rate_vphpl,act_id,ramp_link_id,lgtype);
-
+		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(fwyscn,jcnt.getId(),jcnt.getDt(),has_queue_control,min_rate_vph,max_rate_vph,rate_vphpl);
 		cntrl.setId( jcnt.getId() );
-
 		return cntrl;
 
 	}

@@ -29,11 +29,6 @@ public abstract class AbstractLink implements Comparable {
     // Demands for LinkOnramp and LinkFreeway types only
     protected Map<Long, Profile1D> demands = new HashMap<>();    // commodity -> Profile1D
 
-//    public Map<LaneGroupType,AbstractActuator> actuator = new HashMap<>();
-
-    // simulation data
-//    public SimDataLink simdata;
-
     /////////////////////////////////////
     // abstract methods
     /////////////////////////////////////
@@ -131,10 +126,6 @@ public abstract class AbstractLink implements Comparable {
 
     }
 
-//    protected void populate_sim_data(runner.Scenario scenario){
-//        simdata = new SimDataLink(this,scenario.network.links.get(id));
-//    }
-
     /////////////////////////////////////
     // basic getters
     /////////////////////////////////////
@@ -178,6 +169,34 @@ public abstract class AbstractLink implements Comparable {
         return x;
     }
 
+    public final int [] lgtype2lanes(LaneGroupType lgtype){
+        int [] lanes = new int[2];
+
+        lanes[0] = 1;
+        lanes[1] = 1;
+
+        if(params.has_mng()){
+            lanes[1] += params.mng_lanes-1;
+            if(lgtype==LaneGroupType.mng)
+                return lanes;
+            lanes[0] = params.mng_lanes + 1;
+            lanes[1] = params.mng_lanes + 1;
+        }
+
+        if(lgtype==LaneGroupType.gp){
+            lanes[1] += params.gp_lanes-1;
+            return lanes;
+        }
+
+        if(params.has_aux() && lgtype==LaneGroupType.aux){
+            lanes[0] += params.gp_lanes;
+            lanes[1] += params.gp_lanes + params.get_aux_lanes()-1;
+            return lanes;
+        }
+
+        return null;
+    }
+
     /////////////////////////////////////
     // segment getters
     /////////////////////////////////////
@@ -210,6 +229,10 @@ public abstract class AbstractLink implements Comparable {
         if (newlength<=0.0001)
             throw new Exception("Attempted to set a non-positive segment length");
         params.length = newlength;
+    }
+
+    public final int get_lanes(){
+        return get_mng_lanes() + get_gp_lanes() + get_aux_lanes();
     }
 
     // ramps only
@@ -394,8 +417,10 @@ public abstract class AbstractLink implements Comparable {
     /////////////////////////////////////
 
     public final ControlSchedule get_controller_schedule(LaneGroupType lgtype, AbstractController.Type cntrl_type){
+        FreewayScenario fwyscn = mysegment.get_scenario();
+
         if(!schedules.containsKey(lgtype)) {
-            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(this,lgtype,cntrl_type);
+            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(null,this,lgtype,cntrl_type);
             Map<AbstractController.Type, ControlSchedule> X  = new HashMap<>();
             X.put(cntrl_type,newschedule);
             schedules.put(lgtype,X);
@@ -403,7 +428,7 @@ public abstract class AbstractLink implements Comparable {
         }
         Map<AbstractController.Type, ControlSchedule> X  = schedules.get(lgtype);
         if(!X.containsKey(cntrl_type)) {
-            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(this,lgtype, cntrl_type);
+            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(null,this,lgtype, cntrl_type);
             X.put(cntrl_type,newschedule);
             return newschedule;
         }

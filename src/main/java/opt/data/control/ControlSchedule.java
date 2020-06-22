@@ -1,17 +1,18 @@
 package opt.data.control;
 
+import jaxb.Parameter;
 import opt.data.AbstractLink;
 import opt.data.ControlFactory;
 import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
+import utils.OTMUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ControlSchedule {
 
+    protected long id;
     protected AbstractLink link;
     protected AbstractController.Type controlType;
     protected List<ScheduleEntry> entries;
@@ -21,23 +22,104 @@ public class ControlSchedule {
     // construction
     ////////////////////////////////
 
-    public ControlSchedule(AbstractLink link, LaneGroupType lgtype, AbstractController.Type controlType){
+    public ControlSchedule(long id,AbstractLink link, LaneGroupType lgtype, AbstractController.Type controlType,long act_id){
+        this.id = id;
         this.link = link;
         this.controlType = controlType;
         this.entries = new ArrayList<>();
 
-        FreewayScenario fwyscn = link.get_segment().get_scenario();
+//        long act_id = link.get_segment().get_scenario().new_actuator_id();
         switch(controlType){
             case RampMetering:
-                actuator = ControlFactory.create_actuator_ramp_meter(fwyscn,null,link.get_id(),lgtype);
+                actuator = ControlFactory.create_actuator_ramp_meter(act_id,link,lgtype);
                 break;
             case HOTpolicy:
-                actuator = ControlFactory.create_actuator_hot_policy(fwyscn,null,link.get_id(),lgtype);
+                actuator = ControlFactory.create_actuator_hot_policy(act_id,link,lgtype);
                 break;
             case HOVpolicy:
-                actuator = ControlFactory.create_actuator_hov_policy(fwyscn,null,link.get_id(),lgtype);
+                actuator = ControlFactory.create_actuator_hov_policy(act_id,link,lgtype);
                 break;
         }
+    }
+
+//    public ControlSchedule(long id,AbstractLink link, LaneGroupType lgtype, AbstractController.Type controlType,jaxb.Actuator jact){
+//        this.id = id;
+//        this.link = link;
+//        this.controlType = controlType;
+//        this.entries = new ArrayList<>();
+//
+//        long act_id = jact.getId();
+//        switch(controlType){
+//            case RampMetering:
+//                actuator = ControlFactory.create_actuator_ramp_meter(act_id,link,lgtype);
+//                break;
+//            case HOTpolicy:
+//                actuator = ControlFactory.create_actuator_hot_policy(act_id,link,lgtype);
+//                break;
+//            case HOVpolicy:
+//                actuator = ControlFactory.create_actuator_hov_policy(act_id,link,lgtype);
+//                break;
+//        }
+//    }
+
+
+    public jaxb.Controller to_jaxb(){
+        jaxb.Controller jcntrl = new jaxb.Controller();
+
+        if(entries.isEmpty())
+            return jcntrl;
+
+        // controller attributes
+        jcntrl.setType("schedule");
+        jcntrl.setId(id);
+
+        // target actuator
+        jaxb.TargetActuators tacts = new jaxb.TargetActuators();
+        tacts.setIds(String.format("%d",actuator.id));
+        jcntrl.setTargetActuators(tacts);
+
+        // schedule
+        jaxb.Schedule jsch = new jaxb.Schedule();
+        jcntrl.setSchedule(jsch);
+        for(ScheduleEntry entry : entries){
+            float start_time = entry.get_start_time();
+            float end_time = entry.get_end_time();
+
+            jaxb.Entry jentry = new jaxb.Entry();
+            jsch.getEntry().add(jentry);
+
+            // dt
+            if(!entry.cntrl.getDt().isInfinite())
+                jentry.setDt(entry.cntrl.getDt());
+
+            // start time and end time
+            jentry.setStartTime(start_time);
+            if(Float.isFinite(end_time))
+                jentry.setEndTime(end_time);
+
+            // controller
+            AbstractController cntrl = entry.get_cntrl();
+            jentry.setType(cntrl.algorithm.toString());
+
+            // sensors
+            if(!cntrl.get_sensors().isEmpty()){
+                jaxb.FeedbackSensors jsns = new jaxb.FeedbackSensors();
+                jentry.setFeedbackSensors(jsns);
+                jsns.setIds(OTMUtils.comma_format(cntrl.get_sensors().keySet()));
+            }
+
+            // controller parameters
+            Collection<Parameter> jparamslist = cntrl.jaxb_parameters();
+            if(!jparamslist.isEmpty()){
+                jaxb.Parameters jparams = new jaxb.Parameters();
+                jentry.setParameters(jparams);
+                jparams.getParameter().addAll(jparamslist);
+            }
+
+        }
+
+
+        return jcntrl;
     }
 
     ////////////////////////////////
@@ -60,7 +142,7 @@ public class ControlSchedule {
         if(!entries.stream().anyMatch(e->e.start_time==0f)) {
             try {
                 entries.add(new ScheduleEntry(0f,
-                        ControlFactory.create_controller_open(link.get_segment().get_scenario(), null, null, link.get_id())));
+                        ControlFactory.create_controller_open(link.get_segment().get_scenario(),null)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -89,6 +171,10 @@ public class ControlSchedule {
 
     public float get_largest_start_time(){
         return entries.get(entries.size()-1).start_time;
+    }
+
+    public Set<Sensor> get_sensors(){
+        return entries.stream().flatMap(e->e.get_cntrl().get_sensors().values().stream()).collect(Collectors.toSet());
     }
 
     ////////////////////////////////

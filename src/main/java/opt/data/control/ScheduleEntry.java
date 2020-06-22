@@ -4,7 +4,7 @@ public class ScheduleEntry  implements Comparable<ScheduleEntry>{
     protected float start_time;
     protected float end_time;
     protected AbstractController cntrl;
-    public ScheduleEntry(float start_time, AbstractController cntrl){
+    public ScheduleEntry( float start_time, AbstractController cntrl){
         this.start_time = start_time;
         this.cntrl = cntrl;
     }
