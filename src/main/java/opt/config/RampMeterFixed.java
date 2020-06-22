@@ -135,7 +135,7 @@ public class RampMeterFixed {
         textStartTime.setText(Misc.seconds2timestring(origStartTime, ""));
 
         double rate_vphpl = myController.get_rate_vphpl();
-        double max_rate = myController.getMax_rate_vph();
+        double max_rate = Math.min(myLink.get_gp_capacity_vphpl(), myController.getMax_rate_vph());
         
         String unitsFlow = UserSettings.unitsFlow;
         labelRecRate.setText("Metering Rate per Lane (" + unitsFlow + "):");
@@ -168,21 +168,27 @@ public class RampMeterFixed {
         
         double rate_vphpl = spinnerRecRate.getValue();
         double max_rate = spinnerMaxRate.getValue();
+        rate_vphpl = UserSettings.convertFlow(rate_vphpl, UserSettings.unitsFlow, "vph");
+        max_rate = UserSettings.convertFlow(max_rate, UserSettings.unitsFlow, "vph");
+        
+        if (max_rate > myLink.get_gp_capacity_vphpl()) {
+            max_rate = myLink.get_gp_capacity_vphpl();
+            spinnerMaxRate.getValueFactory().setValue(UserSettings.convertFlow(max_rate, "vph", UserSettings.unitsFlow));
+        }
+        
         if (rate_vphpl > max_rate) {
             opt.utils.Dialogs.ErrorDialog("Recommended rate cannot exceed maximum rate...", "Please, correct the metering rates.");
             return;
         }
 
-        rate_vphpl = UserSettings.convertFlow(rate_vphpl, UserSettings.unitsFlow, "vph");
-//        myController.setMin_rate_vph((float)(0.5*rec_rate));
         myController.set_rate_vphpl((float)rate_vphpl);
-        max_rate = UserSettings.convertFlow(max_rate, UserSettings.unitsFlow, "vph");
+        
         myController.setMax_rate_vph((float)max_rate);
         myController.setHas_queue_control(cbQueueControl.isSelected());
 
-        mySchedule.update(startSeconds,myController);
+        mySchedule.update(startSeconds, myController);
 
-        Stage stage = (Stage) topPane.getScene().getWindow();
+        Stage stage = (Stage)topPane.getScene().getWindow();
         stage.close();
     }
 

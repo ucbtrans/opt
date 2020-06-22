@@ -124,9 +124,9 @@ public class ScrollHandlerFX extends AbstractMouseHandlerFX
             boolean notifyState = plot.isNotify();
             plot.setNotify(false);
             int clicks = (int) e.getDeltaY();
-            double zf = 1.0 + this.zoomFactor;
+            double zf = 1.0 / (1.0 + this.zoomFactor);
             if (clicks < 0) {
-                zf = 1.0 / zf;
+                zf = 1.0 + this.zoomFactor;
             }
             if (canvas.isDomainZoomable()) {
                 zoomable.zoomDomainAxes(zf, pinfo, p, true);
