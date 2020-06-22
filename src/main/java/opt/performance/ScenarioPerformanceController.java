@@ -42,6 +42,8 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import opt.AppMainController;
@@ -55,6 +57,7 @@ import opt.UserSettings;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
 import opt.data.Route;
+import opt.utils.jfxutils.chart.JFXChartUtil;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -196,6 +199,13 @@ public class ScenarioPerformanceController {
         double prefWidth = scenarioPerformanceMainPane.getPrefWidth();
         double prefHeight = scenarioPerformanceMainPane.getPrefHeight()/3;
         chart.setPrefSize(prefWidth, prefHeight);
+        
+        /*JFXChartUtil.setupZooming(chart, (MouseEvent mouseEvent) -> {
+                if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                        mouseEvent.isShortcutDown() )
+                    mouseEvent.consume();
+        });
+        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(chart); */
         
         vbSummary.getChildren().add(chart);
         

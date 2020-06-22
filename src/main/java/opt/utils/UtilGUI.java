@@ -27,6 +27,10 @@
 package opt.utils;
 
 import java.awt.Color;
+import java.io.File;
+import java.io.IOException;
+import javafx.stage.FileChooser;
+import org.jfree.chart.ChartUtilities;
 
 
 /**
@@ -307,6 +311,47 @@ public class UtilGUI {
             ii = Math.max(i, ii);
         float[] hsb =  Color.RGBtoHSB(rgb[ii][0], rgb[ii][1], rgb[ii][2], null);
         return Color.getHSBColor(hsb[0], hsb[1], hsb[2]);
+    }
+    
+    
+    
+    /**
+     * A handler for the export to PNG option in the context menu.
+     */
+    private void handleExportToPNG() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Export to PNG");
+        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(
+                "Portable Network Graphics (PNG)", "*.png");
+        chooser.getExtensionFilters().add(filter);
+        /*File file = chooser.showSaveDialog(getScene().getWindow());
+        if (file != null) {
+            try {
+                ChartUtilities.saveChartAsPNG(file, this.canvas.getChart(), 2*(int)getWidth(), 2*(int)getHeight());
+            } catch (IOException ex) {
+                // FIXME: show a dialog with the error
+                throw new RuntimeException(ex);
+            }
+        }*/   
+    }
+
+    /**
+     * A handler for the export to JPEG option in the context menu.
+     */
+    private void handleExportToJPEG() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Export to JPEG");
+        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("JPEG", "*.jpg");
+        chooser.getExtensionFilters().add(filter);
+        /*File file = chooser.showSaveDialog(getScene().getWindow());
+        if (file != null) {
+            try {
+                ChartUtilities.saveChartAsJPEG(file, this.canvas.getChart(), 2*(int)getWidth(), 2*(int)getHeight());
+            } catch (IOException ex) {
+                // FIXME: show a dialog with the error
+                throw new RuntimeException(ex);
+            }
+        }  */      
     }
 	
 }
