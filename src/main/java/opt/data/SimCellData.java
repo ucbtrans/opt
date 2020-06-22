@@ -58,6 +58,8 @@ public class SimCellData {
                 sumveh += vehs.get(commid).get(k);
             }
             speeds[k] = sumveh<1 || sumflw<1 ? ffspeed_mph : cell_length_miles*sumflw/sumveh;
+            if(speeds[k]>ffspeed_mph)
+                speeds[k] = ffspeed_mph;
         }
         return speeds;
     }

@@ -416,7 +416,10 @@ public class RoutePerformanceController {
                     dd += cellLengths[i];
                 }
             }
-	}
+	    }
+
+        // HACK
+        minSpeed = 0d;
         
     }
     
@@ -615,6 +618,7 @@ public class RoutePerformanceController {
                 minSpeed = maxSpeed - 1.0;
             LookupPaintScale pScale = new LookupPaintScale(minSpeed, maxSpeed, Color.white);
         Color[] clr = UtilGUI.krygColorScale();
+
         double delta = (maxSpeed - minSpeed)/(clr.length - 1);
         double value = minSpeed;
         pScale.add(value, clr[0]);
