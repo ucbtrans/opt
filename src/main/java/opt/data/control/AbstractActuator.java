@@ -4,18 +4,17 @@ import opt.data.LaneGroupType;
 
 public abstract class AbstractActuator {
 
-	public long id;
-	public long link_id;
-	public LaneGroupType lgtype;
-	public AbstractController myController;
+	protected long id;
+	protected long link_id;
+	protected int[] lanes;
+	protected LaneGroupType lgtype;
 
-	public AbstractActuator(long id,long link_id,LaneGroupType lgtype,AbstractController myController){
+	public AbstractActuator(long id,long link_id,int [] lanes,LaneGroupType lgtype){
 		this.id = id;
+		this.lanes = lanes;
 		this.lgtype = lgtype;
 		this.link_id = link_id;
-		this.myController = myController;
 	}
-
 
 	// TODO READ AND WRITE LANE GROUP TYPE TO XML
 
@@ -27,12 +26,15 @@ public abstract class AbstractActuator {
 	public jaxb.Actuator to_jaxb(){
 		jaxb.Actuator j = new jaxb.Actuator();
 		j.setId(id);
-		jaxb.ActuatorTarget target = new jaxb.ActuatorTarget();
-		target.setType("link");
-		target.setId(link_id);
-		j.setActuatorTarget(target);
-
 		return j;
 	}
+
+	public long getId(){
+		return id;
+	}
+
+//	public int[] get_lanegroup_lanes(){
+//
+//	}
 
 }

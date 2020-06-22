@@ -38,27 +38,25 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.UserSettings;
 import opt.data.AbstractLink;
-import opt.data.control.AbstractController;
-import opt.data.control.AbstractControllerRampMeter;
-import opt.data.control.ControllerRampMeterTOD;
+import opt.data.control.*;
 import opt.utils.Misc;
 import opt.utils.ModifiedDoubleStringConverter;
 import opt.utils.ModifiedIntegerStringConverter;
 
 
 /**
- * Controller for the pop-up dialog that edits ALINEA ramp meter.
+ * Controller for the pop-up dialog that edits FIXED RATE ramp meter.
  * 
  * @author Alex Kurzhanskiy
  */
-public class RampMeterTOD {
+public class RampMeterFixed {
     private LinkEditorController linkEditorController = null;
     private AbstractLink myLink = null;
-    private AbstractController myController = null;
-    private boolean isnew = false;
+    private ControlSchedule mySchedule;
+    private ControllerRampMeterFixedRate myController = null;
     private float origStartTime;
-    private float origEndTime;
-    
+    private boolean isnew;
+
 
     @FXML // fx:id="topPane"
     private GridPane topPane; // Value injected by FXMLLoader
@@ -71,9 +69,6 @@ public class RampMeterTOD {
 
     @FXML // fx:id="textStartTime"
     private TextField textStartTime; // Value injected by FXMLLoader
-
-    @FXML // fx:id="textEndTime"
-    private TextField textEndTime; // Value injected by FXMLLoader
 
     @FXML // fx:id="labelRecRate"
     private Label labelRecRate; // Value injected by FXMLLoader
@@ -110,8 +105,7 @@ public class RampMeterTOD {
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
         textStartTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultStartTime, "")));
-        textEndTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultSimulationDuration, "")));
-        
+
         double cap_step = 1;
         if (UserSettings.unitsFlow.equals("vps"))
             cap_step = 0.01;
@@ -131,29 +125,28 @@ public class RampMeterTOD {
     
     
     
-    public void initWithLinkAndController(AbstractLink lnk, AbstractController ctrl, boolean isnew) {
+    public void initWithLinkAndController(AbstractLink lnk, ControlSchedule schedule, ScheduleEntry entry,boolean isnew) {
         myLink = lnk;
-        myController = ctrl;
+        mySchedule = schedule;
+        myController = (ControllerRampMeterFixedRate) entry.get_cntrl();
         this.isnew = isnew;
-        origStartTime = ctrl.getStartTime();
-        origEndTime = ctrl.getEndTime();
-        
+
+        origStartTime = entry.get_start_time();
         textStartTime.setText(Misc.seconds2timestring(origStartTime, ""));
-        textEndTime.setText(Misc.seconds2timestring(origEndTime, ""));
-        
-        double min_rate = ((AbstractControllerRampMeter)ctrl).getMin_rate_vph();
-        double max_rate = ((AbstractControllerRampMeter)ctrl).getMax_rate_vph();
+
+        double min_rate = myController.getMin_rate_vph();
+        double max_rate = myController.getMax_rate_vph();
         
         String unitsFlow = UserSettings.unitsFlow;
-        labelRecRate.setText("Recommended Rate per Lane (" + unitsFlow + "):");
-        labelMaxRate.setText("Maximum Rate per Lane (" + unitsFlow + "):");
+        labelRecRate.setText("Metering Rate per Lane (" + unitsFlow + "):");
+        labelMaxRate.setText("Queue override Rate per Lane (" + unitsFlow + "):");
         min_rate = UserSettings.convertFlow(min_rate, "vph", unitsFlow);
         max_rate = UserSettings.convertFlow(max_rate, "vph", unitsFlow);
         spinnerRecRate.getValueFactory().setValue(min_rate);
         spinnerMaxRate.getValueFactory().setValue(max_rate);
-        
-        controlDt.getValueFactory().setValue(Math.round(ctrl.getDt()));
-        cbQueueControl.setSelected(((AbstractControllerRampMeter)ctrl).isHas_queue_control());
+
+        controlDt.getValueFactory().setValue(Math.round(myController.getDt()));
+        cbQueueControl.setSelected(myController.isHas_queue_control());
     }
     
     
@@ -165,9 +158,6 @@ public class RampMeterTOD {
 
     @FXML
     void onCancel(ActionEvent event) {
-        if (isnew) {
-            myLink.get_segment().get_scenario().get_controller_schedule().delete_controller(myController);
-        }
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
     }
@@ -175,12 +165,6 @@ public class RampMeterTOD {
     @FXML
     void onOK(ActionEvent event) {
         int startSeconds = Misc.timeString2Seconds(textStartTime.getText());
-        int endSeconds = Misc.timeString2Seconds(textEndTime.getText());
-        
-        if (endSeconds <= startSeconds) {
-            opt.utils.Dialogs.ErrorDialog("Start time must be smaller than end time...", "Please, correct the time range.");
-            return;
-        }
         
         double rec_rate = spinnerRecRate.getValue();
         double max_rate = spinnerMaxRate.getValue();
@@ -188,27 +172,16 @@ public class RampMeterTOD {
             opt.utils.Dialogs.ErrorDialog("Recommended rate cannot exceed maximum rate...", "Please, correct the metering rates.");
             return;
         }
-        
-        myController.setStartTime(startSeconds);
-        myController.setEndTime(endSeconds);
-        if (linkEditorController.checkControllerOverlap(myController)) {
-            myController.setStartTime(origStartTime);
-            myController.setEndTime(origEndTime);
-            opt.utils.Dialogs.ErrorDialog("Time range overlaps with other ramp meters in the schedule...", "Please, correct the time range.");
-            return;
-        }
-        
 
         rec_rate = UserSettings.convertFlow(rec_rate, UserSettings.unitsFlow, "vph");
-        ((AbstractControllerRampMeter)myController).setMin_rate_vph((float)(0.5*rec_rate));
-        ((ControllerRampMeterTOD)myController).get_entries().clear();
-        ((ControllerRampMeterTOD)myController).add_entry(startSeconds, (float)rec_rate);
+        myController.setMin_rate_vph((float)(0.5*rec_rate));
+        myController.set_rate_vph((float)rec_rate);
         max_rate = UserSettings.convertFlow(max_rate, UserSettings.unitsFlow, "vph");
-        ((AbstractControllerRampMeter)myController).setMax_rate_vph((float)max_rate);
-        
-        myController.setDt(controlDt.getValue());
-        ((AbstractControllerRampMeter)myController).setHas_queue_control(cbQueueControl.isSelected());
-        
+        myController.setMax_rate_vph((float)max_rate);
+        myController.setHas_queue_control(cbQueueControl.isSelected());
+
+        mySchedule.update(startSeconds,myController);
+
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
     }

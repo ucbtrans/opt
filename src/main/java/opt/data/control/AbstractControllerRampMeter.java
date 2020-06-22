@@ -1,6 +1,9 @@
 package opt.data.control;
 
-import jaxb.Controller;
+import jaxb.Parameter;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 public abstract class AbstractControllerRampMeter extends AbstractController {
 
@@ -8,25 +11,54 @@ public abstract class AbstractControllerRampMeter extends AbstractController {
     protected float min_rate_vph;
     protected float max_rate_vph;
 
-    // factory
-    public AbstractControllerRampMeter(long id, float dt, float start_time, Float end_time, control.AbstractController.Algorithm  algorithm,boolean has_queue_control,float min_rate_vph,float max_rate_vph) throws Exception {
-        super(id, dt, start_time, end_time, algorithm);
+    ////////////////////////////////
+    // construction
+    ////////////////////////////////
+
+    public AbstractControllerRampMeter(long id, Float dt, control.AbstractController.Algorithm  algorithm,boolean has_queue_control,float min_rate_vph,float max_rate_vph) throws Exception {
+        super(id, Type.RampMetering, dt, algorithm);
         this.has_queue_control = has_queue_control;
         this.min_rate_vph = min_rate_vph;
         this.max_rate_vph = max_rate_vph;
     }
 
+    ////////////////////////////////
+    // to jaxb
+    ////////////////////////////////
+
     @Override
-    public Controller to_jaxb() {
-        Controller cntrl = super.to_jaxb();
+    public Collection<Parameter> jaxb_parameters() {
+        Collection<jaxb.Parameter> pset = new HashSet<>();
+
+        boolean write_quecontrol = has_queue_control;
+        boolean write_min_rate = Float.isFinite(min_rate_vph);
+        boolean write_max_rate = Float.isFinite(max_rate_vph);
 
         // write has_queue_control
-        jaxb.Parameter param = new jaxb.Parameter();
-        param.setName("queue_control");
-        param.setValue(has_queue_control ? "true" : "false");
-        cntrl.getParameters().getParameter().add(param);
+        if(write_quecontrol){
+            jaxb.Parameter p = new jaxb.Parameter();
+            p.setName("queue_control");
+            p.setValue(has_queue_control ? "true" : "false");
+            pset.add(p);
+        }
 
-        return cntrl;
+        // write min rate
+        if(write_min_rate){
+            jaxb.Parameter p = new jaxb.Parameter();
+            p.setName("min_rate_vphpl");
+            p.setValue(String.format("%.0f",min_rate_vph));
+            pset.add(p);
+        }
+
+        // write max rate
+        if(write_max_rate){
+            jaxb.Parameter p = new jaxb.Parameter();
+            p.setName("max_rate_vphpl");
+            p.setValue(String.format("%.0f",max_rate_vph));
+            pset.add(p);
+        }
+
+        return pset;
     }
 
     ////////////////////////////////

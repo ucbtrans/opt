@@ -26,7 +26,7 @@
 package opt.config;
 
 import java.util.List;
-import java.util.Set;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -36,6 +36,8 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.data.AbstractLink;
 import opt.data.ControlFactory;
+import opt.data.LaneGroupType;
+import opt.data.control.AbstractController;
 
 
 /**
@@ -114,9 +116,10 @@ public class NewRampMeterController {
      * CALLBACKS
      **************************************************************************/
 
+
     @FXML
     void onCancel(ActionEvent event) {
-        linkEditorController.prepareNewRampMeter(null, cbManagedLanes.isSelected());
+        linkEditorController.prepareNewController(null);
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
     }
@@ -129,8 +132,9 @@ public class NewRampMeterController {
             opt.utils.Dialogs.WarningDialog("No ramp metering algorithm selected!", "Please, choose a ramp meter from the list...");
             return;
         }
-        
-        linkEditorController.prepareNewRampMeter(listRM.getItems().get(idx), cbManagedLanes.isSelected());
+
+
+        linkEditorController.prepareNewController(listRM.getItems().get(idx));
         
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();

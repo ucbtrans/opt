@@ -41,30 +41,30 @@ import opt.data.control.AbstractController;
  */
 public class ControlUtils {
     
-    public static boolean controllerOverlap(AbstractController a, AbstractController b) {
-        boolean res = false;
-        
-        int a_start = Math.round(a.getStartTime());
-        int a_end = Math.round(a.getEndTime());
-        int b_start = Math.round(b.getStartTime());
-        int b_end = Math.round(b.getEndTime());
-        
-        if (a.getId() == b.getId()) // skip self
-            return res;
-        
-        if ((a_end <= b_start) || (a_start >= b_end)) // no time overlap
-            return res;
-        
-        Set<LaneGroupType> a_lg_set = a.get_lanegroup_types();
-        Set<LaneGroupType> b_lg_set = b.get_lanegroup_types();
-        for (LaneGroupType lg : b_lg_set) {
-            if (a_lg_set.contains(lg)) {
-                res = true;
-                break;
-            }
-        }
-        
-        return res;
-    }
+//    public static boolean controllerOverlap(AbstractController a, AbstractController b) {
+//        boolean res = false;
+//
+//        int a_start = Math.round(a.getStartTime());
+//        int a_end = Math.round(a.getEndTime());
+//        int b_start = Math.round(b.getStartTime());
+//        int b_end = Math.round(b.getEndTime());
+//
+//        if (a.getId() == b.getId()) // skip self
+//            return res;
+//
+//        if ((a_end <= b_start) || (a_start >= b_end)) // no time overlap
+//            return res;
+//
+//        Set<LaneGroupType> a_lg_set = a.get_lanegroup_types();
+//        Set<LaneGroupType> b_lg_set = b.get_lanegroup_types();
+//        for (LaneGroupType lg : b_lg_set) {
+//            if (a_lg_set.contains(lg)) {
+//                res = true;
+//                break;
+//            }
+//        }
+//
+//        return res;
+//    }
     
 }

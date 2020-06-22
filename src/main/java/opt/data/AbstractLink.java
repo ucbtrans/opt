@@ -1,9 +1,12 @@
 package opt.data;
 
+import opt.data.control.AbstractController;
+import opt.data.control.ControlSchedule;
 import profiles.Profile1D;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class AbstractLink implements Comparable {
 
@@ -20,13 +23,11 @@ public abstract class AbstractLink implements Comparable {
 
     public AbstractParameters params;
 
+    // for each lane group there is a map from control type to TOD schedule.
+    public Map<LaneGroupType,Map<AbstractController.Type, ControlSchedule>> schedules;
+
     // Demands for LinkOnramp and LinkFreeway types only
     protected Map<Long, Profile1D> demands = new HashMap<>();    // commodity -> Profile1D
-
-//    public Map<LaneGroupType,AbstractActuator> actuator = new HashMap<>();
-
-    // simulation data
-//    public SimDataLink simdata;
 
     /////////////////////////////////////
     // abstract methods
@@ -45,6 +46,7 @@ public abstract class AbstractLink implements Comparable {
 
     public AbstractLink(jaxb.Link link){
         this.id = link.getId();
+        this.schedules = new HashMap<>();
         this.start_node_id = link.getStartNodeId();
         this.end_node_id = link.getEndNodeId();
     }
@@ -52,6 +54,7 @@ public abstract class AbstractLink implements Comparable {
     // used by clone
     public AbstractLink(long id, Long start_node_id, Long end_node_id, AbstractParameters params){
         this.id = id;
+        this.schedules = new HashMap<>();
         this.mysegment = null;
         this.up_link = null;
         this.dn_link = null;
@@ -62,6 +65,7 @@ public abstract class AbstractLink implements Comparable {
 
     public AbstractLink(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, AbstractParameters params){
         this.id = id;
+        this.schedules = new HashMap<>();
         this.mysegment = mysegment;
         this.up_link = up_link;
         this.dn_link = dn_link;
@@ -122,10 +126,6 @@ public abstract class AbstractLink implements Comparable {
 
     }
 
-//    protected void populate_sim_data(runner.Scenario scenario){
-//        simdata = new SimDataLink(this,scenario.network.links.get(id));
-//    }
-
     /////////////////////////////////////
     // basic getters
     /////////////////////////////////////
@@ -169,6 +169,34 @@ public abstract class AbstractLink implements Comparable {
         return x;
     }
 
+    public final int [] lgtype2lanes(LaneGroupType lgtype){
+        int [] lanes = new int[2];
+
+        lanes[0] = 1;
+        lanes[1] = 1;
+
+        if(params.has_mng()){
+            lanes[1] += params.mng_lanes-1;
+            if(lgtype==LaneGroupType.mng)
+                return lanes;
+            lanes[0] = params.mng_lanes + 1;
+            lanes[1] = params.mng_lanes + 1;
+        }
+
+        if(lgtype==LaneGroupType.gp){
+            lanes[1] += params.gp_lanes-1;
+            return lanes;
+        }
+
+        if(params.has_aux() && lgtype==LaneGroupType.aux){
+            lanes[0] += params.gp_lanes;
+            lanes[1] += params.gp_lanes + params.get_aux_lanes()-1;
+            return lanes;
+        }
+
+        return null;
+    }
+
     /////////////////////////////////////
     // segment getters
     /////////////////////////////////////
@@ -201,6 +229,10 @@ public abstract class AbstractLink implements Comparable {
         if (newlength<=0.0001)
             throw new Exception("Attempted to set a non-positive segment length");
         params.length = newlength;
+    }
+
+    public final int get_lanes(){
+        return get_mng_lanes() + get_gp_lanes() + get_aux_lanes();
     }
 
     // ramps only
@@ -378,6 +410,59 @@ public abstract class AbstractLink implements Comparable {
 
     public final void set_demand_vph(Long comm_id, Profile1D profile) throws Exception {
         this.demands.put(comm_id,profile);
+    }
+
+    /////////////////////////////////////
+    // controllers
+    /////////////////////////////////////
+
+    public final ControlSchedule get_controller_schedule(LaneGroupType lgtype, AbstractController.Type cntrl_type){
+        FreewayScenario fwyscn = mysegment.get_scenario();
+
+        if(!schedules.containsKey(lgtype)) {
+            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(null,this,lgtype,cntrl_type);
+            Map<AbstractController.Type, ControlSchedule> X  = new HashMap<>();
+            X.put(cntrl_type,newschedule);
+            schedules.put(lgtype,X);
+            return newschedule;
+        }
+        Map<AbstractController.Type, ControlSchedule> X  = schedules.get(lgtype);
+        if(!X.containsKey(cntrl_type)) {
+            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(null,this,lgtype, cntrl_type);
+            X.put(cntrl_type,newschedule);
+            return newschedule;
+        }
+        return X.get(cntrl_type);
+    }
+
+    public final Set<Long> get_controller_ids(){
+        Set<Long> ids = new HashSet<>();
+        for(Map<AbstractController.Type,ControlSchedule> e1 : schedules.values())
+            for(ControlSchedule sch : e1.values())
+                ids.addAll( sch.get_entries().stream()
+                        .map(e->e.get_cntrl().getId())
+                        .collect(Collectors.toSet()));
+
+        return ids;
+    }
+
+    public final Set<Long> get_actuator_ids(){
+        Set<Long> ids = new HashSet<>();
+        for(Map<AbstractController.Type,ControlSchedule> e1 : schedules.values())
+            for (ControlSchedule sch : e1.values())
+                ids.add(sch.get_actuator().getId());
+        return ids;
+    }
+
+    public final Set<Long> get_sensor_ids(){
+        Set<Long> ids = new HashSet<>();
+        for(Map<AbstractController.Type,ControlSchedule> e1 : schedules.values())
+            for(ControlSchedule sch : e1.values())
+                ids.addAll( sch.get_entries().stream()
+                        .flatMap(e->e.get_cntrl().get_sensor_ids().stream())
+                        .collect(Collectors.toSet()));
+
+        return ids;
     }
 
     /////////////////////////////////////

@@ -2,19 +2,20 @@ package opt.data.control;
 
 import opt.data.ControlFactory;
 import opt.data.FreewayScenario;
-import opt.data.LaneGroupType;
 
 public class ControllerRampMeterAlinea extends AbstractControllerRampMeter {
 
-	public ControllerRampMeterAlinea(FreewayScenario scn,Long id, float dt, float start_time, Float end_time, boolean has_queue_control, float min_rate_vph, float max_rate_vph,Long sensor_id, long sensor_link_id, float sensor_offset,Long act_id, long ramp_link_id, LaneGroupType lgtype) throws Exception {
+	////////////////////////////////
+	// construction
+	////////////////////////////////
+
+	public ControllerRampMeterAlinea(FreewayScenario scn,Long id, float dt, boolean has_queue_control, float min_rate_vph, float max_rate_vph,Long sensor_id, long sensor_link_id, float sensor_offset) throws Exception {
 		super(id!=null ? id : scn.new_controller_id(),
-				dt,start_time,end_time,control.AbstractController.Algorithm.alinea,has_queue_control,min_rate_vph,max_rate_vph);
+				dt,control.AbstractController.Algorithm.alinea,has_queue_control,min_rate_vph,max_rate_vph);
 
 		// feedback sensor
-		add_sensor(ControlFactory.create_sensor(scn,sensor_id,sensor_link_id,sensor_offset,this));
-
-		// ramp meter actuator
-		add_actuator(ControlFactory.create_ramp_meter(scn,act_id,ramp_link_id,lgtype,this));
+		Sensor sns = ControlFactory.create_sensor(scn,sensor_id,sensor_link_id,sensor_offset,this);
+		add_sensor(sns);
 	}
 
 	////////////////////////////////

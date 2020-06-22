@@ -7,6 +7,7 @@ import jaxb.Roadparam;
 import opt.UserSettings;
 import opt.data.control.*;
 import profiles.Profile1D;
+import sensor.AbstractSensor;
 import utils.OTMUtils;
 
 import java.util.*;
@@ -433,38 +434,43 @@ public class Scenario {
 
         /////////////////////////////////////////////////////
         // controllers, actuators, sensors
-
         jaxb.Controllers jcntrls = new jaxb.Controllers();
-        if(my_fwy_scenario.controller_schedule!=null){
-            List<AbstractController> controllers = my_fwy_scenario.controller_schedule.items;
+        jScn.setControllers(jcntrls);
 
-            // controllers
-            if(!controllers.isEmpty())
-                jScn.setControllers(jcntrls);
-            for(AbstractController cntrl : controllers)
-                jcntrls.getController().add(cntrl.to_jaxb());
+        jaxb.Actuators jacts = new jaxb.Actuators();
+        jScn.setActuators(jacts);
 
-            // actuators
-            jaxb.Actuators jacts = new jaxb.Actuators();
-            Set<AbstractActuator> actuators = controllers.stream()
-                    .flatMap(x->x.get_actuators().values().stream())
-                    .collect(toSet());
+        Set<Sensor> all_sensors = new HashSet<>();
 
-            if(!actuators.isEmpty())
-                jScn.setActuators(jacts);
-            for(AbstractActuator act : actuators)
-                jacts.getActuator().add(act.to_jaxb());
+        for(AbstractLink link : links.values()){
 
-            // sensors
-            jaxb.Sensors jsens = new jaxb.Sensors();
-            Set<Sensor> sensors = controllers.stream()
-                    .flatMap(x->x.get_sensors().values().stream())
-                    .collect(toSet());
-            if(!sensors.isEmpty())
-                jScn.setSensors(jsens);
-            for(Sensor sns : sensors)
-                jsens.getSensor().add(sns.to_jaxb());
+            if(link.schedules==null)
+                continue;
+
+            for(Map.Entry<LaneGroupType,Map<AbstractController.Type, ControlSchedule>> e1 : link.schedules.entrySet()){
+//                LaneGroupType lgtype = e1.getKey();
+                for(Map.Entry<AbstractController.Type, ControlSchedule> e2 : e1.getValue().entrySet()){
+//                    AbstractController.Type cntrltype = e2.getKey();
+                    ControlSchedule schedule = e2.getValue();
+
+                    jcntrls.getController().add(schedule.to_jaxb());
+                    AbstractActuator actuator = schedule.get_actuator();
+
+                    // actuator
+                    jacts.getActuator().add(actuator.to_jaxb());
+
+                    // sensors
+                    all_sensors.addAll(schedule.get_sensors());
+                }
+            }
         }
+
+
+        jaxb.Sensors jsnss = new jaxb.Sensors();
+        jScn.setSensors(jsnss);
+        for(Sensor sensor : all_sensors)
+            jsnss.getSensor().add(sensor.to_jaxb());
+
 
         return jScn;
     }
