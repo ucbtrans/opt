@@ -502,7 +502,7 @@ public class LinkPerformanceController {
         label_gp = "Vehicles in GP Lanes";
         label_mng = "Vehicles in Managed Lanes";
         label_aux = "Vehicles in Aux Lanes";
-        if (myLink.get_up_link() == null) { // source link
+        if ((myLink.get_up_link() == null) && (myLink.get_type() == AbstractLink.Type.onramp)) { // source link
             label_gp = "GP Lane Vehicle Queue";
             label_mng = "Managed Lane Vehicle Queue";
         }
