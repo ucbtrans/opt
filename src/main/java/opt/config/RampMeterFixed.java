@@ -140,7 +140,6 @@ public class RampMeterFixed {
         String unitsFlow = UserSettings.unitsFlow;
         labelRecRate.setText("Metering Rate per Lane (" + unitsFlow + "):");
         labelMaxRate.setText("Queue Override Rate per Lane (" + unitsFlow + "):");
-//        min_rate = UserSettings.convertFlow(min_rate, "vph", unitsFlow);
         max_rate = UserSettings.convertFlow(max_rate, "vph", unitsFlow);
         spinnerRecRate.getValueFactory().setValue(rate_vphpl);
         spinnerMaxRate.getValueFactory().setValue(max_rate);

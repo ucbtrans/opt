@@ -146,7 +146,7 @@ public class RampMeterAlinea {
         textStartTime.setText(Misc.seconds2timestring(origStartTime, ""));
 
         double min_rate = myController.getMin_rate_vph();
-        double max_rate = myController.getMax_rate_vph();
+        double max_rate = Math.min(myLink.get_gp_capacity_vphpl(), myController.getMax_rate_vph());
         
         String unitsFlow = UserSettings.unitsFlow;
         labelMinRate.setText("Minimum Rate per Lane (" + unitsFlow + "):");
@@ -199,14 +199,20 @@ public class RampMeterAlinea {
         
         double min_rate = spinnerMinRate.getValue();
         double max_rate = spinnerMaxRate.getValue();
+        min_rate = UserSettings.convertFlow(min_rate, UserSettings.unitsFlow, "vph");
+        max_rate = UserSettings.convertFlow(max_rate, UserSettings.unitsFlow, "vph");
+        
+        if (max_rate > myLink.get_gp_capacity_vphpl()) {
+            max_rate = myLink.get_gp_capacity_vphpl();
+            spinnerMaxRate.getValueFactory().setValue(UserSettings.convertFlow(max_rate, "vph", UserSettings.unitsFlow));
+        }
+        
         if (min_rate > max_rate) {
             opt.utils.Dialogs.ErrorDialog("Minimum rate cannot exceed maximum rate...", "Please, correct the range of metering rates.");
             return;
         }
 
-        min_rate = UserSettings.convertFlow(min_rate, UserSettings.unitsFlow, "vph");
         myController.setMin_rate_vph((float)min_rate);
-        max_rate = UserSettings.convertFlow(max_rate, UserSettings.unitsFlow, "vph");
         myController.setMax_rate_vph((float)max_rate);
         
         myController.setDt((float) controlDt.getValue());
