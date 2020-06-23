@@ -402,16 +402,18 @@ public class Scenario {
                 int prof_size = prof_sizes.iterator().next();
 
                 // profile for downstream mainline
-                Profile1D ml_prof = new Profile1D(0f,dt);
-                for(int i=0;i<prof_size;i++){
-                    float value = 1f;
-                    for(Profile1D fr_prof : outlink2Profile.values())
-                        value -= fr_prof.get_ith_value(i);
-                    if(value<0)
-                        throw new Exception(String.format("One node %d, commodity %d, offramp splits add up to more than 1.0",node.id,comm.id));
-                    ml_prof.add_entry(value);
+                if(dn_ml!=null) {
+                    Profile1D ml_prof = new Profile1D(0f,dt);
+                    for(int i=0;i<prof_size;i++){
+                        float value = 1f;
+                        for(Profile1D fr_prof : outlink2Profile.values())
+                            value -= fr_prof.get_ith_value(i);
+                        if(value<0)
+                            throw new Exception(String.format("One node %d, commodity %d, offramp splits add up to more than 1.0",node.id,comm.id));
+                        ml_prof.add_entry(value);
+                    }
+                    outlink2Profile.put(dn_ml.id,ml_prof);
                 }
-                outlink2Profile.put(dn_ml.id,ml_prof);
 
                 // to jaxb
                 jaxb.SplitNode jsplitnode = new jaxb.SplitNode();

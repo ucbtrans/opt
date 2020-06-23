@@ -362,6 +362,7 @@ public final class Segment implements Comparable {
         my_fwy_scenario.scenario.links.put(or.id,or);
         or.dn_link = fwy;
         or_start_node.out_links.add(or.id);
+        or_end_node.in_links.add(or.id);
 
         return or;
     }
@@ -385,6 +386,7 @@ public final class Segment implements Comparable {
         my_fwy_scenario.scenario.links.put(fr.id,fr);
         fr.up_link = fwy;
         fr_end_node.in_links.add(fr.id);
+        fr_start_node.out_links.add(fr.id);
 
         return fr;
     }
