@@ -676,7 +676,7 @@ public class FreewayScenario {
                 .findFirst();
 
         if(comm_id.isPresent() && scenario.commodities.containsKey(comm_id.get())) {
-            scenario.commodities.remove(comm_id.get());
+            remove_commodity(comm_id.get());
             return true;
         }
         else
@@ -690,12 +690,28 @@ public class FreewayScenario {
      */
     public boolean delete_commodity_with_id(Long comm_id){
         if( scenario.commodities.containsKey(comm_id) ){
-            scenario.commodities.remove(comm_id);
+            remove_commodity(comm_id);
             return true;
         }
         else
             return false;
     }
+
+    private void remove_commodity(long comm_id){
+
+        // remove from commodities
+        scenario.commodities.remove(comm_id);
+
+        // remove demands and splits
+        for(AbstractLink link : scenario.links.values()) {
+            if (link.demands != null && link.demands.containsKey(comm_id))
+                link.demands.remove(comm_id);
+            if(link instanceof LinkOfframp)
+                ((LinkOfframp) link).remove_split_for_commodity(comm_id);
+        }
+
+    }
+
 
     /////////////////////////////////////
     // utilities

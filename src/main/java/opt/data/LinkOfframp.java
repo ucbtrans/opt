@@ -96,6 +96,11 @@ public class LinkOfframp extends AbstractLink {
         }
     }
 
+    public final void remove_split_for_commodity(long comm_id){
+        if(splits.containsKey(comm_id))
+            splits.remove(comm_id);
+    }
+
     public final void set_split(Long comm_id,float dt, double[] values) throws Exception {
         Profile1D profile = new Profile1D(0f,dt);
         for(double v : values)
