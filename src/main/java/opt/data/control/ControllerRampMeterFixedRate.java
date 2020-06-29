@@ -2,7 +2,6 @@ package opt.data.control;
 
 import jaxb.Parameter;
 import opt.data.FreewayScenario;
-import opt.data.LaneGroupType;
 
 import java.util.Collection;
 

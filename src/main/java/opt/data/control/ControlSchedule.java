@@ -3,7 +3,6 @@ package opt.data.control;
 import jaxb.Parameter;
 import opt.data.AbstractLink;
 import opt.data.ControlFactory;
-import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
 import utils.OTMUtils;
 
@@ -40,27 +39,6 @@ public class ControlSchedule {
                 break;
         }
     }
-
-//    public ControlSchedule(long id,AbstractLink link, LaneGroupType lgtype, AbstractController.Type controlType,jaxb.Actuator jact){
-//        this.id = id;
-//        this.link = link;
-//        this.controlType = controlType;
-//        this.entries = new ArrayList<>();
-//
-//        long act_id = jact.getId();
-//        switch(controlType){
-//            case RampMetering:
-//                actuator = ControlFactory.create_actuator_ramp_meter(act_id,link,lgtype);
-//                break;
-//            case HOTpolicy:
-//                actuator = ControlFactory.create_actuator_hot_policy(act_id,link,lgtype);
-//                break;
-//            case HOVpolicy:
-//                actuator = ControlFactory.create_actuator_hov_policy(act_id,link,lgtype);
-//                break;
-//        }
-//    }
-
 
     public jaxb.Controller to_jaxb(){
         jaxb.Controller jcntrl = new jaxb.Controller();
@@ -116,7 +94,6 @@ public class ControlSchedule {
             }
 
         }
-
 
         return jcntrl;
     }

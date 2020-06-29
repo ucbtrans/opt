@@ -197,12 +197,6 @@ public final class Segment implements Comparable {
     // add / delete ramps
     ////////////////////////////////////////
 
-//    public LinkOnramp add_in_or(ParametersRamp params){
-//        LinkOnramp link = create_onramp(params);
-//        in_ors.add(link);
-//        return link;
-//    }
-
     public LinkOnramp add_or(ParametersRamp params){
         LinkOnramp or = create_onramp(params);
         if(params.is_inner)
@@ -211,12 +205,6 @@ public final class Segment implements Comparable {
             out_ors.add(or);
         return or;
     }
-
-//    public LinkOfframp add_in_fr(ParametersRamp params){
-//        LinkOfframp link = create_offramp(params);
-//        in_frs.add(link);
-//        return link;
-//    }
 
     public LinkOfframp add_fr(ParametersRamp params){
         LinkOfframp fr = create_offramp(params);

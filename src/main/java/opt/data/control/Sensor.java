@@ -14,13 +14,6 @@ public class Sensor {
         this.myController = myController;
     }
 
-    public Sensor(jaxb.Sensor j) {
-        this.id = j.getId();
-        this.link_id = j.getLinkId();
-        this.offset = j.getPosition();
-        this.link_id = j.getLinkId();
-    }
-
     public jaxb.Sensor to_jaxb(){
         jaxb.Sensor j = new jaxb.Sensor();
         j.setId(id);

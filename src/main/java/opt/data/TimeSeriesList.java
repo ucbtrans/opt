@@ -24,7 +24,7 @@ public class TimeSeriesList {
         values.add(x);
     }
 
-    public TimeSeriesList resample(float newdt){
+//    public TimeSeriesList resample(float newdt){
 //        final double epsilon = 1e-3;
 //        final float curr_dt = get_dt();
 //        final int n = time.size();
@@ -61,8 +61,7 @@ public class TimeSeriesList {
 //        }
 //
 //        return new TimeSeries(newtime,newvalues);
-        return null;
-    }
+//    }
 
     public String print_time(){
         String str = "";
