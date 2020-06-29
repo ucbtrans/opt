@@ -130,6 +130,14 @@ public abstract class AbstractLink implements Comparable {
     // basic getters
     /////////////////////////////////////
 
+    public final boolean has_mng(){
+        return params.has_mng();
+    }
+
+    public final boolean has_aux(){
+        return params.has_aux();
+    }
+
     public final long get_id(){ return id;}
 
     public final AbstractLink get_up_link() {
@@ -141,12 +149,10 @@ public abstract class AbstractLink implements Comparable {
     }
 
     public final boolean is_source(){
-//        return mysegment.fwy_scenario.scenario.nodes.get(start_node_id).in_links.isEmpty();
         return up_link==null;
     }
 
     public final boolean is_sink(){
-//        return mysegment.fwy_scenario.scenario.nodes.get(end_node_id).out_links.isEmpty();
         return dn_link==null;
     }
 
@@ -417,8 +423,6 @@ public abstract class AbstractLink implements Comparable {
     /////////////////////////////////////
 
     public final ControlSchedule get_controller_schedule(LaneGroupType lgtype, AbstractController.Type cntrl_type){
-        FreewayScenario fwyscn = mysegment.get_scenario();
-
         if(!schedules.containsKey(lgtype)) {
             ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(null,this,lgtype,cntrl_type);
             Map<AbstractController.Type, ControlSchedule> X  = new HashMap<>();

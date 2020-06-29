@@ -18,6 +18,7 @@ public class FreewayScenario {
     private Long max_controller_id;
     private Long max_sensor_id;
     private Long max_actuator_id;
+    private Long max_rc_id;
 
     public String name;
     public String description;
@@ -325,6 +326,7 @@ public class FreewayScenario {
         scn_cpy.max_controller_id = max_controller_id;
         scn_cpy.max_sensor_id = max_sensor_id;
         scn_cpy.max_actuator_id = max_actuator_id;
+        scn_cpy.max_rc_id = max_rc_id;
         scn_cpy.scenario = scenario.clone();
         for(Map.Entry<Long,Segment> e : segments.entrySet()) {
             Segment new_segment = e.getValue().clone();
@@ -795,6 +797,7 @@ public class FreewayScenario {
             max_controller_id = 0l;
             max_sensor_id = 0l;
             max_actuator_id = 0l;
+            max_rc_id = 0l;
             return;
         }
 
@@ -830,6 +833,9 @@ public class FreewayScenario {
                 .flatMap(link->link.get_sensor_ids().stream())
                 .max(Comparator.comparing(Long::valueOf));
         max_sensor_id = opt_max_sens_id.isPresent() ? opt_max_sens_id.get() : 0l;
+
+        // rc
+        max_rc_id = 0l;
     }
 
     protected long new_link_id(){
@@ -854,6 +860,10 @@ public class FreewayScenario {
 
     public long new_sensor_id(){
         return ++max_sensor_id;
+    }
+
+    public long new_rc_id(){
+        return ++max_rc_id;
     }
 
     private List<Segment> build_freeway_from_segment(Segment first){

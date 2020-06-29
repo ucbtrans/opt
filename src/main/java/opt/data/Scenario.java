@@ -268,50 +268,74 @@ public class Scenario {
         jNet.setRoadconnections(jRCs);
 
         // for each link, generate road connections leaving
-        for(AbstractLink link : links.values()){
+        for(AbstractLink up_link : links.values()){
 
-            Segment segment = link.get_segment();
+            Segment up_segment = up_link.get_segment();
+            AbstractLink dn_link = up_link.get_dn_link();
 
-            // case fwy
-            if(link instanceof LinkFreeway){
+            if(dn_link==null)
+                continue;
 
-                // if there is a dwnstream fwy link,
-                //  + connect gp lanes
-                //  + if dnstr link has mng lane, connect mng lane
-                //  + if dnstr link has aux lane, connect aux lane
+            // gp->gp and mng->mng for offramps, freeways, and connectors
+            if( (up_link instanceof LinkFreewayOrConnector) || (up_link instanceof LinkOfframp) ) {
 
-                // connect gp lanes to gp lanes of downstream fwy link
+                // mng->mng
+                if( up_link.has_mng() & dn_link.has_mng())
+                    add_road_connection(my_fwy_scenario,up_link,LaneGroupType.mng,dn_link,LaneGroupType.mng);
 
-
-                // connect mng lanes to mng lanes of downstream fwy link
-
-
-            }
-
-            // case connector
-            if(link instanceof LinkConnector){
+                // add gp-> gp
+                add_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,dn_link,LaneGroupType.gp);
 
             }
 
-            // case offramp
-            if(link instanceof  LinkOfframp){
+            // case freeway
+            if(up_link instanceof LinkFreeway){
+
+                // aux->aux
+                if( (dn_link instanceof LinkFreeway) && up_link.has_aux() && dn_link.has_aux())
+                    add_road_connection(my_fwy_scenario,up_link,LaneGroupType.aux,dn_link,LaneGroupType.aux);
+
+                // mng->inner offramp or gp->inner offramp
+                for(LinkOfframp offramp : up_segment.in_frs)
+                    if( up_link.has_mng())
+                        add_road_connection(my_fwy_scenario,up_link,LaneGroupType.mng,offramp,null);
+                    else
+                        add_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,dn_link,null);
+
+
+                // gp->outer offramp or aux->outer offramp
+                for(LinkOfframp offramp : up_segment.out_frs)
+                    if( up_link.has_aux() )
+                        add_road_connection(my_fwy_scenario,up_link,LaneGroupType.aux,offramp,null);
+                    else
+                        add_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,offramp,null);
 
             }
-
 
             // case onramp
-            if(link instanceof LinkOnramp){
+            if(up_link instanceof LinkOnramp){
 
+                assert(dn_link instanceof LinkFreeway);
+
+                // inner or -> fwy mng OR inner or ->fwy gp
+                if( up_link.get_is_inner() ){
+                    if( dn_link.has_mng() )
+                        add_road_connection(my_fwy_scenario,up_link,null,dn_link,LaneGroupType.mng);
+                    else
+                        add_road_connection(my_fwy_scenario,up_link,null,dn_link,LaneGroupType.gp);
+                }
+
+                // outer or -> fwy gp OR outer or ->fwy aux
+                else {
+                    if( dn_link.has_aux() )
+                        add_road_connection(my_fwy_scenario,up_link,null,dn_link,LaneGroupType.aux);
+                    else
+                        add_road_connection(my_fwy_scenario,up_link,null,dn_link,LaneGroupType.gp);
+
+                }
 
             }
 
-            if(link.params.has_mng()){
-
-            }
-
-            if(link.params.has_aux()){
-
-            }
         }
 
         /////////////////////////////////////////////////////
@@ -375,10 +399,6 @@ public class Scenario {
 
             LinkFreeway dn_ml = outfreeway.isEmpty() ? null : outfreeway.iterator().next();
 
-//            Set<Long> comm_ids = frs.stream()
-//                    .flatMap(fr->fr.splits.keySet().stream())
-//                    .collect(toSet());
-
             for(Commodity comm : commodities.values()){
 
                 // collect the split profiles we have
@@ -386,12 +406,10 @@ public class Scenario {
                 Set<Float> dts = new HashSet<>();
                 Set<Integer> prof_sizes = new HashSet<>();
                 for(LinkOfframp fr : frs) {
-//                    if (fr.splits.containsKey(comm_id)) {
-                        Profile1D prof = fr.get_splits(comm.id, UserSettings.defaultSRDtMinutes*60);
-                        outlink2Profile.put(fr.id, prof);
-                        dts.add(prof.dt);
-                        prof_sizes.add(prof.get_length());
-//                    }
+                    Profile1D prof = fr.get_splits(comm.id, UserSettings.defaultSRDtMinutes*60);
+                    outlink2Profile.put(fr.id, prof);
+                    dts.add(prof.dt);
+                    prof_sizes.add(prof.get_length());
                 }
 
                 if(dts.size()!=1)
@@ -450,9 +468,7 @@ public class Scenario {
                 continue;
 
             for(Map.Entry<LaneGroupType,Map<AbstractController.Type, ControlSchedule>> e1 : link.schedules.entrySet()){
-//                LaneGroupType lgtype = e1.getKey();
                 for(Map.Entry<AbstractController.Type, ControlSchedule> e2 : e1.getValue().entrySet()){
-//                    AbstractController.Type cntrltype = e2.getKey();
                     ControlSchedule schedule = e2.getValue();
 
                     jcntrls.getController().add(schedule.to_jaxb());
@@ -467,14 +483,36 @@ public class Scenario {
             }
         }
 
-
         jaxb.Sensors jsnss = new jaxb.Sensors();
         jScn.setSensors(jsnss);
         for(Sensor sensor : all_sensors)
             jsnss.getSensor().add(sensor.to_jaxb());
 
-
         return jScn;
+    }
+
+
+    /////////////////////////////////////
+    // private
+    /////////////////////////////////////
+
+    private jaxb.Roadconnection add_road_connection(FreewayScenario scn,AbstractLink in_link,LaneGroupType in_lg,AbstractLink out_link,LaneGroupType out_lg){
+        jaxb.Roadconnection rc = new jaxb.Roadconnection();
+
+        rc.setId(scn.new_rc_id());
+        rc.setInLink(in_link.id);
+        if(in_lg!=null)
+            rc.setInLinkLanes(lanestring(in_link,in_lg));
+        rc.setOutLink(out_link.id);
+        if(out_lg!=null)
+            rc.setOutLinkLanes(lanestring(out_link,out_lg));
+
+        return rc;
+    }
+
+    private String lanestring(AbstractLink link ,LaneGroupType lg){
+        int[] lanes = link.lgtype2lanes(lg);
+        return String.format("%d#%d",lanes[0],lanes[1]);
     }
 
     /////////////////////////////////////
