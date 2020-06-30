@@ -1101,6 +1101,9 @@ public class AppMainController {
             if (!empty && getTreeItem().getValue().equals(routesTreeItem)) {
                 setContextMenu(routesCM);
             }
+            else {
+                setContextMenu(null);
+            }
         }
 
     }
