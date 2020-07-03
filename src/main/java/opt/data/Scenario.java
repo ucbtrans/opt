@@ -364,11 +364,11 @@ public class Scenario {
         for(Node node : nodes.values() ) {
 
             // get offramp links ........................
-            Set<AbstractLink> outlinks = node.out_links.stream()
+            Set<AbstractLink> out_links = node.out_links.stream()
                     .map(link_id->links.get(link_id))
                     .collect(toSet());
 
-            Set<LinkOfframp> frs = outlinks.stream()
+            Set<LinkOfframp> frs = out_links.stream()
                     .filter(link->link instanceof LinkOfframp)
                     .map(link-> (LinkOfframp) link)
                     .collect(toSet());
@@ -376,28 +376,35 @@ public class Scenario {
             if(frs.isEmpty())
                 continue;
 
-            // get upstream mainline ........................
-            Set<LinkFreeway> in_links = node.in_links.stream()
+            // get downstream freeway ........................
+            Set<LinkFreeway> dn_fwys = out_links.stream()
+                    .filter(link->link instanceof LinkFreeway)
+                    .map(link-> (LinkFreeway) link)
+                    .collect(toSet());
+
+            assert(dn_fwys.size()<=1);
+            LinkFreeway dn_fwy = dn_fwys.isEmpty() ? null : dn_fwys.iterator().next();
+
+            // get upstream freeway ........................
+            Set<AbstractLink> in_links = node.in_links.stream()
                     .map(link_id->links.get(link_id))
+                    .collect(toSet());
+
+            assert(!in_links.isEmpty());
+
+            Set<LinkFreeway> up_fwys = in_links.stream()
                     .filter(link->link instanceof LinkFreeway)
                     .map(link-> (LinkFreeway) link)
                     .collect(toSet());
 
-            if(in_links.isEmpty() || in_links.size()>1)
-                System.err.println("90443j2f");
+            assert(up_fwys.size()==1);
+            LinkFreeway up_fwy = up_fwys.iterator().next();
 
-            LinkFreeway up_ml = in_links.iterator().next();
-
-            // get downstream mainline ........................
-            Set<LinkFreeway> outfreeway = outlinks.stream()
-                    .filter(link->link instanceof LinkFreeway)
-                    .map(link-> (LinkFreeway) link)
+            // get downstream onramps
+            Set<LinkOnramp> dn_ors = in_links.stream()
+                    .filter(link->link instanceof LinkOnramp)
+                    .map(link-> (LinkOnramp) link)
                     .collect(toSet());
-
-            if(outfreeway.size()>1)
-                System.err.println("h45-oh35g");
-
-            LinkFreeway dn_ml = outfreeway.isEmpty() ? null : outfreeway.iterator().next();
 
             for(Commodity comm : commodities.values()){
 
@@ -414,13 +421,11 @@ public class Scenario {
 
                 if(dts.size()!=1)
                     System.err.println("RG)@J$G 2-43j");
-                if(prof_sizes.size()!=1)
-                    System.err.println("RG)@J$G 2-43j");
                 float dt = dts.iterator().next();
                 int prof_size = prof_sizes.iterator().next();
 
                 // profile for downstream mainline
-                if(dn_ml!=null) {
+                if(dn_fwy!=null) {
                     Profile1D ml_prof = new Profile1D(0f,dt);
                     for(int i=0;i<prof_size;i++){
                         float value = 1f;
@@ -430,22 +435,45 @@ public class Scenario {
                             throw new Exception(String.format("One node %d, commodity %d, offramp splits add up to more than 1.0",node.id,comm.id));
                         ml_prof.add_entry(value);
                     }
-                    outlink2Profile.put(dn_ml.id,ml_prof);
+                    outlink2Profile.put(dn_fwy.id,ml_prof);
                 }
 
-                // to jaxb
-                jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
-                jsplits.getSplitNode().add(jsplitnode);
-                jsplitnode.setCommodityId(comm.id);
-                jsplitnode.setNodeId(node.id);
-                jsplitnode.setLinkIn(up_ml.id);
-                jsplitnode.setDt(dt);
+                // to jaxb -- up fwy
+                jaxb.SplitNode jupfwy = new jaxb.SplitNode();
+                jsplits.getSplitNode().add(jupfwy);
+                jupfwy.setCommodityId(comm.id);
+                jupfwy.setNodeId(node.id);
+                jupfwy.setLinkIn(up_fwy.id);
+                jupfwy.setDt(dt);
 
                 for( Map.Entry<Long,Profile1D> e : outlink2Profile.entrySet() ){
                     jaxb.Split jsplit = new jaxb.Split();
-                    jsplitnode.getSplit().add(jsplit);
+                    jupfwy.getSplit().add(jsplit);
                     jsplit.setLinkOut(e.getKey());
                     jsplit.setContent(OTMUtils.comma_format(e.getValue().get_values()));
+                }
+
+                // to jaxb dn onramps
+                for(LinkOnramp dn_or : dn_ors){
+
+                    jaxb.SplitNode jdnor = new jaxb.SplitNode();
+                    jsplits.getSplitNode().add(jdnor);
+                    jdnor.setCommodityId(comm.id);
+                    jdnor.setNodeId(node.id);
+                    jdnor.setLinkIn(dn_or.id);
+
+                    for(LinkOfframp fr : frs) {
+                        jaxb.Split jsplit = new jaxb.Split();
+                        jdnor.getSplit().add(jsplit);
+                        jsplit.setLinkOut(fr.id);
+                        jsplit.setContent("0");
+                    }
+
+                    jaxb.Split jsplit = new jaxb.Split();
+                    jdnor.getSplit().add(jsplit);
+                    jsplit.setLinkOut(dn_fwy.id);
+                    jsplit.setContent("1");
+
                 }
 
             }
