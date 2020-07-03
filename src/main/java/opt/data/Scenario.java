@@ -11,8 +11,10 @@ import sensor.AbstractSensor;
 import utils.OTMUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.*;
 
 public class Scenario {
 
@@ -411,18 +413,21 @@ public class Scenario {
                 // collect the split profiles we have
                 Map<Long,Profile1D> outlink2Profile = new HashMap<>();
                 Set<Float> dts = new HashSet<>();
-                Set<Integer> prof_sizes = new HashSet<>();
+                int prof_size = Integer.MIN_VALUE;
                 for(LinkOfframp fr : frs) {
                     Profile1D prof = fr.get_splits(comm.id, UserSettings.defaultSRDtMinutes*60);
                     outlink2Profile.put(fr.id, prof);
                     dts.add(prof.dt);
-                    prof_sizes.add(prof.get_length());
+                    prof_size = Integer.max(prof_size,prof.get_length());
                 }
 
                 if(dts.size()!=1)
                     System.err.println("RG)@J$G 2-43j");
                 float dt = dts.iterator().next();
-                int prof_size = prof_sizes.iterator().next();
+
+                // pad offramp profiles
+                for(Profile1D fr_prof : outlink2Profile.values())
+                    fr_prof.pad_to_length(prof_size);
 
                 // profile for downstream mainline
                 if(dn_fwy!=null) {
@@ -453,6 +458,10 @@ public class Scenario {
                     jsplit.setContent(OTMUtils.comma_format(e.getValue().get_values()));
                 }
 
+                String zeros = OTMUtils.comma_format(IntStream.range(0,prof_size).map(i->0).boxed().collect(Collectors.toList()));
+                String ones = OTMUtils.comma_format(IntStream.range(0,prof_size).map(i->1).boxed().collect(Collectors.toList()));
+
+
                 // to jaxb dn onramps
                 for(LinkOnramp dn_or : dn_ors){
 
@@ -466,13 +475,13 @@ public class Scenario {
                         jaxb.Split jsplit = new jaxb.Split();
                         jdnor.getSplit().add(jsplit);
                         jsplit.setLinkOut(fr.id);
-                        jsplit.setContent("0");
+                        jsplit.setContent(zeros);
                     }
 
                     jaxb.Split jsplit = new jaxb.Split();
                     jdnor.getSplit().add(jsplit);
                     jsplit.setLinkOut(dn_fwy.id);
-                    jsplit.setContent("1");
+                    jsplit.setContent(ones);
 
                 }
 
