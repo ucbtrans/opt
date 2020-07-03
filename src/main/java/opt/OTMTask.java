@@ -130,32 +130,6 @@ public class OTMTask  extends Task {
 
 	private static void remove_unsimulatable_stuff(jaxb.Scenario scn){
 
-		// remove controllers on non-gp lanegroups
-		// remove alinra controllers
-		if(scn.getControllers()!=null){
-			Iterator<jaxb.Controller> it = scn.getControllers().getController().iterator();
-			while(it.hasNext()){
-				jaxb.Controller cntrl = it.next();
-
-				if(cntrl.getParameters()!=null) {
-					boolean foundit = false;
-					for (jaxb.Parameter param : cntrl.getParameters().getParameter()) {
-						if (param.getName() == "lane_group" && param.getValue() != "gp")
-							foundit = true;
-					}
-					if(foundit){
-						it.remove();
-						continue;
-					}
-				}
-
-				if(cntrl.getType()=="alinea"){
-					it.remove();
-					continue;
-				}
-			}
-		}
-
 	}
 
 }
