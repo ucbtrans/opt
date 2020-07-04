@@ -7,6 +7,10 @@ public class ParametersFreeway extends AbstractParameters  {
     public Integer aux_lanes;
     public FDparams aux_fd;
 
+    /////////////////////////////////////
+    // construction
+    /////////////////////////////////////
+
     public ParametersFreeway(String name, Integer gp_lanes, Integer mng_lanes,Boolean mng_barrier, Boolean mng_separated,Integer aux_lanes, Float length,
                              Float gp_capacity_vphpl, Float gp_jam_density_vpkpl, Float gp_ff_speed_kph,
                              Float mng_capacity_vphpl, Float mng_jam_density_vpkpl, Float mng_ff_speed_kph,
@@ -38,25 +42,37 @@ public class ParametersFreeway extends AbstractParameters  {
         this.aux_fd = new FDparams(aux_capacity_vphpl,aux_jam_density_vpkpl,aux_ff_speed_kph);
     }
 
-    @Override
-    public boolean get_is_inner() {
-        return false;
-    }
+//    /////////////////////////////////////
+//    // get
+//    /////////////////////////////////////
+//
+//    @Override
+//    public boolean get_is_inner() {
+//        return false;
+//    }
+//
+//    @Override
+//    public int get_aux_lanes(){
+//        return aux_lanes;
+//    }
+//
+//    /////////////////////////////////////
+//    // set
+//    /////////////////////////////////////
+//
+//    @Override
+//    public void set_is_inner(boolean x) {
+//        //
+//    }
+//
+//    @Override
+//    public void set_aux_lanes(int x){
+//        aux_lanes = x;
+//    }
 
-    @Override
-    public void set_is_inner(boolean x) {
-        //
-    }
-
-    @Override
-    public int get_aux_lanes(){
-        return aux_lanes;
-    }
-
-    @Override
-    public void set_aux_lanes(int x){
-        aux_lanes = x;
-    }
+    /////////////////////////////////////
+    // clone
+    /////////////////////////////////////
 
     @Override
     public AbstractParameters clone() {

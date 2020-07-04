@@ -305,11 +305,11 @@ public class Scenario {
 
             }
 
-            if(link.params.has_mng()){
+            if(link.has_mng()){
 
             }
 
-            if(link.params.has_aux()){
+            if(link.has_aux()){
 
             }
         }

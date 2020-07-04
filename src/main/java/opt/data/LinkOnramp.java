@@ -3,28 +3,14 @@ package opt.data;
 import jaxb.Link;
 import jaxb.Roadparam;
 
-public class LinkOnramp extends AbstractLink {
+public class LinkOnramp extends LinkRamp {
 
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
 
     public LinkOnramp(Link link, Roadparam rp,int mng_lanes,FDparams mng_fd,boolean mng_barrier,boolean mng_separated) {
-        super(link);
-        this.params = new ParametersRamp(
-                "",
-                false,
-                link.getFullLanes(),
-                mng_lanes,
-                mng_barrier,
-                mng_separated,
-                link.getLength(),
-                rp.getCapacity(),
-                rp.getJamDensity(),
-                rp.getSpeed() ,
-                mng_fd==null ? Float.NaN : mng_fd.capacity_vphpl,
-                mng_fd==null ? Float.NaN : mng_fd.jam_density_vpkpl,
-                mng_fd==null ? Float.NaN : mng_fd.ff_speed_kph);
+        super(link,rp,mng_lanes,mng_fd,mng_barrier,mng_separated);
     }
 
     public LinkOnramp(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, ParametersRamp params) {
@@ -32,19 +18,9 @@ public class LinkOnramp extends AbstractLink {
     }
 
     // used by clone
-    public LinkOnramp(long id, Long start_node_id, Long end_node_id, AbstractParameters params){
+    public LinkOnramp(long id, Long start_node_id, Long end_node_id, AbstractParameters params) throws Exception {
         super(id,start_node_id,end_node_id,params);
-        this.params.set_is_inner(((ParametersRamp)params).is_inner);
-    }
-
-    @Override
-    public Type get_type() {
-        return Type.onramp;
-    }
-
-    @Override
-    public boolean is_ramp() {
-        return true;
+        this.set_is_inner(((ParametersRamp)params).is_inner);
     }
 
     /////////////////////////////////////
@@ -99,4 +75,14 @@ public class LinkOnramp extends AbstractLink {
     protected boolean is_permitted_dnlink(AbstractLink link) {
         return link instanceof LinkFreeway;
     }
+
+    /////////////////////////////////////
+    // get set
+    /////////////////////////////////////
+
+    @Override
+    public Type get_type() {
+        return Type.onramp;
+    }
+
 }

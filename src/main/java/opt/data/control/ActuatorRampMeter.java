@@ -1,17 +1,14 @@
 package opt.data.control;
 
 import jaxb.Actuator;
+import opt.data.AbstractLink;
 import opt.data.LaneGroupType;
 
 public class ActuatorRampMeter extends AbstractActuator {
 
-	public ActuatorRampMeter(long id, long link_id,int [] lanes, LaneGroupType lgtype ){
-		super(id,link_id,lanes,lgtype);
+	public ActuatorRampMeter(long id, AbstractLink link, LaneGroupType lgtype ){
+		super(id,link,lgtype);
 	}
-
-//	public ActuatorRampMeter(Actuator j) {
-//		super(j);
-//	}
 
 	@Override
 	public Actuator to_jaxb() {
@@ -20,7 +17,8 @@ public class ActuatorRampMeter extends AbstractActuator {
 		jaxb.ActuatorTarget jtgt = new jaxb.ActuatorTarget();
 		j.setActuatorTarget(jtgt);
 		jtgt.setType("lanegroup");
-		jtgt.setId(link_id);
+		jtgt.setId(link.id);
+		int []lanes = link.lgtype2lanes(lgtype);
 		jtgt.setLanes(String.format("%d#%d",lanes[0],lanes[1]));
 
 //			AbstractControllerRampMeter c = (AbstractControllerRampMeter) myController;

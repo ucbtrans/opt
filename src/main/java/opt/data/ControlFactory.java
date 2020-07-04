@@ -109,27 +109,15 @@ public class ControlFactory {
 	/////////////////////
 
 	public static ActuatorRampMeter create_actuator_ramp_meter(long id,AbstractLink link, LaneGroupType lgtype){
-		return new ActuatorRampMeter(
-				id,
-				link.get_id(),
-				link.lgtype2lanes(lgtype),
-				lgtype);
+		return new ActuatorRampMeter(id, link, lgtype);
 	}
 
 	public static ActuatorHOVPolicy create_actuator_hov_policy(long id, AbstractLink link, LaneGroupType lgtype){
-		return new ActuatorHOVPolicy(
-				id,
-				link.get_id(),
-				link.lgtype2lanes(lgtype),
-				lgtype);
+		return new ActuatorHOVPolicy(id, link, lgtype);
 	}
 
 	public static ActuatorHOTPolicy create_actuator_hot_policy(long id,AbstractLink link, LaneGroupType lgtype){
-		return new ActuatorHOTPolicy(
-				id,
-				link.get_id(),
-				link.lgtype2lanes(lgtype),
-				lgtype);
+		return new ActuatorHOTPolicy(id, link, lgtype);
 	}
 
 	/////////////////////////

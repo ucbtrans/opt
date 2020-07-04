@@ -506,9 +506,9 @@ public class LinkEditorController {
         linkLength.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;
-            Double length = new Double(-1);
+            Double length = (double) -1;
             if (myLink != null) {
-                length = new Double(myLink.get_length_meters());
+                length = (double) myLink.get_length_meters();
                 length = UserSettings.convertLength(length, "meters", UserSettings.unitsLength);
             }
             opt.utils.WidgetFunctionality.commitEditorText(linkLength, length);
@@ -654,7 +654,7 @@ public class LinkEditorController {
                 return;
             Double ffspeed = new Double(-1);
             if (myLink != null) {
-                ffspeed = new Double(myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_freespeed_kph() : 0.0);
+                ffspeed = new Double(myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_ff_speed_kph() : 0.0);
                 ffspeed = UserSettings.convertFlow(ffspeed, "kph", UserSettings.unitsSpeed);
             }
             opt.utils.WidgetFunctionality.commitEditorText(ffSpeedAux, ffspeed);
@@ -1264,7 +1264,7 @@ public class LinkEditorController {
     private void initLaneProperties() {
         int managed_lanes = myLink.get_mng_lanes();
         int gp_lanes = myLink.get_gp_lanes();
-        int aux_lanes = myLink.params.get_aux_lanes();
+        int aux_lanes = myLink.get_aux_lanes();
         
         numLanesManagedSpinnerValueFactory.setValue(managed_lanes);
         numLanesGPSpinnerValueFactory.setValue(gp_lanes);
@@ -1316,9 +1316,9 @@ public class LinkEditorController {
             }
         } 
         
-        if (new Double(myLink.get_aux_freespeed_kph()).isNaN()) {
+        if (new Double(myLink.get_aux_ff_speed_kph()).isNaN()) {
             try {
-                myLink.set_aux_freespeed_kph((float)UserSettings.defaultAuxLaneFreeFlowSpeedKph);
+                myLink.set_aux_ff_speed_kph((float)UserSettings.defaultAuxLaneFreeFlowSpeedKph);
             } catch (Exception e) {
                 opt.utils.Dialogs.ExceptionDialog("Cannot set free flow speed for auxiliary lane...", e);
             }
@@ -1359,7 +1359,7 @@ public class LinkEditorController {
         ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
         ffSpeedManagedSpinnerValueFactory.setValue(ffspeed);
         labelFreeFlowSpeedAux.setText("Aux Lane Free Flow Speed (" + unitsSpeed + "):");
-        ffspeed = myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_freespeed_kph() : 0.0;
+        ffspeed = myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_ff_speed_kph() : 0.0;
         ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
         ffSpeedAuxSpinnerValueFactory.setValue(ffspeed);
         
@@ -1524,7 +1524,7 @@ public class LinkEditorController {
             }
             ffspeed = ffSpeedAuxSpinnerValueFactory.getValue();
             if (ffspeed <= 0) {
-                ffspeed = myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_freespeed_kph() : 0.0;
+                ffspeed = myLink.get_type() == AbstractLink.Type.freeway ? myLink.get_aux_ff_speed_kph() : 0.0;
                 ffspeed = UserSettings.convertSpeed(ffspeed, "kph", unitsSpeed);
                 ffSpeedAuxSpinnerValueFactory.setValue(ffspeed);
                 return;
@@ -1547,7 +1547,7 @@ public class LinkEditorController {
             ffspeed = myLink.get_type() == AbstractLink.Type.freeway ? ffSpeedAuxSpinnerValueFactory.getValue() : 0.0;
             ffspeed = UserSettings.convertSpeed(ffspeed, unitsSpeed, "kph");
             try {
-                myLink.set_aux_freespeed_kph((float)ffspeed);
+                myLink.set_aux_ff_speed_kph((float)ffspeed);
             } catch (Exception e) {
                 opt.utils.Dialogs.ExceptionDialog("Cannot set free flow speed for auxiliary lane...", e);
             }
@@ -2423,7 +2423,7 @@ public class LinkEditorController {
                 myLink.set_mng_lanes(managed_lanes);
                 myLink.set_gp_lanes(gp_lanes);
                 if (myLink.get_type() == AbstractLink.Type.freeway)
-                    myLink.params.set_aux_lanes(aux_lanes);
+                    myLink.set_aux_lanes(aux_lanes);
                 myLink.set_mng_barrier(barrier);
                 myLink.set_mng_separated(separated);
                 appMainController.setProjectModified(true);

@@ -246,123 +246,129 @@ public class NewLinkController {
 
     @FXML
     void onOK(ActionEvent event) {
-        // Link name
-        String link_name = linkFromName.getText() + linkToName.getText();
-        if (link_name.equals("")) {
-            if (from_name.equals(""))
-                from_name = "A";
-            if (to_name.equals(""))
-                to_name = "B";
-            link_name = from_name + " -> " + to_name;
-        } else {
-            link_name = linkFromName.getText() + " -> " + linkToName.getText();
-        }
-        link_name = opt.utils.Misc.validateAndCorrectLinkName(link_name, myLink.get_segment().get_scenario());
-        
-        // Link length
-        String unitsLength = UserSettings.unitsLength;
-        double length = lengthSpinnerValueFactory.getValue();
-        length = UserSettings.convertLength(length, unitsLength, "meters");
-        length = Math.max(length, 0.001);
-        
-        boolean is_inner = cbInner.isSelected();
-        
-        Segment new_segment;
-        String segment_name = link_name;
-        
-        ParametersFreeway fwyParams = null;
-        ParametersRamp rmpParams = null;
-        
-        if ((myLink.get_type() == AbstractLink.Type.connector) ||
-            (myLink.get_type() == AbstractLink.Type.freeway)) {
-            // We're creating a freeway section
-            fwyParams = opt.UserSettings.getDefaultFreewayParams(link_name, (float)length);
-        } else {
-            // We're creating a connector section
-            fwyParams = opt.UserSettings.getDefaultConnectorParams(link_name, (float)length);
-        }
 
-        if (downstreamLink != null) {
-            if (downstreamLink.get_type() == AbstractLink.Type.connector) {
-                String fr_name = to_name;
-                if (fr_name.equals(""))
-                    fr_name = "B";
-                fr_name = " -> " + fr_name;
-                fr_name = opt.utils.Misc.validateAndCorrectLinkName(fr_name, myLink.get_segment().get_scenario());
-                rmpParams = opt.UserSettings.getDefaultOfframpParams(fr_name, (float)opt.UserSettings.defaultRampLengthMeters);
-                rmpParams.set_is_inner(is_inner);
+        try{
+
+            // Link name
+            String link_name = linkFromName.getText() + linkToName.getText();
+            if (link_name.equals("")) {
+                if (from_name.equals(""))
+                    from_name = "A";
+                if (to_name.equals(""))
+                    to_name = "B";
+                link_name = from_name + " -> " + to_name;
+            } else {
+                link_name = linkFromName.getText() + " -> " + linkToName.getText();
             }
-            new_segment = downstreamLink.insert_up_segment(segment_name, fwyParams, rmpParams);
-            if (downstreamLink.get_type() == AbstractLink.Type.connector) {
-                AbstractLink fr;
-                if (is_inner)
-                    fr = new_segment.in_frs(0);
-                else
-                    fr = new_segment.out_frs(0);
-                fr.set_gp_lanes(myLink.get_gp_lanes());
-                fr.set_mng_lanes(myLink.get_mng_lanes());
-                fr.set_mng_barrier(myLink.get_mng_barrier());
-                fr.set_mng_separated(myLink.get_mng_separated());
+            link_name = opt.utils.Misc.validateAndCorrectLinkName(link_name, myLink.get_segment().get_scenario());
+
+            // Link length
+            String unitsLength = UserSettings.unitsLength;
+            double length = lengthSpinnerValueFactory.getValue();
+            length = UserSettings.convertLength(length, unitsLength, "meters");
+            length = Math.max(length, 0.001);
+
+            boolean is_inner = cbInner.isSelected();
+
+            Segment new_segment;
+            String segment_name = link_name;
+
+            ParametersFreeway fwyParams = null;
+            ParametersRamp rmpParams = null;
+
+            if ((myLink.get_type() == AbstractLink.Type.connector) ||
+                    (myLink.get_type() == AbstractLink.Type.freeway)) {
+                // We're creating a freeway section
+                fwyParams = opt.UserSettings.getDefaultFreewayParams(link_name, (float)length);
+            } else {
+                // We're creating a connector section
+                fwyParams = opt.UserSettings.getDefaultConnectorParams(link_name, (float)length);
             }
-        } else {
-            if (upstreamLink.get_type() == AbstractLink.Type.connector) {
-                String or_name = to_name;
-                if (or_name.equals(""))
-                    or_name = "A";
-                or_name += " -> ";
-                or_name = opt.utils.Misc.validateAndCorrectLinkName(or_name, myLink.get_segment().get_scenario());
-                rmpParams = opt.UserSettings.getDefaultOnrampParams(or_name, (float)opt.UserSettings.defaultRampLengthMeters);
-                rmpParams.set_is_inner(is_inner);
+
+            if (downstreamLink != null) {
+                if (downstreamLink.get_type() == AbstractLink.Type.connector) {
+                    String fr_name = to_name;
+                    if (fr_name.equals(""))
+                        fr_name = "B";
+                    fr_name = " -> " + fr_name;
+                    fr_name = opt.utils.Misc.validateAndCorrectLinkName(fr_name, myLink.get_segment().get_scenario());
+                    rmpParams = opt.UserSettings.getDefaultOfframpParams(fr_name, (float)opt.UserSettings.defaultRampLengthMeters);
+                    rmpParams.is_inner = is_inner;
+                }
+                new_segment = downstreamLink.insert_up_segment(segment_name, fwyParams, rmpParams);
+                if (downstreamLink.get_type() == AbstractLink.Type.connector) {
+                    AbstractLink fr;
+                    if (is_inner)
+                        fr = new_segment.in_frs(0);
+                    else
+                        fr = new_segment.out_frs(0);
+                    fr.set_gp_lanes(myLink.get_gp_lanes());
+                    fr.set_mng_lanes(myLink.get_mng_lanes());
+                    fr.set_mng_barrier(myLink.get_mng_barrier());
+                    fr.set_mng_separated(myLink.get_mng_separated());
+                }
+            } else {
+                if (upstreamLink.get_type() == AbstractLink.Type.connector) {
+                    String or_name = to_name;
+                    if (or_name.equals(""))
+                        or_name = "A";
+                    or_name += " -> ";
+                    or_name = opt.utils.Misc.validateAndCorrectLinkName(or_name, myLink.get_segment().get_scenario());
+                    rmpParams = opt.UserSettings.getDefaultOnrampParams(or_name, (float)opt.UserSettings.defaultRampLengthMeters);
+                    rmpParams.is_inner = is_inner;
+                }
+                new_segment = upstreamLink.insert_dn_segment(segment_name, fwyParams, rmpParams);
+                if (upstreamLink.get_type() == AbstractLink.Type.connector) {
+                    AbstractLink or = null;
+                    if (is_inner)
+                        or = new_segment.in_ors(0);
+                    else
+                        or = new_segment.out_ors(0);
+                    or.set_gp_lanes(myLink.get_gp_lanes());
+                    or.set_mng_lanes(myLink.get_mng_lanes());
+                    or.set_mng_barrier(myLink.get_mng_barrier());
+                    or.set_mng_separated(myLink.get_mng_separated());
+                }
             }
-            new_segment = upstreamLink.insert_dn_segment(segment_name, fwyParams, rmpParams);
-            if (upstreamLink.get_type() == AbstractLink.Type.connector) {
-                AbstractLink or = null;
-                if (is_inner)
-                    or = new_segment.in_ors(0);
-                else
-                    or = new_segment.out_ors(0);
-                or.set_gp_lanes(myLink.get_gp_lanes());
-                or.set_mng_lanes(myLink.get_mng_lanes());
-                or.set_mng_barrier(myLink.get_mng_barrier());
-                or.set_mng_separated(myLink.get_mng_separated());
-            }
-        }
-        LinkFreewayOrConnector new_link = new_segment.fwy();
-        if (myLink.get_type() == AbstractLink.Type.freeway) {
-            int crOpt = createOption.getSelectionModel().getSelectedIndex();
-            if (crOpt == 0) {
-                new_link.set_gp_lanes(myLink.get_gp_lanes());
-                new_link.set_aux_lanes(myLink.get_aux_lanes());
-                new_link.set_mng_lanes(myLink.get_mng_lanes());
-                new_link.set_mng_barrier(myLink.get_mng_barrier());
-                new_link.set_mng_separated(myLink.get_mng_separated());
-                new_link.set_mng_barrier(myLink.get_mng_barrier());
-                new_link.set_mng_separated(myLink.get_mng_separated());
-                try {
+            LinkFreewayOrConnector new_link = new_segment.fwy();
+            if (myLink.get_type() == AbstractLink.Type.freeway) {
+                int crOpt = createOption.getSelectionModel().getSelectedIndex();
+                if (crOpt == 0) {
+                    new_link.set_gp_lanes(myLink.get_gp_lanes());
+                    new_link.set_aux_lanes(myLink.get_aux_lanes());
+                    new_link.set_mng_lanes(myLink.get_mng_lanes());
+                    new_link.set_mng_barrier(myLink.get_mng_barrier());
+                    new_link.set_mng_separated(myLink.get_mng_separated());
+                    new_link.set_mng_barrier(myLink.get_mng_barrier());
+                    new_link.set_mng_separated(myLink.get_mng_separated());
+
                     new_link.set_gp_capacity_vphpl(myLink.get_gp_capacity_vphpl());
                     new_link.set_mng_capacity_vphpl(myLink.get_mng_capacity_vphpl());
                     new_link.set_aux_capacity_vphpl(myLink.get_aux_capacity_vphpl());
                     new_link.set_gp_freespeed_kph(myLink.get_gp_freespeed_kph());
                     new_link.set_mng_freespeed_kph(myLink.get_mng_freespeed_kph());
-                    new_link.set_aux_freespeed_kph(myLink.get_aux_freespeed_kph());
+                    new_link.set_aux_ff_speed_kph(myLink.get_aux_ff_speed_kph());
                     new_link.set_gp_jam_density_vpkpl(myLink.get_gp_jam_density_vpkpl());
                     new_link.set_mng_jam_density_vpkpl(myLink.get_mng_jam_density_vpkpl());
                     new_link.set_aux_jam_density_vpkpl(myLink.get_aux_jam_density_vpkpl());
-                } catch (Exception e) {
-                    opt.utils.Dialogs.ExceptionDialog("Cannot copy road parameters...", e);
-                }
-            }
-        } else if ((myLink.get_type() == AbstractLink.Type.onramp) || (myLink.get_type() == AbstractLink.Type.offramp)) {
-            new_link.set_gp_lanes(myLink.get_gp_lanes());
-            new_link.set_mng_lanes(myLink.get_mng_lanes());
-            new_link.set_mng_barrier(myLink.get_mng_barrier());
-            new_link.set_mng_separated(myLink.get_mng_separated());
-        }
-        appMainController.clearSimData();
-        appMainController.objectNameUpdate(new_link);
 
-        Stage stage = (Stage) topPane.getScene().getWindow();
-        stage.close();
+                }
+            } else if ((myLink.get_type() == AbstractLink.Type.onramp) || (myLink.get_type() == AbstractLink.Type.offramp)) {
+                new_link.set_gp_lanes(myLink.get_gp_lanes());
+                new_link.set_mng_lanes(myLink.get_mng_lanes());
+                new_link.set_mng_barrier(myLink.get_mng_barrier());
+                new_link.set_mng_separated(myLink.get_mng_separated());
+            }
+            appMainController.clearSimData();
+            appMainController.objectNameUpdate(new_link);
+
+            Stage stage = (Stage) topPane.getScene().getWindow();
+            stage.close();
+
+        } catch(Exception e){
+            opt.utils.Dialogs.ExceptionDialog("Cannot copy road parameters...", e);
+        }
+
     } 
 
 }

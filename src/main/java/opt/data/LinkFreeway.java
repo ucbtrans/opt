@@ -18,18 +18,8 @@ public class LinkFreeway extends LinkFreewayOrConnector {
     }
 
     // used by clone
-    public LinkFreeway(long id, Long start_node_id, Long end_node_id, AbstractParameters params){
+    public LinkFreeway(long id, Long start_node_id, Long end_node_id, AbstractParameters params) throws Exception {
         super(id,start_node_id,end_node_id,params);
-    }
-
-    @Override
-    public Type get_type() {
-        return Type.freeway;
-    }
-
-    @Override
-    public boolean is_ramp() {
-        return false;
     }
 
     /////////////////////////////////////
@@ -145,6 +135,15 @@ public class LinkFreeway extends LinkFreewayOrConnector {
     @Override
     protected boolean is_permitted_dnlink(AbstractLink link) {
         return link instanceof LinkFreeway;
+    }
+
+    /////////////////////////////////////
+    // get set
+    /////////////////////////////////////
+
+    @Override
+    public Type get_type() {
+        return Type.freeway;
     }
 
 }
