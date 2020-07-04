@@ -63,6 +63,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
+import jaxb.Parameter;
 import opt.config.*;
 import opt.data.*;
 import opt.performance.LinkPerformanceController;
@@ -755,6 +756,10 @@ public class AppMainController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save the OPT Project");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("OPT", "*.opt"));
+
+        // TODO THE FOLLOWING LINE COULD BE COMMENTED OUT FOR RELEASE VERSIONS. IN GENERAL IT WOULD BE NICE TO HAVE A DEBUG FLAG THAT CAN BE TURNED OFF.
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("OTM", "*.xml"));
+
         String optProjectFileDir_String = prefs.get(this.optProjectFileDir_String, null);
         if (optProjectFileDir_String != null) {
             projectFileDir = new File(optProjectFileDir_String);
@@ -765,11 +770,26 @@ public class AppMainController {
         if (file==null)
             return;
         try {
+
+            String filetype = fileChooser.getSelectedExtensionFilter().getDescription();
+
             projectFilePath = file.getAbsolutePath();
             projectFileDir = file.getParentFile();
             prefs.put(this.optProjectFileDir_String, projectFileDir.getAbsolutePath());
-            ProjectFactory.save_project(project, projectFilePath);
-            setProjectModified(false);
+
+            // save OPT file
+            if( filetype.equalsIgnoreCase("OPT") ) {
+                ProjectFactory.save_project(project, projectFilePath );
+                setProjectModified(false);
+            }
+
+            // save OTM file
+            if( filetype.equalsIgnoreCase("OTM") ) {
+                int i = 0;
+                for(FreewayScenario scn : project.get_scenarios())
+                    ProjectFactory.save_scenario(scn, projectFilePath+ "_" + i++);
+            }
+
         } catch (Exception ex) {
             opt.utils.Dialogs.ExceptionDialog("Error saving OPT project", ex);
         }
