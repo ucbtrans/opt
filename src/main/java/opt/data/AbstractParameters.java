@@ -63,24 +63,44 @@ public abstract class AbstractParameters {
 
     // TODO : These are just so that Alex does not have to check for type.
     // TODO WONT BE NECESSARY IF WE USE PROPER CASTING ON THE UI SIDE
-    abstract public boolean get_is_inner();
-    abstract public void set_is_inner(boolean x);
-    abstract public int get_aux_lanes();
-    abstract public void set_aux_lanes(int x);
+//    abstract public boolean get_is_inner();
+//    abstract public void set_is_inner(boolean x);
+//    abstract public int get_aux_lanes();
+//    abstract public void set_aux_lanes(int x);
+
+    /////////////////////////////////////
+    // get
+    /////////////////////////////////////
 
 
-    public boolean has_mng(){
-        return mng_lanes>0 && mng_fd!=null;
-    }
 
-    public boolean has_aux(){
-        if(this instanceof ParametersFreeway) {
-            ParametersFreeway p = (ParametersFreeway) this;
-            return p.aux_lanes > 0 && p.aux_fd != null;
-        }
-        else
-            return false;
-    }
+    /////////////////////////////////////
+    // set
+    /////////////////////////////////////
+
+//    public void set_name(String name) {
+//        this.name = name;
+//    }
+//
+//    public void set_length(float length) {
+//        this.length = length;
+//    }
+//
+//    public void set_gp_lanes(int gp_lanes) {
+//        this.gp_lanes = gp_lanes;
+//    }
+//
+//    public void set_mng_lanes(int mng_lanes) {
+//        this.mng_lanes = mng_lanes;
+//    }
+//
+//    public void set_mng_barrier(boolean mng_barrier) {
+//        this.mng_barrier = mng_barrier;
+//    }
+//
+//    public void set_mng_separated(boolean mng_separated) {
+//        this.mng_separated = mng_separated;
+//    }
 
     /////////////////////////////////////
     // override

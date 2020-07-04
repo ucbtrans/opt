@@ -6,6 +6,10 @@ public class ParametersRamp extends AbstractParameters {
 
     public Boolean is_inner;
 
+    /////////////////////////////////////
+    // construction
+    /////////////////////////////////////
+
     public ParametersRamp(String name, Boolean is_inner, Integer gp_lanes, Integer mng_lanes, Boolean mng_barrier, Boolean mng_separated,Float length,
                           Float gp_capacity_vphpl, Float gp_jam_density_vpkpl, Float gp_ff_speed_kph,
                           Float mng_capacity_vphpl, Float mng_jam_density_vpkpl, Float mng_ff_speed_kph) {
@@ -32,26 +36,37 @@ public class ParametersRamp extends AbstractParameters {
                 mng_capacity_vphpl,mng_jam_density_vpkpl,mng_ff_speed_kph);
     }
 
-    @Override
-    public boolean get_is_inner(){
-        return is_inner;
-    }
+    /////////////////////////////////////
+    // get
+    /////////////////////////////////////
 
-    @Override
-    public void set_is_inner(boolean x) {
-        is_inner = x;
-    }
+//    @Override
+//    public boolean get_is_inner(){
+//        return is_inner;
+//    }
+//
+//    @Override
+//    public int get_aux_lanes(){
+//        return 0;
+//    }
+//
+//    /////////////////////////////////////
+//    // set
+//    /////////////////////////////////////
+//
+//    @Override
+//    public void set_is_inner(boolean x) {
+//        is_inner = x;
+//    }
+//
+//    @Override
+//    public void set_aux_lanes(int x) {
+//        //
+//    }
 
-    @Override
-    public int get_aux_lanes(){
-        return 0;
-    }
-
-    @Override
-    public void set_aux_lanes(int x) {
-        //
-    }
-
+    /////////////////////////////////////
+    // clone
+    /////////////////////////////////////
 
     @Override
     public AbstractParameters clone() {

@@ -25,7 +25,7 @@ public class SimDataLink {
 
         models.fluid.FluidLaneGroup lg;
 
-        if(optlink.params.has_mng()){
+        if(optlink.has_mng()){
             lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(1);
             lgtype2id.put(LaneGroupType.mng,lg.id);
             lgData.put(lg.id,new SimDataLanegroup(lg,commids));
@@ -39,7 +39,7 @@ public class SimDataLink {
         float simdt_hr = scndata.fwyscenario.get_sim_dt_sec() / 3600f;
         ffspeed_mph = (float) (lg.ffspeed_cell_per_dt * link_length_miles/numcells/simdt_hr);
 
-        if(optlink.params.has_aux()){
+        if(optlink.has_aux()){
             lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(
                     optlink.get_mng_lanes() + optlink.get_gp_lanes() + 1);
             lgtype2id.put(LaneGroupType.aux,lg.id);

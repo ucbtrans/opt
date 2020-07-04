@@ -327,17 +327,13 @@ public class Scenario {
                         add_road_connection(my_fwy_scenario,up_link,null,dn_link,LaneGroupType.gp);
                 }
 
-                // outer or -> fwy gp OR outer or ->fwy aux
-                else {
-                    if( dn_link.has_aux() )
-                        add_road_connection(my_fwy_scenario,up_link,null,dn_link,LaneGroupType.aux);
-                    else
-                        add_road_connection(my_fwy_scenario,up_link,null,dn_link,LaneGroupType.gp);
-
-                }
+(??)            if(link.has_mng()){
 
             }
 
+(??)            if(link.has_aux()){
+(??)
+(??)            }
         }
 
         /////////////////////////////////////////////////////

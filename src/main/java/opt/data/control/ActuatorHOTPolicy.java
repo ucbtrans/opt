@@ -1,16 +1,13 @@
 package opt.data.control;
 
 import jaxb.Actuator;
+import opt.data.AbstractLink;
 import opt.data.LaneGroupType;
 
 public class ActuatorHOTPolicy extends AbstractActuator {
 
-	public ActuatorHOTPolicy(long id, long link_id,int [] lanes, LaneGroupType lgtype){
-		super(id,link_id,lanes,lgtype);
-	}
-
-	public ActuatorHOTPolicy(Actuator j) {
-		super(j);
+	public ActuatorHOTPolicy(long id, AbstractLink link, LaneGroupType lgtype){
+		super(id,link,lgtype);
 	}
 
 	@Override
@@ -20,7 +17,7 @@ public class ActuatorHOTPolicy extends AbstractActuator {
 		jaxb.ActuatorTarget jtgt = new jaxb.ActuatorTarget();
 		j.setActuatorTarget(jtgt);
 		jtgt.setType("link");
-		jtgt.setId(link_id);
+		jtgt.setId(link.id);
 		return j;
 	}
 

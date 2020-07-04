@@ -71,12 +71,12 @@ public class FreewayScenario {
                     link.set_name(lnk.getName());
 
                     // TODO REMOVE THESE AFTER UPDATING EXISTING FILES.
-                    if(!link.params.has_mng()){
+                    if(!link.has_mng()){
                         link.set_mng_lanes(lnk.getManagedLanes()==null ? 0 : lnk.getManagedLanes().intValue());
                         link.set_mng_barrier(lnk.isManagedLanesBarrier()==null ? false : lnk.isManagedLanesBarrier());
                         link.set_mng_separated(lnk.isManagedLanesSeparated()==null ? false : lnk.isManagedLanesSeparated());
                     }
-                    if(!link.params.has_aux()){
+                    if(!link.has_aux()){
                         link.set_aux_lanes(lnk.getAuxLanes()==null ? 0 : lnk.getAuxLanes().intValue());
                     }
                     link.set_is_inner(lnk.isIsInner()==null ? false : lnk.isIsInner());
@@ -84,7 +84,7 @@ public class FreewayScenario {
                     // TODO REMOVE THIS
                     // HACK SET MNG AND AUX LANE PARAMETERS IF THEY ARE NOT SET
                     // ---------------------------------------------------------------------------
-                    if(link.params.has_mng()){
+                    if(link.has_mng()){
                         if(link.params.mng_fd==null)
                             link.params.mng_fd = new FDparams(
                                     (float)UserSettings.defaultManagedLaneCapacityVph,
@@ -97,7 +97,7 @@ public class FreewayScenario {
                         if(Float.isNaN(link.params.mng_fd.ff_speed_kph))
                             link.params.mng_fd.ff_speed_kph = (float)UserSettings.defaultManagedLaneFreeFlowSpeedKph;
                     }
-                    if(link.params.has_aux()){
+                    if(link.has_aux()){
                         FDparams aux_fd = ((ParametersFreeway) link.params).aux_fd;
                         if(aux_fd==null)
                             aux_fd = new FDparams(

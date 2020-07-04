@@ -318,7 +318,6 @@ public class NewRampController {
         length = Math.max(length, 0.001);
 
         ParametersRamp params = UserSettings.getDefaultOnrampParams(ramp_name,(float)length);
-
         params.mng_lanes = numLanesManagedSpinnerValueFactory.getValue();
         params.gp_lanes = numLanesGPSpinnerValueFactory.getValue();
         params.is_inner = cbInnerRamp.isSelected();

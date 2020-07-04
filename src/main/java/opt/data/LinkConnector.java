@@ -18,19 +18,9 @@ public class LinkConnector extends LinkFreewayOrConnector {
     }
 
     // used by clone
-    public LinkConnector(long id, Long start_node_id, Long end_node_id, AbstractParameters params){
-        super(id,start_node_id,end_node_id,params);
-    }
-
-    @Override
-    public Type get_type() {
-        return Type.connector;
-    }
-
-    @Override
-    public boolean is_ramp() {
-        return false;
-    }
+//    public LinkConnector(long id, Long start_node_id, Long end_node_id, AbstractParameters params) throws Exception {
+//        super(id,start_node_id,end_node_id,params);
+//    }
 
     /////////////////////////////////////
     // insert
@@ -121,6 +111,19 @@ public class LinkConnector extends LinkFreewayOrConnector {
     protected boolean is_permitted_dnlink(AbstractLink link) {
         return link instanceof LinkOnramp;
     }
+
+    /////////////////////////////////////
+    // get set
+    /////////////////////////////////////
+
+    @Override
+    public Type get_type() {
+        return Type.connector;
+    }
+
+    /////////////////////////////////////
+    // private
+    /////////////////////////////////////
 
     private Segment create_isolated_segment(String seg_name, ParametersFreeway fwy_params) {
 

@@ -36,39 +36,82 @@ public abstract class LinkFreewayOrConnector extends AbstractLink {
     }
 
     // used by clone
-    public LinkFreewayOrConnector(long id, Long start_node_id, Long end_node_id, AbstractParameters params){
+    public LinkFreewayOrConnector(long id, Long start_node_id, Long end_node_id, AbstractParameters params) throws Exception {
         super(id,start_node_id,end_node_id,params);
-        this.params.set_aux_lanes(((ParametersFreeway)params).aux_lanes);
+        this.set_aux_lanes(((ParametersFreeway)params).aux_lanes);
     }
 
-    public float get_aux_capacity_vphpl(){
-        return ((ParametersFreeway)params).aux_fd.capacity_vphpl;
+    /////////////////////////////////////
+    // get set
+    /////////////////////////////////////
+
+    @Override
+    public boolean is_ramp() {
+        return false;
     }
 
-    public float get_aux_jam_density_vpkpl(){
-        return ((ParametersFreeway)params).aux_fd.jam_density_vpkpl;
+    @Override
+    public boolean has_aux() {
+        ParametersFreeway p = (ParametersFreeway) params;
+        return p.aux_lanes > 0 && p.aux_fd != null;
     }
 
-    public float get_aux_freespeed_kph(){
-        return ((ParametersFreeway)params).aux_fd.ff_speed_kph;
+    @Override
+    public boolean get_is_inner() {
+        return false;
     }
 
-    public void set_aux_capacity_vphpl(float x) throws Exception {
-        if(x<=0)
-            throw new Exception("Non-positive capacity");
-        ((ParametersFreeway)params).aux_fd.capacity_vphpl = x;
+    @Override
+    public int get_aux_lanes() {
+        return ((ParametersFreeway) params).aux_lanes;
     }
 
-    public void set_aux_jam_density_vpkpl(float x) throws Exception {
-        if(x<=0)
-            throw new Exception("Non-positive jam density");
-        ((ParametersFreeway)params).aux_fd.jam_density_vpkpl = x;
+    @Override
+    public float get_aux_capacity_vphpl() {
+        return ((ParametersFreeway) params).aux_fd.capacity_vphpl;
     }
 
-    public void set_aux_freespeed_kph(float x) throws Exception {
-        if(x<=0)
-            throw new Exception("Non-positive free speed");
-        ((ParametersFreeway)params).aux_fd.ff_speed_kph = x;
+    @Override
+    public float get_aux_jam_density_vpkpl() {
+        return ((ParametersFreeway) params).aux_fd.jam_density_vpkpl;
+    }
+
+    @Override
+    public float get_aux_ff_speed_kph() {
+        return ((ParametersFreeway) params).aux_fd.ff_speed_kph;
+    }
+
+    @Override
+    public void set_is_inner(boolean value) throws Exception {
+//        throw new Exception("Cant call set_is_inner on Freeway or Connector");
+    }
+
+    @Override
+    public void set_aux_lanes(int value) throws Exception {
+        if(value<0)
+            throw new Exception("Negative lanes");
+        ((ParametersFreeway) params).aux_lanes = value;
+    }
+
+    @Override
+    public void set_aux_capacity_vphpl(float value) throws Exception {
+        if(value<=0)
+            throw new Exception("Non-positive value");
+        ((ParametersFreeway) params).aux_fd.capacity_vphpl = value;
+    }
+
+    @Override
+    public void set_aux_jam_density_vpkpl(float value) throws Exception {
+        if(value<=0)
+            throw new Exception("Non-positive value");
+        ((ParametersFreeway) params).aux_fd.jam_density_vpkpl = value;
+    }
+
+    @Override
+    public void set_aux_ff_speed_kph(float value) throws Exception {
+        if(value<=0)
+            throw new Exception("Non-positive value");
+        ((ParametersFreeway) params).aux_fd.ff_speed_kph = value;
     }
 
 }

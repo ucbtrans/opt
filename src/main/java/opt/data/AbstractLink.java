@@ -21,7 +21,7 @@ public abstract class AbstractLink implements Comparable {
     protected long start_node_id;
     protected long end_node_id;
 
-    public AbstractParameters params;
+    protected AbstractParameters params;
 
     // for each lane group there is a map from control type to TOD schedule.
     public Map<LaneGroupType,Map<AbstractController.Type, ControlSchedule>> schedules;
@@ -33,12 +33,26 @@ public abstract class AbstractLink implements Comparable {
     // abstract methods
     /////////////////////////////////////
 
-    abstract public AbstractLink.Type get_type();
-    abstract public boolean is_ramp();
     abstract public Segment insert_up_segment(String seg_name, ParametersFreeway fwy_params, ParametersRamp ramp_params);
     abstract public Segment insert_dn_segment(String seg_name, ParametersFreeway fwy_params, ParametersRamp ramp_params);
     abstract protected boolean is_permitted_uplink(AbstractLink link);
     abstract protected boolean is_permitted_dnlink(AbstractLink link);
+
+    abstract public AbstractLink.Type get_type();
+    abstract public boolean is_ramp();
+
+    abstract public boolean has_aux();
+    abstract public boolean get_is_inner();
+    abstract public int get_aux_lanes();
+    abstract public float get_aux_capacity_vphpl();
+    abstract public float get_aux_jam_density_vpkpl();
+    abstract public float get_aux_ff_speed_kph();
+
+    abstract public void set_is_inner(boolean value) throws Exception;
+    abstract public void set_aux_lanes(int value) throws Exception;
+    abstract public void set_aux_capacity_vphpl(float value) throws Exception;
+    abstract public void set_aux_jam_density_vpkpl(float value) throws Exception;
+    abstract public void set_aux_ff_speed_kph(float value) throws Exception;
 
     /////////////////////////////////////
     // construction
@@ -101,13 +115,13 @@ public abstract class AbstractLink implements Comparable {
         return new_link;
     }
 
-    protected AddlanesAndRoadParams get_addlanes_and_roadparams(){
+    protected final AddlanesAndRoadParams get_addlanes_and_roadparams(){
         AddlanesAndRoadParams X = new AddlanesAndRoadParams();
 
         X.link_id = id;
         X.gpparams = params.gp_fd;
 
-        if(params.has_mng()){
+        if(has_mng()){
             X.roadGeom.mng_addlanes = new jaxb.AddLanes();
             X.roadGeom.mng_addlanes.setIsopen(!params.mng_barrier);
             X.roadGeom.mng_addlanes.setLanes(params.mng_lanes);
@@ -115,9 +129,9 @@ public abstract class AbstractLink implements Comparable {
             X.roadGeom.mng_fdparams = params.mng_fd;
         }
 
-        if(params.has_aux()){
+        if(has_aux()){
             X.roadGeom.aux_addlanes = new jaxb.AddLanes();
-            X.roadGeom.aux_addlanes.setLanes(params.get_aux_lanes());
+            X.roadGeom.aux_addlanes.setLanes(get_aux_lanes());
             X.roadGeom.aux_addlanes.setSide("out");
             X.roadGeom.aux_fdparams = ((ParametersFreeway)params).aux_fd;
         }
@@ -163,13 +177,13 @@ public abstract class AbstractLink implements Comparable {
     public final List<LaneGroupType> lane2lgtype(){
         List<LaneGroupType> x = new ArrayList<>();
         int lane = 0;
-        if(params.has_mng())
+        if(has_mng())
             for(lane=0;lane<params.mng_lanes;lane++)
                 x.add(LaneGroupType.mng);
         for(;lane<params.mng_lanes+params.gp_lanes;lane++)
             x.add(LaneGroupType.gp);
-        if(params.has_aux())
-            for(;lane<params.mng_lanes+params.gp_lanes+params.get_aux_lanes();lane++)
+        if(has_aux())
+            for(;lane<params.mng_lanes+params.gp_lanes+get_aux_lanes();lane++)
                 x.add(LaneGroupType.aux);
 
         return x;
@@ -181,7 +195,7 @@ public abstract class AbstractLink implements Comparable {
         lanes[0] = 1;
         lanes[1] = 1;
 
-        if(params.has_mng()){
+        if(has_mng()){
             lanes[1] += params.mng_lanes-1;
             if(lgtype==LaneGroupType.mng)
                 return lanes;
@@ -194,9 +208,9 @@ public abstract class AbstractLink implements Comparable {
             return lanes;
         }
 
-        if(params.has_aux() && lgtype==LaneGroupType.aux){
+        if(has_aux() && lgtype==LaneGroupType.aux){
             lanes[0] += params.gp_lanes;
-            lanes[1] += params.gp_lanes + params.get_aux_lanes()-1;
+            lanes[1] += params.gp_lanes + get_aux_lanes()-1;
             return lanes;
         }
 
@@ -241,53 +255,43 @@ public abstract class AbstractLink implements Comparable {
         return get_mng_lanes() + get_gp_lanes() + get_aux_lanes();
     }
 
-    // ramps only
-
-    public boolean get_is_inner () {
-        return (this.params instanceof ParametersRamp) ? params.get_is_inner() : false;
-
-    }
-
-    public void set_is_inner(boolean x) {
-        if(this.params instanceof ParametersRamp)
-            params.set_is_inner(x);
-    }
-
     // gp ...................................................
 
-    public int get_gp_lanes(){
+    public final int get_gp_lanes(){
         return params.gp_lanes;
     }
 
-    public void set_gp_lanes(int x) {
+    public final void set_gp_lanes(int x) throws Exception {
+        if(x<=0)
+            throw new Exception("Non-positive lanes");
         params.gp_lanes = x;
     }
 
-    public float get_gp_capacity_vphpl(){
+    public final float get_gp_capacity_vphpl(){
         return params.gp_fd.capacity_vphpl;
     }
 
-    public float get_gp_jam_density_vpkpl(){
+    public final float get_gp_jam_density_vpkpl(){
         return params.gp_fd.jam_density_vpkpl;
     }
 
-    public float get_gp_freespeed_kph(){
+    public final float get_gp_freespeed_kph(){
         return params.gp_fd.ff_speed_kph;
     }
 
-    public void set_gp_capacity_vphpl(float x) throws Exception {
+    public final void set_gp_capacity_vphpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive capacity");
         params.gp_fd.capacity_vphpl = x;
     }
 
-    public void set_gp_jam_density_vpkpl(float x) throws Exception {
+    public final void set_gp_jam_density_vpkpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive jam density");
         params.gp_fd.jam_density_vpkpl = x;
     }
 
-    public void set_gp_freespeed_kph(float x) throws Exception {
+    public final void set_gp_freespeed_kph(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive free speed");
         params.gp_fd.ff_speed_kph = x;
@@ -295,108 +299,64 @@ public abstract class AbstractLink implements Comparable {
 
     // managed ..............................................
 
-    public int get_mng_lanes() {
+    public final boolean has_mng(){
+        return params.mng_lanes>0 && params.mng_fd!=null;
+    }
+
+    public final int get_mng_lanes() {
         return params.mng_lanes;
     }
 
-    public void set_mng_lanes(int x) {
+    public final void set_mng_lanes(int x) throws Exception {
+        if(x<0)
+            throw new Exception("Negative lanes");
         params.mng_lanes = x;
     }
 
-    public boolean get_mng_barrier() {
+    public final boolean get_mng_barrier() {
         return params.mng_barrier;
     }
 
-    public void set_mng_barrier(boolean x) {
+    public final void set_mng_barrier(boolean x) {
         params.mng_barrier = x;
     }
 
-    public boolean get_mng_separated() {
+    public final boolean get_mng_separated() {
         return params.mng_separated;
     }
 
-    public void set_mng_separated(boolean x) {
+    public final void set_mng_separated(boolean x) {
         params.mng_separated = x;
     }
 
-    public float get_mng_capacity_vphpl(){
+    public final float get_mng_capacity_vphpl(){
         return params.mng_fd==null ? Float.NaN : params.mng_fd.capacity_vphpl;
     }
 
-    public float get_mng_jam_density_vpkpl(){
+    public final float get_mng_jam_density_vpkpl(){
         return params.mng_fd==null ? Float.NaN : params.mng_fd.jam_density_vpkpl;
     }
 
-    public float get_mng_freespeed_kph(){
+    public final float get_mng_freespeed_kph(){
         return params.mng_fd==null ? Float.NaN : params.mng_fd.ff_speed_kph;
     }
 
-    public void set_mng_capacity_vphpl(float x) throws Exception {
+    public final void set_mng_capacity_vphpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive capacity");
         params.mng_fd.capacity_vphpl = x;
     }
 
-    public void set_mng_jam_density_vpkpl(float x) throws Exception {
+    public final void set_mng_jam_density_vpkpl(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive jam density");
         params.mng_fd.jam_density_vpkpl = x;
     }
 
-    public void set_mng_freespeed_kph(float x) throws Exception {
+    public final void set_mng_freespeed_kph(float x) throws Exception {
         if(x<=0)
             throw new Exception("Non-positive free speed");
         params.mng_fd.ff_speed_kph = x;
-    }
-
-    // aux .................................................
-
-    public int get_aux_lanes() {
-        return (this.params instanceof ParametersFreeway) ? params.get_aux_lanes() : 0;
-    }
-
-    public void set_aux_lanes(int x) {
-        if(this.params instanceof ParametersFreeway)
-            params.set_aux_lanes(x);
-    }
-
-    public float get_aux_capacity_vphpl(){
-        if(this.params instanceof ParametersFreeway)
-            return ((ParametersFreeway) params).aux_fd.capacity_vphpl;
-        else return Float.NaN;
-    }
-
-    public float get_aux_jam_density_vpkpl(){
-        if(this.params instanceof ParametersFreeway)
-            return ((ParametersFreeway) params).aux_fd.jam_density_vpkpl;
-        else return Float.NaN;
-    }
-
-    public float get_aux_freespeed_kph(){
-        if(this.params instanceof ParametersFreeway)
-            return ((ParametersFreeway) params).aux_fd.ff_speed_kph;
-        else return Float.NaN;
-    }
-
-    public void set_aux_capacity_vphpl(float x) throws Exception {
-        if(x<=0)
-            throw new Exception("Non-positive capacity");
-        if(this.params instanceof ParametersFreeway)
-            ((ParametersFreeway) params).aux_fd.capacity_vphpl = x;
-    }
-
-    public void set_aux_jam_density_vpkpl(float x) throws Exception {
-        if(x<=0)
-            throw new Exception("Non-positive capacity");
-        if(this.params instanceof ParametersFreeway)
-            ((ParametersFreeway) params).aux_fd.jam_density_vpkpl = x;
-    }
-
-    public void set_aux_freespeed_kph(float x) throws Exception {
-        if(x<=0)
-            throw new Exception("Non-positive capacity");
-        if(this.params instanceof ParametersFreeway)
-            ((ParametersFreeway) params).aux_fd.ff_speed_kph = x;
     }
 
     /////////////////////////////////////
@@ -541,7 +501,7 @@ public abstract class AbstractLink implements Comparable {
     // protected and private
     /////////////////////////////////////
 
-    protected LinkFreewayOrConnector create_up_FwyOrConnLink(Type linktype, ParametersFreeway link_params){
+    protected final LinkFreewayOrConnector create_up_FwyOrConnLink(Type linktype, ParametersFreeway link_params){
 
         FreewayScenario fwy_scenario = mysegment.my_fwy_scenario;
 
@@ -592,7 +552,7 @@ public abstract class AbstractLink implements Comparable {
         return new_link;
     }
 
-    protected LinkFreewayOrConnector create_dn_FwyOrConnLink(Type linktype, ParametersFreeway link_params){
+    protected final LinkFreewayOrConnector create_dn_FwyOrConnLink(Type linktype, ParametersFreeway link_params){
 
         FreewayScenario fwy_scenario = mysegment.my_fwy_scenario;
 
@@ -643,7 +603,7 @@ public abstract class AbstractLink implements Comparable {
         return new_link;
     }
 
-    protected Segment create_segment(LinkFreewayOrConnector fwy,String seg_name){
+    protected final Segment create_segment(LinkFreewayOrConnector fwy,String seg_name){
 
         FreewayScenario fwy_scenario = mysegment.my_fwy_scenario;
 
@@ -657,7 +617,7 @@ public abstract class AbstractLink implements Comparable {
         return newseg;
     }
 
-    protected static void connect_segments_dwnstr_node_to(Segment segment, Long new_node_id){
+    protected final static void connect_segments_dwnstr_node_to(Segment segment, Long new_node_id){
 
         if(segment==null)
             return;
@@ -681,7 +641,7 @@ public abstract class AbstractLink implements Comparable {
         }
     }
 
-    protected static void connect_segments_upstr_node_to(Segment segment, Long new_node_id){
+    protected final static void connect_segments_upstr_node_to(Segment segment, Long new_node_id){
 
         if(segment==null)
             return;
@@ -703,6 +663,5 @@ public abstract class AbstractLink implements Comparable {
             new_node.in_links.add(or.id);
         }
     }
-
 
 }
