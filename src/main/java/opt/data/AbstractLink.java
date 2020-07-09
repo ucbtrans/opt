@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractLink implements Comparable {
 
-    public enum Type {freeway,offramp,onramp,connector}
+    public enum Type {freeway,offramp,onramp,connector,ghost}
 
     public final long id;
 

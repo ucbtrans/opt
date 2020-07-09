@@ -4,8 +4,13 @@ import api.OTMdev;
 import error.OTMException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import opt.data.AbstractLink;
 import opt.data.FreewayScenario;
+import opt.data.ProjectFactory;
 import opt.data.SimDataScenario;
+import output.AbstractOutput;
+import output.OutputCellFlow;
+import output.OutputCellVehicles;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -45,17 +50,20 @@ public class OTMTask  extends Task {
 			mainController.bindProgressBar(progressProperty());
 
 		// create a runnable OTM scenario
-		jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
+		fwyscenario.add_ghost_pieces();
 
-		// TODO REMOVE THIS ------------------------------------------------
-		// ProjectFactory.save_scenario(jscenario,"/home/gomes/code/opt/before.xml");
-		remove_unsimulatable_stuff(jscenario);
-		// ProjectFactory.save_scenario(jscenario,"/home/gomes/code/opt/after.xml");
-		// TODO ------------------------------------------------------------
 
-		api.OTM otm = new api.OTM();
-		otm.load_from_jaxb(jscenario,true);
-		this.otmdev = new OTMdev(otm);
+		try {
+			jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
+
+			api.OTM otm = new api.OTM();
+			otm.load_from_jaxb(jscenario,false);
+			this.otmdev = new OTMdev(otm);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			fwyscenario.remove_ghost_pieces();
+		}
 
 	}
 
@@ -87,7 +95,9 @@ public class OTMTask  extends Task {
 
 		try {
 
-			Set<Long> linkids = fwyscenario.get_links().stream().map(x->x.id).collect(Collectors.toSet());
+			Set<Long> linkids = fwyscenario.get_links().stream()
+					.filter(link->link.get_type()!= AbstractLink.Type.ghost)
+					.map(x->x.id).collect(Collectors.toSet());
 			for(Long commid : otmdev.scenario.commodities.keySet()){
 				otmdev.otm.output().request_cell_flw(commid,linkids,outdt);
 				otmdev.otm.output().request_cell_veh(commid,linkids,outdt);
@@ -116,20 +126,16 @@ public class OTMTask  extends Task {
 				}
 			}
 
-		} catch (OTMException e) {
-			// this.exception = e;
+		} catch (Exception e) {
 			failed();
 		} finally {
 			simdata = new SimDataScenario(fwyscenario,otmdev);
+			fwyscenario.remove_ghost_pieces();
 			if(mainController!=null)
 				mainController.attachSimDataToScenario(simdata);
 		}
 
 		return simdata;
-	}
-
-	private static void remove_unsimulatable_stuff(jaxb.Scenario scn){
-
 	}
 
 }

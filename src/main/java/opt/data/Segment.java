@@ -385,6 +385,8 @@ public final class Segment implements Comparable {
                 return "fwy";
             case connector:
                 return "con";
+            case ghost:
+                return "ghost";
             default:
                 return "";
         }

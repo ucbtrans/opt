@@ -49,19 +49,32 @@ public class ProjectFactory {
      * @param filePath Full path and name for the output file. (
      * @throws Exception
      */
-    public static void save_scenario(FreewayScenario scenario,String filePath) throws Exception {
+    public static void save_scenario(FreewayScenario scenario,String filePath,boolean forsimulation) throws Exception {
+
+        if(forsimulation)
+            scenario.add_ghost_pieces();
+
         create_marshaller(jaxb.Scenario.class).marshal(scenario.scenario.to_jaxb(), (new FileInfo(filePath)).get_scenario_file());
+
+        if(forsimulation)
+            scenario.remove_ghost_pieces();
     }
 
+    /**
+     * Save jaxb scenario to xml files
+     */
+    public static void save_scenario_jaxb(jaxb.Scenario scenario,String filePath) throws Exception {
+        create_marshaller(jaxb.Scenario.class).marshal(scenario, (new FileInfo(filePath)).get_scenario_file());
+    }
 
     /**
      * Save scenario to xml files
      * @param scenario
-     * @param filePath Full path and name for the output file. (
+     * @param filename Full path and name for the output file. (
      * @throws Exception
      */
-    public static void save_scenario(jaxb.Scenario scenario,String filePath) throws Exception {
-        create_marshaller(jaxb.Scenario.class).marshal(scenario, (new FileInfo(filePath)).get_scenario_file());
+    public static void save_jaxb_scenario(jaxb.Scenario scenario,String filename) throws Exception {
+        create_marshaller(jaxb.Scenario.class).marshal(scenario, new File(filename));
     }
 
     /**
@@ -77,6 +90,7 @@ public class ProjectFactory {
 
         // save project file
         create_marshaller(jaxb.Prj.class).marshal(project.to_jaxb(), file_info.get_project_file());
+
     }
 
     /////////////////////////////////////

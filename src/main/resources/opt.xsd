@@ -91,7 +91,7 @@
 			<xs:attribute name="type" use="required">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:pattern value="con|fwy"/>
+						<xs:pattern value="con|fwy|ghost"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
