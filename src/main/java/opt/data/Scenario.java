@@ -268,75 +268,75 @@ public class Scenario {
         }
 
         // road connections .....................................
-        jaxb.Roadconnections jRCs = new jaxb.Roadconnections();
-        jNet.setRoadconnections(jRCs);
-
-        // for each link, generate road connections leaving
-        for(AbstractLink up_link : links.values()){
-
-            Segment up_segment = up_link.get_segment();
-            AbstractLink dn_link = up_link.get_dn_link();
-
-            if(dn_link==null)
-                continue;
-
-            // gp->gp and mng->mng for offramps, freeways, and connectors
-            if( (up_link instanceof LinkFreewayOrConnector) || (up_link instanceof LinkOfframp) ) {
-
-                // mng->mng
-                if( up_link.has_mng() & dn_link.has_mng())
-                    add_road_connection(my_fwy_scenario,up_link,LaneGroupType.mng,dn_link,LaneGroupType.mng);
-
-                // add gp-> gp
-                add_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,dn_link,LaneGroupType.gp);
-
-            }
-
-            // case freeway
-            if(up_link instanceof LinkFreeway){
-
-                // aux->aux
-                if( (dn_link instanceof LinkFreeway) && up_link.has_aux() && dn_link.has_aux())
-                    add_road_connection(my_fwy_scenario,up_link,LaneGroupType.aux,dn_link,LaneGroupType.aux);
-
-                // mng->inner offramp or gp->inner offramp
-                for(LinkOfframp offramp : up_segment.in_frs)
-                    if( up_link.has_mng())
-                        add_road_connection(my_fwy_scenario,up_link,LaneGroupType.mng,offramp,null);
-                    else
-                        add_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,dn_link,null);
-
-
-                // gp->outer offramp or aux->outer offramp
-                for(LinkOfframp offramp : up_segment.out_frs)
-                    if( up_link.has_aux() )
-                        add_road_connection(my_fwy_scenario,up_link,LaneGroupType.aux,offramp,null);
-                    else
-                        add_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,offramp,null);
-
-            }
-
-            // case onramp
-            if(up_link instanceof LinkOnramp){
-
-                assert(dn_link instanceof LinkFreeway);
-
-                // inner or -> fwy mng OR inner or ->fwy gp
-                if( up_link.get_is_inner() ){
-                    if( dn_link.has_mng() )
-                        add_road_connection(my_fwy_scenario,up_link,null,dn_link,LaneGroupType.mng);
-                    else
-                        add_road_connection(my_fwy_scenario,up_link,null,dn_link,LaneGroupType.gp);
-                }
-
-(??)            if(link.has_mng()){
-
-            }
-
-(??)            if(link.has_aux()){
-(??)
-(??)            }
-        }
+//        jaxb.Roadconnections jRCs = new jaxb.Roadconnections();
+//        jNet.setRoadconnections(jRCs);
+//
+//        // for each link, generate road connections leaving
+//        for(AbstractLink up_link : links.values()){
+//
+//            Segment up_segment = up_link.get_segment();
+//            AbstractLink dn_link = up_link.get_dn_link();
+//
+//            if(dn_link==null)
+//                continue;
+//
+//            // gp->gp and mng->mng for offramps, freeways, and connectors
+//            if( (up_link instanceof LinkFreewayOrConnector) || (up_link instanceof LinkOfframp) ) {
+//
+//                // mng->mng
+//                if( up_link.has_mng() & dn_link.has_mng())
+//                    add_road_connection(my_fwy_scenario,up_link,LaneGroupType.mng,dn_link,LaneGroupType.mng);
+//
+//                // add gp-> gp
+//                add_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,dn_link,LaneGroupType.gp);
+//
+//            }
+//
+//            // case freeway
+//            if(up_link instanceof LinkFreeway){
+//
+//                // aux->aux
+//                if( (dn_link instanceof LinkFreeway) && up_link.has_aux() && dn_link.has_aux())
+//                    add_road_connection(my_fwy_scenario,up_link,LaneGroupType.aux,dn_link,LaneGroupType.aux);
+//
+//                // mng->inner offramp or gp->inner offramp
+//                for(LinkOfframp offramp : up_segment.in_frs)
+//                    if( up_link.has_mng())
+//                        add_road_connection(my_fwy_scenario,up_link,LaneGroupType.mng,offramp,null);
+//                    else
+//                        add_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,dn_link,null);
+//
+//
+//                // gp->outer offramp or aux->outer offramp
+//                for(LinkOfframp offramp : up_segment.out_frs)
+//                    if( up_link.has_aux() )
+//                        add_road_connection(my_fwy_scenario,up_link,LaneGroupType.aux,offramp,null);
+//                    else
+//                        add_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,offramp,null);
+//
+//            }
+//
+//            // case onramp
+//            if(up_link instanceof LinkOnramp){
+//
+//                assert(dn_link instanceof LinkFreeway);
+//
+//                // inner or -> fwy mng OR inner or ->fwy gp
+//                if( up_link.get_is_inner() ){
+//                    if( dn_link.has_mng() )
+//                        add_road_connection(my_fwy_scenario,up_link,null,dn_link,LaneGroupType.mng);
+//                    else
+//                        add_road_connection(my_fwy_scenario,up_link,null,dn_link,LaneGroupType.gp);
+//                }
+//
+//            if(link.has_mng()){
+//
+//            }
+//
+//            if(link.has_aux()){
+//
+//            }
+//        }
 
         /////////////////////////////////////////////////////
         // demands
@@ -392,20 +392,21 @@ public class Scenario {
                 // collect the split profiles we have
                 Map<Long,Profile1D> outlink2Profile = new HashMap<>();
                 Set<Float> dts = new HashSet<>();
-                Set<Integer> prof_sizes = new HashSet<>();
+                int prof_size = Integer.MIN_VALUE;
                 for(LinkOfframp fr : frs) {
                     Profile1D prof = fr.get_splits(comm.id, UserSettings.defaultSRDtMinutes*60);
                     outlink2Profile.put(fr.id, prof);
                     dts.add(prof.dt);
-                    prof_sizes.add(prof.get_length());
+                    prof_size = Math.max(prof_size,prof.get_length());
                 }
 
                 if(dts.size()!=1)
                     System.err.println("RG)@J$G 2-43j");
-                if(prof_sizes.size()!=1)
-                    System.err.println("RG)@J$G 2-43j");
                 float dt = dts.iterator().next();
-                int prof_size = prof_sizes.iterator().next();
+
+                // pad all offramp profiles
+                for(Profile1D profile : outlink2Profile.values())
+                    profile.pad_to_length(prof_size);
 
                 // profile for downstream mainline
                 if(dn_ml!=null) {
@@ -448,9 +449,9 @@ public class Scenario {
                         jsplit.setLinkOut(e.getKey());
                         jsplit.setContent(e.getValue());
                     }
-(??)
+
                 }
-(??)
+
             }
         }
 

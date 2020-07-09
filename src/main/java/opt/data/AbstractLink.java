@@ -144,14 +144,6 @@ public abstract class AbstractLink implements Comparable {
     // basic getters
     /////////////////////////////////////
 
-    public final boolean has_mng(){
-        return params.has_mng();
-    }
-
-    public final boolean has_aux(){
-        return params.has_aux();
-    }
-
     public final long get_id(){ return id;}
 
     public final AbstractLink get_up_link() {
