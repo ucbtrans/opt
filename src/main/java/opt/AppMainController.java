@@ -779,7 +779,7 @@ public class AppMainController {
 
             // save OPT file
             if( filetype.equalsIgnoreCase("OPT") ) {
-                ProjectFactory.save_project(project, projectFilePath );
+                ProjectFactory.save_project(project, projectFilePath);
                 setProjectModified(false);
             }
 
@@ -787,7 +787,7 @@ public class AppMainController {
             if( filetype.equalsIgnoreCase("OTM") ) {
                 int i = 0;
                 for(FreewayScenario scn : project.get_scenarios())
-                    ProjectFactory.save_scenario(scn, projectFilePath+ "_" + i++);
+                    ProjectFactory.save_scenario(scn, projectFilePath+ "_" + i++,true);
             }
 
         } catch (Exception ex) {

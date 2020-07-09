@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractLink implements Comparable {
 
-    public enum Type {freeway,offramp,onramp,connector}
+    public enum Type {freeway,offramp,onramp,connector,ghost}
 
     public final long id;
 
@@ -155,12 +155,10 @@ public abstract class AbstractLink implements Comparable {
     }
 
     public final boolean is_source(){
-//        return mysegment.fwy_scenario.scenario.nodes.get(start_node_id).in_links.isEmpty();
         return up_link==null;
     }
 
     public final boolean is_sink(){
-//        return mysegment.fwy_scenario.scenario.nodes.get(end_node_id).out_links.isEmpty();
         return dn_link==null;
     }
 

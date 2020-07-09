@@ -30,6 +30,8 @@ public class FreewayScenario {
     protected float sim_duration = 86400f;
     protected float sim_dt = 2f;
 
+    protected GhostPieces ghost_pieces;
+
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
@@ -712,7 +714,6 @@ public class FreewayScenario {
 
     }
 
-
     /////////////////////////////////////
     // utilities
     /////////////////////////////////////
@@ -735,6 +736,7 @@ public class FreewayScenario {
     }
 
     public jaxb.Scn to_jaxb() throws Exception {
+
         jaxb.Scn scn = new jaxb.Scn();
 
         scn.setScenario(scenario.to_jaxb());
@@ -771,7 +773,8 @@ public class FreewayScenario {
 //            lnk.setManagedLanesBarrier(Boolean.valueOf(link.get_mng_barrier()));
 //            lnk.setManagedLanesSeparated(Boolean.valueOf(link.get_mng_separated()));
 //            lnk.setAuxLanes(BigInteger.valueOf(link.get_aux_lanes()));
-            lnk.setIsInner(link.get_is_inner());
+            if(link.get_is_inner())
+                lnk.setIsInner(true);
             lnks.getLnk().add(lnk);
         }
 
@@ -867,6 +870,142 @@ public class FreewayScenario {
         return this_fwy;
     }
 
+    public void add_ghost_pieces() {
+
+        this.ghost_pieces = new GhostPieces();
+
+        // ghost sources................................................
+        Set<AbstractLink> source_links = scenario.links.values().stream().filter(link -> link.is_source()).collect(toSet());
+        for (AbstractLink link : source_links) {
+
+            // create a new segment
+            Segment newsegment = new Segment(++max_seg_id);
+            newsegment.name = "";
+            newsegment.my_fwy_scenario = this;
+            ghost_pieces.segments.add(newsegment);
+            segments.put(newsegment.id,newsegment);                                               // ADDED GHOST SEGMENT
+
+            // create new node
+            Node newnode = new Node(++max_node_id);
+            ghost_pieces.nodes.add(newnode);
+            scenario.nodes.put(newnode.id,newnode);                                                  // ADDED GHOST NODE
+
+            // create params
+            ParametersFreeway newparams = new ParametersFreeway("",link.get_lanes(),
+                    0,false,false,0,
+                    link.get_length_meters(),
+                    link.get_gp_capacity_vphpl(),
+                    link.get_gp_jam_density_vpkpl(),
+                    link.get_gp_freespeed_kph(),
+                    Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN);
+
+            // create new link
+            LinkGhost newlink = new LinkGhost(
+                    ++max_link_id,
+                    newsegment,
+                    null,
+                    link,
+                    newnode.id,
+                    link.start_node_id,
+                    newparams);
+
+            ghost_pieces.links.add(newlink);
+            scenario.links.put(newlink.id,newlink);                                                  // ADDED GHOST LINK
+            newsegment.fwy = newlink;
+            link.up_link = newlink;                                                            // MODIFIED EXISTING LINK
+
+            newnode.out_links.add(newlink.id);
+            scenario.nodes.get(link.start_node_id).in_links.add(newlink.id);                   // MODIFIED EXISTING NODE
+
+            // transfer demands to new link
+            newlink.demands = link.demands;
+            link.demands = new HashMap<>();                                                 // MODIFIED EXISTING DEMANDS
+
+        }
+
+        // ghost sinks................................................
+        Set<Segment> sink_segments_with_offramps = this.segments.values().stream()
+                .filter(s->s.fwy.get_dn_segment()==null)
+                .filter(s->!s.get_frs().isEmpty())
+                .collect(toSet());
+
+        for (Segment segment : sink_segments_with_offramps) {
+
+            AbstractLink link = segment.fwy;
+
+            // create a new segment
+            Segment newsegment = new Segment(++max_seg_id);
+            newsegment.name = "";
+            newsegment.my_fwy_scenario = this;
+            ghost_pieces.segments.add(newsegment);
+            segments.put(newsegment.id,newsegment);                                               // ADDED GHOST SEGMENT
+
+            // create new node
+            Node newnode = new Node(++max_node_id);
+            ghost_pieces.nodes.add(newnode);
+            scenario.nodes.put(newnode.id,newnode);                                                  // ADDED GHOST NODE
+
+            // create params
+            ParametersFreeway newparams = new ParametersFreeway("",link.get_lanes(),
+                    0,false,false,0,
+                    link.get_length_meters(),
+                    link.get_gp_capacity_vphpl(),
+                    link.get_gp_jam_density_vpkpl(),
+                    link.get_gp_freespeed_kph(),
+                    Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN);
+
+            // create new link
+            LinkGhost newlink = new LinkGhost(
+                    ++max_link_id,
+                    newsegment,
+                    link,
+                    null,
+                    link.end_node_id,
+                    newnode.id,
+                    newparams);
+
+            ghost_pieces.links.add(newlink);
+            scenario.links.put(newlink.id,newlink);                                                  // ADDED GHOST LINK
+            newsegment.fwy = newlink;
+            link.dn_link = newlink;                                                            // MODIFIED EXISTING LINK
+
+            newnode.in_links.add(newlink.id);
+            scenario.nodes.get(link.end_node_id).out_links.add(newlink.id);                    // MODIFIED EXISTING NODE
+
+        }
+
+    }
+
+    public void remove_ghost_pieces(){
+
+        // undo modifications
+        for(LinkGhost gl : ghost_pieces.links){
+
+            if(gl.is_source()){
+                AbstractLink link = gl.dn_link;
+                link.up_link = null;
+                scenario.nodes.get(link.start_node_id).in_links.remove(gl.id);
+                link.demands = gl.demands;
+            }
+
+            if(gl.is_sink()){
+                AbstractLink link = gl.up_link;
+                link.dn_link = null;
+                scenario.nodes.get(link.end_node_id).out_links.remove(gl.id);
+            }
+
+        }
+
+        // remove ghost pieces
+        ghost_pieces.segments.forEach(g->segments.remove(g.id));
+        ghost_pieces.nodes.forEach(g->scenario.nodes.remove(g.id));
+        ghost_pieces.links.forEach(g->scenario.links.remove(g.id));
+
+        ghost_pieces = null;
+
+        reset_max_ids();
+    }
+
     /////////////////////////////////////
     // override
     /////////////////////////////////////
@@ -886,4 +1025,15 @@ public class FreewayScenario {
     public int hashCode() {
         return Objects.hash(name, description, scenario, segments);
     }
+
+    /////////////////////////////////////
+    // class
+    /////////////////////////////////////
+
+    public class GhostPieces {
+        public Set<Node> nodes = new HashSet<>();
+        public Set<LinkGhost> links = new HashSet<>();
+        public Set<Segment> segments = new HashSet<>();
+    }
+
 }

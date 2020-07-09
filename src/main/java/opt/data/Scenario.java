@@ -252,7 +252,9 @@ public class Scenario {
             jaxbLink.setFullLanes(link.get_gp_lanes());
             jaxbLink.setEndNodeId(link.end_node_id);
             jaxbLink.setStartNodeId(link.start_node_id);
-            jaxbLink.setRoadType(link.get_type().toString());
+            jaxbLink.setRoadType(link.get_type()== AbstractLink.Type.ghost ?
+                    AbstractLink.Type.freeway.toString() :
+                    link.get_type().toString());
 
             // road params
             AddlanesAndRoadParams x = link2addlanesAndParams.get(link.id);
@@ -337,47 +339,31 @@ public class Scenario {
         // splits
         jaxb.Splits jsplits = new jaxb.Splits();
         jScn.setSplits(jsplits);
-        for(Node node : nodes.values() ) {
 
-            // get offramp links ........................
-            Set<AbstractLink> outlinks = node.out_links.stream()
-                    .map(link_id->links.get(link_id))
-                    .collect(toSet());
+        for(Segment segment : my_fwy_scenario.segments.values()){
 
-            Set<LinkOfframp> frs = outlinks.stream()
-                    .filter(link->link instanceof LinkOfframp)
-                    .map(link-> (LinkOfframp) link)
-                    .collect(toSet());
+            if(segment.fwy.get_type()!= AbstractLink.Type.freeway)
+                continue;
+
+            List<LinkOfframp> frs = segment.get_frs();
 
             if(frs.isEmpty())
                 continue;
 
-            // get upstream mainline ........................
-            Set<LinkFreeway> in_links = node.in_links.stream()
-                    .map(link_id->links.get(link_id))
-                    .filter(link->link instanceof LinkFreeway)
-                    .map(link-> (LinkFreeway) link)
-                    .collect(toSet());
+            LinkFreeway up_ml = (LinkFreeway) segment.fwy;
 
-            if(in_links.isEmpty() || in_links.size()>1)
-                System.err.println("90443j2f");
+            LinkFreewayOrConnector dn_ml = (LinkFreewayOrConnector) up_ml.dn_link;  // actually Freeway or Ghost
 
-            LinkFreeway up_ml = in_links.iterator().next();
+            Node node = this.nodes.get(up_ml.end_node_id);
 
-            // get downstream mainline ........................
-            Set<LinkFreeway> outfreeway = outlinks.stream()
-                    .filter(link->link instanceof LinkFreeway)
-                    .map(link-> (LinkFreeway) link)
-                    .collect(toSet());
-
-            if(outfreeway.size()>1)
-                System.err.println("h45-oh35g");
-
-            LinkFreeway dn_ml = outfreeway.isEmpty() ? null : outfreeway.iterator().next();
-
-//            Set<Long> comm_ids = frs.stream()
-//                    .flatMap(fr->fr.splits.keySet().stream())
-//                    .collect(toSet());
+            // onramp -> offramp profiles
+            List<LinkOnramp> dn_ors = new ArrayList<>();
+            Map<Long, String> or_outlink2value = new HashMap<>();
+            if(dn_ml!=null) {
+                dn_ors = dn_ml.mysegment.get_ors();
+                frs.forEach(fr -> or_outlink2value.put(fr.id, "0")); // start_time, value
+                or_outlink2value.put(dn_ml.id, "1");
+            }
 
             for(Commodity comm : commodities.values()){
 
@@ -386,12 +372,10 @@ public class Scenario {
                 Set<Float> dts = new HashSet<>();
                 Set<Integer> prof_sizes = new HashSet<>();
                 for(LinkOfframp fr : frs) {
-//                    if (fr.splits.containsKey(comm_id)) {
-                        Profile1D prof = fr.get_splits(comm.id, UserSettings.defaultSRDtMinutes*60);
-                        outlink2Profile.put(fr.id, prof);
-                        dts.add(prof.dt);
-                        prof_sizes.add(prof.get_length());
-//                    }
+                    Profile1D prof = fr.get_splits(comm.id, UserSettings.defaultSRDtMinutes*60);
+                    outlink2Profile.put(fr.id, prof);
+                    dts.add(prof.dt);
+                    prof_sizes.add(prof.get_length());
                 }
 
                 if(dts.size()!=1)
@@ -403,26 +387,25 @@ public class Scenario {
 
                 // profile for downstream mainline
                 if(dn_ml!=null) {
-                    Profile1D ml_prof = new Profile1D(0f,dt);
-                    for(int i=0;i<prof_size;i++){
+                    Profile1D ml_prof = new Profile1D(0f, dt);
+                    for (int i = 0; i < prof_size; i++) {
                         float value = 1f;
-                        for(Profile1D fr_prof : outlink2Profile.values())
+                        for (Profile1D fr_prof : outlink2Profile.values())
                             value -= fr_prof.get_ith_value(i);
-                        if(value<0)
-                            throw new Exception(String.format("One node %d, commodity %d, offramp splits add up to more than 1.0",node.id,comm.id));
+                        if (value < 0)
+                            throw new Exception(String.format("One node %d, commodity %d, offramp splits add up to more than 1.0", node.id, comm.id));
                         ml_prof.add_entry(value);
                     }
-                    outlink2Profile.put(dn_ml.id,ml_prof);
+                    outlink2Profile.put(dn_ml.id, ml_prof);
                 }
 
-                // to jaxb
+                // to jaxb: offramps
                 jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
                 jsplits.getSplitNode().add(jsplitnode);
                 jsplitnode.setCommodityId(comm.id);
                 jsplitnode.setNodeId(node.id);
                 jsplitnode.setLinkIn(up_ml.id);
                 jsplitnode.setDt(dt);
-
                 for( Map.Entry<Long,Profile1D> e : outlink2Profile.entrySet() ){
                     jaxb.Split jsplit = new jaxb.Split();
                     jsplitnode.getSplit().add(jsplit);
@@ -430,8 +413,21 @@ public class Scenario {
                     jsplit.setContent(OTMUtils.comma_format(e.getValue().get_values()));
                 }
 
+                // to jaxb: dn ors
+                for( LinkOnramp dn_or : dn_ors ) {
+                    jsplitnode = new jaxb.SplitNode();
+                    jsplits.getSplitNode().add(jsplitnode);
+                    jsplitnode.setCommodityId(comm.id);
+                    jsplitnode.setNodeId(node.id);
+                    jsplitnode.setLinkIn(dn_or.id);
+                    for (Map.Entry<Long, String> e : or_outlink2value.entrySet()) {
+                        jaxb.Split jsplit = new jaxb.Split();
+                        jsplitnode.getSplit().add(jsplit);
+                        jsplit.setLinkOut(e.getKey());
+                        jsplit.setContent(e.getValue());
+                    }
+                }
             }
-
         }
 
         /////////////////////////////////////////////////////

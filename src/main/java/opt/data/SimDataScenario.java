@@ -3,6 +3,7 @@ package opt.data;
 import api.OTMdev;
 import models.fluid.FluidLaneGroup;
 import output.*;
+import utils.OTMUtils;
 
 import java.util.*;
 
@@ -18,8 +19,11 @@ public class SimDataScenario {
         // initialize linkdata
         Set<Long> commids = otmdev.scenario.commodities.keySet();
         this.linkdata = new HashMap<>();
-        for(AbstractLink optlink : fwyscenario.get_links())
-            linkdata.put(optlink.id,new SimDataLink(this,optlink,otmdev.scenario.network.links.get(optlink.id),commids));
+        for(AbstractLink optlink : fwyscenario.get_links()) {
+            if(optlink.get_type()== AbstractLink.Type.ghost)
+                continue;
+            linkdata.put(optlink.id, new SimDataLink(this, optlink, otmdev.scenario.network.links.get(optlink.id), commids));
+        }
 
         // populate with data
         for(AbstractOutput aoutput :  otmdev.otm.output.get_data()){
@@ -36,10 +40,13 @@ public class SimDataScenario {
                 float dt_sec = output.get_outdt();
                 long commid = output.get_commodity_id();
                 for(FluidLaneGroup flg : output.ordered_lgs) {
+                    if(!linkdata.containsKey(flg.link.getId()))
+                        continue;
                     SimDataLanegroup lgdata = linkdata.get(flg.link.getId()).lgData.get(flg.id);
                     List<AbstractOutputTimedCell.CellProfile> cellprofs = output.lgprofiles.get(flg.id);
-                    for(int i=0;i<cellprofs.size();i++)
-                        lgdata.celldata.get(i).set_flws(commid, cellprofs.get(i).profile.values,dt_sec);
+                    for(int i=0;i<cellprofs.size();i++) {
+                        lgdata.celldata.get(i).set_flws(commid, cellprofs.get(i).profile.values, dt_sec);
+                    }
                 }
             }
 
@@ -47,6 +54,8 @@ public class SimDataScenario {
                 OutputCellVehicles output = (OutputCellVehicles) aoutput;
                 long commid = output.get_commodity_id();
                 for(FluidLaneGroup flg : output.ordered_lgs) {
+                    if(!linkdata.containsKey(flg.link.getId()))
+                        continue;
                     SimDataLanegroup lgdata = linkdata.get(flg.link.getId()).lgData.get(flg.id);
                     List<AbstractOutputTimedCell.CellProfile> cellprofs = output.lgprofiles.get(flg.id);
                     for(int i=0;i<cellprofs.size();i++)
