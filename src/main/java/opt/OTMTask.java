@@ -52,13 +52,18 @@ public class OTMTask  extends Task {
 		// create a runnable OTM scenario
 		fwyscenario.add_ghost_pieces();
 
-		jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
 
-//		ProjectFactory.save_jaxb_scenario(jscenario,"/home/gomes/Dropbox/gabriel/work/opt/temp/aaa.xml");
+		try {
+			jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
 
-		api.OTM otm = new api.OTM();
-		otm.load_from_jaxb(jscenario,false);
-		this.otmdev = new OTMdev(otm);
+			api.OTM otm = new api.OTM();
+			otm.load_from_jaxb(jscenario,false);
+			this.otmdev = new OTMdev(otm);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			fwyscenario.remove_ghost_pieces();
+		}
 
 	}
 
