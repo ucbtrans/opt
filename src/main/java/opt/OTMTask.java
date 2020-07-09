@@ -54,7 +54,7 @@ public class OTMTask  extends Task {
 
 		jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
 
-		ProjectFactory.save_jaxb_scenario(jscenario,"/home/gomes/Dropbox/gabriel/work/opt/temp/aaa.xml");
+//		ProjectFactory.save_jaxb_scenario(jscenario,"/home/gomes/Dropbox/gabriel/work/opt/temp/aaa.xml");
 
 		api.OTM otm = new api.OTM();
 		otm.load_from_jaxb(jscenario,false);
