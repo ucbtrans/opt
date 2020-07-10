@@ -52,7 +52,6 @@ public class OTMTask  extends Task {
 		// create a runnable OTM scenario
 		fwyscenario.add_ghost_pieces();
 
-
 		try {
 			jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
 
@@ -61,10 +60,8 @@ public class OTMTask  extends Task {
 			this.otmdev = new OTMdev(otm);
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
 			fwyscenario.remove_ghost_pieces();
 		}
-
 	}
 
 	@Override
