@@ -623,6 +623,8 @@ public class TSTableHandler {
     
     
     public void setColumnValue(int col, double val) {
+        if (focusedCell == null) 
+            return;
         int i0 = focusedCell.getRow();
         int j0 = focusedCell.getColumn();
         int numRows = myTable.getItems().size();
