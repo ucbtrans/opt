@@ -1930,6 +1930,10 @@ public class LinkEditorController {
                 for (int jj = 0; jj < num_vt; jj++) {
                     total_prct += (Double)myItems.get(i).get(jj+2);
                 }
+                if (total_prct < 0.0000000001) {
+                    myItems.get(i).set(2, 100.0);
+                    total_prct = 100.0;
+                }
                 values[i] = fcc * (Double)myItems.get(i).get(1) * (Double)myItems.get(i).get(j+2) / total_prct;
             }
             
