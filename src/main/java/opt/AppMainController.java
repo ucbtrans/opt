@@ -1024,21 +1024,13 @@ public class AppMainController {
     public void deleteLink(AbstractLink lnk, boolean reconnect) {
         if (lnk == null) 
             return;
-        
+
         FreewayScenario scenario = lnk.get_segment().get_scenario();
-        AbstractLink up_link = lnk.get_up_link();
-        AbstractLink dn_link = lnk.get_dn_link();
         try {
-            scenario.delete_segment(lnk.get_segment());
+            scenario.delete_segment(lnk.get_segment(),reconnect);
         } catch (Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not delete road section...", e);
             return;
-        }
-        
-        if ((up_link != null) && (dn_link != null) &&
-            (dn_link.get_type() == AbstractLink.Type.freeway) &&
-             reconnect) {
-            dn_link.connect_to_upstream(up_link);
         }
         
         setProjectModified(true);

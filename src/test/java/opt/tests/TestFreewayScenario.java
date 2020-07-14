@@ -105,7 +105,7 @@ public class TestFreewayScenario extends AbstractTest {
             assertTrue(node_ids.contains(9l));
             assertTrue(node_ids.contains(10l));
 
-            X.scenario.delete_segment(sA3);
+            X.scenario.delete_segment(sA3,false);
 
             assertNull( X.scenario.get_segment_by_name("sA3") );
             assertTrue( sA2.get_dnstrm_segments().isEmpty() );

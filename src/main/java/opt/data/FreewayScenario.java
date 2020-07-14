@@ -572,7 +572,7 @@ public class FreewayScenario {
      * Delete a segment
      * @param segment
      */
-    public void delete_segment(Segment segment) throws Exception {
+    public void delete_segment(Segment segment, boolean connect_adjacent) throws Exception {
 
         if(segments.size()==1)
             throw new Exception("Removing the sole segment is not allowed.");
@@ -624,6 +624,23 @@ public class FreewayScenario {
         segment.in_frs = null;
         segment.out_frs = null;
         segments.remove(segment.id);
+
+        // connect adjacent
+        if(connect_adjacent){
+            AbstractLink up_link = segment.fwy.up_link;
+            AbstractLink dn_link = segment.fwy.dn_link;
+            if ((up_link != null) && (dn_link != null) && (dn_link.get_type() == AbstractLink.Type.freeway) )
+                dn_link.connect_to_upstream(up_link);
+        }
+
+        // if connecting, then remove segment from routes
+        // otherwise, remove routes with segment
+        if(connect_adjacent)
+            routes.values().stream()
+                    .filter(route->route.segments.contains(segment))
+                    .forEach(route->route.segments.remove(segment));
+        else
+            routes.values().removeIf(route->route.segments.contains(segment));
 
     }
 
