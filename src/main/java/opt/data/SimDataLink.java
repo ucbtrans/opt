@@ -104,7 +104,6 @@ public class SimDataLink {
                 double sumflw = 0d;
                 double sumveh = 0d;
                 for(SimDataLanegroup lg : lgData.values()) {
-
                     for (SimCellData cd : lg.celldata) {
                         for (long commid : cd.vehs.keySet()) {
                             sumflw += cd.flws.get(commid).get(k);
@@ -115,9 +114,7 @@ public class SimDataLink {
                 speeds[k] = sumveh<1 || sumflw<1 ? ffspeed_mph : cell_length_miles*sumflw/sumveh;
             }
         } else {
-
             SimDataLanegroup lgdata = lgData.get(lgtype2id.get(lgtype));
-
             for(int k=0;k<scndata.numtime();k++) {
                 double sumflw = 0d;
                 double sumveh = 0d;
@@ -129,16 +126,120 @@ public class SimDataLink {
                 }
                 speeds[k] = sumveh<1 || sumflw<1 ? ffspeed_mph : cell_length_miles*sumflw/sumveh;
             }
-
         }
 
         return speeds;
-
     }
 
     /////////////////////////////////////////////////
     // API
     /////////////////////////////////////////////////
+
+    public TimeSeries get_vht(LaneGroupType lgtype,Long commid){
+        double[] vehs = get_veh_array(lgtype,commid);
+        double dt_hr = scndata.get_dt_sec() / 3600d;
+        for(int k=0;k<vehs.length;k++)
+            vehs[k] = vehs[k]*dt_hr;
+        return new TimeSeries(scndata.time,vehs);
+    }
+
+    public TimeSeries get_vmt(LaneGroupType lgtype,Long commid){
+
+        assert(lgtype2id.containsKey(lgtype) || lgtype==null);
+        double cell_length = cell_length();
+
+        double [] vmt = new double [scndata.numtime()];
+
+        if(lgtype==null){
+
+            if(commid==null){
+                for(int k=0;k<scndata.numtime();k++) {
+                    double flw = 0d;
+                    for(SimDataLanegroup lg : lgData.values())
+                        for (SimCellData cd : lg.celldata)
+                            for( List<Double> lst : cd.flws.values() )
+                                flw += lst.get(k);
+                    vmt[k] = flw*cell_length;
+                }
+            }
+
+            else{
+                for(int k=0;k<scndata.numtime();k++) {
+                    double flw = 0d;
+                    for(SimDataLanegroup lg : lgData.values())
+                        for (SimCellData cd : lg.celldata)
+                            flw += cd.flws.get(commid).get(k);
+                    vmt[k] = flw*cell_length;
+                }
+            }
+
+        } else {
+            SimDataLanegroup lgdata = lgData.get(lgtype2id.get(lgtype));
+
+            if(commid==null){
+                for(int k=0;k<scndata.numtime();k++) {
+                    double flw = 0d;
+                    for (SimCellData cd : lgdata.celldata)
+                        for( List<Double> lst : cd.flws.values() )
+                            flw += lst.get(k);
+                    vmt[k] = flw*cell_length;
+                }
+            }
+
+            else {
+                for(int k=0;k<scndata.numtime();k++) {
+                    double flw = 0d;
+                    for (SimCellData cd : lgdata.celldata)
+                        flw += cd.flws.get(commid).get(k);
+                    vmt[k] = flw*cell_length;
+                }
+            }
+        }
+
+        return new TimeSeries(scndata.time,vmt);
+
+    }
+
+    public TimeSeries get_delay(LaneGroupType lgtype, float threshold_mph){
+
+        assert(lgtype2id.containsKey(lgtype) || lgtype==null);
+
+        double dt_hr = scndata.get_dt_sec() / 3600d;
+        double cell_length_over_threshold = cell_length() / threshold_mph;
+
+        double [] delays = new double [scndata.numtime()];
+
+        if(lgtype==null){
+            for(int k=0;k<scndata.numtime();k++) {
+                for(SimDataLanegroup lg : lgData.values()) {
+                    double flw = 0d;
+                    double veh = 0d;
+                    for (SimCellData cd : lg.celldata) {
+                        for (long commid : cd.vehs.keySet()) {
+                            flw += cd.flws.get(commid).get(k);
+                            veh += cd.vehs.get(commid).get(k);
+                        }
+                    }
+                    delays[k] = (veh-flw*cell_length_over_threshold)*dt_hr;
+                }
+            }
+        } else {
+            SimDataLanegroup lgdata = lgData.get(lgtype2id.get(lgtype));
+            for(int k=0;k<scndata.numtime();k++) {
+                double flw = 0d;
+                double veh = 0d;
+                for (SimCellData cd : lgdata.celldata) {
+                    for(long commid : cd.vehs.keySet()){
+                        flw += cd.flws.get(commid).get(k);
+                        veh += cd.vehs.get(commid).get(k);
+                    }
+                }
+                delays[k] = (veh-flw*cell_length_over_threshold)*dt_hr;
+            }
+        }
+
+        return new TimeSeries(scndata.time,delays);
+    }
 
     /** returns a TimeSeries of vehicle numbers for the given lane group type and commodity id
      * lgtype==null means all lanes in the link

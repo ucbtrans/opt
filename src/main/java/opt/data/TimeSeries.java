@@ -11,6 +11,11 @@ public class TimeSeries {
     public List<Float> time;
     public List<Double> values;
 
+    public TimeSeries(List<Float> time){
+        this.time = time;
+        this.values = new ArrayList<>();
+    }
+
     public TimeSeries(List<Float> time,double [] v){
         this.time = time;
         this.values = Arrays.stream(v).boxed().collect(Collectors.toList());
@@ -23,6 +28,20 @@ public class TimeSeries {
 
     public float get_dt(){
         return time.get(1)-time.get(0);
+    }
+
+    public void add(TimeSeries ts) throws Exception {
+        if(this.time.size()!=ts.values.size())
+            throw new Exception("this.time.size()!=ts.values.size()");
+
+        if(this.values.isEmpty()) {
+            this.values = ts.values;
+            return;
+        }
+
+        for(int k=0;k<this.time.size();k++)
+            values.set(k,values.get(k)+ts.values.get(k));
+
     }
 
     public void mult(float alpha){

@@ -3,7 +3,6 @@ package opt.data;
 import api.OTMdev;
 import models.fluid.FluidLaneGroup;
 import output.*;
-import utils.OTMUtils;
 
 import java.util.*;
 
@@ -188,7 +187,38 @@ public class SimDataScenario {
         return time.size();
     }
 
-    /** To get VHT just apply X.mult(X.get_dt()) to this **/
+    public double get_dt_sec(){
+        return time.size()<2 ? Double.NaN : time.get(1)-time.get(0);
+    }
+
+    public TimeSeries get_vht_for_network(Long commid){
+        TimeSeries X = get_vehs_for_network(commid);
+        X.mult(X.get_dt());
+        return X;
+    }
+
+    public TimeSeries get_vmt_for_network(Long commid){
+        TimeSeries vmt = new TimeSeries(time);
+        try {
+            for(SimDataLink lkdata : linkdata.values())
+                vmt.add(lkdata.get_vmt(null,commid));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return vmt;
+    }
+
+    public TimeSeries get_delay_for_network(float speed_threshold_mph){
+        TimeSeries delay = new TimeSeries(time);
+        try {
+            for(SimDataLink lkdata : linkdata.values())
+                delay.add(lkdata.get_delay(null,speed_threshold_mph));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return delay;
+    }
+
     public TimeSeries get_vehs_for_network(Long commid){
         return new TimeSeries(time,get_vehs_for_network_array(commid));
     }
@@ -236,6 +266,17 @@ public class SimDataScenario {
         }
 
         return X;
+    }
+
+    public TimeSeries get_delay_for_route(long routeid,LaneGroupType lgtype,float speed_threshold_kph){
+        TimeSeries delay = new TimeSeries(time);
+        try {
+            for(AbstractLink link : fwyscenario.routes.get(routeid).get_link_sequence())
+                delay.add(linkdata.get(link.id).get_delay(lgtype,speed_threshold_kph));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return delay;
     }
 
 }
