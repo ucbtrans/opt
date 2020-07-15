@@ -220,21 +220,21 @@ public class SimDataLink {
                             veh += cd.vehs.get(commid).get(k);
                         }
                     }
-                    delays[k] = (veh-flw*cell_length_over_threshold)*dt_hr;
+                    delays[k] = veh==0d? 0d : Math.max( 0d, (veh-flw*cell_length_over_threshold)*dt_hr );
                 }
             }
         } else {
             SimDataLanegroup lgdata = lgData.get(lgtype2id.get(lgtype));
-            for(int k=0;k<scndata.numtime();k++) {
+            for(int k=1;k<scndata.numtime();k++) {
                 double flw = 0d;
                 double veh = 0d;
                 for (SimCellData cd : lgdata.celldata) {
                     for(long commid : cd.vehs.keySet()){
-                        flw += cd.flws.get(commid).get(k);
+                        flw += cd.flws.get(commid).get(k-1);
                         veh += cd.vehs.get(commid).get(k);
                     }
                 }
-                delays[k] = (veh-flw*cell_length_over_threshold)*dt_hr;
+                delays[k] =  veh==0d? 0d : Math.max( 0d, (veh-flw*cell_length_over_threshold)*dt_hr );
             }
         }
 

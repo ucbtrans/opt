@@ -32,7 +32,7 @@ public class TestSimData extends AbstractTest {
             FreewayScenario fwy_scenario = project.get_scenarios().iterator().next();
             float start_time = 0f;
             float duration = 3600;
-            int outsteps = 300;
+            int outsteps = 1800;
             int progbar_steps = 10;
             task = new OTMTask(null,fwy_scenario,start_time,duration,outsteps,progbar_steps);
         } catch (Exception e) {
@@ -47,6 +47,42 @@ public class TestSimData extends AbstractTest {
     /////////////////////////////////
     // scenario level
     /////////////////////////////////
+
+    @Test
+    public void network_vht(){
+        XYSeriesCollection A = new XYSeriesCollection();
+        A.addSeries(simdata.get_vht_for_network(car).get_XYSeries("cars"));
+        A.addSeries(simdata.get_vht_for_network(truck).get_XYSeries("truck"));
+        A.addSeries(simdata.get_vht_for_network(null).get_XYSeries("all"));
+        TestPlot.plot(A,
+                "network VHT",
+                "veh hours",
+                "temp/net_vht.png");
+    }
+
+    @Test
+    public void network_vmt(){
+        XYSeriesCollection A = new XYSeriesCollection();
+        A.addSeries(simdata.get_vmt_for_network(car).get_XYSeries("cars"));
+        A.addSeries(simdata.get_vmt_for_network(truck).get_XYSeries("truck"));
+        A.addSeries(simdata.get_vmt_for_network(null).get_XYSeries("all"));
+        TestPlot.plot(A,
+                "network VMT",
+                "veh miles",
+                "temp/net_vmt.png");
+    }
+
+    @Test
+    public void network_delay(){
+        XYSeriesCollection A = new XYSeriesCollection();
+        A.addSeries(simdata.get_delay_for_network(20f).get_XYSeries("20 mph"));
+        A.addSeries(simdata.get_delay_for_network(35f).get_XYSeries("35 mph"));
+        A.addSeries(simdata.get_delay_for_network(50f).get_XYSeries("50 mph"));
+        TestPlot.plot(A,
+                "network delay",
+                "veh hours",
+                "temp/net_delay.png");
+    }
 
     @Test
     public void network_vehicles(){
@@ -130,9 +166,72 @@ public class TestSimData extends AbstractTest {
         System.out.println(X.print_values());
     }
 
+    @Test
+    public void route_delay(){
+//        // get delay on route A for various lane group types
+//        XYSeriesCollection A = new XYSeriesCollection();
+//        A.addSeries(simdata.get_speed_for_route(routeA,LaneGroupType.gp).get_XYSeries("gp lanes"));
+//        A.addSeries(simdata.get_speed_for_route(routeA,LaneGroupType.mng).get_XYSeries("mng lanes"));
+//        A.addSeries(simdata.get_speed_for_route(routeA,LaneGroupType.aux).get_XYSeries("aux lanes"));
+//        TestPlot.plot(A,
+//                "route A speed",
+//                "speed [mph]",
+//                "temp/routeA_speed.png");
+//
+//        // get speed on route for all lane group types
+//        A = new XYSeriesCollection();
+//        A.addSeries(simdata.get_speed_for_route(routeA,null).get_XYSeries("all lanes"));
+//        TestPlot.plot(A,
+//                "route A speed",
+//                "speed [mph]",
+//                "temp/routeA_speed_all.png");
+    }
+
     /////////////////////////////////
     // link level
     /////////////////////////////////
+
+    @Test
+    public void link_vht(){
+        for(Map.Entry<Long,SimDataLink> e :  simdata.linkdata.entrySet()){
+            Long linkid = e.getKey();
+            SimDataLink data = e.getValue();
+            XYSeriesCollection A = new XYSeriesCollection();
+            A.addSeries(data.get_vht(null,null).get_XYSeries("all"));
+            TestPlot.plot(A,
+                    String.format("Link %d",linkid),
+                    "veh hours",
+                    String.format("temp/link%d_vht.png",linkid));
+        }
+    }
+
+    @Test
+    public void link_vmt(){
+        for(Map.Entry<Long,SimDataLink> e :  simdata.linkdata.entrySet()){
+            Long linkid = e.getKey();
+            SimDataLink data = e.getValue();
+            XYSeriesCollection A = new XYSeriesCollection();
+            A.addSeries(data.get_vmt(null,null).get_XYSeries("all"));
+            TestPlot.plot(A,
+                    String.format("Link %d",linkid),
+                    "veh miles",
+                    String.format("temp/link%d_vmt.png",linkid));
+        }
+    }
+
+    @Test
+    public void link_delay(){
+        for(Map.Entry<Long,SimDataLink> e :  simdata.linkdata.entrySet()){
+            Long linkid = e.getKey();
+            SimDataLink data = e.getValue();
+            XYSeriesCollection A = new XYSeriesCollection();
+            A.addSeries(data.get_delay(null,30f).get_XYSeries("all"));
+            TestPlot.plot(A,
+                    String.format("Link %d",linkid),
+                    "veh hours",
+                    String.format("temp/link%d_delay.png",linkid));
+        }
+    }
 
     @Test
     public void link_vehicles(){

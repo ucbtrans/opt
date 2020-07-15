@@ -19,9 +19,9 @@ public class SimCellData {
     protected void set_flws(long commid,List<Double> cummvalues,float dt_sec){
         List<Double> flw = new ArrayList<>();
         double alpha = 3600d/dt_sec;
-        flw.add(0d);
         for(int i = 1; i < cummvalues.size(); ++i)
             flw.add((cummvalues.get(i)-cummvalues.get(i-1))*alpha);
+        flw.add(flw.get(flw.size()-1));
         flws.put(commid,flw);
     }
 
@@ -78,7 +78,7 @@ public class SimCellData {
                 flw += flws.get(commid).get(k);
                 veh += vehs.get(commid).get(k);
             }
-            delays[k] = (veh-flw*cell_length_over_threshold)*dt_hr;
+            delays[k] =  veh==0d? 0d : Math.max(0d,(veh-flw*cell_length_over_threshold)*dt_hr);
         }
         return delays;
     }
