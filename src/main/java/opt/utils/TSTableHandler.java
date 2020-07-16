@@ -289,7 +289,9 @@ public class TSTableHandler {
             
             while ((jj < numCols) && (jj-j0+offset < numSubs)) {
                 try {
-                    Double val = dsc.fromString(textCols[jj-j0+offset]);
+                    String cs = textCols[jj-j0+offset];
+                    cs = cs.replaceAll(",", "");
+                    Double val = dsc.fromString(cs);
                     row.add(val);
                 } catch(Exception e) {
                     row.add(myItems.get(ii).get(jj));
