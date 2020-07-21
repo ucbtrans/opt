@@ -329,16 +329,11 @@ public class AppMainController {
         clearSimData();
         
         try {
-            float start_time = selectedScenario.get_start_time();
-            float duration = selectedScenario.get_sim_duration();
 
             // Set the number of divisions of the progress bar
             int progbar_steps = 50;
 
-            // Set the number of time steps in the reported values
-            int output_steps = (int)Math.abs((double)selectedScenario.get_sim_duration() / UserSettings.reportingPeriodSeconds);
-
-            Thread th = new Thread(new OTMTask(this,selectedScenario,start_time,duration,output_steps,progbar_steps));
+            Thread th = new Thread(new OTMTask(this,selectedScenario,(float) UserSettings.reportingPeriodSeconds,progbar_steps));
             th.setDaemon(true);
             th.start();
             leftStatus.setText("Simulating scenario \"" + selectedScenario.name + "\"...");

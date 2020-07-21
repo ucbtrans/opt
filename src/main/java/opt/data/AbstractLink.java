@@ -247,6 +247,15 @@ public abstract class AbstractLink implements Comparable {
         return get_mng_lanes() + get_gp_lanes() + get_aux_lanes();
     }
 
+    public final float get_fastest_ffspeed_kph(){
+        float x = get_gp_freespeed_kph();
+        if(has_mng())
+            x = Math.max(x, get_mng_freespeed_kph());
+        if(has_aux())
+            x = Math.max(x,get_aux_ff_speed_kph());
+        return x;
+    }
+
     // gp ...................................................
 
     public final int get_gp_lanes(){

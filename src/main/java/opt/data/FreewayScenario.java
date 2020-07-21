@@ -28,8 +28,9 @@ public class FreewayScenario {
 
     // simulation parameters
     protected float sim_start_time = 0f;
-    protected float sim_duration = 86400f;
-    protected float sim_dt = 2f;
+    protected float sim_duration;
+    protected float max_celllength_meters;
+    protected float sim_dt = Float.NaN;
 
     protected GhostPieces ghost_pieces;
 
@@ -60,6 +61,7 @@ public class FreewayScenario {
         if(sim!=null){
             this.sim_start_time = sim.getStarttime();
             this.sim_duration = sim.getDuration();
+            this.max_celllength_meters = sim.getMaxCelllength();
         }
 
         // create Scenario object
@@ -369,7 +371,14 @@ public class FreewayScenario {
         return sim_duration;
     }
 
+    public float get_max_celllength_meters(){
+        return max_celllength_meters;
+    }
+
     public float get_sim_dt_sec(){
+        // compute it if it is not computed
+        if(Float.isNaN(this.sim_dt))
+            sim_dt = (float) Math.floor(scenario.compute_max_simdt_sec(max_celllength_meters));
         return sim_dt;
     }
 
@@ -381,8 +390,20 @@ public class FreewayScenario {
         this.sim_duration = duration;
     }
 
-    public void set_sim_dt_sec(float sim_dt){
-        this.sim_dt = sim_dt;
+    public void set_max_celllength_meters(float new_max_celllength_meters){
+        if(new_max_celllength_meters!=max_celllength_meters){
+            sim_dt = Float.NaN;
+            this.max_celllength_meters = new_max_celllength_meters;
+        }
+    }
+
+    public float set_sim_dt_sec(float new_sim_dt){
+        // compute it if it is not computed
+        float max_sim_dt = Float.isNaN(this.sim_dt) ?
+                (float) Math.floor(scenario.compute_max_simdt_sec(max_celllength_meters)) :
+                sim_dt;
+        sim_dt = Math.min(max_sim_dt,new_sim_dt);
+        return sim_dt;
     }
 
     /////////////////////////////////////
@@ -767,6 +788,7 @@ public class FreewayScenario {
         scn.setSim(sim);
         sim.setStarttime(sim_start_time);
         sim.setDuration(sim_duration);
+        sim.setMaxCelllength(max_celllength_meters);
 
         jaxb.Sgmts sgmts = new jaxb.Sgmts();
         scn.setSgmts(sgmts);

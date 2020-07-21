@@ -1,18 +1,11 @@
 package opt;
 
 import api.OTMdev;
-import error.OTMException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import opt.data.AbstractLink;
-import opt.data.FreewayScenario;
-import opt.data.ProjectFactory;
-import opt.data.SimDataScenario;
-import output.AbstractOutput;
-import output.OutputCellFlow;
-import output.OutputCellVehicles;
+import opt.data.*;
 
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,35 +19,47 @@ public class OTMTask  extends Task {
 	private float outdt;
 	private int step_per_progbar_update;
 
-	public OTMTask(AppMainController mainController, FreewayScenario fwyscenario,float start_time, float duration, int outsteps, int progbar_steps) throws Exception {
+	public OTMTask(AppMainController mainController, FreewayScenario fwyscenario,float outdt, int progbar_steps) throws Exception {
 
 		this.mainController = mainController;
 		this.fwyscenario = fwyscenario;
+		this.outdt = outdt;
 
-		fwyscenario.set_start_time(start_time);
-		fwyscenario.set_sim_duration(duration);
-		fwyscenario.set_sim_dt_sec(2f);
-
-		// number of time steps in the simulation
-		float simdt = fwyscenario.get_sim_dt_sec();
-		this.simsteps = (int) Math.ceil(duration/simdt);
-		this.outdt = duration/outsteps;
-		this.step_per_progbar_update = Math.max( simsteps / progbar_steps , 1);
-
-		// check outdt is multiple of simdt
-		if(outdt%simdt > 0.01)
-			throw new Exception("Reporting time step should be a multiple of simulation time step.");
+		assert(outdt==300f);
 
 		// bind the progress bar and make it visible
 		if(mainController!=null)
 			mainController.bindProgressBar(progressProperty());
 
-		// create a runnable OTM scenario
-		fwyscenario.add_ghost_pieces();
-
 		try {
-			jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
 
+			// add ghost pieces
+			fwyscenario.add_ghost_pieces();
+
+			final float nominal_duration = fwyscenario.get_sim_duration();
+			final float nominal_simdt = fwyscenario.get_sim_dt_sec();
+
+			if(nominal_simdt<1f)
+				throw new Exception("out dt too small.");
+			if(nominal_simdt>300f)
+				throw new Exception("out dt too large.");
+
+			List<Float> factors_300 = List.of(1f, 2f, 3f, 4f, 5f, 6f, 9f, 10f, 12f, 15f, 20f, 25f, 30f, 50f, 60f, 75f, 100f, 150f, 300f);
+
+			float simdt = nominal_simdt;
+			if(!factors_300.contains(simdt))
+				simdt = factors_300.stream().filter(x->x>nominal_simdt).findFirst().get();
+
+			fwyscenario.set_sim_dt_sec(simdt);
+			this.simsteps = (int) Math.ceil(nominal_duration/simdt);
+
+			this.step_per_progbar_update = Math.max( simsteps / progbar_steps , 1);
+
+			// check outdt is multiple of simdt
+			if(outdt%simdt > 0.01)
+				throw new Exception("Reporting time step should be a multiple of simulation time step.");
+
+			jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
 			api.OTM otm = new api.OTM();
 			otm.load_from_jaxb(jscenario,false);
 			this.otmdev = new OTMdev(otm);
