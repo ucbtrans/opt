@@ -16,7 +16,7 @@ public class Scenario {
     protected FreewayScenario my_fwy_scenario;
 
     protected Map<Long, Node> nodes = new HashMap<>();
-    protected Map<Long, AbstractLink> links = new HashMap<>();
+    public Map<Long, AbstractLink> links = new HashMap<>();
     protected Map<Long, Commodity> commodities = new HashMap<>();
 
 	/////////////////////////////////////
@@ -202,40 +202,41 @@ public class Scenario {
         }
 
         // read road parameters and geometries from the links ...........
-        Map<Long,AddlanesAndRoadParams> link2addlanesAndParams = new HashMap<>();
-        Set<FDparams> unique_roadparams = new HashSet<>();
-        Set<RoadGeom> unique_roadgeoms = new HashSet<>();
+        Map<Long, FDparamsAndRoadGeoms> link2paramsandgeoms = new HashMap<>();
+        Set<FDparams> unique_params = new HashSet<>();
+        Set<RoadGeom> unique_geoms = new HashSet<>();
         for(AbstractLink link : links.values()) {
-            AddlanesAndRoadParams x = link.get_addlanes_and_roadparams();
-            link2addlanesAndParams.put(link.id,x);
+
+            FDparamsAndRoadGeoms x = link.get_fdparams_and_roadgeoms();
+            link2paramsandgeoms.put(link.id,x);
 
             // store gp road parameters
-            unique_roadparams.add(x.gpparams) ;
+            unique_params.add( x.gpparams ) ;
             if(x.roadGeom.mng_fdparams!=null)
-                unique_roadparams.add( x.roadGeom.mng_fdparams);
+                unique_params.add( x.roadGeom.mng_fdparams );
             if(x.roadGeom.aux_fdparams!=null)
-                unique_roadparams.add(  x.roadGeom.aux_fdparams);
+                unique_params.add( x.roadGeom.aux_fdparams );
 
             if(x.roadGeom.notEmpty())
-                unique_roadgeoms.add(x.roadGeom);
+                unique_geoms.add( x.roadGeom );
         }
 
         // map from params to its id ...................
         Map<FDparams,Long> param2id = new HashMap<>();
         long c = 0;
-        for(FDparams rp : unique_roadparams)
+        for(FDparams rp : unique_params)
             param2id.put(rp,c++);
 
         // map from roadgeom to its id ...................
         Map<RoadGeom,Long> geom2id = new HashMap<>();
         c = 0;
-        for(RoadGeom rg : unique_roadgeoms)
+        for(RoadGeom rg : unique_geoms)
             geom2id.put(rg,c++);
 
         // write road params .............................
         jaxb.Roadparams jRoadParams = new jaxb.Roadparams();
         jNet.setRoadparams(jRoadParams);
-        for(FDparams fd : unique_roadparams){
+        for(FDparams fd : unique_params){
             jaxb.Roadparam rp = fd.to_jaxb();
             rp.setId(param2id.get(fd));
             jRoadParams.getRoadparam().add(rp);
@@ -244,7 +245,7 @@ public class Scenario {
         // write road geoms ................................
         jaxb.Roadgeoms jRoadGeoms = new jaxb.Roadgeoms();
         jNet.setRoadgeoms(jRoadGeoms);
-        for(RoadGeom rg : unique_roadgeoms){
+        for(RoadGeom rg : unique_geoms){
             jaxb.Roadgeom jrg = rg.to_jaxb(param2id);
             jrg.setId(geom2id.get(rg));
             jRoadGeoms.getRoadgeom().add(jrg);
@@ -267,7 +268,7 @@ public class Scenario {
                     link.get_type().toString());
 
             // road params
-            AddlanesAndRoadParams x = link2addlanesAndParams.get(link.id);
+            FDparamsAndRoadGeoms x = link2paramsandgeoms.get(link.id);
             jaxbLink.setRoadparam(param2id.get(x.gpparams));
 
             // road geoms

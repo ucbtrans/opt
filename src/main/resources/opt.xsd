@@ -46,7 +46,6 @@
 		<xs:complexType>
 			<xs:attribute name="starttime" type="xs:float" use="optional" default="0"/>
 			<xs:attribute name="duration" type="xs:float" use="optional" default="3600"/>
-			<xs:attribute name="max_celllength" type="xs:float" use="optional" default="500"/>
 		</xs:complexType>
 	</xs:element>
 

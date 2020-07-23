@@ -115,24 +115,31 @@ public abstract class AbstractLink implements Comparable {
         return new_link;
     }
 
-    protected final AddlanesAndRoadParams get_addlanes_and_roadparams(){
-        AddlanesAndRoadParams X = new AddlanesAndRoadParams();
+    public final FDparamsAndRoadGeoms get_fdparams_and_roadgeoms(){
+        FDparamsAndRoadGeoms X = new FDparamsAndRoadGeoms();
 
         X.link_id = id;
         X.gpparams = params.gp_fd;
 
         if(has_mng()){
-            X.roadGeom.mng_addlanes = new jaxb.AddLanes();
-            X.roadGeom.mng_addlanes.setIsopen(!params.mng_barrier);
-            X.roadGeom.mng_addlanes.setLanes(params.mng_lanes);
-            X.roadGeom.mng_addlanes.setSide("in");
+            X.roadGeom.mng_addlanes = new AddLanes(
+                    !params.mng_barrier,
+                    "in",
+                    null,
+                    null,
+                    params.mng_lanes,
+                    null);
             X.roadGeom.mng_fdparams = params.mng_fd;
         }
 
         if(has_aux()){
-            X.roadGeom.aux_addlanes = new jaxb.AddLanes();
-            X.roadGeom.aux_addlanes.setLanes(get_aux_lanes());
-            X.roadGeom.aux_addlanes.setSide("out");
+            X.roadGeom.aux_addlanes = new AddLanes(
+                    true,
+                    "out",
+                    null,
+                    null,
+                    get_aux_lanes(),
+                    null );
             X.roadGeom.aux_fdparams = ((ParametersFreeway)params).aux_fd;
         }
 

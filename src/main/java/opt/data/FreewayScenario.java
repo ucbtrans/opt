@@ -61,7 +61,12 @@ public class FreewayScenario {
         if(sim!=null){
             this.sim_start_time = sim.getStarttime();
             this.sim_duration = sim.getDuration();
-            this.max_celllength_meters = sim.getMaxCelllength();
+        }
+
+        // model
+        if (jaxb_scenario.getModels()!=null){
+            jaxb.Model model = jaxb_scenario.getModels().getModel().get(0);
+            set_max_celllength_meters(model.getModelParams().getMaxCellLength());
         }
 
         // create Scenario object
@@ -788,7 +793,6 @@ public class FreewayScenario {
         scn.setSim(sim);
         sim.setStarttime(sim_start_time);
         sim.setDuration(sim_duration);
-        sim.setMaxCelllength(max_celllength_meters);
 
         jaxb.Sgmts sgmts = new jaxb.Sgmts();
         scn.setSgmts(sgmts);

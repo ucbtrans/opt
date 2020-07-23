@@ -29,12 +29,10 @@ public class TestSimData extends AbstractTest {
         boolean validate = true;
         try {
             Project project = ProjectFactory.load_project(project_file_name,validate);
-            FreewayScenario fwy_scenario = project.get_scenarios().iterator().next();
-            float start_time = 0f;
-            float duration = 3600;
-            int outsteps = 1800;
-            int progbar_steps = 10;
-            task = new OTMTask(null,fwy_scenario,start_time,duration,outsteps,progbar_steps);
+            FreewayScenario fwyscenario = project.get_scenarios().iterator().next();
+            fwyscenario.set_start_time(0f);
+            fwyscenario.set_sim_duration(3600f);
+            task = new OTMTask(null,fwyscenario,2f,10);
         } catch (Exception e) {
             fail(e.getMessage());
         }
