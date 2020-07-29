@@ -146,7 +146,8 @@ public class SimDataLink {
     public TimeSeries get_vmt(LaneGroupType lgtype,Long commid){
 
         assert(lgtype2id.containsKey(lgtype) || lgtype==null);
-        double cell_length = cell_length();
+        double dt_hr = scndata.get_dt_sec() / 3600d;
+        double cell_length_times_dt = cell_length()*dt_hr;
 
         double [] vmt = new double [scndata.numtime()];
 
@@ -159,7 +160,7 @@ public class SimDataLink {
                         for (SimCellData cd : lg.celldata)
                             for( List<Double> lst : cd.flws.values() )
                                 flw += lst.get(k);
-                    vmt[k] = flw*cell_length;
+                    vmt[k] = flw*cell_length_times_dt;
                 }
             }
 
@@ -169,7 +170,7 @@ public class SimDataLink {
                     for(SimDataLanegroup lg : lgData.values())
                         for (SimCellData cd : lg.celldata)
                             flw += cd.flws.get(commid).get(k);
-                    vmt[k] = flw*cell_length;
+                    vmt[k] = flw*cell_length_times_dt;
                 }
             }
 
@@ -182,7 +183,7 @@ public class SimDataLink {
                     for (SimCellData cd : lgdata.celldata)
                         for( List<Double> lst : cd.flws.values() )
                             flw += lst.get(k);
-                    vmt[k] = flw*cell_length;
+                    vmt[k] = flw*cell_length_times_dt;
                 }
             }
 
@@ -191,13 +192,12 @@ public class SimDataLink {
                     double flw = 0d;
                     for (SimCellData cd : lgdata.celldata)
                         flw += cd.flws.get(commid).get(k);
-                    vmt[k] = flw*cell_length;
+                    vmt[k] = flw*cell_length_times_dt;
                 }
             }
         }
 
         return new TimeSeries(scndata.time,vmt);
-
     }
 
     public TimeSeries get_delay(LaneGroupType lgtype, float threshold_mph){
