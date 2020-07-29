@@ -3,17 +3,22 @@ package opt.data;
 import api.OTMdev;
 import models.fluid.FluidLaneGroup;
 import output.*;
+import profiles.Profile1D;
 
 import java.util.*;
+
+import static java.util.stream.Collectors.toSet;
 
 public class SimDataScenario {
 
     public FreewayScenario fwyscenario;
+    public float outdt;
     public List<Float> time;
     public Map<Long,SimDataLink> linkdata;
 
-    public SimDataScenario(FreewayScenario fwyscenario, OTMdev otmdev){
+    public SimDataScenario(FreewayScenario fwyscenario, OTMdev otmdev,float outdt){
         this.fwyscenario = fwyscenario;
+        this.outdt = outdt;
 
         // initialize linkdata
         Set<Long> commids = otmdev.scenario.commodities.keySet();
@@ -24,44 +29,66 @@ public class SimDataScenario {
             linkdata.put(optlink.id, new SimDataLink(this, optlink, otmdev.scenario.network.links.get(optlink.id), commids));
         }
 
-        // populate with data
-        for(AbstractOutput aoutput :  otmdev.otm.output.get_data()){
+        float start_time = fwyscenario.get_start_time();
+        float sim_dt = fwyscenario.get_sim_dt_sec();
+        float duration = fwyscenario.get_sim_duration();
 
-            if(time==null)
-                time = ((AbstractOutputTimedCell) aoutput).lgprofiles.entrySet().iterator().next()
-                        .getValue()
-                        .get(0)
-                        .profile
-                        .get_times();
+        this.time= new ArrayList();
+        List<Integer> time_index = new ArrayList<>();
+        float currtime = start_time;
+        int currindex = 0;
+        int step = (int) (outdt/sim_dt);
 
-            if (aoutput instanceof OutputCellFlow){
-                OutputCellFlow output = (OutputCellFlow) aoutput;
-                float dt_sec = output.get_outdt();
-                long commid = output.get_commodity_id();
-                for(FluidLaneGroup flg : output.ordered_lgs) {
-                    if(!linkdata.containsKey(flg.link.getId()))
-                        continue;
-                    SimDataLanegroup lgdata = linkdata.get(flg.link.getId()).lgData.get(flg.id);
-                    List<AbstractOutputTimedCell.CellProfile> cellprofs = output.lgprofiles.get(flg.id);
-                    for(int i=0;i<cellprofs.size();i++) {
-                        lgdata.celldata.get(i).set_flws(commid, cellprofs.get(i).profile.values, dt_sec);
-                    }
-                }
-            }
-
-            if (aoutput instanceof OutputCellVehicles) {
-                OutputCellVehicles output = (OutputCellVehicles) aoutput;
-                long commid = output.get_commodity_id();
-                for(FluidLaneGroup flg : output.ordered_lgs) {
-                    if(!linkdata.containsKey(flg.link.getId()))
-                        continue;
-                    SimDataLanegroup lgdata = linkdata.get(flg.link.getId()).lgData.get(flg.id);
-                    List<AbstractOutputTimedCell.CellProfile> cellprofs = output.lgprofiles.get(flg.id);
-                    for(int i=0;i<cellprofs.size();i++)
-                        lgdata.celldata.get(i).set_vehs(commid, cellprofs.get(i).profile.values);
-                }
-            }
+        float end_time = start_time + duration;
+        while(currtime<=end_time) {
+            time.add(currtime);
+            time_index.add(currindex);
+            currtime += outdt;
+            currindex += step;
         }
+
+        // populate with data
+
+        Set<OutputCellFlow> flws = otmdev.otm.output.get_data().stream()
+                .filter(s->s.type==AbstractOutput.Type.cell_flw)
+                .map(s->(OutputCellFlow)s)
+                .collect(toSet());
+
+        Set<OutputCellVehicles> vehs = otmdev.otm.output.get_data().stream()
+                .filter(s->s.type==AbstractOutput.Type.cell_veh)
+                .map(s->(OutputCellVehicles)s)
+                .collect(toSet());
+
+
+//        float dt_sec = flws.iterator().next().get_outdt();
+        for(Long commid : commids){
+            OutputCellFlow flw = flws.stream().filter(s->s.get_commodity_id()==commid).findFirst().get();
+            OutputCellVehicles veh = vehs.stream().filter(s->s.get_commodity_id()==commid).findFirst().get();
+
+            ArrayList<FluidLaneGroup> lgs = flw.ordered_lgs;
+
+            for(FluidLaneGroup flg : lgs) {
+
+                if(!linkdata.containsKey(flg.link.getId()))
+                    continue;
+
+                SimDataLanegroup lgdata = linkdata.get(flg.link.getId()).lgData.get(flg.id);
+
+                List<AbstractOutputTimedCell.CellProfile> flw_cellprofs = flw.lgprofiles.get(flg.id);
+                List<AbstractOutputTimedCell.CellProfile> veh_cellprofs = veh.lgprofiles.get(flg.id);
+
+                for(int i=0;i<flw_cellprofs.size();i++) {
+                    SimCellData celldata = lgdata.celldata.get(i);
+//                    celldata.set_flws(commid,time_index,flw_cellprofs.get(i).profile.values, dt_sec);
+//                    celldata.set_vehs(commid,time_index,veh_cellprofs.get(i).profile.values);
+
+                    celldata.set(commid,time_index,flw_cellprofs.get(i).profile.values,veh_cellprofs.get(i).profile.values,sim_dt);
+                }
+
+            }
+
+        }
+
 
     }
 

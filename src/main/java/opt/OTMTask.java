@@ -97,12 +97,14 @@ public class OTMTask  extends Task {
 
 		try {
 
+			float sim_dt = fwyscenario.get_sim_dt_sec();
+
 			Set<Long> linkids = fwyscenario.get_links().stream()
 					.filter(link->link.get_type()!= AbstractLink.Type.ghost)
 					.map(x->x.id).collect(Collectors.toSet());
 			for(Long commid : otmdev.scenario.commodities.keySet()){
-				otmdev.otm.output().request_cell_flw(commid,linkids,outdt);
-				otmdev.otm.output().request_cell_veh(commid,linkids,outdt);
+				otmdev.otm.output().request_cell_flw(commid,linkids,sim_dt);
+				otmdev.otm.output().request_cell_veh(commid,linkids,sim_dt);
 			}
 
 			otmdev.otm.initialize(fwyscenario.get_start_time());
@@ -114,7 +116,7 @@ public class OTMTask  extends Task {
 					break;
 
 				// advance otm, get back information
-				otmdev.otm.advance(fwyscenario.get_sim_dt_sec());
+				otmdev.otm.advance(sim_dt);
 				steps_taken += 1;
 
 				// progress bar
@@ -131,7 +133,7 @@ public class OTMTask  extends Task {
 		} catch (Exception e) {
 			failed();
 		} finally {
-			simdata = new SimDataScenario(fwyscenario,otmdev);
+			simdata = new SimDataScenario(fwyscenario,otmdev,outdt);
 			fwyscenario.remove_ghost_pieces();
 			if(mainController!=null)
 				mainController.attachSimDataToScenario(simdata);

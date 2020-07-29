@@ -16,17 +16,18 @@ public class SimCellData {
         }
     }
 
-    protected void set_flws(long commid,List<Double> cummvalues,float dt_sec){
+    protected void set(long commid,List<Integer> time_indices,List<Double> flwdata,List<Double> vehdata,float dt_sec){
+        List<Double> veh = new ArrayList<>();
         List<Double> flw = new ArrayList<>();
         double alpha = 3600d/dt_sec;
-        for(int i = 1; i < cummvalues.size(); ++i)
-            flw.add((cummvalues.get(i)-cummvalues.get(i-1))*alpha);
-        flw.add(flw.get(flw.size()-1));
-        flws.put(commid,flw);
-    }
 
-    protected void set_vehs(long commid,List<Double> values){
-        vehs.put(commid,values);
+        for(int time_index : time_indices){
+            double this_flow = time_index==0 ? 0d : (flwdata.get(time_index)-flwdata.get(time_index-1))*alpha;
+            flw.add(this_flow);
+            veh.add(vehdata.get(time_index));
+        }
+        vehs.put(commid,veh);
+        flws.put(commid,flw);
     }
 
     public double [] get_total_flw(){
