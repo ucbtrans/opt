@@ -1,5 +1,8 @@
 package opt.data;
 
+import common.LaneGroupSet;
+import common.Link;
+import error.OTMException;
 import opt.UserSettings;
 import opt.data.control.*;
 import profiles.Profile1D;
@@ -270,7 +273,11 @@ public class FreewayScenario {
 
                 // target
                 AbstractLink link = scenario.links.get(jact.getActuatorTarget().getId());
-                int [] lanes = OTMUtils.read_lanes(jact.getActuatorTarget().getLanes(),link.get_lanes());
+
+                String str = jact.getActuatorTarget().getContent();
+                String [] a1 = str.split("[(]");
+                String [] a2 = a1[1].split("[)]");
+                int [] lanes = OTMUtils.read_lanes(a2[0],link.get_lanes());
                 LaneGroupType lgtype = link.lane2lgtype().get(lanes[0]-1);
 
                 // TODO FIX THIS WHEN WE GET TO HOV/HOT POLICIES

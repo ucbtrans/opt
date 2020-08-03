@@ -14,10 +14,10 @@ public class ActuatorHOVPolicy extends AbstractActuator  {
     public Actuator to_jaxb() {
         jaxb.Actuator j =  super.to_jaxb();
         j.setType("hovpolicy");
-        jaxb.ActuatorTarget jtgt = new jaxb.ActuatorTarget();
-        j.setActuatorTarget(jtgt);
-        jtgt.setType("link");
-        jtgt.setId(link.id);
+//        jaxb.ActuatorTarget jtgt = new jaxb.ActuatorTarget();
+//        j.setActuatorTarget(jtgt);
+//        jtgt.setType("link");
+//        jtgt.setId(link.id);
         return j;
     }
 
