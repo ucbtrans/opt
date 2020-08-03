@@ -272,10 +272,12 @@ public class FreewayScenario {
                 jaxb.Actuator jact = actuators.get(act_id);
 
                 // target
-                AbstractLink link = scenario.links.get(jact.getActuatorTarget().getId());
 
                 String str = jact.getActuatorTarget().getContent();
                 String [] a1 = str.split("[(]");
+                Long linkid = Long.parseLong(a1[0]);
+                AbstractLink link = scenario.links.get(linkid);
+
                 String [] a2 = a1[1].split("[)]");
                 int [] lanes = OTMUtils.read_lanes(a2[0],link.get_lanes());
                 LaneGroupType lgtype = link.lane2lgtype().get(lanes[0]-1);

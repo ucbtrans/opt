@@ -18,7 +18,7 @@ public class ActuatorRampMeter extends AbstractActuator {
 		j.setActuatorTarget(jtgt);
 		jtgt.setType("lanegroups");
 		int []lanes = link.lgtype2lanes(lgtype);
-		jtgt.setContent(String.format("%d(%d,%d)",link.id,lanes[0],lanes[1]));
+		jtgt.setContent(String.format("%d(%d#%d)",link.id,lanes[0],lanes[1]));
 		return j;
 	}
 
