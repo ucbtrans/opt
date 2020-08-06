@@ -223,6 +223,8 @@ public class RampMeterAlinea {
         myController.setSensor_offset_m(0.5f*sensor_link.get_length_meters());
 
         mySchedule.update(startSeconds,myController);
+        
+        linkEditorController.setProjectModified(true);
 
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();

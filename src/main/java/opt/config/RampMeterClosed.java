@@ -74,6 +74,8 @@ public class RampMeterClosed {
         int startSeconds = Misc.timeString2Seconds(textStartTime.getText());
 
         mySchedule.update(startSeconds,myController);
+        
+        linkEditorController.setProjectModified(true);
 
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();

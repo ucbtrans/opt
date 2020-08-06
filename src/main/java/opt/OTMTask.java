@@ -135,7 +135,7 @@ public class OTMTask  extends Task {
 		} finally {
 			simdata = new SimDataScenario(fwyscenario,otmdev,outdt);
 			fwyscenario.remove_ghost_pieces();
-			if(mainController!=null)
+			if(mainController!=null) 
 				mainController.attachSimDataToScenario(simdata);
 		}
 

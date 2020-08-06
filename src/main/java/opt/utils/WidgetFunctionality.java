@@ -36,25 +36,46 @@ import javafx.util.StringConverter;
 public class WidgetFunctionality {
     
     
-/**
- * Spinner commit: c&p from Spinner
- */
-public static <T> void commitEditorText(Spinner<T> spinner, T oldValue) {
-    if (!spinner.isEditable()) return;
-    String text = spinner.getEditor().getText();
-    SpinnerValueFactory<T> valueFactory = spinner.getValueFactory();
-    if (valueFactory != null) {
-        StringConverter<T> converter = valueFactory.getConverter();
-        if (converter != null) {
-            try {
-                T value = converter.fromString(text);
-                valueFactory.setValue(value);
-            } catch(Exception e) {
-                valueFactory.setValue(oldValue);
+    /**
+     * Spinner commit: c&p from Spinner
+     */
+    public static <T> void commitEditorText(Spinner<T> spinner, T oldValue) {
+        if (!spinner.isEditable()) return;
+        String text = spinner.getEditor().getText();
+        SpinnerValueFactory<T> valueFactory = spinner.getValueFactory();
+        if (valueFactory != null) {
+            StringConverter<T> converter = valueFactory.getConverter();
+            if (converter != null) {
+                try {
+                    T value = converter.fromString(text);
+                    valueFactory.setValue(value);
+                } catch(Exception e) {
+                    valueFactory.setValue(oldValue);
+                }
             }
         }
     }
-}
+
+
+    /**
+     * Spinner commit: c&p from Spinner
+     */
+    public static <T> void commitEditorText(Spinner<T> spinner) {
+        if (!spinner.isEditable()) return;
+        String text = spinner.getEditor().getText();
+        SpinnerValueFactory<T> valueFactory = spinner.getValueFactory();
+        if (valueFactory != null) {
+            StringConverter<T> converter = valueFactory.getConverter();
+            if (converter != null) {
+                try {
+                    T value = converter.fromString(text);
+                    valueFactory.setValue(value);
+                } catch(Exception e) {
+                    ;
+                }
+            }
+        }
+    }
     
     
     

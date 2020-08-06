@@ -186,6 +186,8 @@ public class RampMeterFixed {
         myController.setHas_queue_control(cbQueueControl.isSelected());
 
         mySchedule.update(startSeconds, myController);
+        
+        linkEditorController.setProjectModified(true);
 
         Stage stage = (Stage)topPane.getScene().getWindow();
         stage.close();

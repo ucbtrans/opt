@@ -28,8 +28,10 @@ package opt.config;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -464,6 +466,11 @@ public class LinkEditorController {
     }
     
     
+    public void setProjectModified(boolean val) {
+        appMainController.setProjectModified(val);
+    }
+    
+    
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {        
         linkFromName.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -499,7 +506,13 @@ public class LinkEditorController {
         lengthSpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter());
         linkLength.setValueFactory(lengthSpinnerValueFactory);
         linkLength.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (!ignoreChange && (Math.abs(oldValue-newValue) > 0.00001)) {
+            if (newValue == null) {
+                double length = (double) myLink.get_length_meters();
+                length = UserSettings.convertLength(length, "meters", UserSettings.unitsLength);
+                linkLength.getValueFactory().setValue(length);
+                return;
+            }
+            if (!ignoreChange && ((oldValue == null) || (Math.abs(oldValue-newValue) > 0.00001))) {
                 onLinkLengthChange();
             }
         });
@@ -513,30 +526,45 @@ public class LinkEditorController {
             }
             opt.utils.WidgetFunctionality.commitEditorText(linkLength, length);
         });
+        linkLength.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+            opt.utils.WidgetFunctionality.commitEditorText(linkLength);
+        });
         
         
         numLanesGPSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1, 1);
         numLanesGPSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter());
         numGPLanes.setValueFactory(numLanesGPSpinnerValueFactory);
         numGPLanes.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (!ignoreChange && (oldValue != newValue))
+            if (newValue == null) {
+                numGPLanes.getValueFactory().setValue(myLink.get_gp_lanes());
+                return;
+            }
+            if (!ignoreChange && (!Objects.equals(oldValue, newValue)))
                 onNumLanesChange();
         });
-        numGPLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
+        numGPLanes.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
             if (newValue)
                 return;
-            Integer num_lanes = new Integer(1);
+            int num_lanes = 1;
             if (myLink != null) {
-                num_lanes = new Integer(myLink.get_gp_lanes());
+                num_lanes = myLink.get_gp_lanes();
             }
             opt.utils.WidgetFunctionality.commitEditorText(numGPLanes, num_lanes);
         });
+        numGPLanes.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+            opt.utils.WidgetFunctionality.commitEditorText(numGPLanes);
+        });
+        
         
         numLanesAuxSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0, 1);
         numLanesAuxSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter());
         numAuxLanes.setValueFactory(numLanesAuxSpinnerValueFactory);
         numAuxLanes.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (!ignoreChange && (oldValue != newValue))
+            if (newValue == null) {
+                numAuxLanes.getValueFactory().setValue(myLink.get_aux_lanes());
+                return;
+            }
+            if (!ignoreChange && (!Objects.equals(oldValue, newValue)))
                 onNumLanesChange();
         });
         numAuxLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
@@ -548,12 +576,20 @@ public class LinkEditorController {
             }
             opt.utils.WidgetFunctionality.commitEditorText(numAuxLanes, num_lanes);
         });
+        numAuxLanes.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+            opt.utils.WidgetFunctionality.commitEditorText(numAuxLanes);
+        });
+        
         
         numLanesManagedSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 20, 0, 1);
         numLanesManagedSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter());
         numManagedLanes.setValueFactory(numLanesManagedSpinnerValueFactory);
         numManagedLanes.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (!ignoreChange && (oldValue != newValue))
+            if (newValue == null) {
+                numManagedLanes.getValueFactory().setValue(myLink.get_mng_lanes());
+                return;
+            }
+            if (!ignoreChange && (!Objects.equals(oldValue, newValue)))
                 onNumLanesChange();
         });
         numManagedLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
@@ -564,6 +600,9 @@ public class LinkEditorController {
                 num_lanes = myLink.get_mng_lanes();
             }
             opt.utils.WidgetFunctionality.commitEditorText(numManagedLanes, num_lanes);
+        });
+        numManagedLanes.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+            opt.utils.WidgetFunctionality.commitEditorText(numManagedLanes);
         });
         
         
