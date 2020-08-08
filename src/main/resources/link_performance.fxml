@@ -3,7 +3,6 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
 <TabPane id="linkPerformanceMainPane" fx:id="linkPerformanceMainPane" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.performance.LinkPerformanceController">
@@ -16,15 +15,11 @@
                </content></ScrollPane>
          </content>
     </Tab>
-    <Tab id="tabAggregates" fx:id="tabAggregates" disable="true" text="Aggregates">
+    <Tab id="tabAggregates" fx:id="tabAggregates" text="Aggregates">
          <content>
-            <ScrollPane id="spAggregates" fx:id="spAggregates" prefHeight="200.0" prefWidth="200.0" vbarPolicy="ALWAYS">
+            <ScrollPane id="spAggregates" fx:id="spAggregates" fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" vbarPolicy="ALWAYS">
                <content>
-                  <AnchorPane>
-                     <children>
-                        <VBox id="vbAggregates" fx:id="vbAggregates" prefHeight="397.0" prefWidth="237.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                     </children>
-                  </AnchorPane>
+                  <VBox id="vbAggregates" fx:id="vbAggregates" />
                </content></ScrollPane>
          </content>
     </Tab>

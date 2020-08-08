@@ -664,64 +664,431 @@ public class LinkPerformanceController {
             JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vehChart);
         }
     }
+    
      
     
     
     public void fillTabAggregates() {
-        String label_gp, label_mng, label_aux;
         vbAggregates.getChildren().clear();
+        String label_gp, label_mng, label_aux;
+        XYChart.Series dataSeries_gp, dataSeries_mng, dataSeries_aux, dataSeries_total;
+        List<XYDataItem> xydata_gp, xydata_mng, xydata_aux;
+        int sz_gp, sz_mng, sz_aux;
+        XYDataItem xy;
+        float dt = mySimData.get_speed(LaneGroupType.gp).get_dt();
+        
+        label_gp = "VMT in GP Lanes";
+        label_mng = "VMT in Managed Lanes";
+        label_aux = "VMT in Aux Lanes";
         
         NumberAxis xAxis = new NumberAxis();
-        xAxis.setLabel("Time");
-
+        xAxis.setLabel(timeLabel);
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Speed");
+        yAxis.setLabel("VMT");
 
-        LineChart speedChart = new LineChart(xAxis, yAxis);
+        LineChart vmtChart = new LineChart(xAxis, yAxis);
+        vmtChart.setTitle(label_gp);
         
-        label_gp = "Speed in GP Lanes";
-        label_mng = "Speed in Managed Lanes";
-        label_aux = "Speed in Aux Lanes";
+        int max_sz = 0;
+        for (Commodity c : listVT) {
+            max_sz = Math.max(max_sz, mySimData.get_vmt(LaneGroupType.gp, c.getId()).values.size());
+        }
+        double[] total = new double[max_sz];
+        for (int i = 0; i < max_sz; i++)
+            total[i] = 0;
+        for (Commodity c : listVT) {
+            dt = mySimData.get_vmt(LaneGroupType.gp, c.getId()).get_dt();
+            dataSeries_gp = new XYChart.Series();
+            dataSeries_gp.setName(c.get_name());
+            xydata_gp = mySimData.get_vmt(LaneGroupType.gp, c.getId()).get_XYSeries(c.get_name()).getItems();
+            
+            sz_gp = xydata_gp.size();
+            
+            for (int i = 0; i < max_sz; i++) {
+                if (i < sz_gp) {
+                    xy = xydata_gp.get(i);
+                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                    total[i] += xy.getYValue();
+                } else {
+                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                }
+            }
+            vmtChart.getData().add(dataSeries_gp);
+        }
+        
+        dataSeries_total = new XYChart.Series();
+        dataSeries_total.setName("Total");
+        for (int i = 0; i < max_sz; i++)
+            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+        if (listVT.size() > 1)
+            vmtChart.getData().add(dataSeries_total);
+        
+        vmtChart.setCreateSymbols(false);
+        vmtChart.setLegendSide(Side.RIGHT);
+        vmtChart.setMinHeight(200);
+        vbAggregates.getChildren().add(vmtChart);
+        JFXChartUtil.setupZooming(vmtChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+        });
+        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vmtChart);
+        
+        if (myLink.get_mng_lanes() > 0) {
+            xAxis = new NumberAxis();
+            xAxis.setLabel(timeLabel);
+            yAxis = new NumberAxis();
+            yAxis.setLabel("VMT");
 
-        XYChart.Series dataSeries_gp = new XYChart.Series();
+            vmtChart = new LineChart(xAxis, yAxis);
+            vmtChart.setTitle(label_mng);
+
+            max_sz = 0;
+            for (Commodity c : listVT) {
+                max_sz = Math.max(max_sz, mySimData.get_vmt(LaneGroupType.mng, c.getId()).values.size());
+            }
+            for (int i = 0; i < max_sz; i++)
+                total[i] = 0;
+            for (Commodity c : listVT) {
+                dataSeries_mng = new XYChart.Series();
+                dataSeries_mng.setName(c.get_name());
+                xydata_mng = mySimData.get_vmt(LaneGroupType.mng, c.getId()).get_XYSeries(c.get_name()).getItems();
+
+                sz_mng = xydata_mng.size();
+
+                for (int i = 0; i < max_sz; i++) {
+                    if (i < sz_mng) {
+                        xy = xydata_mng.get(i);
+                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                        total[i] += xy.getYValue();
+                    } else {
+                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                    }
+                }
+                vmtChart.getData().add(dataSeries_mng);
+            }
+            
+            dataSeries_total = new XYChart.Series();
+            dataSeries_total.setName("Total");
+            for (int i = 0; i < max_sz; i++)
+                dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+            if (listVT.size() > 1)
+                vmtChart.getData().add(dataSeries_total);
+        
+            vmtChart.setCreateSymbols(false);
+            vmtChart.setLegendSide(Side.RIGHT);
+            vmtChart.setMinHeight(200);
+            vbAggregates.getChildren().add(vmtChart);
+            JFXChartUtil.setupZooming(vmtChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+            });
+            JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vmtChart);
+        }
+        
+        if (myLink.get_aux_lanes() > 0) {
+            xAxis = new NumberAxis();
+            xAxis.setLabel(timeLabel);
+            yAxis = new NumberAxis();
+            yAxis.setLabel("VMT");
+
+            vmtChart = new LineChart(xAxis, yAxis);
+            vmtChart.setTitle(label_aux);
+
+            max_sz = 0;
+            for (Commodity c : listVT) {
+                max_sz = Math.max(max_sz, mySimData.get_vmt(LaneGroupType.aux, c.getId()).values.size());
+            }
+            for (int i = 0; i < max_sz; i++)
+                total[i] = 0;
+            for (Commodity c : listVT) {
+                dataSeries_aux = new XYChart.Series();
+                dataSeries_aux.setName(c.get_name());
+                xydata_aux = mySimData.get_vmt(LaneGroupType.aux, c.getId()).get_XYSeries(c.get_name()).getItems();
+
+                sz_aux = xydata_aux.size();
+
+                for (int i = 0; i < max_sz; i++) {
+                    if (i < sz_aux) {
+                        xy = xydata_aux.get(i);
+                        dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                        total[i] += xy.getYValue();
+                    } else {
+                        dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                    }
+                }
+                vmtChart.getData().add(dataSeries_aux);
+            }
+            
+            dataSeries_total = new XYChart.Series();
+            dataSeries_total.setName("Total");
+            for (int i = 0; i < max_sz; i++)
+                dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+            if (listVT.size() > 1)
+                vmtChart.getData().add(dataSeries_total);
+            
+            vmtChart.setCreateSymbols(false);
+            vmtChart.setLegendSide(Side.RIGHT);
+            vmtChart.setMinHeight(200);
+            vbAggregates.getChildren().add(vmtChart);
+            JFXChartUtil.setupZooming(vmtChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+            });
+            JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vmtChart);
+        }
+        
+        
+        label_gp = "VHT in GP Lanes";
+        label_mng = "VHT in Managed Lanes";
+        label_aux = "VHT in Aux Lanes";
+        
+        xAxis = new NumberAxis();
+        xAxis.setLabel(timeLabel);
+        yAxis = new NumberAxis();
+        yAxis.setLabel("VHT");
+
+        LineChart vhtChart = new LineChart(xAxis, yAxis);
+        vhtChart.setTitle(label_gp);
+        
+        max_sz = 0;
+        for (Commodity c : listVT) {
+            max_sz = Math.max(max_sz, mySimData.get_vht(LaneGroupType.gp, c.getId()).values.size());
+        }
+        total = new double[max_sz];
+        for (int i = 0; i < max_sz; i++)
+            total[i] = 0;
+        for (Commodity c : listVT) {
+            dt = mySimData.get_vht(LaneGroupType.gp, c.getId()).get_dt();
+            dataSeries_gp = new XYChart.Series();
+            dataSeries_gp.setName(c.get_name());
+            xydata_gp = mySimData.get_vht(LaneGroupType.gp, c.getId()).get_XYSeries(c.get_name()).getItems();
+            
+            sz_gp = xydata_gp.size();
+            
+            for (int i = 0; i < max_sz; i++) {
+                if (i < sz_gp) {
+                    xy = xydata_gp.get(i);
+                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                    total[i] += xy.getYValue();
+                } else {
+                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                }
+            }
+            vhtChart.getData().add(dataSeries_gp);
+        }
+        
+        dataSeries_total = new XYChart.Series();
+        dataSeries_total.setName("Total");
+        for (int i = 0; i < max_sz; i++)
+            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+        if (listVT.size() > 1)
+            vhtChart.getData().add(dataSeries_total);
+        
+        vhtChart.setCreateSymbols(false);
+        vhtChart.setLegendSide(Side.RIGHT);
+        vhtChart.setMinHeight(200);
+        vbAggregates.getChildren().add(vhtChart);
+        JFXChartUtil.setupZooming(vhtChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+        });
+        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart);
+        
+        if (myLink.get_mng_lanes() > 0) {
+            xAxis = new NumberAxis();
+            xAxis.setLabel(timeLabel);
+            yAxis = new NumberAxis();
+            yAxis.setLabel("VHT");
+
+            vhtChart = new LineChart(xAxis, yAxis);
+            vhtChart.setTitle(label_mng);
+
+            max_sz = 0;
+            for (Commodity c : listVT) {
+                max_sz = Math.max(max_sz, mySimData.get_vht(LaneGroupType.mng, c.getId()).values.size());
+            }
+            for (int i = 0; i < max_sz; i++)
+                total[i] = 0;
+            for (Commodity c : listVT) {
+                dataSeries_mng = new XYChart.Series();
+                dataSeries_mng.setName(c.get_name());
+                xydata_mng = mySimData.get_vht(LaneGroupType.mng, c.getId()).get_XYSeries(c.get_name()).getItems();
+
+                sz_mng = xydata_mng.size();
+
+                for (int i = 0; i < max_sz; i++) {
+                    if (i < sz_mng) {
+                        xy = xydata_mng.get(i);
+                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                        total[i] += xy.getYValue();
+                    } else {
+                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                    }
+                }
+                vhtChart.getData().add(dataSeries_mng);
+            }
+            
+            dataSeries_total = new XYChart.Series();
+            dataSeries_total.setName("Total");
+            for (int i = 0; i < max_sz; i++)
+                dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+            if (listVT.size() > 1)
+                vhtChart.getData().add(dataSeries_total);
+        
+            vhtChart.setCreateSymbols(false);
+            vhtChart.setLegendSide(Side.RIGHT);
+            vhtChart.setMinHeight(200);
+            vbAggregates.getChildren().add(vhtChart);
+            JFXChartUtil.setupZooming(vhtChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+            });
+            JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart);
+        }
+        
+        if (myLink.get_aux_lanes() > 0) {
+            xAxis = new NumberAxis();
+            xAxis.setLabel(timeLabel);
+            yAxis = new NumberAxis();
+            yAxis.setLabel("VHT");
+
+            vhtChart = new LineChart(xAxis, yAxis);
+            vhtChart.setTitle(label_aux);
+
+            max_sz = 0;
+            for (Commodity c : listVT) {
+                max_sz = Math.max(max_sz, mySimData.get_vht(LaneGroupType.aux, c.getId()).values.size());
+            }
+            for (int i = 0; i < max_sz; i++)
+                total[i] = 0;
+            for (Commodity c : listVT) {
+                dataSeries_aux = new XYChart.Series();
+                dataSeries_aux.setName(c.get_name());
+                xydata_aux = mySimData.get_vht(LaneGroupType.aux, c.getId()).get_XYSeries(c.get_name()).getItems();
+
+                sz_aux = xydata_aux.size();
+
+                for (int i = 0; i < max_sz; i++) {
+                    if (i < sz_aux) {
+                        xy = xydata_aux.get(i);
+                        dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                        total[i] += xy.getYValue();
+                    } else {
+                        dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                    }
+                }
+                vhtChart.getData().add(dataSeries_aux);
+            }
+            
+            dataSeries_total = new XYChart.Series();
+            dataSeries_total.setName("Total");
+            for (int i = 0; i < max_sz; i++)
+                dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+            if (listVT.size() > 1)
+                vhtChart.getData().add(dataSeries_total);
+            
+            vhtChart.setCreateSymbols(false);
+            vhtChart.setLegendSide(Side.RIGHT);
+            vhtChart.setMinHeight(200);
+            vbAggregates.getChildren().add(vhtChart);
+            JFXChartUtil.setupZooming(vhtChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+            });
+            JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart);
+        }
+
+        
+        label_gp = "GP Lanes";
+        label_mng = "Managed Lanes";
+        label_aux = "Aux Lanes";
+        String label_units = UserSettings.unitsSpeed;
+        double cc = UserSettings.speedConversionMap.get("mph"+label_units);
+        double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;
+        if (v_thres < 0)
+            v_thres = UserSettings.speedConversionMap.get("kphmph") * myLink.get_gp_freespeed_kph();
+        String label_thres = String.format("(Speed Threshold: %.0f %s)", cc*v_thres, label_units);
+        
+        xAxis = new NumberAxis();
+        xAxis.setLabel(timeLabel);
+        yAxis = new NumberAxis();
+        yAxis.setLabel("Delay (vehicle-hours)");
+
+        LineChart delayChart = new LineChart(xAxis, yAxis);
+        delayChart.setTitle("Delay " + label_thres);
+
+        dataSeries_gp = new XYChart.Series();
         dataSeries_gp.setName(label_gp);
-        List<XYDataItem> xydata_gp = mySimData.get_speed(LaneGroupType.gp).get_XYSeries(label_gp).getItems();
+        xydata_gp = mySimData.get_delay(LaneGroupType.gp, (float)v_thres).get_XYSeries(label_gp).getItems();
         
-        XYChart.Series dataSeries_mng = new XYChart.Series();
+        dataSeries_mng = new XYChart.Series();
         dataSeries_mng.setName(label_mng);
-        List<XYDataItem> xydata_mng = mySimData.get_speed(LaneGroupType.mng).get_XYSeries(label_mng).getItems();
+        xydata_mng = null;
+        sz_mng = 0;
+        if (myLink.get_mng_lanes() > 0) {
+            mySimData.get_delay(LaneGroupType.mng, (float)v_thres).get_XYSeries(label_mng).getItems();
+            sz_mng = xydata_mng.size();
+        }
         
-        XYChart.Series dataSeries_aux = new XYChart.Series();
+        dataSeries_aux = new XYChart.Series();
         dataSeries_aux.setName(label_aux);
-        List<XYDataItem> xydata_aux = mySimData.get_speed(LaneGroupType.gp).get_XYSeries(label_aux).getItems();
+        xydata_aux = null;
+        sz_aux = 0;
+        if (myLink.get_aux_lanes() > 0) {
+            mySimData.get_delay(LaneGroupType.aux, (float)v_thres).get_XYSeries(label_aux).getItems();
+            sz_aux = xydata_aux.size();
+        }
         
-        int sz_gp = xydata_gp.size();
-        int sz_mng = xydata_gp.size();
-        int sz_aux = xydata_gp.size();
+        sz_gp = xydata_gp.size();
+        max_sz = Math.max(Math.max(sz_gp, sz_mng), sz_aux);
         
-        for (int i = 0; i < sz_gp; i++) {
-            XYDataItem xy = xydata_gp.get(i);
-            dataSeries_gp.getData().add(new XYChart.Data(xy.getX(), xy.getY()));
+        dt = mySimData.get_speed(LaneGroupType.gp).get_dt();
+        for (int i = 0; i < max_sz; i++) {
+            if (i < sz_gp) {
+                xy = xydata_gp.get(i);
+                dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+            } else {
+                dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+            }
             if (i < sz_mng) {
                 xy = xydata_mng.get(i);
-                dataSeries_mng.getData().add(new XYChart.Data(xy.getX(), xy.getYValue()*0.5));
+                dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+            } else {
+                dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
             }
             if (i < sz_aux) {
                 xy = xydata_aux.get(i);
-                dataSeries_aux.getData().add(new XYChart.Data(xy.getX(), xy.getY()));
+                dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+            } else {
+                dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
             }
         }
 
-        speedChart.getData().add(dataSeries_gp);
+        delayChart.getData().add(dataSeries_gp);
         if (myLink.get_mng_lanes() > 0)
-            speedChart.getData().add(dataSeries_mng);
+            delayChart.getData().add(dataSeries_mng);
         if (myLink.get_aux_lanes() > 0)
-            speedChart.getData().add(dataSeries_aux);
-        speedChart.setCreateSymbols(false);
-        speedChart.setLegendSide(Side.RIGHT);
-
-        vbAggregates.getChildren().add(speedChart);
-
+            delayChart.getData().add(dataSeries_aux);
+        delayChart.setCreateSymbols(false);
+        delayChart.setLegendSide(Side.RIGHT);
+        delayChart.setMinHeight(200);
+        
+        vbAggregates.getChildren().add(delayChart);
+        
+        //Zooming works only via primary mouse button without ctrl held down
+        JFXChartUtil.setupZooming(delayChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+        });
+        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(delayChart);
+        
         
     }
         

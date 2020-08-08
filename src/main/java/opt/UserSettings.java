@@ -84,6 +84,7 @@ public class UserSettings {
     public static double defaultManagedLaneJamDensityVpk = 110;
     public static double defaultAuxLaneJamDensityVpk = 110;
     
+    public static double defaultFreeFlowSpeedThresholdForDelayMph = 45;
     
     public static int defaultDemandDtMinutes = 5;
     public static int defaultSRDtMinutes = 5;
