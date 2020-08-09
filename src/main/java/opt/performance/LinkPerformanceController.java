@@ -1048,33 +1048,47 @@ public class LinkPerformanceController {
         sz_gp = xydata_gp.size();
         max_sz = Math.max(Math.max(sz_gp, sz_mng), sz_aux);
         
-        dt = mySimData.get_speed(LaneGroupType.gp).get_dt();
+        for (int i = 0; i < max_sz; i++)
+            total[i] = 0;
+        
+        //dt = mySimData.get_speed(LaneGroupType.gp).get_dt();
         for (int i = 0; i < max_sz; i++) {
             if (i < sz_gp) {
                 xy = xydata_gp.get(i);
                 dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                total[i] += xy.getYValue();
             } else {
                 dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
             }
             if (i < sz_mng) {
                 xy = xydata_mng.get(i);
                 dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                total[i] += xy.getYValue();
             } else {
                 dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
             }
             if (i < sz_aux) {
                 xy = xydata_aux.get(i);
                 dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                total[i] += xy.getYValue();
             } else {
                 dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
             }
         }
 
+        dataSeries_total = new XYChart.Series();
+        dataSeries_total.setName("Total");
+        for (int i = 0; i < max_sz; i++)
+            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+        
         delayChart.getData().add(dataSeries_gp);
         if (myLink.get_mng_lanes() > 0)
             delayChart.getData().add(dataSeries_mng);
         if (myLink.get_aux_lanes() > 0)
             delayChart.getData().add(dataSeries_aux);
+        if ((myLink.get_mng_lanes() > 0) || (myLink.get_aux_lanes() > 0))
+            delayChart.getData().add(dataSeries_total);
+    
         delayChart.setCreateSymbols(false);
         delayChart.setLegendSide(Side.RIGHT);
         delayChart.setMinHeight(200);
