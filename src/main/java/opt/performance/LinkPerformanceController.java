@@ -1018,7 +1018,7 @@ public class LinkPerformanceController {
         xAxis = new NumberAxis();
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
-        yAxis.setLabel("Delay (vehicle-hours)");
+        yAxis.setLabel("Delay (veh.-hr.)");
 
         LineChart delayChart = new LineChart(xAxis, yAxis);
         delayChart.setTitle("Delay " + label_thres);
@@ -1032,7 +1032,7 @@ public class LinkPerformanceController {
         xydata_mng = null;
         sz_mng = 0;
         if (myLink.get_mng_lanes() > 0) {
-            mySimData.get_delay(LaneGroupType.mng, (float)v_thres).get_XYSeries(label_mng).getItems();
+            xydata_mng = mySimData.get_delay(LaneGroupType.mng, (float)v_thres).get_XYSeries(label_mng).getItems();
             sz_mng = xydata_mng.size();
         }
         
@@ -1041,7 +1041,7 @@ public class LinkPerformanceController {
         xydata_aux = null;
         sz_aux = 0;
         if (myLink.get_aux_lanes() > 0) {
-            mySimData.get_delay(LaneGroupType.aux, (float)v_thres).get_XYSeries(label_aux).getItems();
+            xydata_aux = mySimData.get_delay(LaneGroupType.aux, (float)v_thres).get_XYSeries(label_aux).getItems();
             sz_aux = xydata_aux.size();
         }
         
