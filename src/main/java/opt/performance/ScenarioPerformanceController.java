@@ -163,50 +163,67 @@ public class ScenarioPerformanceController {
         vbSummary.getChildren().clear();
         
         PieChart chart;
-        ObservableList<PieChart.Data> vehPieData = FXCollections.observableArrayList();
+        ObservableList<PieChart.Data> vmtPieData = FXCollections.observableArrayList();
+        ObservableList<PieChart.Data> vhtPieData = FXCollections.observableArrayList();
         
         int sz = listVT.size();
         String[] labels = new String[sz];
-        double[] counts = new double[sz];
+        double[] c_vmt = new double[sz];
+        double[] c_vht = new double[sz];
         int[] prcts = new int[sz];
-        double total_count = 0;
+        double total_vmt = 0;
+        double total_vht = 0;
         
         for (int i = 0; i < sz; i++) {
-            double total_c = 0;
-            List<Double> veh_s = mySimData.get_vehs_for_network(listVT.get(i).getId()).values;
-            for (double v : veh_s) 
-                total_c += v;
-            total_count += total_c;
-            counts[i] = total_c;
+            double t_vmt = 0;
+            double t_vht = 0;
+            List<Double> vmt_s = mySimData.get_vmt_for_network(listVT.get(i).getId()).values;
+            List<Double> vht_s = mySimData.get_vht_for_network(listVT.get(i).getId()).values;
+            t_vmt = vmt_s.stream().map((v) -> v).reduce(t_vmt, (accumulator, _item) -> accumulator + _item);
+            t_vht = vht_s.stream().map((v) -> v).reduce(t_vht, (accumulator, _item) -> accumulator + _item);
+            total_vmt += t_vmt;
+            total_vht += t_vht;
+            c_vmt[i] = t_vmt;
+            c_vht[i] = t_vht;
         }
         
-        int total_prct = 0;
+        int vmt_prct = 0;
+        int vht_prct = 0;
         for (int i = 0; i < sz; i++) {
-            int p = (int) Math.round(100 * counts[i] / total_count);
-            if (i == sz - 1)
-                p = Math.max(0, 100 - total_prct);
-            else
-                total_prct += p;
-            String l = listVT.get(i).get_name() + " = " + (int)Math.round(counts[i]) + " (" + p + "%)";
-            vehPieData.add(new PieChart.Data(l, counts[i]));
+            int p_vmt = (int) Math.round(100 * c_vmt[i] / total_vmt);
+            int p_vht = (int) Math.round(100 * c_vht[i] / total_vht);
+            if (i == sz - 1) {
+                p_vmt = Math.max(0, 100 - vmt_prct);
+                p_vht = Math.max(0, 100 - vht_prct);
+            }
+            else {
+                vmt_prct += p_vmt;
+                vht_prct += p_vht;
+            }
+            String l = listVT.get(i).get_name() + " = " + (int)Math.round(c_vmt[i]) + " (" + p_vmt + "%)";
+            vmtPieData.add(new PieChart.Data(l, c_vmt[i]));
+            l = listVT.get(i).get_name() + " = " + (int)Math.round(c_vht[i]) + " (" + p_vht + "%)";
+            vhtPieData.add(new PieChart.Data(l, c_vht[i]));
         }
         
-        chart = new PieChart(vehPieData);
-        chart.setTitle("Total Vehicles (" + (int)Math.round(total_count) + ")");
+        chart = new PieChart(vmtPieData);
+        chart.setTitle("Total VMT (" + (int)Math.round(total_vmt) + ")");
         chart.setLegendSide(Side.RIGHT);
         chart.setMinWidth(300);
         chart.setMinHeight(200);
         double prefWidth = scenarioPerformanceMainPane.getPrefWidth();
         double prefHeight = scenarioPerformanceMainPane.getPrefHeight()/3;
         chart.setPrefSize(prefWidth, prefHeight);
+        vbSummary.getChildren().add(chart);
         
-        /*JFXChartUtil.setupZooming(chart, (MouseEvent mouseEvent) -> {
-                if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
-                        mouseEvent.isShortcutDown() )
-                    mouseEvent.consume();
-        });
-        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(chart); */
-        
+        chart = new PieChart(vhtPieData);
+        chart.setTitle("Total VHT (" + (int)Math.round(total_vht) + ")");
+        chart.setLegendSide(Side.RIGHT);
+        chart.setMinWidth(300);
+        chart.setMinHeight(200);
+        prefWidth = scenarioPerformanceMainPane.getPrefWidth();
+        prefHeight = scenarioPerformanceMainPane.getPrefHeight()/3;
+        chart.setPrefSize(prefWidth, prefHeight);
         vbSummary.getChildren().add(chart);
         
     }

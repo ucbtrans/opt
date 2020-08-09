@@ -208,7 +208,7 @@ public class SimDataScenario {
 
     public TimeSeries get_vht_for_network(Long commid){
         TimeSeries X = get_vehs_for_network(commid);
-        X.mult(X.get_dt());
+        X.mult(X.get_dt()/3600.0f);
         return X;
     }
 
