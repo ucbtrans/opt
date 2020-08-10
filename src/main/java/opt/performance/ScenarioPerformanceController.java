@@ -295,8 +295,8 @@ public class ScenarioPerformanceController {
         dataSeries_total.setName("Total");
         for (int i = 0; i < max_sz; i++)
             dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-        //if (listVT.size() > 1)
-        //    vmtChart.getData().add(dataSeries_total);
+        if (listVT.size() > 1)
+            vmtChart.getData().add(dataSeries_total);
         
         vmtChart.setCreateSymbols(false);
         vmtChart.setLegendSide(Side.RIGHT);
@@ -308,6 +308,65 @@ public class ScenarioPerformanceController {
                 mouseEvent.consume();
         });
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vmtChart);
+        
+        
+        
+        label = "Network VHT";
+        
+        xAxis = new NumberAxis();
+        xAxis.setLabel(timeLabel);
+        yAxis = new NumberAxis();
+        yAxis.setLabel("VHT");
+
+        LineChart vhtChart = new LineChart(xAxis, yAxis);
+        vhtChart.setTitle(label);
+        
+        max_sz = 0;
+        for (Commodity c : listVT) {
+            TimeSeries ts = mySimData.get_vmt_for_network(c.getId());
+            if (ts != null)
+                max_sz = Math.max(max_sz, ts.values.size());
+        }
+        total = new double[max_sz];
+        for (int i = 0; i < max_sz; i++)
+            total[i] = 0;
+        for (Commodity c : listVT) {
+            dt = mySimData.get_vht_for_network(c.getId()).get_dt();
+            dataSeries = new XYChart.Series();
+            dataSeries.setName(c.get_name());
+            xydata = mySimData.get_vht_for_network(c.getId()).get_XYSeries(c.get_name()).getItems();
+            
+            sz = xydata.size();
+            
+            for (int i = 0; i < max_sz; i++) {
+                if (i < sz) {
+                    xy = xydata.get(i);
+                    dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                    total[i] += xy.getYValue();
+                } else {
+                    dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                }
+            }
+            vhtChart.getData().add(dataSeries);
+        }
+        
+        dataSeries_total = new XYChart.Series();
+        dataSeries_total.setName("Total");
+        for (int i = 0; i < max_sz; i++)
+            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+        if (listVT.size() > 1)
+            vhtChart.getData().add(dataSeries_total);
+        
+        vhtChart.setCreateSymbols(false);
+        vhtChart.setLegendSide(Side.RIGHT);
+        vhtChart.setMinHeight(200);
+        vbAggregates.getChildren().add(vhtChart);
+        JFXChartUtil.setupZooming(vhtChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+        });
+        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart);
         
         
     }
