@@ -233,6 +233,28 @@ public class SimDataScenario {
         }
         return delay;
     }
+    
+    public TimeSeries get_delay_for_network_sources(float speed_threshold_mph){
+        TimeSeries delay = new TimeSeries(time);
+        try {
+            for(SimDataLink lkdata : linkdata.values())
+                delay.add(lkdata.get_delay_source(null,speed_threshold_mph));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return delay;
+    }
+    
+    public TimeSeries get_delay_for_network_inner(float speed_threshold_mph){
+        TimeSeries delay = new TimeSeries(time);
+        try {
+            for(SimDataLink lkdata : linkdata.values())
+                delay.add(lkdata.get_delay_inner(null,speed_threshold_mph));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return delay;
+    }
 
     public TimeSeries get_vehs_for_network(Long commid){
         return new TimeSeries(time,get_vehs_for_network_array(commid));

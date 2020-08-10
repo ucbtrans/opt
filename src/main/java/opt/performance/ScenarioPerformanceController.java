@@ -178,6 +178,7 @@ public class ScenarioPerformanceController {
         PieChart chart;
         ObservableList<PieChart.Data> vmtPieData = FXCollections.observableArrayList();
         ObservableList<PieChart.Data> vhtPieData = FXCollections.observableArrayList();
+        ObservableList<PieChart.Data> delayPieData = FXCollections.observableArrayList();
         
         int sz = listVT.size();
         String[] labels = new String[sz];
@@ -239,6 +240,45 @@ public class ScenarioPerformanceController {
         chart.setPrefSize(prefWidth, prefHeight);
         vbSummary.getChildren().add(chart);
         
+        String label_units = UserSettings.unitsSpeed;
+        double cc = UserSettings.speedConversionMap.get("mph"+label_units);
+        double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;
+        TimeSeries delay_no = mySimData.get_delay_for_network_inner((float)v_thres);
+        TimeSeries delay_o = mySimData.get_delay_for_network_sources((float)v_thres);
+        
+        double d_n = 0.0;
+        if (delay_no != null) {
+            List<Double> vals = delay_no.values;
+            for (double v : vals)
+                d_n += v;
+        }
+        
+        double d_o = 0.0;
+        if (delay_o != null) {
+            List<Double> vals = delay_o.values;
+            for (double v : vals)
+                d_o += v;
+        }
+        
+        int p_no = (int) Math.round(100 * d_n / (d_n + d_o));
+        String l = String.format("Non-Origins = %.1f (%d%%)", d_n, p_no);
+        delayPieData.add(new PieChart.Data(l, d_n));
+        l = String.format("Origins = %.1f (%d%%)", d_o, 100-p_no);
+        delayPieData.add(new PieChart.Data(l, d_o));
+        
+        String label_thres = String.format("(%.1f veh.-hr., Speed Threshold: %.0f %s)", d_n+d_o, cc*v_thres, label_units);
+        if (v_thres < 0)
+            label_thres = String.format("(%.1f veh.-hr., Speed Threshold: Free Flow Speed)", d_n+d_o);
+        
+        chart = new PieChart(delayPieData);
+        chart.setTitle("Total Delay " + label_thres);
+        chart.setLegendSide(Side.RIGHT);
+        chart.setMinWidth(300);
+        chart.setMinHeight(200);
+        prefWidth = scenarioPerformanceMainPane.getPrefWidth();
+        prefHeight = scenarioPerformanceMainPane.getPrefHeight()/3;
+        chart.setPrefSize(prefWidth, prefHeight);
+        vbSummary.getChildren().add(chart);
     }
     
     
@@ -253,7 +293,6 @@ public class ScenarioPerformanceController {
         double dt = mySimData.get_dt_sec();
         
         label = "Network VMT";
-        
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel(timeLabel);
         NumberAxis yAxis = new NumberAxis();
@@ -272,7 +311,6 @@ public class ScenarioPerformanceController {
         for (int i = 0; i < max_sz; i++)
             total[i] = 0;
         for (Commodity c : listVT) {
-            dt = mySimData.get_vmt_for_network(c.getId()).get_dt();
             dataSeries = new XYChart.Series();
             dataSeries.setName(c.get_name());
             xydata = mySimData.get_vmt_for_network(c.getId()).get_XYSeries(c.get_name()).getItems();
@@ -312,7 +350,6 @@ public class ScenarioPerformanceController {
         
         
         label = "Network VHT";
-        
         xAxis = new NumberAxis();
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
@@ -323,7 +360,7 @@ public class ScenarioPerformanceController {
         
         max_sz = 0;
         for (Commodity c : listVT) {
-            TimeSeries ts = mySimData.get_vmt_for_network(c.getId());
+            TimeSeries ts = mySimData.get_vht_for_network(c.getId());
             if (ts != null)
                 max_sz = Math.max(max_sz, ts.values.size());
         }
@@ -331,7 +368,6 @@ public class ScenarioPerformanceController {
         for (int i = 0; i < max_sz; i++)
             total[i] = 0;
         for (Commodity c : listVT) {
-            dt = mySimData.get_vht_for_network(c.getId()).get_dt();
             dataSeries = new XYChart.Series();
             dataSeries.setName(c.get_name());
             xydata = mySimData.get_vht_for_network(c.getId()).get_XYSeries(c.get_name()).getItems();
@@ -367,6 +403,80 @@ public class ScenarioPerformanceController {
                 mouseEvent.consume();
         });
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart);
+         
+        
+        label = "Network Delay ";
+        String label_units = UserSettings.unitsSpeed;
+        double cc = UserSettings.speedConversionMap.get("mph"+label_units);
+        double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;
+        String label_thres = String.format("(Speed Threshold: %.0f %s)", cc*v_thres, label_units);
+        if (v_thres < 0)
+            label_thres = "(Speed Threshold: Free Flow Speed)";
+        xAxis = new NumberAxis();
+        xAxis.setLabel(timeLabel);
+        yAxis = new NumberAxis();
+        yAxis.setLabel("Delay (veh.-hr.)");
+
+        LineChart delayChart = new LineChart(xAxis, yAxis);
+        delayChart.setTitle(label + label_thres);
+        
+        max_sz = 0;
+        TimeSeries ts = mySimData.get_delay_for_network((float)v_thres);
+        if (ts != null)
+            max_sz = Math.max(max_sz, ts.values.size());
+
+        total = new double[max_sz];
+        for (int i = 0; i < max_sz; i++)
+            total[i] = 0;
+
+        dataSeries = new XYChart.Series();
+        dataSeries.setName("Non-Origin Sections");
+        xydata = mySimData.get_delay_for_network_inner((float)v_thres).get_XYSeries("Non-Origin Sections").getItems();
+        sz = xydata.size();
+        for (int i = 0; i < max_sz; i++) {
+            if (i < sz) {
+                xy = xydata.get(i);
+                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                total[i] += xy.getYValue();
+            } else {
+                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+            }
+        }
+        delayChart.getData().add(dataSeries);
+        
+        dataSeries = new XYChart.Series();
+        dataSeries.setName("Origin Sections");
+        ts = mySimData.get_delay_for_network_sources((float)v_thres);
+        xydata = ts.get_XYSeries("Origin Sections").getItems();
+        sz = xydata.size();
+        for (int i = 0; i < max_sz; i++) {
+            if (i < sz) {
+                xy = xydata.get(i);
+                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                total[i] += xy.getYValue();
+            } else {
+                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+            }
+        }
+        delayChart.getData().add(dataSeries);
+        
+        dataSeries_total = new XYChart.Series();
+        dataSeries_total.setName("Total");
+        for (int i = 0; i < max_sz; i++)
+            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+        if (listVT.size() > 1)
+            delayChart.getData().add(dataSeries_total);
+        
+        delayChart.setCreateSymbols(false);
+        delayChart.setLegendSide(Side.RIGHT);
+        delayChart.setMinHeight(200);
+        vbAggregates.getChildren().add(delayChart);
+        JFXChartUtil.setupZooming(delayChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+        });
+        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(delayChart);
         
         
     }

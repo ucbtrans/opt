@@ -11,6 +11,7 @@ public class SimDataLink {
 
     public double link_length_miles;
     public boolean is_source;
+    public boolean is_origin = false;
     protected float ffspeed_mph;
 
     public SimDataLink(SimDataScenario scndata,AbstractLink optlink, common.Link otmlink, Set<Long> commids){
@@ -19,6 +20,14 @@ public class SimDataLink {
         this.scndata = scndata;
         this.is_source = otmlink.is_source;
         this.link_length_miles = otmlink.length / 1609.344;
+        
+        if (optlink.get_up_link() == null) {
+            is_origin = true;
+        }
+        else if (optlink.get_up_link().get_type() == AbstractLink.Type.ghost) {
+            is_origin = true;
+            is_source = true;
+        }
 
         lgData = new HashMap<>();
         lgtype2id = new HashMap<>();
@@ -200,7 +209,7 @@ public class SimDataLink {
         return new TimeSeries(scndata.time,vmt);
     }
 
-    public TimeSeries get_delay(LaneGroupType lgtype, float threshold_mph){
+    public TimeSeries get_delay(LaneGroupType lgtype, float threshold_mph) {
 
         assert(lgtype2id.containsKey(lgtype) || lgtype==null);
 
@@ -245,7 +254,21 @@ public class SimDataLink {
 
         return new TimeSeries(scndata.time,delays);
     }
-
+    
+    public TimeSeries get_delay_source(LaneGroupType lgtype, float threshold_mph) {
+        if (is_origin)
+            return get_delay(lgtype, threshold_mph);
+        return null;
+    }
+    
+    public TimeSeries get_delay_inner(LaneGroupType lgtype, float threshold_mph) {
+        if (!is_origin)
+            return get_delay(lgtype, threshold_mph);
+        return null;
+    }
+    
+    
+    
     /** returns a TimeSeries of vehicle numbers for the given lane group type and commodity id
      * lgtype==null means all lanes in the link
      * comm==null means all commodities

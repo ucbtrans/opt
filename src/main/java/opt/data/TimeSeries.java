@@ -31,6 +31,9 @@ public class TimeSeries {
     }
 
     public void add(TimeSeries ts) throws Exception {
+        if (ts == null)
+            return;
+        
         if(this.time.size()!=ts.values.size())
             throw new Exception("this.time.size()!=ts.values.size()");
 
