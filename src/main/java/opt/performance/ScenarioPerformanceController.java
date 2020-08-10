@@ -83,6 +83,10 @@ public class ScenarioPerformanceController {
     private SimDataScenario mySimData = null;
     
     private List<Commodity> listVT = null;
+    
+    private float start = 0;
+    private String timeLabel;
+    private double timeDivider;
             
     
     @FXML // fx:id="scenarioPerformanceMainPane"
@@ -151,9 +155,18 @@ public class ScenarioPerformanceController {
         mySimData = sdata;
         myScenario = mySimData.fwyscenario;
         
+        start = myScenario.get_start_time();
+        
+        timeLabel = "Time (hours)";
+        timeDivider = 3600.0;
+        if (sdata.fwyscenario.get_sim_duration() <= 7200) {
+            timeLabel = "Time (minutes)";
+            timeDivider = 60.0;
+        }
+        
         listVT = Misc.makeListVT(myScenario.get_commodities());
         fillTabSummary();
-
+        fillTabAggregates();
              
     }
 
@@ -228,6 +241,76 @@ public class ScenarioPerformanceController {
         
     }
     
+    
+    
+    public void fillTabAggregates() {
+        vbAggregates.getChildren().clear();
+        String label;
+        XYChart.Series dataSeries, dataSeries_mng, dataSeries_aux, dataSeries_total;
+        List<XYDataItem> xydata, xydata_src;
+        int sz, sz_src;
+        XYDataItem xy;
+        double dt = mySimData.get_dt_sec();
+        
+        label = "Network VMT";
+        
+        NumberAxis xAxis = new NumberAxis();
+        xAxis.setLabel(timeLabel);
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("VMT");
+
+        LineChart vmtChart = new LineChart(xAxis, yAxis);
+        vmtChart.setTitle(label);
+        
+        int max_sz = 0;
+        for (Commodity c : listVT) {
+            TimeSeries ts = mySimData.get_vmt_for_network(c.getId());
+            if (ts != null)
+                max_sz = Math.max(max_sz, ts.values.size());
+        }
+        double[] total = new double[max_sz];
+        for (int i = 0; i < max_sz; i++)
+            total[i] = 0;
+        for (Commodity c : listVT) {
+            dt = mySimData.get_vmt_for_network(c.getId()).get_dt();
+            dataSeries = new XYChart.Series();
+            dataSeries.setName(c.get_name());
+            xydata = mySimData.get_vmt_for_network(c.getId()).get_XYSeries(c.get_name()).getItems();
+            
+            sz = xydata.size();
+            
+            for (int i = 0; i < max_sz; i++) {
+                if (i < sz) {
+                    xy = xydata.get(i);
+                    dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+                    total[i] += xy.getYValue();
+                } else {
+                    dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                }
+            }
+            vmtChart.getData().add(dataSeries);
+        }
+        
+        dataSeries_total = new XYChart.Series();
+        dataSeries_total.setName("Total");
+        for (int i = 0; i < max_sz; i++)
+            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+        //if (listVT.size() > 1)
+        //    vmtChart.getData().add(dataSeries_total);
+        
+        vmtChart.setCreateSymbols(false);
+        vmtChart.setLegendSide(Side.RIGHT);
+        vmtChart.setMinHeight(200);
+        vbAggregates.getChildren().add(vmtChart);
+        JFXChartUtil.setupZooming(vmtChart, (MouseEvent mouseEvent) -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+        });
+        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vmtChart);
+        
+        
+    }
     
     
 }

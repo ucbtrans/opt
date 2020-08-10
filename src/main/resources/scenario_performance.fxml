@@ -17,9 +17,9 @@
     </Tab>
     <Tab id="tabAggregates" fx:id="tabAggregates" text="Aggregates">
          <content>
-            <ScrollPane id="spAggregates" fx:id="spAggregates" prefHeight="200.0" prefWidth="200.0" vbarPolicy="ALWAYS">
+            <ScrollPane id="spAggregates" fx:id="spAggregates" fitToHeight="true" fitToWidth="true" vbarPolicy="ALWAYS">
                <content>
-                  <VBox id="vbAggregates" fx:id="vbAggregates" />
+                  <VBox id="vbAggregates" fx:id="vbAggregates" prefHeight="820.0" prefWidth="900.0" />
                </content></ScrollPane>
          </content>
     </Tab>

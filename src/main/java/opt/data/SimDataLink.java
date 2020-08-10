@@ -205,7 +205,12 @@ public class SimDataLink {
         assert(lgtype2id.containsKey(lgtype) || lgtype==null);
 
         double dt_hr = scndata.get_dt_sec() / 3600d;
-        double cell_length_over_threshold = cell_length() / threshold_mph;
+        
+        double my_thres = threshold_mph;
+        if (my_thres < 0)
+            my_thres = ffspeed_mph;
+        
+        double cell_length_over_threshold = cell_length() / my_thres;
 
         double [] delays = new double [scndata.numtime()];
 
