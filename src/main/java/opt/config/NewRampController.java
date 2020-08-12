@@ -188,6 +188,7 @@ public class NewRampController {
         }
         
         cbInnerRamp.setSelected(false);
+        cbInnerRamp.setDisable(false);
         
         if (is_onramp) {
             if (from_name.equals(""))
