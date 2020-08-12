@@ -339,7 +339,7 @@ public class Scenario {
                         rcs.add( make_road_connection(my_fwy_scenario, up_link, null, dn_link, LaneGroupType.gp) );
 
                 // VII) outer or -> fwy aux OR outer or->fwy gp
-                if (up_link.get_is_inner())
+                if (!up_link.get_is_inner())
                     if (dn_link.has_aux())
                         rcs.add( make_road_connection(my_fwy_scenario, up_link, null, dn_link, LaneGroupType.aux) );
                     else

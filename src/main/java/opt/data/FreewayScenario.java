@@ -1,8 +1,5 @@
 package opt.data;
 
-import common.LaneGroupSet;
-import common.Link;
-import error.OTMException;
 import opt.UserSettings;
 import opt.data.control.*;
 import profiles.Profile1D;
@@ -31,7 +28,7 @@ public class FreewayScenario {
 
     // simulation parameters
     protected float sim_start_time = 0f;
-    protected float sim_duration;
+    protected float sim_duration = (float) UserSettings.defaultSimulationDuration;
     protected float max_celllength_meters = UserSettings.defaultMaxCellLength;
     protected float sim_dt = Float.NaN;
 
