@@ -89,11 +89,12 @@ public class UserSettings {
     public static int defaultDemandDtMinutes = 5;
     public static int defaultSRDtMinutes = 5;
     
-    public static int defaultSimulationDtSeconds = 5;
+//    public static int defaultSimulationDtSeconds = 5;
     public static double defaultStartTime = 0.0;
     public static double defaultSimulationDuration = 86400.0;
-    
-    
+
+    public static float defaultMaxCellLength = 100f;
+
     public static double minGPRampMeteringRatePerLaneVph = 160;
     public static double minManagedRampMeteringRatePerLaneVph = 320;
     public static double maxGPRampMeteringRatePerLaneVph = 1200;

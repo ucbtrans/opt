@@ -243,7 +243,7 @@ public class ScenarioPerformanceController {
         String label_units = UserSettings.unitsSpeed;
         double cc = UserSettings.speedConversionMap.get("mph"+label_units);
         double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;
-        TimeSeries delay_no = mySimData.get_delay_for_network_inner((float)v_thres);
+        TimeSeries delay_no = mySimData.get_delay_for_network_nonsources((float)v_thres);
         TimeSeries delay_o = mySimData.get_delay_for_network_sources((float)v_thres);
         
         double d_n = 0.0;
@@ -431,7 +431,7 @@ public class ScenarioPerformanceController {
 
         dataSeries = new XYChart.Series();
         dataSeries.setName("Non-Origin Sections");
-        xydata = mySimData.get_delay_for_network_inner((float)v_thres).get_XYSeries("Non-Origin Sections").getItems();
+        xydata = mySimData.get_delay_for_network_nonsources((float)v_thres).get_XYSeries("Non-Origin Sections").getItems();
         sz = xydata.size();
         for (int i = 0; i < max_sz; i++) {
             if (i < sz) {

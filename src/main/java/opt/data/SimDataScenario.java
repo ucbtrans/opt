@@ -3,7 +3,6 @@ package opt.data;
 import api.OTMdev;
 import models.fluid.FluidLaneGroup;
 import output.*;
-import profiles.Profile1D;
 
 import java.util.*;
 
@@ -26,7 +25,8 @@ public class SimDataScenario {
         for(AbstractLink optlink : fwyscenario.get_links()) {
             if(optlink.get_type()== AbstractLink.Type.ghost)
                 continue;
-            linkdata.put(optlink.id, new SimDataLink(this, optlink, otmdev.scenario.network.links.get(optlink.id), commids));
+            boolean is_source = fwyscenario.ghost_pieces.links.contains(optlink.get_up_link());
+            linkdata.put(optlink.id, new SimDataLink(this, optlink, otmdev.scenario.network.links.get(optlink.id), commids,is_source));
         }
 
         float start_time = fwyscenario.get_start_time();
@@ -126,8 +126,8 @@ public class SimDataScenario {
         double[] flw_length = new double[numtime()];
 
         for(SimDataLink lkdata : linkdata.values()) {
-            if(lkdata.is_source)
-                continue;
+//            if(lkdata.is_source)
+//                continue;
             double cell_length_miles = lkdata.cell_length();
             for (SimDataLanegroup lgdata : lkdata.lgData.values()) {
                 for (SimCellData celldata : lgdata.celldata) {
@@ -233,23 +233,25 @@ public class SimDataScenario {
         }
         return delay;
     }
-    
+
     public TimeSeries get_delay_for_network_sources(float speed_threshold_mph){
         TimeSeries delay = new TimeSeries(time);
         try {
             for(SimDataLink lkdata : linkdata.values())
-                delay.add(lkdata.get_delay_source(null,speed_threshold_mph));
+                if(lkdata.is_source)
+                    delay.add(lkdata.get_delay(null, speed_threshold_mph));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return delay;
     }
-    
-    public TimeSeries get_delay_for_network_inner(float speed_threshold_mph){
+
+    public TimeSeries get_delay_for_network_nonsources(float speed_threshold_mph){
         TimeSeries delay = new TimeSeries(time);
         try {
             for(SimDataLink lkdata : linkdata.values())
-                delay.add(lkdata.get_delay_inner(null,speed_threshold_mph));
+                if(!lkdata.is_source)
+                    delay.add(lkdata.get_delay(null, speed_threshold_mph));
         } catch (Exception e) {
             e.printStackTrace();
         }

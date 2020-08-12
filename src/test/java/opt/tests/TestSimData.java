@@ -25,14 +25,15 @@ public class TestSimData extends AbstractTest {
 
         // load
         OTMTask task = null;
-        String project_file_name = get_test_fullpath("project.opt");
+//        String project_file_name = get_test_fullpath("project.opt");
+        String project_file_name = "/home/gomes/Desktop/testrc/config/Y.opt";
         boolean validate = true;
         try {
             Project project = ProjectFactory.load_project(project_file_name,validate);
             FreewayScenario fwyscenario = project.get_scenarios().iterator().next();
             fwyscenario.set_start_time(0f);
             fwyscenario.set_sim_duration(3600f);
-            task = new OTMTask(null,fwyscenario,2f,10);
+            task = new OTMTask(null,fwyscenario,300f,10);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -80,6 +81,31 @@ public class TestSimData extends AbstractTest {
                 "network delay",
                 "veh hours",
                 "temp/net_delay.png");
+    }
+
+    @Test
+    public void network_delay_sources(){
+        XYSeriesCollection A = new XYSeriesCollection();
+        A.addSeries(simdata.get_delay_for_network_sources(20f).get_XYSeries("20 mph"));
+        A.addSeries(simdata.get_delay_for_network_sources(35f).get_XYSeries("35 mph"));
+        A.addSeries(simdata.get_delay_for_network_sources(50f).get_XYSeries("50 mph"));
+        TestPlot.plot(A,
+                "network delay",
+                "veh hours",
+                "temp/net_delay_sources.png");
+    }
+
+
+    @Test
+    public void network_delay_nonsources(){
+        XYSeriesCollection A = new XYSeriesCollection();
+        A.addSeries(simdata.get_delay_for_network_nonsources(20f).get_XYSeries("20 mph"));
+        A.addSeries(simdata.get_delay_for_network_nonsources(35f).get_XYSeries("35 mph"));
+        A.addSeries(simdata.get_delay_for_network_nonsources(50f).get_XYSeries("50 mph"));
+        TestPlot.plot(A,
+                "network delay",
+                "veh hours",
+                "temp/net_delay_nonsources.png");
     }
 
     @Test

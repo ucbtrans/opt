@@ -19,6 +19,8 @@ public class OTMTask  extends Task {
 	private float outdt;
 	private int step_per_progbar_update;
 
+	private Exception exception;
+
 	public OTMTask(AppMainController mainController, FreewayScenario fwyscenario,float outdt, int progbar_steps) throws Exception {
 
 		this.mainController = mainController;
@@ -93,7 +95,8 @@ public class OTMTask  extends Task {
 
 	public SimDataScenario run_simulation(){
 
-		SimDataScenario simdata;
+		SimDataScenario simdata = null;
+		exception = null;
 
 		try {
 
@@ -129,14 +132,15 @@ public class OTMTask  extends Task {
 					});
 				}
 			}
+			simdata = new SimDataScenario(fwyscenario,otmdev,outdt);
 
 		} catch (Exception e) {
+			this.exception = e;
 			failed();
 		} finally {
-			simdata = new SimDataScenario(fwyscenario,otmdev,outdt);
 			fwyscenario.remove_ghost_pieces();
 			if(mainController!=null) 
-				mainController.attachSimDataToScenario(simdata);
+				mainController.attachSimDataToScenario(simdata,exception);
 		}
 
 		return simdata;

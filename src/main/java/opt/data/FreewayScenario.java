@@ -32,7 +32,7 @@ public class FreewayScenario {
     // simulation parameters
     protected float sim_start_time = 0f;
     protected float sim_duration;
-    protected float max_celllength_meters;
+    protected float max_celllength_meters = UserSettings.defaultMaxCellLength;
     protected float sim_dt = Float.NaN;
 
     protected GhostPieces ghost_pieces;
@@ -405,6 +405,8 @@ public class FreewayScenario {
     }
 
     public void set_max_celllength_meters(float new_max_celllength_meters){
+        if(new_max_celllength_meters<=0f)
+            new_max_celllength_meters = UserSettings.defaultMaxCellLength;
         if(new_max_celllength_meters!=max_celllength_meters){
             sim_dt = Float.NaN;
             this.max_celllength_meters = new_max_celllength_meters;
