@@ -314,7 +314,7 @@ public class Scenario {
                     if( up_link.has_mng())
                         rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.mng,offramp,null) );
                     else
-                        rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,dn_link,null) );
+                        rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,offramp,null) );
 
 
                 // V) gp->outer offramp or aux->outer offramp
