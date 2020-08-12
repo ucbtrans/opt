@@ -1,9 +1,16 @@
 package opt.data;
 
+import profiles.Profile1D;
+
+import java.util.Map;
+
 public class LinkGhost extends LinkFreewayOrConnector {
 
-    public LinkGhost(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, ParametersFreeway params) {
+    public LinkGhost(long id, Segment mysegment, AbstractLink up_link, AbstractLink dn_link, Long start_node_id, Long end_node_id, ParametersFreeway params, Map<Long, Profile1D> demands) {
         super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, params);
+
+        if(demands!=null)
+            this.demands = demands;
     }
 
     ///////////////////////////////

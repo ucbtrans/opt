@@ -21,11 +21,13 @@ public class SimCellData {
         List<Double> flw = new ArrayList<>();
         double alpha = 3600d/dt_sec;
 
-        for(int time_index : time_indices){
-            double this_flow = time_index==0 ? 0d : (flwdata.get(time_index)-flwdata.get(time_index-1))*alpha;
-            flw.add(this_flow);
-            veh.add(vehdata.get(time_index));
-        }
+        if(!vehdata.isEmpty())
+            for(int time_index : time_indices){
+                double this_flow = time_index==0 ? 0d : (flwdata.get(time_index)-flwdata.get(time_index-1))*alpha;
+                flw.add(this_flow);
+                veh.add(vehdata.get(time_index));
+            }
+
         vehs.put(commid,veh);
         flws.put(commid,flw);
     }

@@ -971,9 +971,11 @@ public class FreewayScenario {
                     link,
                     newnode.id,
                     link.start_node_id,
-                    newparams);
+                    newparams,
+                    link.demands);
 
             ghost_pieces.links.add(newlink);
+
             scenario.links.put(newlink.id,newlink);                                                  // ADDED GHOST LINK
             newsegment.fwy = newlink;
             link.up_link = newlink;                                                            // MODIFIED EXISTING LINK
@@ -982,8 +984,7 @@ public class FreewayScenario {
             scenario.nodes.get(link.start_node_id).in_links.add(newlink.id);                   // MODIFIED EXISTING NODE
 
             // transfer demands to new link
-            newlink.demands = link.demands;
-            link.demands = new HashMap<>();                                                 // MODIFIED EXISTING DEMANDS
+            link.demands = new HashMap<>();                                                 // REMOVE EXISTING DEMANDS
 
         }
 
@@ -1026,7 +1027,8 @@ public class FreewayScenario {
                     null,
                     link.end_node_id,
                     newnode.id,
-                    newparams);
+                    newparams,
+                    null);
 
             ghost_pieces.links.add(newlink);
             scenario.links.put(newlink.id,newlink);                                                  // ADDED GHOST LINK

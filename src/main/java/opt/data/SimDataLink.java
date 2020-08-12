@@ -1,4 +1,6 @@
 package opt.data;
+import utils.OTMUtils;
+
 import java.util.*;
 
 public class SimDataLink {
@@ -235,7 +237,7 @@ public class SimDataLink {
                 double veh = 0d;
                 for (SimCellData cd : lgdata.celldata) {
                     for(long commid : cd.vehs.keySet()){
-                        flw += cd.flws.get(commid).get(k-1);
+                        flw += cd.flws.get(commid).get(k);
                         veh += cd.vehs.get(commid).get(k);
                     }
                 }
@@ -244,6 +246,7 @@ public class SimDataLink {
         }
 
         return new TimeSeries(scndata.time,delays);
+
     }
 
     /** returns a TimeSeries of vehicle numbers for the given lane group type and commodity id
