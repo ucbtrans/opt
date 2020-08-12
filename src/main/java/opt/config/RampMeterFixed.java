@@ -135,6 +135,7 @@ public class RampMeterFixed {
         textStartTime.setText(Misc.seconds2timestring(origStartTime, ""));
 
         double rate_vphpl = myController.get_rate_vphpl();
+        double ctrl_max_rate = myController.getMax_rate_vph();
         double max_rate = Math.min(myLink.get_gp_capacity_vphpl(), myController.getMax_rate_vph());
         
         String unitsFlow = UserSettings.unitsFlow;

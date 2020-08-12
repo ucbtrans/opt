@@ -240,7 +240,7 @@ public class ScenarioPerformanceController {
         chart.setPrefSize(prefWidth, prefHeight);
         vbSummary.getChildren().add(chart);
         
-        /*
+        
         String label_units = UserSettings.unitsSpeed;
         double cc = UserSettings.speedConversionMap.get("mph"+label_units);
         double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;
@@ -280,7 +280,7 @@ public class ScenarioPerformanceController {
         prefHeight = scenarioPerformanceMainPane.getPrefHeight()/3;
         chart.setPrefSize(prefWidth, prefHeight);
         vbSummary.getChildren().add(chart);
-        */
+
     }
     
     
@@ -406,7 +406,6 @@ public class ScenarioPerformanceController {
         });
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart);
          
-        /*
         label = "Network Delay ";
         String label_units = UserSettings.unitsSpeed;
         double cc = UserSettings.speedConversionMap.get("mph"+label_units);
@@ -479,7 +478,6 @@ public class ScenarioPerformanceController {
                 mouseEvent.consume();
         });
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(delayChart);
-        */
         
     }
     
