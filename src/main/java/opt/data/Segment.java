@@ -424,23 +424,23 @@ public final class Segment implements Comparable {
         return this.name.compareTo(((Segment) that).name);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Segment segment = (Segment) o;
-        return id == segment.id &&
-                name.equals(segment.name) &&
-                fwy.equals(segment.fwy) &&
-                in_ors.equals(segment.in_ors) &&
-                out_ors.equals(segment.out_ors) &&
-                in_frs.equals(segment.in_frs) &&
-                out_frs.equals(segment.out_frs);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, fwy, in_ors, out_ors, in_frs, out_frs);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        Segment segment = (Segment) o;
+//        return id == segment.id &&
+//                name.equals(segment.name) &&
+//                fwy.equals(segment.fwy) &&
+//                in_ors.equals(segment.in_ors) &&
+//                out_ors.equals(segment.out_ors) &&
+//                in_frs.equals(segment.in_frs) &&
+//                out_frs.equals(segment.out_frs);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(id, name, fwy, in_ors, out_ors, in_frs, out_frs);
+//    }
 
 }

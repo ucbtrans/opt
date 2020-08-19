@@ -10,21 +10,21 @@ public class RoadGeom {
     public AddLanes aux_addlanes;
     public FDparams aux_fdparams;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RoadGeom that = (RoadGeom) o;
-        return Objects.equals(mng_addlanes, that.mng_addlanes) &&
-                Objects.equals(mng_fdparams, that.mng_fdparams) &&
-                Objects.equals(aux_addlanes, that.aux_addlanes) &&
-                Objects.equals(aux_fdparams, that.aux_fdparams);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(mng_addlanes, mng_fdparams, aux_addlanes, aux_fdparams);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        RoadGeom that = (RoadGeom) o;
+//        return Objects.equals(mng_addlanes, that.mng_addlanes) &&
+//                Objects.equals(mng_fdparams, that.mng_fdparams) &&
+//                Objects.equals(aux_addlanes, that.aux_addlanes) &&
+//                Objects.equals(aux_fdparams, that.aux_fdparams);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(mng_addlanes, mng_fdparams, aux_addlanes, aux_fdparams);
+//    }
 
     public boolean notEmpty(){
         return mng_addlanes!=null || aux_addlanes!=null;

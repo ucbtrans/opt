@@ -55,17 +55,17 @@ public class Commodity {
         return String.format("id=%d, name=%s, weight=%s", id, name, pvequiv);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Commodity commodity = (Commodity) o;
-        return id == commodity.id &&  name.equals(commodity.name) && pvequiv == commodity.pvequiv;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, pvequiv);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        Commodity commodity = (Commodity) o;
+//        return id == commodity.id &&  name.equals(commodity.name) && pvequiv == commodity.pvequiv;
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(id, name, pvequiv);
+//    }
 
 }

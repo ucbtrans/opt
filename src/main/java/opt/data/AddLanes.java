@@ -22,23 +22,23 @@ public class AddLanes {
         this.gates = gates;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AddLanes addLanes = (AddLanes) o;
-        return isopen == addLanes.isopen &&
-                side.equals(addLanes.side) &&
-                Objects.equals(pos, addLanes.pos) &&
-                Objects.equals(length, addLanes.length) &&
-                lanes.equals(addLanes.lanes) &&
-                Objects.equals(gates, addLanes.gates);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(isopen, side, pos, length, lanes, gates);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        AddLanes addLanes = (AddLanes) o;
+//        return isopen == addLanes.isopen &&
+//                side.equals(addLanes.side) &&
+//                Objects.equals(pos, addLanes.pos) &&
+//                Objects.equals(length, addLanes.length) &&
+//                lanes.equals(addLanes.lanes) &&
+//                Objects.equals(gates, addLanes.gates);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(isopen, side, pos, length, lanes, gates);
+//    }
 
 //    public Gates getGates() {
 //        return jaddlanes.getGates();

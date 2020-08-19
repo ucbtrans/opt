@@ -1073,21 +1073,21 @@ public class FreewayScenario {
     // override
     /////////////////////////////////////
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        FreewayScenario that = (FreewayScenario) o;
-        return name.equals(that.name) &&
-                description.equals(that.description) &&
-                scenario.equals(that.scenario) &&
-                segments.equals(that.segments);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, description, scenario, segments);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        FreewayScenario that = (FreewayScenario) o;
+//        return name.equals(that.name) &&
+//                description.equals(that.description) &&
+//                scenario.equals(that.scenario) &&
+//                segments.equals(that.segments);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(name, description, scenario, segments);
+//    }
 
     /////////////////////////////////////
     // class

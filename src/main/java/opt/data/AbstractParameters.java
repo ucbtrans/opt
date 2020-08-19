@@ -106,29 +106,29 @@ public abstract class AbstractParameters {
     // override
     /////////////////////////////////////
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AbstractParameters that = (AbstractParameters) o;
-        return Objects.equals(name, that.name) &&
-                Objects.equals(gp_lanes, that.gp_lanes) &&
-                Objects.equals(mng_lanes, that.mng_lanes) &&
-                mng_barrier ==that.mng_barrier &&
-                mng_separated ==that.mng_separated &&
-                Objects.equals(length, that.length) &&
-                Objects.equals(gp_fd.capacity_vphpl, that.gp_fd.capacity_vphpl) &&
-                Objects.equals(gp_fd.jam_density_vpkpl, that.gp_fd.jam_density_vpkpl) &&
-                Objects.equals(gp_fd.ff_speed_kph, that.gp_fd.ff_speed_kph) &&
-                Objects.equals(mng_fd.capacity_vphpl, that.mng_fd.capacity_vphpl) &&
-                Objects.equals(mng_fd.jam_density_vpkpl, that.mng_fd.jam_density_vpkpl) &&
-                Objects.equals(mng_fd.ff_speed_kph, that.mng_fd.ff_speed_kph) ;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name,gp_lanes, mng_lanes, mng_barrier, mng_separated,length,
-                gp_fd.capacity_vphpl, gp_fd.jam_density_vpkpl, gp_fd.ff_speed_kph,
-                mng_fd.capacity_vphpl, mng_fd.jam_density_vpkpl, mng_fd.ff_speed_kph);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        AbstractParameters that = (AbstractParameters) o;
+//        return Objects.equals(name, that.name) &&
+//                Objects.equals(gp_lanes, that.gp_lanes) &&
+//                Objects.equals(mng_lanes, that.mng_lanes) &&
+//                mng_barrier ==that.mng_barrier &&
+//                mng_separated ==that.mng_separated &&
+//                Objects.equals(length, that.length) &&
+//                Objects.equals(gp_fd.capacity_vphpl, that.gp_fd.capacity_vphpl) &&
+//                Objects.equals(gp_fd.jam_density_vpkpl, that.gp_fd.jam_density_vpkpl) &&
+//                Objects.equals(gp_fd.ff_speed_kph, that.gp_fd.ff_speed_kph) &&
+//                Objects.equals(mng_fd.capacity_vphpl, that.mng_fd.capacity_vphpl) &&
+//                Objects.equals(mng_fd.jam_density_vpkpl, that.mng_fd.jam_density_vpkpl) &&
+//                Objects.equals(mng_fd.ff_speed_kph, that.mng_fd.ff_speed_kph) ;
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(name,gp_lanes, mng_lanes, mng_barrier, mng_separated,length,
+//                gp_fd.capacity_vphpl, gp_fd.jam_density_vpkpl, gp_fd.ff_speed_kph,
+//                mng_fd.capacity_vphpl, mng_fd.jam_density_vpkpl, mng_fd.ff_speed_kph);
+//    }
 }

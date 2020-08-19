@@ -38,20 +38,20 @@ public class Node {
     // override
     /////////////////////////////////////
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Node node = (Node) o;
-        return id == node.id &&
-                in_links.equals(node.in_links) &&
-                out_links.equals(node.out_links);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, in_links, out_links);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        Node node = (Node) o;
+//        return id == node.id &&
+//                in_links.equals(node.in_links) &&
+//                out_links.equals(node.out_links);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(id, in_links, out_links);
+//    }
 
     @Override
     public String toString() {

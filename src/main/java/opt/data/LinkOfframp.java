@@ -139,14 +139,14 @@ public class LinkOfframp extends LinkRamp {
         return clink;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o) ? splits.equals(((LinkOfframp) o).splits) : false;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, start_node_id, end_node_id, params, demands, splits);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        return super.equals(o) ? splits.equals(((LinkOfframp) o).splits) : false;
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(id, start_node_id, end_node_id, params, demands, splits);
+//    }
 
 }

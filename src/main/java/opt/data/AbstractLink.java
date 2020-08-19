@@ -488,22 +488,22 @@ public abstract class AbstractLink implements Comparable {
         return Long.compare(this.id,((AbstractLink) that).id);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AbstractLink that = (AbstractLink) o;
-        return id == that.id &&
-                start_node_id == that.start_node_id &&
-                end_node_id == that.end_node_id &&
-                Objects.equals(params, that.params) &&
-                demands.equals(that.demands);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, start_node_id, end_node_id, params, demands);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        AbstractLink that = (AbstractLink) o;
+//        return id == that.id &&
+//                start_node_id == that.start_node_id &&
+//                end_node_id == that.end_node_id &&
+//                Objects.equals(params, that.params) &&
+//                demands.equals(that.demands);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(id, start_node_id, end_node_id, params, demands);
+//    }
 
     /////////////////////////////////////
     // protected and private
