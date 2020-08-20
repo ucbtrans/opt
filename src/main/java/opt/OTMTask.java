@@ -66,8 +66,8 @@ public class OTMTask  extends Task {
 			otm.load_from_jaxb(jscenario,false);
 			this.otmdev = new OTMdev(otm);
 		} catch (Exception e) {
-			e.printStackTrace();
 			fwyscenario.remove_ghost_pieces();
+			throw new Exception(e);
 		}
 	}
 

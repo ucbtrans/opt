@@ -3,6 +3,8 @@ package opt.data;
 import jaxb.Link;
 import jaxb.Roadparam;
 
+import java.util.HashMap;
+
 public class LinkOnramp extends LinkRamp {
 
     /////////////////////////////////////
@@ -51,12 +53,16 @@ public class LinkOnramp extends LinkRamp {
         // wrap in a segment
         Segment new_segment = create_segment(new_link,seg_name);
 
+        // delete existing demands
+        this.demands = new HashMap<>();
+
         // connect upstream segment to new node
         if(up_segment!=null) {
             connect_segments_dwnstr_node_to(up_segment, new_link.start_node_id);
             new_link.up_link = up_segment.fwy;
             up_segment.fwy.dn_link = new_link;
         }
+
 
         return new_segment;
     }

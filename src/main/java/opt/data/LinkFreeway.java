@@ -3,6 +3,8 @@ package opt.data;
 import jaxb.Link;
 import jaxb.Roadparam;
 
+import java.util.HashMap;
+
 public class LinkFreeway extends LinkFreewayOrConnector {
 
     /////////////////////////////////////
@@ -38,6 +40,9 @@ public class LinkFreeway extends LinkFreewayOrConnector {
 
         // wrap in a segment
         Segment new_segment = create_segment(fwy_link,seg_name);
+
+        // delete existing demands
+        this.demands = new HashMap<>();
 
         // connect upstream segment to new node
         if(up_segment!=null) {
