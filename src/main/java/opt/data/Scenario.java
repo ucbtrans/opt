@@ -361,7 +361,8 @@ public class Scenario {
                 jaxb.Demand jdemand = new jaxb.Demand();
                 jdemands.getDemand().add(jdemand);
                 jdemand.setCommodityId(comm_id);
-                jdemand.setDt(profile.dt);
+                if(profile.dt!=null)
+                    jdemand.setDt(profile.dt);
                 jdemand.setStartTime(profile.start_time);
                 jdemand.setLinkId(link.id);
                 jdemand.setContent(OTMUtils.comma_format(profile.get_values()));
@@ -413,7 +414,7 @@ public class Scenario {
 
                 if(dts.size()!=1)
                     System.err.println("RG)@J$G 2-43j");
-                float dt = dts.iterator().next();
+                Float dt = dts.iterator().next();
 
                 // pad all offramp profiles
                 for(Profile1D profile : outlink2Profile.values())
@@ -439,28 +440,13 @@ public class Scenario {
                 jsplitnode.setCommodityId(comm.id);
                 jsplitnode.setNodeId(node.id);
                 jsplitnode.setLinkIn(up_ml.id);
-                jsplitnode.setDt(dt);
+                if(dt!=null)
+                    jsplitnode.setDt(dt);
                 for( Map.Entry<Long,Profile1D> e : outlink2Profile.entrySet() ){
                     jaxb.Split jsplit = new jaxb.Split();
                     jsplitnode.getSplit().add(jsplit);
                     jsplit.setLinkOut(e.getKey());
                     jsplit.setContent(OTMUtils.comma_format(e.getValue().get_values()));
-                }
-
-                // to jaxb: dn ors
-                for( LinkOnramp dn_or : dn_ors ) {
-                    jsplitnode = new jaxb.SplitNode();
-                    jsplits.getSplitNode().add(jsplitnode);
-                    jsplitnode.setCommodityId(comm.id);
-                    jsplitnode.setNodeId(node.id);
-                    jsplitnode.setLinkIn(dn_or.id);
-                    for (Map.Entry<Long, String> e : or_outlink2value.entrySet()) {
-                        jaxb.Split jsplit = new jaxb.Split();
-                        jsplitnode.getSplit().add(jsplit);
-                        jsplit.setLinkOut(e.getKey());
-                        jsplit.setContent(e.getValue());
-                    }
-
                 }
 
             }
