@@ -33,13 +33,13 @@ public class TestSimData extends AbstractTest {
             FreewayScenario fwyscenario = project.get_scenarios().iterator().next();
             fwyscenario.set_start_time(0f);
             fwyscenario.set_sim_duration(3600f);
-            task = new OTMTask(null,fwyscenario,300f,10);
+            task = new OTMTask(null,fwyscenario,300f,10, null);
         } catch (Exception e) {
             fail(e.getMessage());
         }
 
         // run and retrieve data
-        simdata = task.run_simulation();
+        simdata = task.run_simulation(null);
         simdatalink = simdata.linkdata.get(linkid);
     }
 

@@ -21,7 +21,7 @@ public class OTMTask  extends Task {
 
 	private Exception exception;
 
-	public OTMTask(AppMainController mainController, FreewayScenario fwyscenario,float outdt, int progbar_steps) throws Exception {
+	public OTMTask(AppMainController mainController, FreewayScenario fwyscenario, float outdt, int progbar_steps, Benchmarker logger) throws Exception {
 
 		this.mainController = mainController;
 		this.fwyscenario = fwyscenario;
@@ -62,8 +62,14 @@ public class OTMTask  extends Task {
 				throw new Exception("Reporting time step should be a multiple of simulation time step.");
 
 			jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
+			if(logger!=null)
+				logger.write("to_jaxb");
+
 			api.OTM otm = new api.OTM();
 			otm.load_from_jaxb(jscenario,false);
+			if(logger!=null)
+				logger.write("otm_load");
+
 			this.otmdev = new OTMdev(otm);
 		} catch (Exception e) {
 			fwyscenario.remove_ghost_pieces();
@@ -73,7 +79,7 @@ public class OTMTask  extends Task {
 
 	@Override
 	protected Object call()  {
-		this.run_simulation();
+		this.run_simulation(null);
 		return null;
 	}
 
@@ -93,7 +99,7 @@ public class OTMTask  extends Task {
 		});
 	}
 
-	public SimDataScenario run_simulation(){
+	public SimDataScenario run_simulation(Benchmarker logger){
 
 		SimDataScenario simdata = null;
 		exception = null;
@@ -102,15 +108,20 @@ public class OTMTask  extends Task {
 
 			float sim_dt = fwyscenario.get_sim_dt_sec();
 
-			Set<Long> linkids = fwyscenario.get_links().stream()
-					.filter(link->link.get_type()!= AbstractLink.Type.ghost)
-					.map(x->x.id).collect(Collectors.toSet());
-			for(Long commid : otmdev.scenario.commodities.keySet()){
-				otmdev.otm.output().request_cell_flw(commid,linkids,sim_dt);
-				otmdev.otm.output().request_cell_veh(commid,linkids,sim_dt);
-			}
+//			Set<Long> linkids = fwyscenario.get_links().stream()
+//					.filter(link->link.get_type()!= AbstractLink.Type.ghost)
+//					.map(x->x.id).collect(Collectors.toSet());
+//			for(Long commid : otmdev.scenario.commodities.keySet()){
+//				otmdev.otm.output().request_cell_flw(commid,linkids,sim_dt);
+//				otmdev.otm.output().request_cell_veh(commid,linkids,sim_dt);
+//			}
+			if(logger!=null)
+				logger.write("requests");
 
 			otmdev.otm.initialize(fwyscenario.get_start_time());
+
+			if(logger!=null)
+				logger.write("initialize");
 
 			int steps_taken = 0;
 			while(steps_taken<simsteps){
@@ -132,7 +143,14 @@ public class OTMTask  extends Task {
 					});
 				}
 			}
-			simdata = new SimDataScenario(fwyscenario,otmdev,outdt);
+
+			if(logger!=null)
+				logger.write("run");
+
+//			simdata = new SimDataScenario(fwyscenario,otmdev,outdt);
+
+			if(logger!=null)
+				logger.write("output");
 
 		} catch (Exception e) {
 			this.exception = e;

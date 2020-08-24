@@ -333,7 +333,7 @@ public class AppMainController {
             // Set the number of divisions of the progress bar
             int progbar_steps = 50;
 
-            Thread th = new Thread(new OTMTask(this,selectedScenario,(float) UserSettings.reportingPeriodSeconds,progbar_steps));
+            Thread th = new Thread(new OTMTask(this,selectedScenario,(float) UserSettings.reportingPeriodSeconds,progbar_steps,null));
             th.setDaemon(true);
             th.start();
             leftStatus.setText("Simulating scenario \"" + selectedScenario.name + "\"...");
