@@ -79,7 +79,7 @@ public class OTMTask  extends Task {
 
 	@Override
 	protected Object call()  {
-		this.run_simulation(null);
+		this.run_simulation(null,true,false);
 		return null;
 	}
 
@@ -99,7 +99,7 @@ public class OTMTask  extends Task {
 		});
 	}
 
-	public SimDataScenario run_simulation(Benchmarker logger){
+	public SimDataScenario run_simulation(Benchmarker logger,boolean celloutput, boolean lgoutput){
 
 		SimDataScenario simdata = null;
 		exception = null;
@@ -108,13 +108,22 @@ public class OTMTask  extends Task {
 
 			float sim_dt = fwyscenario.get_sim_dt_sec();
 
-//			Set<Long> linkids = fwyscenario.get_links().stream()
-//					.filter(link->link.get_type()!= AbstractLink.Type.ghost)
-//					.map(x->x.id).collect(Collectors.toSet());
-//			for(Long commid : otmdev.scenario.commodities.keySet()){
-//				otmdev.otm.output().request_cell_flw(commid,linkids,sim_dt);
-//				otmdev.otm.output().request_cell_veh(commid,linkids,sim_dt);
-//			}
+			Set<Long> linkids = fwyscenario.get_links().stream()
+					.filter(link->link.get_type()!= AbstractLink.Type.ghost)
+					.map(x->x.id).collect(Collectors.toSet());
+
+			if(celloutput)
+				for(Long commid : otmdev.scenario.commodities.keySet()){
+					otmdev.otm.output().request_cell_flw(commid,linkids,sim_dt);
+					otmdev.otm.output().request_cell_veh(commid,linkids,sim_dt);
+				}
+
+			if(lgoutput)
+				for(Long commid : otmdev.scenario.commodities.keySet()){
+					otmdev.otm.output().request_lanegroup_flw(commid,linkids,sim_dt);
+					otmdev.otm.output().request_lanegroup_veh(commid,linkids,sim_dt);
+				}
+
 			if(logger!=null)
 				logger.write("requests");
 
@@ -147,7 +156,8 @@ public class OTMTask  extends Task {
 			if(logger!=null)
 				logger.write("run");
 
-//			simdata = new SimDataScenario(fwyscenario,otmdev,outdt);
+			if(celloutput)
+				simdata = new SimDataScenario(fwyscenario,otmdev,outdt);
 
 			if(logger!=null)
 				logger.write("output");

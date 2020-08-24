@@ -3,7 +3,6 @@ package opt;
 import opt.data.FreewayScenario;
 import opt.data.Project;
 import opt.data.ProjectFactory;
-import opt.data.SimDataScenario;
 import opt.utils.Version;
 
 import java.io.FileWriter;
@@ -15,6 +14,7 @@ public class Benchmarker {
 
     long time_start;
     float duration;
+    public float runtime;
 
     public Benchmarker(String logfile,String description, float duration){
         this.duration = duration;
@@ -28,7 +28,8 @@ public class Benchmarker {
         }
     }
 
-    public void run(){
+    public void run(boolean celloutput, boolean lgoutput){
+        runtime = Float.NaN;
         try {
 
             start_time();
@@ -42,7 +43,7 @@ public class Benchmarker {
 
             OTMTask task = new OTMTask(null,fwyscenario,300f,-1,this);
 
-            task.run_simulation(this);
+            task.run_simulation(this,celloutput,lgoutput);
 
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -61,7 +62,13 @@ public class Benchmarker {
 
     public void write(String str){
         try {
-            log.write(String.format("%s\t%f\n",str,get_elapsed()));
+            if(str.equals("run")) {
+                float elapsed = get_elapsed();
+                runtime = elapsed;
+                log.write(String.format("%s\t%f\n",str,elapsed));
+            }
+            else
+                log.write(String.format("%s\t%f\n",str,get_elapsed()));
         } catch (IOException e) {
             e.printStackTrace();
         }
