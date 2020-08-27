@@ -245,13 +245,13 @@ public class RoutePerformanceController {
         }
         
         long startTime = System.nanoTime();
-        //processLinkSequence();
+        processLinkSequence();
         long endTime = System.nanoTime();
         double dur = (endTime - startTime) / 1000000000f;
         System.err.println("processLinkSequence(): " + dur);
         
         startTime = System.nanoTime();
-        //fillTabContours();
+        fillTabContours();
         endTime = System.nanoTime();
         dur = (endTime - startTime) / 1000000000f;
         System.err.println("fillTabContours(): " + dur);
