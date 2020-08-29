@@ -475,6 +475,13 @@ public class LinkEditorController {
         appMainController.setProjectModified(val);
     }
     
+    public void updateTablePositions(KeyCode kc) {
+        if (myLink.get_up_link() == null)
+            demandTableHandler.onKeyPressed2(kc);
+        if (myLink.get_type() == AbstractLink.Type.offramp)
+            srTableHandler.onKeyPressed2(kc);
+    }
+    
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {        
@@ -951,6 +958,7 @@ public class LinkEditorController {
         ignoreChange = true;        
         myLink = lnk;
         
+        UserSettings.linkEditorController = this;
         appMainController.setLeftStatus("");
     
         initHeader();

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019, Regents of the University of California
+ * Copyright (c) 2020, Regents of the University of California
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -120,6 +120,9 @@ public class TSTableHandler {
         if (prevFocusedCell == null)
             prevFocusedCell = focusedCell;
         
+        int row = focusedCell.getRow();
+        int col = focusedCell.getColumn();
+        
         if ((event.getCode() == KeyCode.C) && event.isControlDown()) {
             return copyToClipboard();
         }
@@ -147,8 +150,7 @@ public class TSTableHandler {
                 selectDown();
             }
             
-            event.consume();
-            
+            event.consume();           
             prevFocusedCell = focusedCell;
             
             return false;
@@ -163,7 +165,13 @@ public class TSTableHandler {
         
         if ((event.getCode() == KeyCode.RIGHT) || (event.getCode() == KeyCode.TAB)) {
             res = moveForward();
-           // event.consume();
+            event.consume();
+            //return false;
+        }
+        
+        if (event.getCode() == KeyCode.UP) {
+            res = moveUp();
+            event.consume();
             //return false;
         }
         
@@ -179,6 +187,51 @@ public class TSTableHandler {
     }
     
     
+    public boolean onKeyPressed2(KeyCode kc) {
+        boolean res = false;
+        if (prevFocusedCell == null)
+            prevFocusedCell = focusedCell;
+        focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
+        if (prevFocusedCell == null)
+            prevFocusedCell = focusedCell;
+        
+        if (kc == KeyCode.LEFT) {
+            res = moveBack();
+        }
+        
+        if ((kc == KeyCode.RIGHT) || (kc == KeyCode.TAB)) {
+            res = moveForward();
+        }
+        
+        if (kc == KeyCode.UP) {
+            res = moveUp();
+        }
+        
+        if (kc == KeyCode.DOWN) {
+            res = moveDown();
+        }
+        
+        prevFocusedCell = focusedCell;
+        
+        return res;
+    }
+    
+    
+    
+    
+    public void onFocusChanged() {
+        prevFocusedCell = focusedCell;
+        focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
+        if (prevFocusedCell == null)
+            prevFocusedCell = focusedCell;
+        
+        int row = focusedCell.getRow();
+        int col = focusedCell.getColumn();
+        //myTable.getSelectionModel().clearSelection();
+        //myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
+        //myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        System.err.println("onFocusChanged: row = " + row + ";\t col = " + col);
+    }
     
     
     public void onSelection(ObservableList<Object> newSelection) {
@@ -650,6 +703,40 @@ public class TSTableHandler {
     }
     
     
+    private boolean moveUp() {
+        int numRows = myTable.getItems().size();
+        int numCols = myTable.getColumns().size();
+        
+        int row = prevFocusedCell.getRow() - 1;
+        int col = prevFocusedCell.getColumn();
+        myTable.getSelectionModel().clearSelection();
+        
+        boolean res = false;
+        
+        if (row < 1) {
+            row = 0;
+            res = true;
+        }
+        
+        if (col < numCols) {
+            myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
+            myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        }
+        
+        if (col == 0) {
+            minSelectedRow = maxSelectedRow = row;
+            minSelectedColumn = 0;
+            maxSelectedColumn = myTable.getColumns().size() - 1;
+            selectBox();
+            myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
+        }
+        
+        focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
+        
+        return res;
+    }
+    
+    
     private boolean moveDown() {
         int numRows = myTable.getItems().size();
         int numCols = myTable.getColumns().size();
@@ -670,6 +757,14 @@ public class TSTableHandler {
         if (col < numCols) {
             myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        }
+        
+        if (col == 0) {
+            minSelectedRow = maxSelectedRow = row;
+            minSelectedColumn = 0;
+            maxSelectedColumn = myTable.getColumns().size() - 1;
+            selectBox();
+            myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
         }
         
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
