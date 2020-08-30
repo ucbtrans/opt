@@ -38,6 +38,7 @@ import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
@@ -70,6 +71,7 @@ public class ScenarioEditorController {
     private boolean ignoreChange = true;
     
     private String origScenarioName = null;
+    private String origScenarioDescription = null;
     private List<Commodity> listVT = new ArrayList<Commodity>();
     
     
@@ -114,6 +116,9 @@ public class ScenarioEditorController {
 
     @FXML // fx:id="sDuration"
     private TextField sDuration; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="sDescription"
+    private TextArea sDescription; // Value injected by FXMLLoader
     
     @FXML // fx:id="controllerPane"
     private TitledPane controllerPane; // Value injected by FXMLLoader
@@ -211,6 +216,10 @@ public class ScenarioEditorController {
             onScenarioNameChange(null);
         });
         
+        sDescription.textProperty().addListener((observable, oldValue, newValue) -> {
+            onScenarioDescriptionChange(null);
+        });
+        
         startTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultStartTime, "")));
         startTime.textProperty().addListener((observable, oldValue, newValue) -> {
             onStartTimeChange(null);
@@ -255,6 +264,8 @@ public class ScenarioEditorController {
         startTime.setText(Misc.seconds2timestring(st, ""));
         sDuration.setText(Misc.seconds2timestring(duration, ""));
         
+        origScenarioDescription = myScenario.description;
+        sDescription.setText(myScenario.description);
     }
     
 
@@ -281,6 +292,15 @@ public class ScenarioEditorController {
         appMainController.changeScenarioName(myScenario, nm);
     }
     
+    
+    
+    
+    private void onScenarioDescriptionChange(ActionEvent event) {
+        if (ignoreChange)
+            return;
+        
+        myScenario.description = sDescription.getText();
+    }
     
     
     
