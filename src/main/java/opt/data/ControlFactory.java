@@ -85,8 +85,8 @@ public class ControlFactory {
 		return new ControllerRampMeterAlinea(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
 	}
 
-	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,Long id, float dt,Set<Long> dissallowed_comms) throws Exception {
-		return new ControllerPolicyHOV(fwyscn,id,dt,dissallowed_comms);
+	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,Long id, Set<Long> dissallowed_comms) throws Exception {
+		return new ControllerPolicyHOV(fwyscn,id,dissallowed_comms);
 	}
 
 	public static ControllerPolicyHOT create_controller_hot(FreewayScenario fwyscn,Long id, float dt) throws Exception {
@@ -302,7 +302,7 @@ public class ControlFactory {
 				}
 			}
 
-		ControllerPolicyHOV cntrl = create_controller_hov(null,0l,0f,disallowed_comms);
+		ControllerPolicyHOV cntrl = create_controller_hov(null,0l,disallowed_comms);
 		return cntrl;
 	}
 

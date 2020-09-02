@@ -6,7 +6,7 @@ import java.util.*;
 
 public abstract class AbstractController {
 
-	public enum Type {RampMetering,HOVpolicy,HOTpolicy}
+	public enum Type { RampMetering , HOVpolicy }
 
 	protected long id;
 	protected Type type;

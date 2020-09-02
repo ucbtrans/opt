@@ -16,8 +16,8 @@ public class ControllerPolicyHOV extends AbstractController {
 	// construction
 	////////////////////////////////
 
-	public ControllerPolicyHOV(FreewayScenario scn, Long id, float dt, Set<Long> dissallowed_comms) throws Exception {
-		super(id!=null ? id : scn.new_controller_id(),Type.HOVpolicy,dt,null);
+	public ControllerPolicyHOV(FreewayScenario scn, Long id, Set<Long> dissallowed_comms) {
+		super(id!=null ? id : scn.new_controller_id(),Type.HOVpolicy,null, control.AbstractController.Algorithm.lg_restrict);
 		this.dissallowed_comms = dissallowed_comms==null ? new HashSet<>() : dissallowed_comms;
 	}
 
