@@ -291,15 +291,15 @@ public class FreewayScenario {
                     AbstractController ctrl = null;
                     switch( algorithm ){
 
-                        case open:
-                            ctrl = ControlFactory.create_controller_open(null,0l);
+                        case rm_open:
+                            ctrl = ControlFactory.create_controller_rmopen(null,0l);
                             break;
 
-                        case closed:
-                            ctrl = ControlFactory.create_controller_closed(null,0l);
+                        case rm_closed:
+                            ctrl = ControlFactory.create_controller_rmclosed(null,0l);
                             break;
 
-                        case alinea:
+                        case rm_alinea:
 
                             // feedback sensors
                             jaxb.Sensor jsns = null;
@@ -311,7 +311,7 @@ public class FreewayScenario {
                             ctrl = ControlFactory.create_controller_alinea(jentry,jsns);
                             break;
 
-                        case fixed_rate:
+                        case rm_fixed_rate:
                             ctrl = ControlFactory.create_controller_fixed_rate(jentry);
 
                             break;

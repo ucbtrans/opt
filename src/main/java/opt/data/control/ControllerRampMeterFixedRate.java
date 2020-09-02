@@ -16,7 +16,7 @@ public class ControllerRampMeterFixedRate extends AbstractControllerRampMeter {
     public ControllerRampMeterFixedRate(FreewayScenario scn, Long id,float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl,float rate_vphpl) throws Exception {
         super(id!=null ? id : scn.new_controller_id(),
                 dt,
-                control.AbstractController.Algorithm.fixed_rate,
+                control.AbstractController.Algorithm.rm_fixed_rate,
                 has_queue_control,
                 min_rate_vphpl,
                 max_rate_vphpl);

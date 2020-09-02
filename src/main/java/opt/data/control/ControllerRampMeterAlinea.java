@@ -11,7 +11,7 @@ public class ControllerRampMeterAlinea extends AbstractControllerRampMeter {
 
 	public ControllerRampMeterAlinea(FreewayScenario scn,Long id, float dt, boolean has_queue_control, float min_rate_vph, float max_rate_vph,Long sensor_id, long sensor_link_id, float sensor_offset) throws Exception {
 		super(id!=null ? id : scn.new_controller_id(),
-				dt,control.AbstractController.Algorithm.alinea,has_queue_control,min_rate_vph,max_rate_vph);
+				dt,control.AbstractController.Algorithm.rm_alinea,has_queue_control,min_rate_vph,max_rate_vph);
 
 		// feedback sensor
 		Sensor sns = ControlFactory.create_sensor(scn,sensor_id,sensor_link_id,sensor_offset,this);

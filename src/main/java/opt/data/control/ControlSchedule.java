@@ -121,7 +121,7 @@ public class ControlSchedule {
         if(!entries.stream().anyMatch(e->e.start_time==0f)) {
             try {
                 entries.add(new ScheduleEntry(0f,
-                        ControlFactory.create_controller_open(link.get_segment().get_scenario(),null)));
+                        ControlFactory.create_controller_rmopen(link.get_segment().get_scenario(),null)));
             } catch (Exception e) {
                 e.printStackTrace();
             }

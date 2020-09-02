@@ -3,7 +3,6 @@ package opt.data;
 import error.OTMException;
 import opt.data.control.*;
 import opt.utils.BijectiveMap;
-import utils.OTMUtils;
 
 import java.util.*;
 
@@ -12,27 +11,27 @@ public class ControlFactory {
 	public static BijectiveMap<control.AbstractController.Algorithm,String> cntrl_alg_name;
 	static{
 		cntrl_alg_name = new BijectiveMap<>();
-		cntrl_alg_name.put(control.AbstractController.Algorithm.alinea,"Alinea");
-		cntrl_alg_name.put(control.AbstractController.Algorithm.fixed_rate,"Fixed rate");
-		cntrl_alg_name.put(control.AbstractController.Algorithm.open,"Open");
-		cntrl_alg_name.put(control.AbstractController.Algorithm.closed,"Closed");
+		cntrl_alg_name.put(control.AbstractController.Algorithm.rm_alinea,"Alinea");
+		cntrl_alg_name.put(control.AbstractController.Algorithm.rm_fixed_rate,"Fixed rate");
+		cntrl_alg_name.put(control.AbstractController.Algorithm.rm_open,"Open");
+		cntrl_alg_name.put(control.AbstractController.Algorithm.rm_closed,"Closed");
 	}
 
 	public static List<control.AbstractController.Algorithm> get_available_ramp_metering_algorithms(){
 		List<control.AbstractController.Algorithm> x = new ArrayList<>();
-		x.add(control.AbstractController.Algorithm.alinea);
-		x.add(control.AbstractController.Algorithm.fixed_rate);
-		x.add(control.AbstractController.Algorithm.open);
-		x.add(control.AbstractController.Algorithm.closed);
+		x.add(control.AbstractController.Algorithm.rm_alinea);
+		x.add(control.AbstractController.Algorithm.rm_fixed_rate);
+		x.add(control.AbstractController.Algorithm.rm_open);
+		x.add(control.AbstractController.Algorithm.rm_closed);
 		return x;
 	}
 
 	public static List<String> get_available_ramp_metering_names(){
 		List<String> x = new ArrayList<>();
-		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.alinea));
-		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.fixed_rate));
-		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.open));
-		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.closed));
+		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.rm_alinea));
+		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.rm_fixed_rate));
+		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.rm_open));
+		x.add(cntrl_alg_name.AtoB(control.AbstractController.Algorithm.rm_closed));
 		return x;
 	}
 
@@ -52,7 +51,7 @@ public class ControlFactory {
 		if(cntrl_type==AbstractController.Type.RampMetering){
 			try {
 				FreewayScenario fwyscn = link.mysegment.my_fwy_scenario;
-				schedule.update(0f,ControlFactory.create_controller_open(fwyscn,null));
+				schedule.update(0f,ControlFactory.create_controller_rmopen(fwyscn,null));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -66,11 +65,11 @@ public class ControlFactory {
 	// controller
 	/////////////////////
 
-	public static ControllerRampMeterOpen create_controller_open(FreewayScenario fwyscn, Long id) throws Exception {
+	public static ControllerRampMeterOpen create_controller_rmopen(FreewayScenario fwyscn, Long id) throws Exception {
 		return new ControllerRampMeterOpen(fwyscn,id);
 	}
 
-	public static ControllerRampMeterClosed create_controller_closed(FreewayScenario fwyscn, Long id) throws Exception {
+	public static ControllerRampMeterClosed create_controller_rmclosed(FreewayScenario fwyscn, Long id) throws Exception {
 		return new ControllerRampMeterClosed(fwyscn,id);
 	}
 

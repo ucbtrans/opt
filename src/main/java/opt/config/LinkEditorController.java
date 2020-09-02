@@ -2244,15 +2244,15 @@ public class LinkEditorController {
                 AbstractControllerRampMeter newController;
                 switch(controlAlgorithm){
 
-                    case open:
-                        newController = ControlFactory.create_controller_open(myLink.get_segment().get_scenario(),null);
+                    case rm_open:
+                        newController = ControlFactory.create_controller_rmopen(myLink.get_segment().get_scenario(),null);
                         break;
 
-                    case closed:
-                        newController = ControlFactory.create_controller_closed(myLink.get_segment().get_scenario(),null);
+                    case rm_closed:
+                        newController = ControlFactory.create_controller_rmclosed(myLink.get_segment().get_scenario(),null);
                         break;
 
-                    case alinea:
+                    case rm_alinea:
                         AbstractLink sensor_link = myLink.get_dn_link();
                         newController = ControlFactory.create_controller_alinea(myLink.get_segment().get_scenario(),
                                 null,
@@ -2265,7 +2265,7 @@ public class LinkEditorController {
                                 sensor_link.get_length_meters() / 2f );
                         break;
 
-                    case fixed_rate:
+                    case rm_fixed_rate:
                         newController = ControlFactory.create_controller_fixed_rate(myLink.get_segment().get_scenario(),
                                 null,
                                 dt,
@@ -2309,25 +2309,25 @@ public class LinkEditorController {
         inputStage.initOwner(primaryStage);
 
         switch(entry.get_cntrl().getAlgorithm()){
-            case open:
+            case rm_open:
                 inputStage.setScene(rampMeterOpenScene);
                 rampMeterOpen.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
                 inputStage.setTitle("Open ramp");
                 break;
 
-            case closed:
+            case rm_closed:
                 inputStage.setScene(rampMeterClosedScene);
                 rampMeterClosed.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
                 inputStage.setTitle("Close ramp");
                 break;
 
-            case alinea:
+            case rm_alinea:
                 inputStage.setScene(rampMeterAlineaScene);
                 rampMeterAlinea.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
                 inputStage.setTitle("Ramp Meter ALINEA");
                 break;
 
-            case fixed_rate:
+            case rm_fixed_rate:
                 inputStage.setScene(rampMeterFixedScene);
                 rampMeterFixed.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
                 inputStage.setTitle("Ramp Meter Fixed Rate");
