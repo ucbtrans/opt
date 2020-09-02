@@ -61,18 +61,6 @@ public class TestControl extends AbstractTest{
 //		}
 //	}
 
-	@Test
-	public void test_create_controller_hot(){
-		try {
-			TestData X = new TestData("project2_rm.opt");
-			ControllerPolicyHOT cntrl = ControlFactory.create_controller_hot(X.scenario,
-					null,
-					3f);
-			assertNotNull(cntrl);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	/////////////////////////////////////
 	// delete controllers

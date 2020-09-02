@@ -6,7 +6,7 @@ import java.util.*;
 
 public abstract class AbstractController {
 
-	public enum Type { RampMetering , HOVpolicy , HOTpolicy }
+	public enum Type { RampMetering , HOVHOT }
 
 	protected long id;
 	protected Type type;
@@ -42,6 +42,17 @@ public abstract class AbstractController {
 
 	public final control.AbstractController.Algorithm getAlgorithm(){
 		return algorithm;
+	}
+
+	public final static boolean is_ramp_metering(control.AbstractController.Algorithm a){
+		return a==control.AbstractController.Algorithm.rm_alinea ||
+				a==control.AbstractController.Algorithm.rm_closed ||
+				a==control.AbstractController.Algorithm.rm_open ||
+				a==control.AbstractController.Algorithm.rm_fixed_rate;
+	}
+
+	public final static boolean is_lg_restrict(control.AbstractController.Algorithm a){
+		return a==control.AbstractController.Algorithm.lg_restrict;
 	}
 
 	////////////////////////////////

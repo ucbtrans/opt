@@ -4,10 +4,12 @@ import jaxb.Actuator;
 import opt.data.AbstractLink;
 import opt.data.LaneGroupType;
 
+import java.util.Set;
+
 public class ActuatorHOTPolicy extends AbstractActuator {
 
-	public ActuatorHOTPolicy(long id, AbstractLink link, LaneGroupType lgtype){
-		super(id,link,lgtype);
+	public ActuatorHOTPolicy(long id, Set<AbstractLink> links, LaneGroupType lgtype){
+		super(id,links,lgtype);
 	}
 
 	@Override

@@ -268,24 +268,49 @@ public class FreewayScenario {
                 long act_id = Long.parseLong(jcnt.getTargetActuators().getIds());
                 jaxb.Actuator jact = actuators.get(act_id);
 
-                // target
+                // read link ids
+                List<AbstractLink> links = new ArrayList<>();
+                List<LaneGroupType> lgtypes = new ArrayList<>();
+                for(String e : jact.getActuatorTarget().getContent().split(",")){
 
-                String str = jact.getActuatorTarget().getContent();
-                String [] a1 = str.split("[(]");
-                Long linkid = Long.parseLong(a1[0]);
-                AbstractLink link = scenario.links.get(linkid);
+                    String [] a1 = e.split("[(]");
+                    Long linkid = Long.parseLong(a1[0]);
+                    AbstractLink link = scenario.links.get(linkid);
+                    links.add(link);
 
-                String [] a2 = a1[1].split("[)]");
-                int [] lanes = OTMUtils.read_lanes(a2[0],link.get_lanes());
-                LaneGroupType lgtype = link.lane2lgtype().get(lanes[0]-1);
+                    String [] a2 = a1[1].split("[)]");
+                    int [] lanes = OTMUtils.read_lanes(a2[0],link.get_lanes());
+                    lgtypes.add( link.lane2lgtype().get(lanes[0]-1) );
+                }
 
-                // TODO FIX THIS WHEN WE GET TO HOV/HOT POLICIES
-                AbstractController.Type cntr_type = AbstractController.Type.RampMetering;
 
-//                ControlSchedule sch = new ControlSchedule(jcnt.getId(),link,lgtype,cntr_type,jact.getId());
-                ControlSchedule sch = link.get_controller_schedule(lgtype,cntr_type);
+                // determine the controller type from the entry types
+                Set<control.AbstractController.Algorithm> entry_types = jcnt.getSchedule().getEntry().stream()
+                        .map(e->control.AbstractController.Algorithm.valueOf(e.getType()))
+                        .collect(toSet());
+
+                AbstractController.Type cntr_type = null;
+                LaneGroupType lg_type = null;
+                if( entry_types.stream().allMatch(e->AbstractController.is_ramp_metering(e) ) ) {
+                    cntr_type = AbstractController.Type.RampMetering;
+                    assert(links.size()==1);
+                    lg_type = lgtypes.get(0);
+                }
+                else if ( entry_types.stream().allMatch(e->AbstractController.is_lg_restrict(e) ) ) {
+                    cntr_type = AbstractController.Type.HOVHOT;
+
+                    // all lane groups should be mng
+                    assert(lgtypes.stream().allMatch(t->t==LaneGroupType.mng));
+                    lg_type = LaneGroupType.mng;
+                }
+                else
+                    throw new Exception("Incompatible control algorithms in schedule.");
+
+                // create the schedule
+                ControlSchedule sch = new ControlSchedule(jcnt.getId(),links,lg_type,cntr_type,jact.getId());
 
                 for(jaxb.Entry jentry : jcnt.getSchedule().getEntry()){
+
                     control.AbstractController.Algorithm  algorithm = control.AbstractController.Algorithm.valueOf(jentry.getType());
 
                     AbstractController ctrl = null;
@@ -316,7 +341,7 @@ public class FreewayScenario {
                             break;
 
                         case lg_restrict:
-                            ctrl = ControlFactory.create_controller_hov(jentry);
+                            ctrl = ControlFactory.create_controller_hovhot(jentry);
 
                     }
 
@@ -424,9 +449,15 @@ public class FreewayScenario {
     // API controller
     /////////////////////////////////////
 
-//    public Schedule get_controller_schedule(){
-//        return controller_schedule;
-//    }
+    public Map<Long,ControlSchedule> get_controller_schedules_for_links(Collection<Long> link_ids,LaneGroupType lgtype, AbstractController.Type cntrl_type){
+        Map<Long,ControlSchedule> X = new HashMap<>();
+        for(Long link_id : link_ids){
+            if(!scenario.links.containsKey(link_id))
+                continue;
+            X.put(link_id,scenario.links.get(link_id).get_controller_schedule(lgtype,cntrl_type));
+        }
+        return X;
+    }
 
     /////////////////////////////////////
     // API network

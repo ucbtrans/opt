@@ -3,6 +3,7 @@ package opt.data.control;
 import jaxb.Parameter;
 import opt.data.AbstractLink;
 import opt.data.ControlFactory;
+import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
 import utils.OTMUtils;
 
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 public class ControlSchedule {
 
     protected long id;
-    protected AbstractLink link;
+    protected FreewayScenario fwyscn;
     protected AbstractController.Type controlType;
     protected List<ScheduleEntry> entries;
     protected AbstractActuator actuator;
@@ -21,21 +22,23 @@ public class ControlSchedule {
     // construction
     ////////////////////////////////
 
-    public ControlSchedule(long id,AbstractLink link, LaneGroupType lgtype, AbstractController.Type controlType,long act_id){
+    public ControlSchedule(long id,Collection<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type controlType,long act_id){
         this.id = id;
-        this.link = link;
         this.controlType = controlType;
         this.entries = new ArrayList<>();
 
+        // all links should belong to the same scenario
+        assert(!links.isEmpty());
+        assert(links.stream().map(x->x.get_segment().get_scenario()).distinct().count()==1);
+        this.fwyscn = links.iterator().next().get_segment().get_scenario();
+
         switch(controlType){
             case RampMetering:
-                actuator = ControlFactory.create_actuator_ramp_meter(act_id,link,lgtype);
+                assert(links.size()==1); // ramp metering controllers refer to a single onramp
+                actuator = ControlFactory.create_actuator_ramp_meter(act_id,links.iterator().next(),lgtype);
                 break;
-            case HOTpolicy:
-                actuator = ControlFactory.create_actuator_hot_policy(act_id,link,lgtype);
-                break;
-            case HOVpolicy:
-                actuator = ControlFactory.create_actuator_hov_policy(act_id,link,lgtype);
+            case HOVHOT:
+                actuator = ControlFactory.create_actuator_hov_policy(act_id,links,lgtype);
                 break;
         }
     }
@@ -117,11 +120,17 @@ public class ControlSchedule {
             }
         }
 
-        // If there is no controller starting at midnight, then add Open
+        // If there is no controller starting at midnight, then add default
         if(!entries.stream().anyMatch(e->e.start_time==0f)) {
             try {
-                entries.add(new ScheduleEntry(0f,
-                        ControlFactory.create_controller_rmopen(link.get_segment().get_scenario(),null)));
+                switch(controlType){
+                    case RampMetering:
+                        entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_rmopen(fwyscn,null)));
+                        break;
+                    case HOVHOT:
+                        entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_hovhot(fwyscn,null,null)));
+                        break;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

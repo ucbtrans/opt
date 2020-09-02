@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ControllerPolicyHOV extends AbstractController {
+public class ControllerPolicyHOVHOT extends AbstractController {
 
 	Set<Long> dissallowed_comms;
 
@@ -16,8 +16,8 @@ public class ControllerPolicyHOV extends AbstractController {
 	// construction
 	////////////////////////////////
 
-	public ControllerPolicyHOV(FreewayScenario scn, Long id, Set<Long> dissallowed_comms) {
-		super(id!=null ? id : scn.new_controller_id(),Type.HOVpolicy,null, control.AbstractController.Algorithm.lg_restrict);
+	public ControllerPolicyHOVHOT(FreewayScenario scn, Long id, Set<Long> dissallowed_comms) {
+		super(id!=null ? id : scn.new_controller_id(),Type.HOVHOT,null, control.AbstractController.Algorithm.lg_restrict);
 		this.dissallowed_comms = dissallowed_comms==null ? new HashSet<>() : dissallowed_comms;
 	}
 

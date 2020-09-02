@@ -41,23 +41,41 @@ public class ControlFactory {
 	// schedule
 	/////////////////////
 
-	public static ControlSchedule create_empty_controller_schedule(Long id,AbstractLink link, LaneGroupType lgtype, AbstractController.Type cntrl_type){
+	public static ControlSchedule create_empty_controller_schedule(Long id,AbstractLink link, LaneGroupType lgtype, AbstractController.Type cntrl_type) {
+		Set<AbstractLink> links = new HashSet<>();
+		links.add(link);
+		return create_empty_controller_schedule(id,links,lgtype,cntrl_type);
+	}
+
+	public static ControlSchedule create_empty_controller_schedule(Long id,Set<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type cntrl_type) {
+
+		// all links should be in the same scenario
+		assert(links.stream().map(x->x.mysegment.my_fwy_scenario).distinct().count()==1);
+		FreewayScenario fwyscn = links.iterator().next().mysegment.my_fwy_scenario;
+
 		ControlSchedule schedule = new ControlSchedule(
-				id==null ? link.mysegment.my_fwy_scenario.new_controller_id() : id,
-				link,
+				id==null ? fwyscn.new_controller_id() : id,
+				links,
 				lgtype,
 				cntrl_type,
-				link.mysegment.my_fwy_scenario.new_actuator_id()
+				fwyscn.new_actuator_id()
 				);
 
-		if(cntrl_type==AbstractController.Type.RampMetering){
-			try {
-				FreewayScenario fwyscn = link.mysegment.my_fwy_scenario;
-				schedule.update(0f,ControlFactory.create_controller_rmopen(fwyscn,null));
-			} catch (Exception e) {
-				e.printStackTrace();
+		try {
+			switch(cntrl_type){
+
+				case RampMetering:
+					schedule.update(0f,ControlFactory.create_controller_rmopen(fwyscn,null));
+					break;
+
+				case HOVHOT:
+					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,null,null));
+					break;
+
 			}
-			// TODO CREATE THE ACTUATOR ACCORDIG TO  cntrl_type
+
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return schedule;
@@ -85,14 +103,8 @@ public class ControlFactory {
 		return new ControllerRampMeterAlinea(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
 	}
 
-	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,Long id, Set<Long> dissallowed_comms) throws Exception {
-		return new ControllerPolicyHOV(fwyscn,id,dissallowed_comms);
-	}
-
-	public static ControllerPolicyHOT create_controller_hot(FreewayScenario fwyscn,Long id, float dt) throws Exception {
-		parameters_check(dt);
-		ControllerPolicyHOT ctrl = new ControllerPolicyHOT(fwyscn,id,dt);
-		return ctrl;
+	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn, Long id, Set<Long> dissallowed_comms) throws Exception {
+		return new ControllerPolicyHOVHOT(fwyscn,id,dissallowed_comms);
 	}
 
 	/////////////////////
@@ -111,12 +123,12 @@ public class ControlFactory {
 		return new ActuatorRampMeter(id, link, lgtype);
 	}
 
-	public static ActuatorHOVPolicy create_actuator_hov_policy(long id, AbstractLink link, LaneGroupType lgtype){
-		return new ActuatorHOVPolicy(id, link, lgtype);
+	public static ActuatorHOVHOT create_actuator_hov_policy(long id, Collection<AbstractLink> links, LaneGroupType lgtype){
+		return new ActuatorHOVHOT(id, links, lgtype);
 	}
 
-	public static ActuatorHOTPolicy create_actuator_hot_policy(long id,AbstractLink link, LaneGroupType lgtype){
-		return new ActuatorHOTPolicy(id, link, lgtype);
+	public static ActuatorHOTPolicy create_actuator_hot_policy(long id,Set<AbstractLink> links, LaneGroupType lgtype){
+		return new ActuatorHOTPolicy(id, links, lgtype);
 	}
 
 	/////////////////////////
@@ -287,7 +299,7 @@ public class ControlFactory {
 //
 //	}
 
-	public static ControllerPolicyHOV create_controller_hov(jaxb.Entry jentry) throws Exception {
+	public static ControllerPolicyHOVHOT create_controller_hovhot(jaxb.Entry jentry) throws Exception {
 
 		// read parameters
 		Set<Long> disallowed_comms = new HashSet<>();
@@ -302,13 +314,7 @@ public class ControlFactory {
 				}
 			}
 
-		ControllerPolicyHOV cntrl = create_controller_hov(null,0l,disallowed_comms);
-		return cntrl;
-	}
-
-	public static ControllerPolicyHOT create_controller_hot(FreewayScenario fwyscn,jaxb.Controller jcnt) throws Exception {
-		ControllerPolicyHOT cntrl = create_controller_hot(fwyscn,jcnt.getId(),jcnt.getDt());
-		cntrl.setId( jcnt.getId() );
+		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(null,0l,disallowed_comms);
 		return cntrl;
 	}
 

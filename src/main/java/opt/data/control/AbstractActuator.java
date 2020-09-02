@@ -3,16 +3,27 @@ package opt.data.control;
 import opt.data.AbstractLink;
 import opt.data.LaneGroupType;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 public abstract class AbstractActuator {
 
 	protected long id;
-	protected AbstractLink link;
+	protected Set<AbstractLink> links;
 	protected LaneGroupType lgtype;
 
 	public AbstractActuator(long id,AbstractLink link,LaneGroupType lgtype){
 		this.id = id;
 		this.lgtype = lgtype;
-		this.link = link;
+		this.links = new HashSet<>();
+		links.add(link);
+	}
+
+	public AbstractActuator(long id, Collection<AbstractLink> links, LaneGroupType lgtype){
+		this.id = id;
+		this.lgtype = lgtype;
+		this.links = new HashSet<>(links);
 	}
 
 	// TODO READ AND WRITE LANE GROUP TYPE TO XML
@@ -32,8 +43,6 @@ public abstract class AbstractActuator {
 		return id;
 	}
 
-//	public int[] get_lanegroup_lanes(){
-//
-//	}
+
 
 }

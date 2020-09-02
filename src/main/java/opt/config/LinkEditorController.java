@@ -2359,14 +2359,10 @@ public class LinkEditorController {
         }
 
         // HOV policy
-        if( controlType==AbstractController.Type.HOVpolicy){
+        if( controlType==AbstractController.Type.HOVHOT){
             // ...
         }
 
-        // HOT policy
-        if( controlType==AbstractController.Type.HOTpolicy){
-            // ...
-        }
 
     }
 
