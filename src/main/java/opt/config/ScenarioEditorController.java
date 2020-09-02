@@ -38,6 +38,9 @@ import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
@@ -70,7 +73,11 @@ public class ScenarioEditorController {
     private boolean ignoreChange = true;
     
     private String origScenarioName = null;
+    private String origScenarioDescription = null;
     private List<Commodity> listVT = new ArrayList<Commodity>();
+    
+    private List<Tab> listPolicyTabs = new ArrayList<Tab>();
+    private int selectedPolicyTab = -1;
     
     
     @FXML // fx:id="scenarioEditorMainPane"
@@ -115,8 +122,18 @@ public class ScenarioEditorController {
     @FXML // fx:id="sDuration"
     private TextField sDuration; // Value injected by FXMLLoader
     
+    @FXML // fx:id="sDescription"
+    private TextArea sDescription; // Value injected by FXMLLoader
+    
     @FXML // fx:id="controllerPane"
     private TitledPane controllerPane; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="addPolicy"
+    private Button addPolicy; // Value injected by FXMLLoader
+
+    @FXML // fx:id="policyTabs"
+    private TabPane policyTabs; // Value injected by FXMLLoader
+
 
     @FXML // fx:id="eventPane"
     private TitledPane eventPane; // Value injected by FXMLLoader
@@ -211,6 +228,10 @@ public class ScenarioEditorController {
             onScenarioNameChange(null);
         });
         
+        sDescription.textProperty().addListener((observable, oldValue, newValue) -> {
+            onScenarioDescriptionChange(null);
+        });
+        
         startTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultStartTime, "")));
         startTime.textProperty().addListener((observable, oldValue, newValue) -> {
             onStartTimeChange(null);
@@ -255,6 +276,8 @@ public class ScenarioEditorController {
         startTime.setText(Misc.seconds2timestring(st, ""));
         sDuration.setText(Misc.seconds2timestring(duration, ""));
         
+        origScenarioDescription = myScenario.description;
+        sDescription.setText(myScenario.description);
     }
     
 
@@ -275,12 +298,19 @@ public class ScenarioEditorController {
             return;
         
         String nm = scenarioName.getText();
-        if (nm.equals(""))
-            nm = origScenarioName;
-        
-        appMainController.changeScenarioName(myScenario, nm);
+        if (!nm.equals(""))
+            appMainController.changeScenarioName(myScenario, nm);
     }
     
+    
+    
+    
+    private void onScenarioDescriptionChange(ActionEvent event) {
+        if (ignoreChange)
+            return;
+        
+        myScenario.description = sDescription.getText();
+    }
     
     
     
@@ -378,6 +408,12 @@ public class ScenarioEditorController {
         int seconds = Misc.timeString2Seconds(buf);
         myScenario.set_sim_duration(seconds);
         appMainController.setProjectModified(true);
+    }
+    
+    
+    @FXML
+    void addLanePolicy(ActionEvent event) {
+
     }
     
 }

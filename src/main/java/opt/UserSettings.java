@@ -27,6 +27,7 @@ package opt;
 
 import java.util.HashMap;
 import java.util.Map;
+import opt.config.LinkEditorController;
 import opt.data.ParametersFreeway;
 import opt.data.ParametersRamp;
 
@@ -277,6 +278,9 @@ public class UserSettings {
                 (float)defaultAuxLaneJamDensityVpk,
                 (float)defaultAuxLaneFreeFlowSpeedKph);
     }
+    
+    
+    public static LinkEditorController linkEditorController = null;
     
 
     

@@ -48,8 +48,10 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -153,6 +155,9 @@ public class LinkEditorController {
     
     private TSTableHandler demandTableHandler = new TSTableHandler();
     private TSTableHandler srTableHandler = new TSTableHandler();
+    
+    private ObservableList<Object> defaultDemandRow = null;
+    private ObservableList<Object> defaultSRRow = null;
     
     
     
@@ -470,6 +475,13 @@ public class LinkEditorController {
         appMainController.setProjectModified(val);
     }
     
+    public void updateTablePositions(KeyCode kc) {
+        if (myLink.get_up_link() == null)
+            demandTableHandler.onKeyPressed2(kc);
+        if (myLink.get_type() == AbstractLink.Type.offramp)
+            srTableHandler.onKeyPressed2(kc);
+    }
+    
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {        
@@ -507,9 +519,9 @@ public class LinkEditorController {
         linkLength.setValueFactory(lengthSpinnerValueFactory);
         linkLength.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
-                double length = (double) myLink.get_length_meters();
+                /*double length = (double) myLink.get_length_meters();
                 length = UserSettings.convertLength(length, "meters", UserSettings.unitsLength);
-                linkLength.getValueFactory().setValue(length);
+                linkLength.getValueFactory().setValue(length);*/
                 return;
             }
             if (!ignoreChange && ((oldValue == null) || (Math.abs(oldValue-newValue) > 0.00001))) {
@@ -816,7 +828,6 @@ public class LinkEditorController {
                 appMainController.setLeftStatus("Deleted " + del_num + " demand entries from '" + myLink.get_name() + "'.");
             }
 
-            
             if (event.getCode().isDigitKey()) {              
                 tableDemand.edit(focusedCell.getRow(), focusedCell.getTableColumn());
             } 
@@ -826,6 +837,17 @@ public class LinkEditorController {
             if (ignoreChange)
                 return;
             demandTableHandler.onMouseClicked(event);
+        });
+        
+        tableDemand.setRowFactory(tv -> {
+            TableRow<ObservableList<Object>> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if ((event.getClickCount() == 2) && (row.isEmpty())) {
+                    demandTableHandler.addRow();
+                    setDemand();
+                }
+            });
+            return row ;
         });
         
         tableDemand.getSelectionModel().setCellSelectionEnabled(true);
@@ -887,6 +909,17 @@ public class LinkEditorController {
             srTableHandler.onMouseClicked(event);
         });
         
+        tableSR.setRowFactory(tv -> {
+            TableRow<ObservableList<Object>> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if ((event.getClickCount() == 2) && (row.isEmpty())) {
+                    srTableHandler.addRow();
+                    setSR();
+                }
+            });
+            return row ;
+        });
+        
         tableSR.getSelectionModel().setCellSelectionEnabled(true);
         tableSR.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
        
@@ -925,6 +958,7 @@ public class LinkEditorController {
         ignoreChange = true;        
         myLink = lnk;
         
+        UserSettings.linkEditorController = this;
         appMainController.setLeftStatus("");
     
         initHeader();
@@ -1095,20 +1129,20 @@ public class LinkEditorController {
              ttAddSectionUpstream.setText("Create and attach a new freeway section upstream");
              if (myLink.get_up_link() != null) 
                  ttAddSectionDownstream.setText("Create and insert a new freeway section upstream");
-             ttConnectDownstream.setText("Connect to an origin (source) freeway section downstream");
-             ttConnectUpstream.setText("Connect to a destination (sink) freeway section upstream");
+             ttConnectDownstream.setText("Connect to beginning of downstream freeway segment");
+             ttConnectUpstream.setText("Connect to end of upstream freeway segment");
         } else if (myLink.get_type() == AbstractLink.Type.connector) {
              ttDeleteSection.setText("Delete the connector");
              ttAddSectionDownstream.setText("Create and attach a new freeway section with an on-ramp downstream");
              ttAddSectionUpstream.setText("Create and attach a new freeway with an off-ramp section upstream");
-             ttConnectDownstream.setText("Connect to an origin (source) on-ramp downstream");
-             ttConnectUpstream.setText("Connect to a destination (sink) off-ramp section upstream");
+             ttConnectDownstream.setText("Connect to beginning of downstream freeway segment");
+             ttConnectUpstream.setText("Connect to end of upstream freeway segment");
         } else if (myLink.get_type() == AbstractLink.Type.onramp) {
              ttAddSectionUpstream.setText("Create and attach a new connector upstream");
-             ttConnectUpstream.setText("Connect to a destination (sink) connector upstream");
+             ttConnectUpstream.setText("Connect to end of upstream freeway segment");
         } else { // off-ramp
              ttAddSectionDownstream.setText("Create and attach a new connector downstream");
-             ttConnectDownstream.setText("Connect to an origin (source) connector downstream");
+             ttConnectDownstream.setText("Connect to beginning of downstream freeway segment");
         }
     }
     
@@ -1274,14 +1308,16 @@ public class LinkEditorController {
             return;
         String unitsLength = UserSettings.unitsLength;
         double length = lengthSpinnerValueFactory.getValue();
-        if (length < 0.001) {
+        /*if (length < 0.001) {
             length = myLink.get_length_meters();
             length = UserSettings.convertLength(length, "meters", unitsLength);
             lengthSpinnerValueFactory.setValue(length);
             return;
-        }
+        }*/
         
         length = UserSettings.convertLength(length, unitsLength, "meters");
+        if (length < 0.1)
+            return;
         
         try {
             myLink.set_length_meters((float)length);
@@ -1844,7 +1880,8 @@ public class LinkEditorController {
             if (ignoreChange)
                 return;
             TablePosition<ObservableList<Object>, ?> focusedCell = event.getTablePosition();
-            tableDemand.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), event.getNewValue().doubleValue());
+            if ((event.getNewValue() != null) && (!event.getNewValue().equals("")))
+                tableDemand.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), event.getNewValue().doubleValue());
             tableDemand.refresh();
             setDemand();
         });
@@ -1867,9 +1904,11 @@ public class LinkEditorController {
                 if (ignoreChange)
                     return;
                 TablePosition<ObservableList<Object>, ?> focusedCell = event.getTablePosition();
-                double val = event.getNewValue().doubleValue();
-                val = Math.min(Math.max(val, 0), 100);
-                tableDemand.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), val);
+                if ((event.getNewValue() != null) && (!event.getNewValue().equals(""))) {
+                    double val = event.getNewValue().doubleValue();
+                    val = Math.min(Math.max(val, 0), 100);
+                    tableDemand.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), val);
+                }
                 tableDemand.refresh();
                 setDemand();
             });
@@ -1899,8 +1938,9 @@ public class LinkEditorController {
         
         double fcc = UserSettings.flowConversionMap.get("vph" + UserSettings.unitsFlow);
         
+        ObservableList<Object> row;
         for (int i = 0; i < numSteps; i++) {
-            ObservableList<Object> row = FXCollections.observableArrayList();
+            row = FXCollections.observableArrayList();
             row.add(opt.utils.Misc.minutes2timeString(i*dtD));
             
             row.add(0.0);
@@ -1919,11 +1959,27 @@ public class LinkEditorController {
                 double val = (Double)row.get(j+2);
                 val = Math.round(100 * val / total);
                 row.set(j+2, val);
+                if ((total < 0.0000000001) && (j == 0))
+                    row.set(j+2, 100.0);
             }
             
             row.set(1, fcc*total);
             tableDemand.getItems().add(row);
         }
+        
+        row = FXCollections.observableArrayList();
+        row.add("");
+        row.add(0.0);
+        row.add(100.0);
+        for (int i = 1; i < num_vt + 1; i++)
+            row.add(0.0);
+        demandTableHandler.setDefaultRow(row);
+        demandTableHandler.setDt(dtD);
+        
+        if (num_vt == 1) {
+            demandTableHandler.setColumnValue(2, 100.0);
+        }
+        
         tableDemand.refresh();
 
         dtDemandSpinnerValueFactory.setValue(dtD);
@@ -1956,7 +2012,7 @@ public class LinkEditorController {
         int num_vt = listVT.size();
         
         if (num_vt == 1) {
-            demandTableHandler.setColumnValue(2, 100);
+            demandTableHandler.setColumnValue(2, 100.0);
         }
         
         double fcc = UserSettings.flowConversionMap.get(UserSettings.unitsFlow + "vph");
@@ -2038,9 +2094,11 @@ public class LinkEditorController {
                 if (ignoreChange)
                     return;
                 TablePosition<ObservableList<Object>, ?> focusedCell = event.getTablePosition();
-                double val = event.getNewValue().doubleValue();
-                val = Math.min(Math.max(val, 0), 100);
-                tableSR.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), val);
+                if ((event.getNewValue() != null) && (!event.getNewValue().equals(""))) {
+                    double val = event.getNewValue().doubleValue();
+                    val = Math.min(Math.max(val, 0), 100);
+                    tableSR.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), val);
+                }
                 tableSR.refresh();
                 setSR();
             });
@@ -2070,8 +2128,9 @@ public class LinkEditorController {
         
         int dtSR = (int)Math.round(pdt / 60);
         
+        ObservableList<Object> row;
         for (int i = 0; i < numSteps; i++) {
-            ObservableList<Object> row = FXCollections.observableArrayList();
+            row = FXCollections.observableArrayList();
             row.add(opt.utils.Misc.minutes2timeString(i*dtSR));
             
             double total = 0;
@@ -2085,6 +2144,14 @@ public class LinkEditorController {
             
             tableSR.getItems().add(row);
         }
+        
+        row = FXCollections.observableArrayList();
+        row.add("");
+        for (int i = 1; i < num_vt + 1; i++)
+            row.add(0.0);
+        srTableHandler.setDefaultRow(row);
+        srTableHandler.setDt(dtSR);
+        
         tableSR.refresh();
 
         dtSRSpinnerValueFactory.setValue(dtSR);

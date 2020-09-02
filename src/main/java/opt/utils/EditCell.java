@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019, Regents of the University of California
+ * Copyright (c) 2020, Regents of the University of California
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
+import opt.UserSettings;
 
 
 
@@ -67,7 +68,7 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
     int maxSelectedColumn = 0;
     
     
-    
+    T myNewValue;
 
     public EditCell(final StringConverter<T> converter) {
 	super(converter);
@@ -132,6 +133,12 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
     public void commitEdit(T newValue) {
         if (!isEditing())
             return;
+        
+        myNewValue = newValue;
+        
+        if ((newValue == null) || (newValue.equals("")))
+            super.cancelEdit(); 
+            
         final TableView<S> table = getTableView();
         if (table != null) {
             // Inform the TableView of the edit being ready to be committed.
@@ -147,6 +154,8 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
             table.edit(-1, null);
         }
     }
+    
+    
 
     /** {@inheritDoc} */
     @Override
@@ -165,15 +174,9 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
         setGraphic(null); // stop editing with TextField
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void updateItem(T item, boolean empty) {
-	super.updateItem(item, empty);
-	updateItem();
-    }
+    
 
     private TextField getTextField() {
-
         final TextField textField = new TextField(getItemText());
 
 	textField.setOnAction(new EventHandler<ActionEvent>() {
@@ -224,21 +227,27 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
 		//getTableView().getSelectionModel().selectNext();
                 //getTableView().getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
 		event.consume();
+                UserSettings.linkEditorController.updateTablePositions(KeyCode.RIGHT);
             } else if (event.getCode() == KeyCode.LEFT) {
                 moveBack(getTableView(), focusedCell);
 		//getTableView().getSelectionModel().selectPrevious();
                 //getTableView().getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
 		event.consume();
+                UserSettings.linkEditorController.updateTablePositions(KeyCode.LEFT);
             } else if (event.getCode() == KeyCode.UP) {
-		//getTableView().getSelectionModel().selectAboveCell();
-                moveUp(getTableView(), focusedCell);
-                getTableView().getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
+		getTableView().getSelectionModel().selectPrevious();
+                //moveUp(getTableView(), focusedCell);
+                getTableView().getSelectionModel().clearSelection();
+                getTableView().getSelectionModel().select(focusedCell.getRow(), focusedCell.getTableColumn());
 		event.consume();
+                UserSettings.linkEditorController.updateTablePositions(KeyCode.UP);
             } else if (event.getCode() == KeyCode.DOWN) {
-		//getTableView().getSelectionModel().selectBelowCell();
-                moveDown(getTableView(), focusedCell);
-                getTableView().getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
+		getTableView().getSelectionModel().selectBelowCell();
+                //moveDown(getTableView(), focusedCell);
+                getTableView().getSelectionModel().clearSelection();
+                getTableView().getSelectionModel().select(focusedCell.getRow(), focusedCell.getTableColumn());
 		event.consume();
+                UserSettings.linkEditorController.updateTablePositions(KeyCode.DOWN);
             }
 	});
 
@@ -247,6 +256,13 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
 
     private String getItemText() {
         return getConverter() == null ? getItem() == null ? "" : getItem().toString() : getConverter().toString(getItem());
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public void updateItem(T item, boolean empty) {
+	super.updateItem(item, empty);
+	updateItem();
     }
 
     private void updateItem() {
@@ -285,17 +301,18 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
         int numCols = myTable.getColumns().size();
         
         int row = focusedCell.getRow();
-        int col = focusedCell.getColumn() - 1;
+        int col = focusedCell.getColumn();
         myTable.getSelectionModel().clearSelection();
         
         if (col < (ignoreFirstCol ? 1 : 0)) {
-            row--;
-            col = numCols - 1;
+            if (row > 0) {
+                row--;
+                col = numCols - 1;
+            }
         }
         
-        if (row >= 0) {
-             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
-        }
+        myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
+        myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
     }
     
     
@@ -305,15 +322,16 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
         
         int row = focusedCell.getRow() - 1;
         int col = focusedCell.getColumn();
+        
+        myTable.getSelectionModel().selectPrevious();
         myTable.getSelectionModel().clearSelection();
         
         if (row < 0) {
             row = 0;
         }
         
-        if (col >= (ignoreFirstCol ? 1 : 0)) {
-             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
-        }
+        myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
+        myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
     }
     
     
@@ -322,17 +340,18 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
         int numCols = myTable.getColumns().size();
         
         int row = focusedCell.getRow();
-        int col = focusedCell.getColumn() + 1;
+        int col = focusedCell.getColumn();
         myTable.getSelectionModel().clearSelection();
         
         if (col >= numCols) {
-            row++;
-            col = ignoreFirstCol ? 1 : 0;
+            if (row < numRows - 1) {
+                row++;
+                col = ignoreFirstCol ? 1 : 0;
+            }
         }
         
-        if (row < numRows) {
-             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
-        }
+        myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
+        myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
     }
     
     
@@ -348,9 +367,8 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
             row = numRows - 1;
         }
         
-        if (col < numCols) {
-             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
-        }
+        myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
+        myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
     }
     
     

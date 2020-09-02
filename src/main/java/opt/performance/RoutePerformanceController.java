@@ -100,6 +100,7 @@ import org.jfree.ui.HorizontalAlignment;
 import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class serves to display plots of simulation data for a given route.
@@ -243,9 +244,23 @@ public class RoutePerformanceController {
             timeDivider = 60.0;
         }
         
+        long startTime = System.nanoTime();
         processLinkSequence();
+        long endTime = System.nanoTime();
+        double dur = (endTime - startTime) / 1000000000f;
+        System.err.println("processLinkSequence(): " + dur);
+        
+        startTime = System.nanoTime();
         fillTabContours();
+        endTime = System.nanoTime();
+        dur = (endTime - startTime) / 1000000000f;
+        System.err.println("fillTabContours(): " + dur);
+        
+        startTime = System.nanoTime();
         fillTabAggregates();
+        endTime = System.nanoTime();
+        dur = (endTime - startTime) / 1000000000f;
+        System.err.println("fillTabAggregates(): " + dur);
 
              
     }

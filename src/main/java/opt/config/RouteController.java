@@ -448,11 +448,10 @@ public class RouteController {
             return;
         
         String nm = routeName.getText();
-        if (nm.equals(""))
-            nm = origRouteName;
-        
-        myRoute.setName(nm);
-        appMainController.objectNameUpdate(myRoute);
+        if (!nm.equals("")) {
+            myRoute.setName(nm);
+            appMainController.objectNameUpdate(myRoute);
+        }
     }
     
     @FXML
