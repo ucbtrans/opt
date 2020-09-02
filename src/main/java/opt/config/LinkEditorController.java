@@ -519,9 +519,9 @@ public class LinkEditorController {
         linkLength.setValueFactory(lengthSpinnerValueFactory);
         linkLength.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
-                double length = (double) myLink.get_length_meters();
+                /*double length = (double) myLink.get_length_meters();
                 length = UserSettings.convertLength(length, "meters", UserSettings.unitsLength);
-                linkLength.getValueFactory().setValue(length);
+                linkLength.getValueFactory().setValue(length);*/
                 return;
             }
             if (!ignoreChange && ((oldValue == null) || (Math.abs(oldValue-newValue) > 0.00001))) {
@@ -1129,20 +1129,20 @@ public class LinkEditorController {
              ttAddSectionUpstream.setText("Create and attach a new freeway section upstream");
              if (myLink.get_up_link() != null) 
                  ttAddSectionDownstream.setText("Create and insert a new freeway section upstream");
-             ttConnectDownstream.setText("Connect to an origin (source) freeway section downstream");
-             ttConnectUpstream.setText("Connect to a destination (sink) freeway section upstream");
+             ttConnectDownstream.setText("Connect to beginning of downstream freeway segment");
+             ttConnectUpstream.setText("Connect to end of upstream freeway segment");
         } else if (myLink.get_type() == AbstractLink.Type.connector) {
              ttDeleteSection.setText("Delete the connector");
              ttAddSectionDownstream.setText("Create and attach a new freeway section with an on-ramp downstream");
              ttAddSectionUpstream.setText("Create and attach a new freeway with an off-ramp section upstream");
-             ttConnectDownstream.setText("Connect to an origin (source) on-ramp downstream");
-             ttConnectUpstream.setText("Connect to a destination (sink) off-ramp section upstream");
+             ttConnectDownstream.setText("Connect to beginning of downstream freeway segment");
+             ttConnectUpstream.setText("Connect to end of upstream freeway segment");
         } else if (myLink.get_type() == AbstractLink.Type.onramp) {
              ttAddSectionUpstream.setText("Create and attach a new connector upstream");
-             ttConnectUpstream.setText("Connect to a destination (sink) connector upstream");
+             ttConnectUpstream.setText("Connect to end of upstream freeway segment");
         } else { // off-ramp
              ttAddSectionDownstream.setText("Create and attach a new connector downstream");
-             ttConnectDownstream.setText("Connect to an origin (source) connector downstream");
+             ttConnectDownstream.setText("Connect to beginning of downstream freeway segment");
         }
     }
     
@@ -1308,14 +1308,16 @@ public class LinkEditorController {
             return;
         String unitsLength = UserSettings.unitsLength;
         double length = lengthSpinnerValueFactory.getValue();
-        if (length < 0.001) {
+        /*if (length < 0.001) {
             length = myLink.get_length_meters();
             length = UserSettings.convertLength(length, "meters", unitsLength);
             lengthSpinnerValueFactory.setValue(length);
             return;
-        }
+        }*/
         
         length = UserSettings.convertLength(length, unitsLength, "meters");
+        if (length < 0.1)
+            return;
         
         try {
             myLink.set_length_meters((float)length);
