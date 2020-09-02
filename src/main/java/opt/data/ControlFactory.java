@@ -3,12 +3,14 @@ package opt.data;
 import error.OTMException;
 import opt.data.control.*;
 import opt.utils.BijectiveMap;
+import utils.OTMUtils;
 
 import java.util.*;
 
 public class ControlFactory {
 
 	public static BijectiveMap<control.AbstractController.Algorithm,String> cntrl_alg_name;
+
 	static{
 		cntrl_alg_name = new BijectiveMap<>();
 		cntrl_alg_name.put(control.AbstractController.Algorithm.rm_alinea,"Alinea");
@@ -83,10 +85,8 @@ public class ControlFactory {
 		return new ControllerRampMeterAlinea(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
 	}
 
-	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,Long id, float dt) throws Exception {
-		parameters_check(dt);
-		ControllerPolicyHOV ctrl = new ControllerPolicyHOV(fwyscn,id,dt);
-		return ctrl;
+	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,Long id, float dt,Set<Long> dissallowed_comms) throws Exception {
+		return new ControllerPolicyHOV(fwyscn,id,dt,dissallowed_comms);
 	}
 
 	public static ControllerPolicyHOT create_controller_hot(FreewayScenario fwyscn,Long id, float dt) throws Exception {
@@ -123,7 +123,6 @@ public class ControlFactory {
 	// jaxb
 	/////////////////////////
 
-
 	public static ControllerRampMeterAlinea create_controller_alinea(jaxb.Entry jentry,jaxb.Sensor jsn) throws Exception {
 
 		// read parameters
@@ -158,7 +157,6 @@ public class ControlFactory {
 
 		return cntrl;
 	}
-
 
 //		public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn, jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool, Map<Long,jaxb.Sensor> sensor_pool) throws Exception {
 //
@@ -215,9 +213,7 @@ public class ControlFactory {
 //		return cntrl;
 //	}
 
-
 	public static ControllerRampMeterFixedRate create_controller_fixed_rate(jaxb.Entry jentry) throws Exception {
-
 
 		// read parameters
 		boolean has_queue_control = false;
@@ -250,7 +246,6 @@ public class ControlFactory {
 		return cntrl;
 
 	}
-
 
 //	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn, jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool) throws Exception {
 //
@@ -292,9 +287,22 @@ public class ControlFactory {
 //
 //	}
 
-	public static ControllerPolicyHOV create_controller_hov(FreewayScenario fwyscn,jaxb.Controller jcnt) throws Exception {
-		ControllerPolicyHOV cntrl = create_controller_hov(fwyscn,jcnt.getId(),jcnt.getDt());
-		cntrl.setId( jcnt.getId() );
+	public static ControllerPolicyHOV create_controller_hov(jaxb.Entry jentry) throws Exception {
+
+		// read parameters
+		Set<Long> disallowed_comms = new HashSet<>();
+		if(jentry.getParameters()!=null)
+			for(jaxb.Parameter param : jentry.getParameters().getParameter()){
+				switch(param.getName()){
+					case "disallowed_comms":
+						disallowed_comms.addAll(OTMUtils.csv2longlist(param.getValue()));
+						break;
+					default:
+						throw new Exception("Unknown controller parameter");
+				}
+			}
+
+		ControllerPolicyHOV cntrl = create_controller_hov(null,0l,0f,disallowed_comms);
 		return cntrl;
 	}
 

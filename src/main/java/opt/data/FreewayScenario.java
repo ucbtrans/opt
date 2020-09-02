@@ -313,9 +313,10 @@ public class FreewayScenario {
 
                         case rm_fixed_rate:
                             ctrl = ControlFactory.create_controller_fixed_rate(jentry);
-
                             break;
 
+                        case lg_restrict:
+                            ctrl = ControlFactory.create_controller_hov(jentry);
 
                     }
 

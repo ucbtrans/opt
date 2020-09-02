@@ -48,18 +48,18 @@ public class TestControl extends AbstractTest{
 		}
 	}
 
-	@Test
-	public void test_create_controller_hov(){
-		try {
-			TestData X = new TestData("project2_rm.opt");
-			ControllerPolicyHOV cntrl = ControlFactory.create_controller_hov(X.scenario,
-					null,
-					3f);
-			assertNotNull(cntrl);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	@Test
+//	public void test_create_controller_hov(){
+//		try {
+//			TestData X = new TestData("project2_rm.opt");
+//			ControllerPolicyHOV cntrl = ControlFactory.create_controller_hov(X.scenario,
+//					null,
+//					3f);
+//			assertNotNull(cntrl);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	@Test
 	public void test_create_controller_hot(){
