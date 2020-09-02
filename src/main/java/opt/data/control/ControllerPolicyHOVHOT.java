@@ -10,15 +10,15 @@ import java.util.Set;
 
 public class ControllerPolicyHOVHOT extends AbstractController {
 
-	Set<Long> dissallowed_comms;
+	Set<Long> disallowed_comms;
 
 	////////////////////////////////
 	// construction
 	////////////////////////////////
 
-	public ControllerPolicyHOVHOT(FreewayScenario scn, Long id, Set<Long> dissallowed_comms) {
+	public ControllerPolicyHOVHOT(FreewayScenario scn, Long id, Set<Long> disallowed_comms) {
 		super(id!=null ? id : scn.new_controller_id(),Type.HOVHOT,null, control.AbstractController.Algorithm.lg_restrict);
-		this.dissallowed_comms = dissallowed_comms==null ? new HashSet<>() : dissallowed_comms;
+		this.disallowed_comms = disallowed_comms==null ? new HashSet<>() : disallowed_comms;
 	}
 
 	////////////////////////////////
@@ -27,10 +27,12 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 
 	@Override
 	public Collection<Parameter> jaxb_parameters() {
+		if(disallowed_comms.isEmpty())
+			return new HashSet<>();
 		Set<Parameter> params = new HashSet<>();
 		Parameter n = new Parameter();
-		n.setName("dissallowed_comms");
-		n.setValue(OTMUtils.comma_format(dissallowed_comms));
+		n.setName("disallowed_comms");
+		n.setValue(OTMUtils.comma_format(disallowed_comms));
 		params.add(n);
 		return params;
 	}

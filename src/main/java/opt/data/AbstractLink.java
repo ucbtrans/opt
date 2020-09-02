@@ -437,6 +437,30 @@ public abstract class AbstractLink implements Comparable {
         return ids;
     }
 
+    public final Set<ControlSchedule> get_all_schedules(){
+        Set<ControlSchedule> X = new HashSet<>();
+        for(Map<AbstractController.Type, ControlSchedule> e1 : schedules.values())
+            X.addAll(e1.values());
+        return X;
+    }
+
+    // WARNING: This is not an API function. Internal use only!!
+    protected final void add_schedule(ControlSchedule sch) throws Exception {
+
+        LaneGroupType lgtype = sch.get_lgtype();
+        AbstractController.Type cntrltype = sch.get_controlType();
+
+        Map<AbstractController.Type, ControlSchedule> schmap =
+                schedules.containsKey(lgtype) ? schedules.get(lgtype) : new HashMap<>();
+
+        if(schmap.containsKey(cntrltype))
+            throw new Exception("Control schedule clash in link " + id);
+        else
+            schedules.put(lgtype,schmap);
+
+        schmap.put(cntrltype,sch);
+    }
+
     /////////////////////////////////////
     // connect
     /////////////////////////////////////

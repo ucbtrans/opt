@@ -103,8 +103,8 @@ public class ControlFactory {
 		return new ControllerRampMeterAlinea(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
 	}
 
-	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn, Long id, Set<Long> dissallowed_comms) throws Exception {
-		return new ControllerPolicyHOVHOT(fwyscn,id,dissallowed_comms);
+	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn, Long id, Set<Long> disallowed_comms) throws Exception {
+		return new ControllerPolicyHOVHOT(fwyscn,id,disallowed_comms);
 	}
 
 	/////////////////////

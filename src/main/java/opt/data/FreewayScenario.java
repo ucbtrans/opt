@@ -349,6 +349,10 @@ public class FreewayScenario {
 
                 }
 
+                // add the schedule to all of its links
+                for(AbstractLink link : links)
+                    link.add_schedule(sch);
+
             }
         }
 

@@ -16,11 +16,22 @@ public class ActuatorHOVHOT extends AbstractActuator  {
     @Override
     public Actuator to_jaxb() {
         jaxb.Actuator j =  super.to_jaxb();
-        j.setType("hovpolicy");
-//        jaxb.ActuatorTarget jtgt = new jaxb.ActuatorTarget();
-//        j.setActuatorTarget(jtgt);
-//        jtgt.setType("link");
-//        jtgt.setId(link.id);
+        j.setType("lg_restrict");
+        jaxb.ActuatorTarget jtgt = new jaxb.ActuatorTarget();
+        j.setActuatorTarget(jtgt);
+        jtgt.setType("lanegroups");
+
+        String str = "";
+        for(AbstractLink link : links){
+            int []lanes = link.lgtype2lanes(lgtype);
+            String str2 = String.format("%d(%d#%d)",link.id,lanes[0],lanes[1]);
+            str += str2 + ",";
+        }
+        if(!str.isEmpty())
+            str = str.substring(0, str.length() - 1);
+        jtgt.setContent(str);
+
+
         return j;
     }
 

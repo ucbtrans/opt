@@ -69,7 +69,7 @@ public class ControlSchedule {
             jsch.getEntry().add(jentry);
 
             // dt
-            if(!entry.cntrl.getDt().isInfinite())
+            if(entry.cntrl.getDt()!=null && !entry.cntrl.getDt().isInfinite())
                 jentry.setDt(entry.cntrl.getDt());
 
             // start time and end time
@@ -104,6 +104,14 @@ public class ControlSchedule {
     ////////////////////////////////
     // API
     ////////////////////////////////
+
+    public LaneGroupType get_lgtype(){
+        return actuator.lgtype;
+    }
+
+    public AbstractController.Type get_controlType(){
+        return controlType;
+    }
 
     public void update(float start_time, AbstractController cntrl) {
 

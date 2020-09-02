@@ -4,12 +4,14 @@ import geometry.Side;
 import jaxb.ModelParams;
 import jaxb.Roadgeom;
 import jaxb.Roadparam;
+import jaxb.Schedule;
 import opt.UserSettings;
 import opt.data.control.*;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Scenario {
 
@@ -462,25 +464,20 @@ public class Scenario {
 
         Set<Sensor> all_sensors = new HashSet<>();
 
-        for(AbstractLink link : links.values()){
+        Set<ControlSchedule> all_schedules = links.values().stream()
+                .flatMap(link->link.get_all_schedules().stream())
+                .collect(Collectors.toSet());
 
-            if(link.schedules==null)
-                continue;
+        for(ControlSchedule schedule : all_schedules){
 
-            for(Map.Entry<LaneGroupType,Map<AbstractController.Type, ControlSchedule>> e1 : link.schedules.entrySet()){
-                for(Map.Entry<AbstractController.Type, ControlSchedule> e2 : e1.getValue().entrySet()){
-                    ControlSchedule schedule = e2.getValue();
+            jcntrls.getController().add(schedule.to_jaxb());
+            AbstractActuator actuator = schedule.get_actuator();
 
-                    jcntrls.getController().add(schedule.to_jaxb());
-                    AbstractActuator actuator = schedule.get_actuator();
+            // actuator
+            jacts.getActuator().add(actuator.to_jaxb());
 
-                    // actuator
-                    jacts.getActuator().add(actuator.to_jaxb());
-
-                    // sensors
-                    all_sensors.addAll(schedule.get_sensors());
-                }
-            }
+            // sensors
+            all_sensors.addAll(schedule.get_sensors());
         }
 
         jaxb.Sensors jsnss = new jaxb.Sensors();
