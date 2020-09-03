@@ -41,13 +41,13 @@ public class ControlFactory {
 	// schedule
 	/////////////////////
 
-	public static ControlSchedule create_empty_controller_schedule(Long id,AbstractLink link, LaneGroupType lgtype, AbstractController.Type cntrl_type) throws Exception {
+	public static ControlSchedule create_empty_controller_schedule(Long id,String name,AbstractLink link, LaneGroupType lgtype, AbstractController.Type cntrl_type) throws Exception {
 		Set<AbstractLink> links = new HashSet<>();
 		links.add(link);
-		return create_empty_controller_schedule(id,links,lgtype,cntrl_type);
+		return create_empty_controller_schedule(id,name,links,lgtype,cntrl_type);
 	}
 
-	public static ControlSchedule create_empty_controller_schedule(Long id,Set<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type cntrl_type) throws Exception {
+	public static ControlSchedule create_empty_controller_schedule(Long id,String name,Set<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type cntrl_type) throws Exception {
 
 		// all links should be in the same scenario
 		assert(links.stream().map(x->x.mysegment.my_fwy_scenario).distinct().count()==1);
@@ -55,6 +55,7 @@ public class ControlFactory {
 
 		ControlSchedule schedule = new ControlSchedule(
 				id==null ? fwyscn.new_controller_id() : id,
+				name,
 				links,
 				lgtype,
 				cntrl_type,

@@ -4,7 +4,6 @@ import geometry.Side;
 import jaxb.ModelParams;
 import jaxb.Roadgeom;
 import jaxb.Roadparam;
-import jaxb.Schedule;
 import opt.UserSettings;
 import opt.data.control.*;
 import profiles.Profile1D;
@@ -470,7 +469,7 @@ public class Scenario {
 
         for(ControlSchedule schedule : all_schedules){
 
-            jcntrls.getController().add(schedule.to_jaxb());
+            jcntrls.getController().add(schedule.to_jaxb_controller());
             AbstractActuator actuator = schedule.get_actuator();
 
             // actuator

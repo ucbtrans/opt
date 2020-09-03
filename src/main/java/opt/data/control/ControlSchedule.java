@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 public class ControlSchedule {
 
     protected long id;
+    protected String name;
     protected FreewayScenario fwyscn;
     protected AbstractController.Type controlType;
     protected List<ScheduleEntry> entries;
@@ -22,8 +23,9 @@ public class ControlSchedule {
     // construction
     ////////////////////////////////
 
-    public ControlSchedule(long id,Collection<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type controlType,long act_id) throws Exception {
+    public ControlSchedule(long id,String name,Collection<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type controlType,long act_id) throws Exception {
         this.id = id;
+        this.name = name;
         this.controlType = controlType;
         this.entries = new ArrayList<>();
 
@@ -43,7 +45,14 @@ public class ControlSchedule {
         }
     }
 
-    public jaxb.Controller to_jaxb(){
+    public jaxb.Schd to_jaxb(){
+        jaxb.Schd jsch = new jaxb.Schd();
+        jsch.setId(id);
+        jsch.setName(name);
+        return jsch;
+    }
+
+    public jaxb.Controller to_jaxb_controller(){
         jaxb.Controller jcntrl = new jaxb.Controller();
 
         if(entries.isEmpty())
@@ -104,6 +113,14 @@ public class ControlSchedule {
     ////////////////////////////////
     // API
     ////////////////////////////////
+
+    public String get_name(){
+        return name;
+    }
+
+    public void set_name(String name){
+        this.name=name;
+    }
 
     public LaneGroupType get_lgtype(){
         return actuator.lgtype;

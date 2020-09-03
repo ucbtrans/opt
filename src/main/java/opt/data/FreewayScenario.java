@@ -51,7 +51,7 @@ public class FreewayScenario {
         reset_max_ids();
     }
 
-    public FreewayScenario(String name,String description,jaxb.Sim sim,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Routes jaxb_routes,jaxb.Scenario jaxb_scenario) throws Exception {
+    public FreewayScenario(String name,String description,jaxb.Sim sim,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Routes jaxb_routes,jaxb.Schds jaxb_schds,jaxb.Scenario jaxb_scenario) throws Exception {
 
         reset_max_ids();
 
@@ -257,7 +257,12 @@ public class FreewayScenario {
             for(jaxb.Sensor x : jaxb_scenario.getSensors().getSensor())
                 sensors.put(x.getId(),x);
 
-        // read controllers
+        // put schedule names into a HashMap
+        Map<Long,String> sch_names = new HashMap<>();
+        if(jaxb_schds!=null)
+            for(jaxb.Schd jschd : jaxb_schds.getSchd())
+                sch_names.put(jschd.getId(), jschd.getName());
+
         if(jaxb_scenario.getControllers()!=null){
             for(jaxb.Controller jcnt : jaxb_scenario.getControllers().getController()){
 
@@ -283,7 +288,6 @@ public class FreewayScenario {
                     lgtypes.add( link.lane2lgtype().get(lanes[0]-1) );
                 }
 
-
                 // determine the controller type from the entry types
                 Set<control.AbstractController.Algorithm> entry_types = jcnt.getSchedule().getEntry().stream()
                         .map(e->control.AbstractController.Algorithm.valueOf(e.getType()))
@@ -307,7 +311,9 @@ public class FreewayScenario {
                     throw new Exception("Incompatible control algorithms in schedule.");
 
                 // create the schedule
-                ControlSchedule sch = new ControlSchedule(jcnt.getId(),links,lg_type,cntr_type,jact.getId());
+                long sch_id = jcnt.getId();
+                String sch_name = sch_names.containsKey(sch_id) ? sch_names.get(sch_id) : "";
+                ControlSchedule sch = new ControlSchedule(sch_id,sch_name,links,lg_type,cntr_type,jact.getId());
 
                 for(jaxb.Entry jentry : jcnt.getSchedule().getEntry()){
 
@@ -453,17 +459,20 @@ public class FreewayScenario {
     // API controller
     /////////////////////////////////////
 
+    public Set<ControlSchedule> get_all_schedules(){
+        Set<ControlSchedule> X = new HashSet<>();
+        for(Segment segment : segments.values())
+            for (AbstractLink link : segment.get_links())
+                X.addAll(link.get_all_schedules());
+        return X;
+    }
+
     public List<ControlSchedule> get_schedules_for_controltype(AbstractController.Type cntrltype) {
         List<ControlSchedule> X = new ArrayList<>();
-        for(Segment segment : segments.values()){
-            for (AbstractLink link : segment.get_links()) {
-                Long link_id = link.id;
-                if (!scenario.links.containsKey(link_id))
-                    continue;
+        for(Segment segment : segments.values())
+            for (AbstractLink link : segment.get_links())
                 for (LaneGroupType lgtype : LaneGroupType.values())
-                    X.add(scenario.links.get(link_id).get_controller_schedule(lgtype, cntrltype));
-            }
-        }
+                    X.add(scenario.links.get(link.id).get_controller_schedule(lgtype, cntrltype));
         return X;
     }
 
@@ -863,6 +872,11 @@ public class FreewayScenario {
         scn.setSgmts(sgmts);
         for(Segment segment : segments.values())
             sgmts.getSgmt().add(segment.to_jaxb());
+
+        jaxb.Schds schds = new jaxb.Schds();
+        scn.setSchds(schds);
+        for(ControlSchedule sch : get_all_schedules())
+            schds.getSchd().add(sch.to_jaxb());
 
         jaxb.Routes rts = new jaxb.Routes();
         scn.setRoutes(rts);

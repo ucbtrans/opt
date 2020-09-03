@@ -57,6 +57,7 @@ public class Project {
                         jaxb_scn.getLnks(),
                         jaxb_scn.getSgmts(),
                         jaxb_scn.getRoutes(),
+                        jaxb_scn.getSchds(),
                         jaxb_scenario ));
 
             }
@@ -139,7 +140,7 @@ public class Project {
     public void create_scenario(String name) throws Exception {
         if( scenarios.containsKey(name))
             throw new Exception("The project already has a scenario by this name.");
-        scenarios.put(name,new FreewayScenario(name,"",null,null,null,null,new jaxb.Scenario()));
+        scenarios.put(name,new FreewayScenario(name,"",null,null,null,null,null,new jaxb.Scenario()));
     }
 
     /**
