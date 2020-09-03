@@ -41,13 +41,13 @@ public class ControlFactory {
 	// schedule
 	/////////////////////
 
-	public static ControlSchedule create_empty_controller_schedule(Long id,AbstractLink link, LaneGroupType lgtype, AbstractController.Type cntrl_type) {
+	public static ControlSchedule create_empty_controller_schedule(Long id,AbstractLink link, LaneGroupType lgtype, AbstractController.Type cntrl_type) throws Exception {
 		Set<AbstractLink> links = new HashSet<>();
 		links.add(link);
 		return create_empty_controller_schedule(id,links,lgtype,cntrl_type);
 	}
 
-	public static ControlSchedule create_empty_controller_schedule(Long id,Set<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type cntrl_type) {
+	public static ControlSchedule create_empty_controller_schedule(Long id,Set<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type cntrl_type) throws Exception {
 
 		// all links should be in the same scenario
 		assert(links.stream().map(x->x.mysegment.my_fwy_scenario).distinct().count()==1);
@@ -119,16 +119,20 @@ public class ControlFactory {
 	// actuator
 	/////////////////////
 
-	public static ActuatorRampMeter create_actuator_ramp_meter(long id,AbstractLink link, LaneGroupType lgtype){
+	public static ActuatorRampMeter create_actuator_ramp_meter(long id,AbstractLink link, LaneGroupType lgtype) throws Exception {
+
+		if( link.schedules.containsKey(lgtype) && link.schedules.get(lgtype).containsKey(AbstractController.Type.RampMetering))
+				throw new Exception("Controller clash in link "+ link.id);
+
 		return new ActuatorRampMeter(id, link, lgtype);
 	}
 
-	public static ActuatorHOVHOT create_actuator_hov_policy(long id, Collection<AbstractLink> links, LaneGroupType lgtype){
+	public static ActuatorHOVHOT create_actuator_hovhot_policy(long id, Collection<AbstractLink> links) throws Exception {
+		LaneGroupType lgtype = LaneGroupType.mng;
+		for(AbstractLink link : links)
+			if( link.schedules.containsKey(lgtype) && link.schedules.get(lgtype).containsKey(AbstractController.Type.HOVHOT))
+				throw new Exception("Controller clash in link "+ link.id);
 		return new ActuatorHOVHOT(id, links, lgtype);
-	}
-
-	public static ActuatorHOTPolicy create_actuator_hot_policy(long id,Set<AbstractLink> links, LaneGroupType lgtype){
-		return new ActuatorHOTPolicy(id, links, lgtype);
 	}
 
 	/////////////////////////

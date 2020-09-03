@@ -26,13 +26,6 @@ public abstract class AbstractActuator {
 		this.links = new HashSet<>(links);
 	}
 
-	// TODO READ AND WRITE LANE GROUP TYPE TO XML
-
-//	public AbstractActuator(jaxb.Actuator j){
-//		this.id = j.getId();
-//		this.link_id = j.getActuatorTarget().getId();
-//	}
-
 	public jaxb.Actuator to_jaxb(){
 		jaxb.Actuator j = new jaxb.Actuator();
 		j.setId(id);
@@ -42,6 +35,5 @@ public abstract class AbstractActuator {
 	public long getId(){
 		return id;
 	}
-
 
 }

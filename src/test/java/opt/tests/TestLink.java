@@ -76,8 +76,6 @@ public class TestLink extends AbstractTest {
         assertEquals(1l,sNEW5.fwy().get_dn_link().id);
         assertEquals("lNEW5",sA1.fwy().get_up_link().get_name());
 
-        // case : connector link has no upstream segment
-        // TODO
 
         // case : onramp link has no upstream segment
         Segment sNEW7 = l8.insert_up_segment("sNEW7",

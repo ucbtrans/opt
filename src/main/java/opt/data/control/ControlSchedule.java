@@ -22,7 +22,7 @@ public class ControlSchedule {
     // construction
     ////////////////////////////////
 
-    public ControlSchedule(long id,Collection<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type controlType,long act_id){
+    public ControlSchedule(long id,Collection<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type controlType,long act_id) throws Exception {
         this.id = id;
         this.controlType = controlType;
         this.entries = new ArrayList<>();
@@ -38,7 +38,7 @@ public class ControlSchedule {
                 actuator = ControlFactory.create_actuator_ramp_meter(act_id,links.iterator().next(),lgtype);
                 break;
             case HOVHOT:
-                actuator = ControlFactory.create_actuator_hov_policy(act_id,links,lgtype);
+                actuator = ControlFactory.create_actuator_hovhot_policy(act_id,links);
                 break;
         }
     }
@@ -172,6 +172,38 @@ public class ControlSchedule {
 
     public Set<Sensor> get_sensors(){
         return entries.stream().flatMap(e->e.get_cntrl().get_sensors().values().stream()).collect(Collectors.toSet());
+    }
+
+    public Set<AbstractLink> get_links(){
+        return actuator.links;
+    }
+
+    public List<AbstractLink> get_ordered_links(){
+        List<AbstractLink> X = new ArrayList<>();
+        X.addAll(actuator.links);
+        Collections.sort(X);
+        return X;
+    }
+
+    // return true if successful, false otherwise
+    public boolean add_link(AbstractLink link){
+
+        // try to and schedule to link
+        try {
+            link.add_schedule(this);
+        } catch (Exception e) {
+            return false;
+        }
+
+        // if it works, add link to actuator
+        actuator.links.add(link);
+        return true;
+
+    }
+
+    public void remove_link(AbstractLink link){
+        this.actuator.links.remove(link);
+        link.remove_schedule( get_lgtype(),get_controlType());
     }
 
     ////////////////////////////////

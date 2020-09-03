@@ -391,20 +391,26 @@ public abstract class AbstractLink implements Comparable {
     /////////////////////////////////////
 
     public final ControlSchedule get_controller_schedule(LaneGroupType lgtype, AbstractController.Type cntrl_type){
-        if(!schedules.containsKey(lgtype)) {
-            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(null,this,lgtype,cntrl_type);
-            Map<AbstractController.Type, ControlSchedule> X  = new HashMap<>();
-            X.put(cntrl_type,newschedule);
-            schedules.put(lgtype,X);
-            return newschedule;
+        try {
+            Map<AbstractController.Type, ControlSchedule> X ;
+            if(!schedules.containsKey(lgtype)) {
+                ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(null,this,lgtype,cntrl_type);
+                X  = new HashMap<>();
+                X.put(cntrl_type,newschedule);
+                schedules.put(lgtype,X);
+                return newschedule;
+            }
+            X = schedules.get(lgtype);
+            if(!X.containsKey(cntrl_type)) {
+                ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(null,this,lgtype, cntrl_type);
+                X.put(cntrl_type,newschedule);
+                return newschedule;
+            }
+            return X.get(cntrl_type);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        Map<AbstractController.Type, ControlSchedule> X  = schedules.get(lgtype);
-        if(!X.containsKey(cntrl_type)) {
-            ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(null,this,lgtype, cntrl_type);
-            X.put(cntrl_type,newschedule);
-            return newschedule;
-        }
-        return X.get(cntrl_type);
+        return null;
     }
 
     public final Set<Long> get_controller_ids(){
@@ -445,20 +451,32 @@ public abstract class AbstractLink implements Comparable {
     }
 
     // WARNING: This is not an API function. Internal use only!!
-    protected final void add_schedule(ControlSchedule sch) throws Exception {
+    public final void add_schedule(ControlSchedule sch) throws Exception {
 
         LaneGroupType lgtype = sch.get_lgtype();
         AbstractController.Type cntrltype = sch.get_controlType();
 
-        Map<AbstractController.Type, ControlSchedule> schmap =
+        Map<AbstractController.Type, ControlSchedule> lgsch =
                 schedules.containsKey(lgtype) ? schedules.get(lgtype) : new HashMap<>();
 
-        if(schmap.containsKey(cntrltype))
+        if(lgsch.containsKey(cntrltype))
             throw new Exception("Control schedule clash in link " + id);
         else
-            schedules.put(lgtype,schmap);
+            schedules.put(lgtype,lgsch);
 
-        schmap.put(cntrltype,sch);
+        lgsch.put(cntrltype,sch);
+    }
+
+    // WARNING: This is not an API function. Internal use only!!
+    public final void remove_schedule(LaneGroupType lgtype,AbstractController.Type cntrltype){
+        if(!schedules.containsKey(lgtype))
+            return;
+        Map<AbstractController.Type, ControlSchedule> sch = schedules.get(lgtype);
+        if(!sch.containsKey(cntrltype))
+            return;
+        sch.remove(cntrltype);
+        if(sch.isEmpty())
+            schedules.remove(sch);
     }
 
     /////////////////////////////////////

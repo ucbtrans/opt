@@ -12,6 +12,16 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 
 	Set<Long> disallowed_comms;
 
+	// TODO add these
+	Set<Long> free_comms;
+	int [][] vplph_to_cents_table;
+	// vplph_to_cents_table[i][1] is the price for all flows
+	// between vplph_to_cents_table[i][0] and vplph_to_cents_table[i+1][0]
+	// the price for flows above vplph_to_cents_table[last][0] = vplph_to_cents_table[last][1]
+	// the price for flows below vplph_to_cents_table[0][0] = 0
+
+	Double a0,a1,a2;
+
 	////////////////////////////////
 	// construction
 	////////////////////////////////

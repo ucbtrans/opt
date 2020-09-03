@@ -453,6 +453,27 @@ public class FreewayScenario {
     // API controller
     /////////////////////////////////////
 
+    public List<ControlSchedule> get_schedules_for_controltype(AbstractController.Type cntrltype) {
+        List<ControlSchedule> X = new ArrayList<>();
+        for(Segment segment : segments.values()){
+            for (AbstractLink link : segment.get_links()) {
+                Long link_id = link.id;
+                if (!scenario.links.containsKey(link_id))
+                    continue;
+                for (LaneGroupType lgtype : LaneGroupType.values())
+                    X.add(scenario.links.get(link_id).get_controller_schedule(lgtype, cntrltype));
+            }
+        }
+        return X;
+    }
+
+    public void delete_schedule(ControlSchedule sch){
+        LaneGroupType lgtype = sch.get_lgtype();
+        AbstractController.Type cntrltype = sch.get_controlType();
+        for(AbstractLink link : sch.get_links())
+            link.remove_schedule(lgtype,cntrltype);
+    }
+
     public Map<Long,ControlSchedule> get_controller_schedules_for_links(Collection<Long> link_ids,LaneGroupType lgtype, AbstractController.Type cntrl_type){
         Map<Long,ControlSchedule> X = new HashMap<>();
         for(Long link_id : link_ids){

@@ -6,7 +6,7 @@ import opt.data.LaneGroupType;
 
 public class ActuatorRampMeter extends AbstractActuator {
 
-	public ActuatorRampMeter(long id, AbstractLink link, LaneGroupType lgtype ){
+	public ActuatorRampMeter(long id, AbstractLink link, LaneGroupType lgtype ) {
 		super(id,link,lgtype);
 	}
 
