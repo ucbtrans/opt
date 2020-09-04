@@ -70,7 +70,7 @@ public class ControlFactory {
 					break;
 
 				case HOVHOT:
-					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,null,null));
+					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null));
 					break;
 
 			}
@@ -104,8 +104,8 @@ public class ControlFactory {
 		return new ControllerRampMeterAlinea(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
 	}
 
-	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn, Long id, Set<Long> disallowed_comms) throws Exception {
-		return new ControllerPolicyHOVHOT(fwyscn,id,disallowed_comms);
+	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn, Long id, Set<Long> disallowed_comms,Set<Long> free_comms,Double a0,Double a1,Double a2,int [][] vplph_to_cents_table) throws Exception {
+		return new ControllerPolicyHOVHOT(fwyscn,id,disallowed_comms,free_comms,a0,a1,a2,vplph_to_cents_table);
 	}
 
 	/////////////////////
@@ -264,62 +264,44 @@ public class ControlFactory {
 
 	}
 
-//	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn, jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool) throws Exception {
-//
-//		// read parameters
-//		float rate_vphpl = 0f;
-//		boolean has_queue_control = false;
-//		LaneGroupType lgtype = LaneGroupType.gp;
-//		if(jcnt.getParameters()!=null)
-//			for(jaxb.Parameter param : jcnt.getParameters().getParameter()){
-//				switch(param.getName()){
-//					case "queue_control":
-//						has_queue_control = param.getValue().equals("true");
-//						break;
-//					case "lane_group":
-//						lgtype = LaneGroupType.valueOf(param.getValue());
-//						break;
-//					case "rate_vphpl":
-//						rate_vphpl = Float.parseFloat(param.getValue());
-//						break;
-//					default:
-//						throw new Exception("Unknown controller parameter");
-//				}
-//			}
-//
-//		// read actuators
-//		float min_rate_vph = -1f;
-//		float max_rate_vph = -1f;
-//		List<Long> act_ids = OTMUtils.csv2longlist(jcnt.getTargetActuators().getIds());
-//		assert(act_ids.size()==1);
-//		for(long a : act_ids) {
-//			jaxb.Actuator jact = actuator_pool.get(a);
-//			min_rate_vph = jact.getMinValue();
-//			max_rate_vph = jact.getMaxValue();
-//		}
-//
-//		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(fwyscn,jcnt.getId(),jcnt.getDt(),has_queue_control,min_rate_vph,max_rate_vph,rate_vphpl);
-//		cntrl.setId( jcnt.getId() );
-//		return cntrl;
-//
-//	}
-
 	public static ControllerPolicyHOVHOT create_controller_hovhot(jaxb.Entry jentry) throws Exception {
 
 		// read parameters
 		Set<Long> disallowed_comms = new HashSet<>();
-		if(jentry.getParameters()!=null)
-			for(jaxb.Parameter param : jentry.getParameters().getParameter()){
-				switch(param.getName()){
+		Set<Long> free_comms = new HashSet<>();
+		Double a0 = null;
+		Double a1 = null;
+		Double a2 = null;
+		int [][] vplph_to_cents_table = null;
+		if(jentry.getParameters()!=null) {
+			for (jaxb.Parameter param : jentry.getParameters().getParameter()) {
+				switch (param.getName()) {
 					case "disallowed_comms":
 						disallowed_comms.addAll(OTMUtils.csv2longlist(param.getValue()));
+						break;
+					case "free_comms":
+						free_comms.addAll(OTMUtils.csv2longlist(param.getValue()));
+						break;
+					case "a0":
+						a0 = Double.parseDouble(param.getValue());
+						break;
+					case "a1":
+						a1 = Double.parseDouble(param.getValue());
+						break;
+					case "a2":
+						a2 = Double.parseDouble(param.getValue());
+						break;
+					case "vplph_to_cents_table":
+//						vplph_to_cents_table = OTMUtils.read_int_table(param.getValue());
 						break;
 					default:
 						throw new Exception("Unknown controller parameter");
 				}
 			}
+		}
 
-		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(null,0l,disallowed_comms);
+
+		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(null,0l,disallowed_comms,free_comms,a0,a1,a2,vplph_to_cents_table);
 		return cntrl;
 	}
 
