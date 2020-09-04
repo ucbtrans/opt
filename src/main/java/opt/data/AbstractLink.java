@@ -391,26 +391,32 @@ public abstract class AbstractLink implements Comparable {
     /////////////////////////////////////
 
     public final ControlSchedule get_controller_schedule(LaneGroupType lgtype, AbstractController.Type cntrl_type){
-        try {
-            Map<AbstractController.Type, ControlSchedule> X ;
-            if(!schedules.containsKey(lgtype)) {
-                ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(null,"",this,lgtype,cntrl_type);
-                X  = new HashMap<>();
-                X.put(cntrl_type,newschedule);
-                schedules.put(lgtype,X);
-                return newschedule;
-            }
-            X = schedules.get(lgtype);
-            if(!X.containsKey(cntrl_type)) {
-                ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(null,"",this,lgtype, cntrl_type);
-                X.put(cntrl_type,newschedule);
-                return newschedule;
-            }
-            return X.get(cntrl_type);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+
+        if(!schedules.containsKey(lgtype) || !schedules.get(lgtype).containsKey(cntrl_type))
+            return null;
+        else
+            return schedules.get(lgtype).get(cntrl_type);
+
+        
+//        try {
+//            if(!schedules.containsKey(lgtype)) {
+//                ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(null,"",this,lgtype,cntrl_type);
+//                X  = new HashMap<>();
+//                X.put(cntrl_type,newschedule);
+//                schedules.put(lgtype,X);
+//                return newschedule;
+//            }
+//            X = schedules.get(lgtype);
+//            if(!X.containsKey(cntrl_type)) {
+//                ControlSchedule newschedule = ControlFactory.create_empty_controller_schedule(null,"",this,lgtype, cntrl_type);
+//                X.put(cntrl_type,newschedule);
+//                return newschedule;
+//            }
+//            return X.get(cntrl_type);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
     }
 
     public final Set<Long> get_controller_ids(){
