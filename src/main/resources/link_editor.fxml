@@ -96,12 +96,11 @@
                           </rowConstraints>
                            <children>
                               <Label id="labelFromName" fx:id="labelFromName" text="FROM Name:" GridPane.valignment="BOTTOM" />
-                              <Label id="labelToName" fx:id="labelToName" text="TO Name:" GridPane.columnIndex="1" GridPane.valignment="BOTTOM" />
-                              <Label id="labelLength" fx:id="labelLength" text="Length (miles):" GridPane.columnIndex="2" GridPane.valignment="BOTTOM" />
                               <TextField id="linkFromName" fx:id="linkFromName" GridPane.rowIndex="1" />
+                              <Label id="labelToName" fx:id="labelToName" text="TO Name:" GridPane.columnIndex="1" GridPane.valignment="BOTTOM" />
                               <TextField id="linkToName" fx:id="linkToName" prefHeight="12.0" prefWidth="209.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label id="labelLength" fx:id="labelLength" text="Length (miles):" GridPane.columnIndex="2" GridPane.valignment="BOTTOM" />
                               <Spinner id="linkLength" fx:id="linkLength" editable="true" prefHeight="25.0" prefWidth="134.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                              <Spinner id="mergePriority" fx:id="mergePriority" prefHeight="25.0" prefWidth="135.0" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                            </children>
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -298,11 +297,11 @@
                                                    </font>
                                                 </Label>
                                                 <ListView id="listOnramps" fx:id="listOnramps" onKeyPressed="#onrampsKeyPressed" onMouseClicked="#onrampsOnClick" prefHeight="136.0" prefWidth="123.0" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
-                                                <Button id="addOnRamp" fx:id="addOnRamp" alignment="CENTER_RIGHT" defaultButton="true" mnemonicParsing="false" onAction="#onAddOnRamp" text="Add On-Ramp" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                                                <Button id="deleteOnRamps" fx:id="deleteOnRamps" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#onDeleteOnRamp" text="Delete On-Ramp" GridPane.rowIndex="5" />
+                                                <Button id="addOnRamp" fx:id="addOnRamp" alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddOnRamp" prefWidth="130.0" text="Add On-Ramp" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                                                <Button id="deleteOnRamps" fx:id="deleteOnRamps" alignment="CENTER" mnemonicParsing="false" onAction="#onDeleteOnRamp" prefWidth="130.0" text="Delete On-Ramp" textAlignment="CENTER" GridPane.rowIndex="5" />
                                                 <ListView id="listOfframps" fx:id="listOfframps" onKeyPressed="#offrampsKeyPressed" onMouseClicked="#offrampsOnClick" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
-                                                <Button id="addOffRamp" fx:id="addOffRamp" alignment="CENTER_RIGHT" defaultButton="true" mnemonicParsing="false" onAction="#onAddOffRamp" text="Add Off-Ramp" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                                                <Button id="deleteOffRamps" fx:id="deleteOffRamps" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onDeleteOffRamp" text="Delete Off-Ramp" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                <Button id="addOffRamp" fx:id="addOffRamp" alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddOffRamp" prefWidth="130.0" text="Add Off-Ramp" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                                                <Button id="deleteOffRamps" fx:id="deleteOffRamps" alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onDeleteOffRamp" prefWidth="130.0" text="Delete Off-Ramp" GridPane.columnIndex="2" GridPane.rowIndex="5" />
                                              </children>
                                              <padding>
                                                 <Insets left="10.0" right="10.0" />
@@ -447,8 +446,8 @@
                                              </padding>
                                              <children>
                                                 <ListView id="listControllers" fx:id="listControllers" onKeyPressed="#controllersOnKeyPressed" onMouseClicked="#controllersOnClick" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="9" />
-                                                <Button id="deleteController" fx:id="deleteController" mnemonicParsing="false" onAction="#onDeleteController" text="Delete Controller" GridPane.rowIndex="10" />
-                                                <Button id="addController" fx:id="addController" defaultButton="true" mnemonicParsing="false" onAction="#onAddController" text="Add Controller" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
+                                                <Button id="deleteController" fx:id="deleteController" mnemonicParsing="false" onAction="#onDeleteController" prefWidth="130.0" text="Delete Controller" GridPane.rowIndex="10" />
+                                                <Button id="addController" fx:id="addController" defaultButton="true" mnemonicParsing="false" onAction="#onAddController" prefWidth="130.0" text="Add Controller" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
                                              </children>
                                           </GridPane>
                                        </children></AnchorPane>

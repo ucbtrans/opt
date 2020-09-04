@@ -36,6 +36,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
@@ -128,11 +129,44 @@ public class ScenarioEditorController {
     @FXML // fx:id="controllerPane"
     private TitledPane controllerPane; // Value injected by FXMLLoader
     
+    @FXML // fx:id="cbPolicies"
+    private ComboBox<String> cbPolicies; // Value injected by FXMLLoader
+
     @FXML // fx:id="addPolicy"
     private Button addPolicy; // Value injected by FXMLLoader
 
-    @FXML // fx:id="policyTabs"
-    private TabPane policyTabs; // Value injected by FXMLLoader
+    @FXML // fx:id="deletePolicy"
+    private Button deletePolicy; // Value injected by FXMLLoader
+
+    @FXML // fx:id="policyPane"
+    private TabPane policyPane; // Value injected by FXMLLoader
+
+    @FXML // fx:id="tabSchedule"
+    private AnchorPane tabSchedule; // Value injected by FXMLLoader
+
+    @FXML // fx:id="listControllers"
+    private ListView<?> listControllers; // Value injected by FXMLLoader
+
+    @FXML // fx:id="deleteController"
+    private Button deleteController; // Value injected by FXMLLoader
+
+    @FXML // fx:id="addController"
+    private Button addController; // Value injected by FXMLLoader
+
+    @FXML // fx:id="tabLinks"
+    private Tab tabLinks; // Value injected by FXMLLoader
+
+    @FXML // fx:id="freeLinks"
+    private ListView<?> freeLinks; // Value injected by FXMLLoader
+
+    @FXML // fx:id="addToPolicy"
+    private Button addToPolicy; // Value injected by FXMLLoader
+
+    @FXML // fx:id="policyLinks"
+    private ListView<?> policyLinks; // Value injected by FXMLLoader
+
+    @FXML // fx:id="removeFromPolicy"
+    private Button removeFromPolicy; // Value injected by FXMLLoader
 
 
     @FXML // fx:id="eventPane"
@@ -309,7 +343,10 @@ public class ScenarioEditorController {
         if (ignoreChange)
             return;
         
-        myScenario.description = sDescription.getText();
+        if (!myScenario.description.equals(sDescription.getText())) {
+            myScenario.description = sDescription.getText();
+            appMainController.setProjectModified(true);
+        }
     }
     
     
@@ -410,9 +447,34 @@ public class ScenarioEditorController {
         appMainController.setProjectModified(true);
     }
     
+
+    @FXML
+    void onAddPolicy(ActionEvent event) {
+
+    }
     
     @FXML
-    void addLanePolicy(ActionEvent event) {
+    void onDeletePolicy(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onAddToPolicy(ActionEvent event) {
+
+    }
+    
+    @FXML
+    void onRemoveFromPolicy(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onAddController(ActionEvent event) {
+
+    }
+    
+    @FXML
+    void onDeleteController(ActionEvent event) {
 
     }
     

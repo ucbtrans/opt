@@ -130,7 +130,6 @@ public class LinkEditorController {
     private ControlSchedule controlSchedule = null;
     private ScheduleEntry controlEntry = null;
 
-    private SpinnerValueFactory<Double> mergePrioritySpinnerValueFactory = null;
     private SpinnerValueFactory<Double> lengthSpinnerValueFactory = null;
     
     private SpinnerValueFactory<Integer> numLanesGPSpinnerValueFactory = null;
@@ -200,9 +199,6 @@ public class LinkEditorController {
 
     @FXML // fx:id="linkToName"
     private TextField linkToName; // Value injected by FXMLLoader
-
-    @FXML // fx:id="mergePriority"
-    private Spinner<Double> mergePriority; // Value injected by FXMLLoader
     
     @FXML // fx:id="linkLength"
     private Spinner<Double> linkLength; // Value injected by FXMLLoader
@@ -494,21 +490,6 @@ public class LinkEditorController {
         });
         
         
-        
-        double merge_priority_step = 0.01;
-        mergePrioritySpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1.0, 0.0, merge_priority_step);
-        mergePrioritySpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter());
-        mergePriority.setValueFactory(mergePrioritySpinnerValueFactory);
-        mergePriority.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (!ignoreChange && (Math.abs(oldValue-newValue) > 0.00001)) {
-                onMergePriorityChange();
-            }
-        });
-        mergePriority.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue)
-                return;
-            opt.utils.WidgetFunctionality.commitEditorText(mergePriority, UserSettings.defaultMergePriority);
-        });
         
         
         double length_step = 1;
@@ -1004,9 +985,7 @@ public class LinkEditorController {
             linkFromName.setVisible(true);
             linkToName.setVisible(false);
             labelFromName.setVisible(true);
-            //labelToName.setVisible(false);
-            labelToName.setText("Merge Priority:");
-            mergePriority.setVisible(true);
+            labelToName.setVisible(false);
             deleteSection.setVisible(false);
             addSectionDownstream.setVisible(false);
             connectSectionDownstream.setVisible(false);
@@ -1025,9 +1004,8 @@ public class LinkEditorController {
             linkFromName.setVisible(false);
             linkToName.setVisible(true);
             labelFromName.setVisible(false);
-            //labelToName.setVisible(true);
+            labelToName.setVisible(true);
             labelToName.setText("TO Name:");
-            mergePriority.setVisible(false);
             deleteSection.setVisible(false);
             addSectionUpstream.setVisible(false);
             connectSectionUpstream.setVisible(false);
@@ -1043,9 +1021,8 @@ public class LinkEditorController {
             linkFromName.setVisible(true);
             linkToName.setVisible(true);
             labelFromName.setVisible(true);
-            //labelToName.setVisible(true);
+            labelToName.setVisible(true);
             labelToName.setText("TO Name:");
-            mergePriority.setVisible(false);
             deleteSection.setVisible(true);
             addSectionUpstream.setVisible(true);
             addSectionDownstream.setVisible(true);
@@ -1057,9 +1034,6 @@ public class LinkEditorController {
                     addSectionDownstream.setVisible(false);   
             }
         }
-        
-        double mergePriority = UserSettings.defaultMergePriority; // FIXME
-        mergePrioritySpinnerValueFactory.setValue(mergePriority);
         
         String unitsLength = UserSettings.unitsLength;
         double length = myLink.get_length_meters();
@@ -1273,7 +1247,7 @@ public class LinkEditorController {
     
     
     /*
-     * Link name, merge priority and length callbacks
+     * Link name and length callbacks
      */
 
     @FXML
@@ -1291,15 +1265,6 @@ public class LinkEditorController {
         appMainController.objectNameUpdate(myLink);
     }
     
-    
-    @FXML
-    private void onMergePriorityChange() {
-        if (ignoreChange)
-            return;
-        double mergePriority = mergePrioritySpinnerValueFactory.getValue();
-        //TODO
-
-    }
     
     
     @FXML
