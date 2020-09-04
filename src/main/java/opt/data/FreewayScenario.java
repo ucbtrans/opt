@@ -471,8 +471,11 @@ public class FreewayScenario {
         List<ControlSchedule> X = new ArrayList<>();
         for(Segment segment : segments.values())
             for (AbstractLink link : segment.get_links())
-                for (LaneGroupType lgtype : LaneGroupType.values())
-                    X.add(scenario.links.get(link.id).get_controller_schedule(lgtype, cntrltype));
+                for (LaneGroupType lgtype : LaneGroupType.values()) {
+                    ControlSchedule sch = scenario.links.get(link.id).get_controller_schedule(lgtype, cntrltype);
+                    if(sch!=null)
+                        X.add(sch);
+                }
         return X;
     }
 
