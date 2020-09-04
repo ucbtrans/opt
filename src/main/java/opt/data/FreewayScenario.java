@@ -468,7 +468,7 @@ public class FreewayScenario {
     }
 
     public List<ControlSchedule> get_schedules_for_controltype(AbstractController.Type cntrltype) {
-        List<ControlSchedule> X = new ArrayList<>();
+        Set<ControlSchedule> X = new HashSet<>();
         for(Segment segment : segments.values())
             for (AbstractLink link : segment.get_links())
                 for (LaneGroupType lgtype : LaneGroupType.values()) {
@@ -476,7 +476,10 @@ public class FreewayScenario {
                     if(sch!=null)
                         X.add(sch);
                 }
-        return X;
+        List<ControlSchedule> sortedX = new ArrayList<>();
+        sortedX.addAll(X);
+        Collections.sort(sortedX);
+        return sortedX;
     }
 
     public void delete_schedule(ControlSchedule sch){
