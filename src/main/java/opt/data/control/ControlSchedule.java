@@ -10,7 +10,7 @@ import utils.OTMUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ControlSchedule {
+public class ControlSchedule implements Comparable {
 
     protected long id;
     protected String name;
@@ -153,7 +153,7 @@ public class ControlSchedule {
                         entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_rmopen(fwyscn,null)));
                         break;
                     case HOVHOT:
-                        entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_hovhot(fwyscn,null,null)));
+                        entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null)));
                         break;
                 }
             } catch (Exception e) {
@@ -233,4 +233,9 @@ public class ControlSchedule {
         entries.get(entries.size()-1).end_time = Float.POSITIVE_INFINITY;
     }
 
+    @Override
+    public int compareTo(Object o) {
+        ControlSchedule that = (ControlSchedule) o;
+        return this.name.compareTo(that.name);
+    }
 }
