@@ -54,6 +54,8 @@ import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
+import opt.data.control.AbstractController;
+import opt.data.control.ControlSchedule;
 import opt.utils.Misc;
 
 
@@ -77,7 +79,7 @@ public class ScenarioEditorController {
     private String origScenarioDescription = null;
     private List<Commodity> listVT = new ArrayList<Commodity>();
     
-    private List<Tab> listPolicyTabs = new ArrayList<Tab>();
+    private List<ControlSchedule> listLanePolicies = null;
     private int selectedPolicyTab = -1;
     
     
@@ -291,14 +293,14 @@ public class ScenarioEditorController {
         myScenario = (FreewayScenario)s;
         
         makeListVT(myScenario.get_commodities());
-        
         initScenarioTiming();
+        initLanePolicies();
         
         ignoreChange = false;
     }
     
     
-    public void initScenarioTiming() {
+    private void initScenarioTiming() {
         float st = myScenario.get_start_time();
         if (st == Float.NaN)
             st = (float)opt.UserSettings.defaultStartTime;
@@ -312,6 +314,11 @@ public class ScenarioEditorController {
         
         origScenarioDescription = myScenario.description;
         sDescription.setText(myScenario.description);
+    }
+    
+    private void initLanePolicies() {
+        listLanePolicies = myScenario.get_schedules_for_controltype(AbstractController.Type.HOVHOT);
+        System.err.println("Size: " + listLanePolicies.size());
     }
     
 
