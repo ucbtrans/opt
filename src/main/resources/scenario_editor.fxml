@@ -244,7 +244,7 @@
                                                                       <RowConstraints maxHeight="17.33331298828125" minHeight="6.66668701171875" prefHeight="12.0" vgrow="SOMETIMES" />
                                                                     </rowConstraints>
                                                                      <children>
-                                                                        <ListView id="listControllers" fx:id="listControllers" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="7" />
+                                                                        <ListView id="listControllers" fx:id="listControllers" onKeyPressed="#controllersOnKeyPressed" onMouseClicked="#controllersOnClick" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="7" />
                                                                         <Button id="deleteController" fx:id="deleteController" mnemonicParsing="false" onAction="#onDeleteController" prefWidth="130.0" text="Delete Controller" GridPane.rowIndex="8" />
                                                                         <Button id="addController" fx:id="addController" defaultButton="true" mnemonicParsing="false" onAction="#onAddController" prefWidth="130.0" text="Add Controller" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
                                                                      </children>

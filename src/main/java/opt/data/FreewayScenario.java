@@ -47,7 +47,7 @@ public class FreewayScenario {
         this.description = description;
         scenario = new Scenario(this);
         create_isolated_segment(segmentname,params, AbstractLink.Type.freeway);
-        scenario.commodities.put(0l,new Commodity(0l,"Unnamed commodity",1f));
+        scenario.commodities.put(0l,new Commodity(0l,"Car",1f));
         reset_max_ids();
     }
 

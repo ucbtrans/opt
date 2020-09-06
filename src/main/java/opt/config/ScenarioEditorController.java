@@ -66,6 +66,7 @@ import opt.data.LinkConnector;
 import opt.data.Segment;
 import opt.data.control.AbstractController;
 import opt.data.control.ControlSchedule;
+import opt.data.control.ScheduleEntry;
 import opt.utils.Misc;
 
 
@@ -94,6 +95,8 @@ public class ScenarioEditorController {
     private int selectedPolicyIndex = -1;
     private Set<AbstractLink> linksUnderPolicy = new HashSet<AbstractLink>();
     private List<AbstractLink> linksFreeForPolicy = new ArrayList<AbstractLink>();
+    
+    private List<ScheduleEntry> policyEntries = null;
     
     
     @FXML // fx:id="scenarioEditorMainPane"
@@ -394,16 +397,14 @@ public class ScenarioEditorController {
     }
     
     
-    private void fillLanePolicyTabs() {
-        if (selectedPolicy == null)
-            return;
-        
-        fillLanePolicySchedule();
-        fillLanePolicyLinks();
-    }
-    
     private void fillLanePolicySchedule() {
         listControllers.getItems().clear();
+        policyEntries = selectedPolicy.get_entries();
+        
+        for (ScheduleEntry se : policyEntries) {
+            
+        }
+        
         
     }
     
@@ -427,6 +428,14 @@ public class ScenarioEditorController {
             removeFromPolicy.setDisable(true);
     }
 
+    
+    private void fillLanePolicyTabs() {
+        if (selectedPolicy == null)
+            return;
+        
+        fillLanePolicySchedule();
+        fillLanePolicyLinks();
+    }
     
     
     
@@ -700,5 +709,17 @@ public class ScenarioEditorController {
     void onDeleteController(ActionEvent event) {
 
     }
+    
+    @FXML
+    void controllersOnClick(MouseEvent event) {
+
+    }
+
+    
+    @FXML
+    void controllersOnKeyPressed(KeyEvent event) {
+
+    }
+
     
 }
