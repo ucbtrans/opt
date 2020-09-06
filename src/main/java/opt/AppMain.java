@@ -33,7 +33,7 @@ public class AppMain extends Application {
         VBox root = (VBox)loader.load();
         main_controller = loader.getController();
         main_controller.setPrimaryStage(primaryStage);
-        Scene scene = new Scene(root, 1200, 900);
+        Scene scene = new Scene(root, 1250, 920);
         //setUserAgentStylesheet(STYLESHEET_CASPIAN);
         setUserAgentStylesheet(STYLESHEET_MODENA);
         scene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());

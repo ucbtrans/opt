@@ -209,7 +209,7 @@
                                                       <Insets />
                                                    </GridPane.margin>
                                                 </Label>
-                                                <ComboBox id="cbPolicies" fx:id="cbPolicies" editable="true" prefWidth="380.0" GridPane.halignment="LEFT" GridPane.rowIndex="1">
+                                                <ComboBox id="cbPolicies" fx:id="cbPolicies" editable="true" onAction="#onPolicySelection" prefWidth="380.0" GridPane.halignment="LEFT" GridPane.rowIndex="1">
                                                    <GridPane.margin>
                                                       <Insets left="3.0" right="3.0" />
                                                    </GridPane.margin>
@@ -220,7 +220,7 @@
                                                       <Insets />
                                                    </GridPane.margin>
                                                 </Button>
-                                                <TabPane id="policyPane" fx:id="policyPane" prefHeight="200.0" prefWidth="836.0" tabClosingPolicy="UNAVAILABLE" visible="false" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="9">
+                                                <TabPane id="policyPane" fx:id="policyPane" prefHeight="200.0" prefWidth="836.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="9">
                                                   <tabs>
                                                     <Tab id="tabSchedule" text="Schedule">
                                                       <content>
@@ -259,9 +259,9 @@
                                                                <children>
                                                                   <GridPane layoutX="90.0" layoutY="32.0" prefHeight="260.0" prefWidth="837.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                                     <columnConstraints>
-                                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="341.3333740234375" minWidth="10.0" prefWidth="334.66668701171875" />
-                                                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="273.6666259765625" minWidth="10.0" prefWidth="166.3333740234375" />
-                                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="345.33331298828125" minWidth="10.0" prefWidth="336.6666259765625" />
+                                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="341.3333740234375" minWidth="10.0" prefWidth="321.0" />
+                                                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="273.6666259765625" minWidth="10.0" prefWidth="211.0" />
+                                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="345.33331298828125" minWidth="10.0" prefWidth="322.0" />
                                                                     </columnConstraints>
                                                                     <rowConstraints>
                                                                         <RowConstraints maxHeight="20.00000762939453" minHeight="2.6666336059570312" prefHeight="16.66663360595703" vgrow="SOMETIMES" />
@@ -278,12 +278,12 @@
                                                                         <RowConstraints maxHeight="18.6666259765625" minHeight="0.6666259765625" prefHeight="12.0" vgrow="SOMETIMES" />
                                                                     </rowConstraints>
                                                                      <children>
-                                                                        <Label text="Available Road Sections:" GridPane.rowIndex="1" />
+                                                                        <Label text="Road Sections without Lane Policy:" GridPane.rowIndex="1" />
                                                                         <ListView id="freeLinks" fx:id="freeLinks" GridPane.rowIndex="2" GridPane.rowSpan="9" />
-                                                                        <Button id="addToPolicy" fx:id="addToPolicy" defaultButton="true" mnemonicParsing="false" onAction="#onAddToPolicy" prefHeight="25.0" prefWidth="152.0" text="Add to Policy &gt;&gt;" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
+                                                                        <Button id="addToPolicy" fx:id="addToPolicy" defaultButton="true" mnemonicParsing="false" onAction="#onAddToPolicy" prefWidth="142.0" text="Add to Policy &gt;&gt;" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
                                                                         <Label text="Road Sections under Policy:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                                                         <ListView id="policyLinks" fx:id="policyLinks" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.rowSpan="9" />
-                                                                        <Button id="removeFromPolicy" fx:id="removeFromPolicy" mnemonicParsing="false" onAction="#onRemoveFromPolicy" prefHeight="25.0" prefWidth="149.0" text="&lt;&lt; Remove from Policy" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
+                                                                        <Button id="removeFromPolicy" fx:id="removeFromPolicy" mnemonicParsing="false" onAction="#onRemoveFromPolicy" prefWidth="142.0" text="&lt;&lt; Remove from Policy" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
                                                                      </children>
                                                                   </GridPane>
                                                                </children>

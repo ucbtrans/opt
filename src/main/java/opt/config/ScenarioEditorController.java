@@ -27,8 +27,10 @@ package opt.config;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -37,7 +39,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tab;
@@ -51,9 +55,15 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import opt.AppMainController;
+import opt.data.AbstractLink;
 import opt.data.Commodity;
+import opt.data.ControlFactory;
 import opt.data.FreewayScenario;
+import opt.data.LaneGroupType;
+import opt.data.LinkConnector;
+import opt.data.Segment;
 import opt.data.control.AbstractController;
 import opt.data.control.ControlSchedule;
 import opt.utils.Misc;
@@ -80,7 +90,10 @@ public class ScenarioEditorController {
     private List<Commodity> listVT = new ArrayList<Commodity>();
     
     private List<ControlSchedule> listLanePolicies = null;
-    private int selectedPolicyTab = -1;
+    private ControlSchedule selectedPolicy = null;
+    private int selectedPolicyIndex = -1;
+    private Set<AbstractLink> linksUnderPolicy = new HashSet<AbstractLink>();
+    private List<AbstractLink> linksFreeForPolicy = new ArrayList<AbstractLink>();
     
     
     @FXML // fx:id="scenarioEditorMainPane"
@@ -147,7 +160,7 @@ public class ScenarioEditorController {
     private AnchorPane tabSchedule; // Value injected by FXMLLoader
 
     @FXML // fx:id="listControllers"
-    private ListView<?> listControllers; // Value injected by FXMLLoader
+    private ListView<String> listControllers; // Value injected by FXMLLoader
 
     @FXML // fx:id="deleteController"
     private Button deleteController; // Value injected by FXMLLoader
@@ -159,13 +172,13 @@ public class ScenarioEditorController {
     private Tab tabLinks; // Value injected by FXMLLoader
 
     @FXML // fx:id="freeLinks"
-    private ListView<?> freeLinks; // Value injected by FXMLLoader
+    private ListView<String> freeLinks; // Value injected by FXMLLoader
 
     @FXML // fx:id="addToPolicy"
     private Button addToPolicy; // Value injected by FXMLLoader
 
     @FXML // fx:id="policyLinks"
-    private ListView<?> policyLinks; // Value injected by FXMLLoader
+    private ListView<String> policyLinks; // Value injected by FXMLLoader
 
     @FXML // fx:id="removeFromPolicy"
     private Button removeFromPolicy; // Value injected by FXMLLoader
@@ -277,6 +290,13 @@ public class ScenarioEditorController {
         sDuration.textProperty().addListener((observable, oldValue, newValue) -> {
             onDurationChange(null);
         });
+        
+        cbPolicies.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+            onPolicyNameChange(oldValue, newValue);
+        });
+        
+        freeLinks.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        policyLinks.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
     
      
@@ -317,11 +337,95 @@ public class ScenarioEditorController {
     }
     
     private void initLanePolicies() {
+        policyPane.setVisible(false);
+        deletePolicy.setDisable(true);
+        linksUnderPolicy.clear();
         listLanePolicies = myScenario.get_schedules_for_controltype(AbstractController.Type.HOVHOT);
-        System.err.println("Size: " + listLanePolicies.size());
+        
+        for (ControlSchedule p : listLanePolicies)
+            linksUnderPolicy.addAll(p.get_links());
+        
+        populatePolicyList();
+        populateFreeForPolicyLinkList();
+        
+        if (selectedPolicyIndex < 0) {
+            selectedPolicy = null;
+            cbPolicies.getSelectionModel().clearSelection();
+            return;
+        }
+        
+        fillLanePolicyTabs();
+                
+        //cbPolicies.getSelectionModel().select(selectedPolicyIndex);
+        policyPane.setVisible(true);
+        deletePolicy.setDisable(false);
     }
     
-
+    private void populatePolicyList() {
+        cbPolicies.getItems().clear();
+        
+        int sz = listLanePolicies.size();
+        selectedPolicyIndex = -1;
+        for (int i = 0; i < sz; i++) {
+            cbPolicies.getItems().add(listLanePolicies.get(i).get_name());
+            if (listLanePolicies.get(i).equals(selectedPolicy)) {
+                selectedPolicyIndex = i;
+            }
+        }
+        
+        if (selectedPolicyIndex >= 0)
+            cbPolicies.getSelectionModel().select(selectedPolicyIndex);
+    }
+    
+    private void populateFreeForPolicyLinkList() {
+        linksFreeForPolicy.clear();
+        
+        List<List<Segment>> seg_list = myScenario.get_linear_freeway_segments();
+        for (List<Segment> segments : seg_list)
+            for(Segment segment : segments)
+                for (AbstractLink link : segment.get_links())
+                    if (!linksUnderPolicy.contains(link))
+                        linksFreeForPolicy.add(link);
+        
+        List<LinkConnector> connectors = myScenario.get_connectors();
+        for (AbstractLink link : connectors)
+            if (!linksUnderPolicy.contains(link))
+                linksFreeForPolicy.add(link);
+    }
+    
+    
+    private void fillLanePolicyTabs() {
+        if (selectedPolicy == null)
+            return;
+        
+        fillLanePolicySchedule();
+        fillLanePolicyLinks();
+    }
+    
+    private void fillLanePolicySchedule() {
+        listControllers.getItems().clear();
+        
+    }
+    
+    private void fillLanePolicyLinks() {
+        freeLinks.getItems().clear();
+        policyLinks.getItems().clear();
+        
+        for (AbstractLink link : linksFreeForPolicy)
+            freeLinks.getItems().add(link.get_name());
+        
+        addToPolicy.setDisable(false);
+        if (linksFreeForPolicy.size() < 1)
+            addToPolicy.setDisable(true);
+        
+        List<AbstractLink> pll = selectedPolicy.get_ordered_links();
+        for (AbstractLink link : pll)
+            policyLinks.getItems().add(link.get_name());
+        
+        removeFromPolicy.setDisable(false);
+        if (pll.size() < 2)
+            removeFromPolicy.setDisable(true);
+    }
 
     
     
@@ -456,23 +560,135 @@ public class ScenarioEditorController {
     
 
     @FXML
-    void onAddPolicy(ActionEvent event) {
+    void onPolicySelection(ActionEvent event) {
+        selectedPolicyIndex = cbPolicies.getSelectionModel().getSelectedIndex();
+        if (ignoreChange || (selectedPolicyIndex < 0) || (selectedPolicyIndex >= listLanePolicies.size())) {
+            policyPane.setVisible(false);
+            deletePolicy.setDisable(true);
+            return;
+        }
+        
+        selectedPolicy = listLanePolicies.get(selectedPolicyIndex);
+        fillLanePolicyTabs();
+        policyPane.setVisible(true);
+        deletePolicy.setDisable(false);
+    }
+    
+    private void onPolicyNameChange(String old_nm, String nm) {
+        selectedPolicyIndex = cbPolicies.getSelectionModel().getSelectedIndex();
+        if (ignoreChange || (selectedPolicy == null) || (selectedPolicyIndex < 0) || (selectedPolicyIndex >= listLanePolicies.size()))
+            return;
+        
+        selectedPolicy = listLanePolicies.get(selectedPolicyIndex);
+        
+        if (!nm.equals("")) {
+            //System.err.println("Name = " + nm + "\t Index = " + selectedPolicyIndex + "\t Policy = " + selectedPolicy);
+            selectedPolicy.set_name(nm);
+            cbPolicies.getItems().set(selectedPolicyIndex, nm);
+            appMainController.setProjectModified(true);
+        }
+    }
+    
 
+    @FXML
+    void onAddPolicy(ActionEvent event) {
+        if (ignoreChange)
+            return;
+        
+        if (linksFreeForPolicy.size() < 1) {
+            opt.utils.Dialogs.ErrorDialog("Cannot add new lane policy...",
+                                          "All road sections are already assigned to other policies!");
+            return;
+        }
+        
+        int cnt = listLanePolicies.size() + 1;
+        String name = "Lane Policy " + cnt;
+        boolean exists = true;
+        while (exists) {
+            exists = false;
+            for (ControlSchedule cs : listLanePolicies)
+                if (name.equals(cs.get_name())) {
+                    cnt++;
+                    name = "Lane Policy " + cnt;
+                    exists = true;
+                    break;
+                }
+        }
+        
+        Set<AbstractLink> links = new HashSet<AbstractLink>();
+        links.addAll(linksFreeForPolicy);
+        try {
+            selectedPolicy = ControlFactory.create_empty_controller_schedule(null, name, links, LaneGroupType.mng, AbstractController.Type.HOVHOT);
+        } catch(Exception ex) {
+            opt.utils.Dialogs.ExceptionDialog("Error adding new lane policy", ex);
+        }
+        
+        initLanePolicies();
+        appMainController.setProjectModified(true);
     }
     
     @FXML
     void onDeletePolicy(ActionEvent event) {
-
+        if (ignoreChange || (selectedPolicy == null) || (selectedPolicyIndex < 0))
+            return;
+        
+        String header = "You are deleting lane policy '" + selectedPolicy.get_name() + "'...";
+        if (opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) {
+            myScenario.delete_schedule(selectedPolicy);
+            selectedPolicy = null;
+            initLanePolicies();
+            appMainController.setProjectModified(true);
+        }
     }
 
     @FXML
     void onAddToPolicy(ActionEvent event) {
-
+        if (ignoreChange || (selectedPolicy == null))
+            return;
+        
+        List<Integer> selected = freeLinks.getSelectionModel().getSelectedIndices();
+        if ((selected == null) || (selected.size() < 1))
+            return;
+        
+        for (int i : selected) {
+            if ((i < 0) || (i >= linksFreeForPolicy.size()))
+                continue;
+            selectedPolicy.add_link(linksFreeForPolicy.get(i));
+            linksUnderPolicy.add(linksFreeForPolicy.get(i));
+        }
+        
+        populateFreeForPolicyLinkList();
+        fillLanePolicyLinks();
+        appMainController.setProjectModified(true);
     }
     
     @FXML
     void onRemoveFromPolicy(ActionEvent event) {
-
+        if (ignoreChange || (selectedPolicy == null))
+            return;
+        
+        List<Integer> selected = policyLinks.getSelectionModel().getSelectedIndices();
+        if ((selected == null) || (selected.size() < 1))
+            return;
+        
+        if (selected.size() == policyLinks.getItems().size()) {
+            policyLinks.getSelectionModel().clearSelection(0);
+            opt.utils.Dialogs.ErrorDialog("Cannot remove all road sections from policy...",
+                                          "At least one road section must remain!");
+            return;
+        }
+        
+        List<AbstractLink> pll = selectedPolicy.get_ordered_links();
+        for (int i : selected) {
+            if ((i < 0) || (i >= pll.size()))
+                continue;
+            selectedPolicy.remove_link(pll.get(i));
+            linksUnderPolicy.remove(pll.get(i));
+        }
+        
+        populateFreeForPolicyLinkList();
+        fillLanePolicyLinks();
+        appMainController.setProjectModified(true);
     }
 
     @FXML

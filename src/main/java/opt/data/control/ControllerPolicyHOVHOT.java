@@ -10,8 +10,8 @@ import java.util.Set;
 
 public class ControllerPolicyHOVHOT extends AbstractController {
 
-	protected Set<Long> disallowed_comms;
-	protected Set<Long> free_comms;
+	public Set<Long> disallowed_comms;
+	public Set<Long> free_comms;
 	protected Double a0,a1,a2;
 	protected int [][] vplph_to_cents_table;
 	// vplph_to_cents_table[i][1] is the price for all flows
