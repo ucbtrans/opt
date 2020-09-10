@@ -1,6 +1,5 @@
 package opt.data.control;
 
-import opt.data.ControlFactory;
 import opt.data.FreewayScenario;
 
 public class ControllerRampMeterAlinea extends AbstractControllerRampMeter {

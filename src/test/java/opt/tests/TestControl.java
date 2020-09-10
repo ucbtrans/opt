@@ -1,6 +1,5 @@
 package opt.tests;
 
-import opt.data.*;
 import opt.data.control.*;
 import org.junit.Test;
 
