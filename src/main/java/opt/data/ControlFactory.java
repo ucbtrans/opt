@@ -70,7 +70,7 @@ public class ControlFactory {
 					break;
 
 				case HOVHOT:
-					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null));
+					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null,null));
 					break;
 
 			}
@@ -104,8 +104,8 @@ public class ControlFactory {
 		return new ControllerRampMeterAlinea(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
 	}
 
-	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn, Long id, Set<Long> disallowed_comms,Set<Long> free_comms,Double a0,Double a1,Double a2,int [][] vplph_to_cents_table) throws Exception {
-		return new ControllerPolicyHOVHOT(fwyscn,id,disallowed_comms,free_comms,a0,a1,a2,vplph_to_cents_table);
+	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn, Long id, Set<Long> disallowed_comms,Set<Long> free_comms,Double a0,Double a1,Double a2,int [][] vplph_to_cents_table, Double qos_speed_threshold_kph) throws Exception {
+		return new ControllerPolicyHOVHOT(fwyscn,id,disallowed_comms,free_comms,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
 	}
 
 	/////////////////////
@@ -273,6 +273,7 @@ public class ControlFactory {
 		Double a1 = null;
 		Double a2 = null;
 		int [][] vplph_to_cents_table = null;
+                Double qos_speed_threshold_kph = null;
 		if(jentry.getParameters()!=null) {
 			for (jaxb.Parameter param : jentry.getParameters().getParameter()) {
 				switch (param.getName()) {
@@ -294,6 +295,9 @@ public class ControlFactory {
 					case "vplph_to_cents_table":
 //						vplph_to_cents_table = OTMUtils.read_int_table(param.getValue());
 						break;
+                                        case "qos_speed_threshold_kph":
+						qos_speed_threshold_kph = Double.parseDouble(param.getValue());
+						break;
 					default:
 						throw new Exception("Unknown controller parameter");
 				}
@@ -301,7 +305,7 @@ public class ControlFactory {
 		}
 
 
-		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(null,0l,disallowed_comms,free_comms,a0,a1,a2,vplph_to_cents_table);
+		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(null,0l,disallowed_comms,free_comms,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
 		return cntrl;
 	}
 

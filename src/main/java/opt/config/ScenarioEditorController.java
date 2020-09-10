@@ -66,6 +66,7 @@ import opt.data.LinkConnector;
 import opt.data.Segment;
 import opt.data.control.AbstractController;
 import opt.data.control.ControlSchedule;
+import opt.data.control.ControllerPolicyHOVHOT;
 import opt.data.control.ScheduleEntry;
 import opt.utils.Misc;
 
@@ -97,6 +98,9 @@ public class ScenarioEditorController {
     private List<AbstractLink> linksFreeForPolicy = new ArrayList<AbstractLink>();
     
     private List<ScheduleEntry> policyEntries = null;
+    
+    private LaneControlEditorController laneControlEditorController = null;
+    private Scene laneControlEditorScene = null;
     
     
     @FXML // fx:id="scenarioEditorMainPane"
@@ -210,6 +214,10 @@ public class ScenarioEditorController {
         appMainController = ctrl;
     }
     
+    public void setProjectModified(boolean val) {
+        appMainController.setProjectModified(val);
+    }
+    
     /**
      * This function should be called once: during the initialization.
      * @param ctrl - pointer to the new ramp controller that is used to set up
@@ -219,6 +227,17 @@ public class ScenarioEditorController {
         vehicleTypeController = ctrl;
         vehicleTypeScene = scn;
         vehicleTypeScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
+    }
+    
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the lane policy editor controller that is used to
+     *               edit lane control.
+     */
+    public void setLaneControlEditorControllerAndScene(LaneControlEditorController ctrl, Scene scn) {
+        laneControlEditorController = ctrl;
+        laneControlEditorScene = scn;
+        laneControlEditorScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
     
     
@@ -240,6 +259,23 @@ public class ScenarioEditorController {
         ignoreChange = true;
         makeListVT(myScenario.get_commodities());
         ignoreChange = false;
+    }
+    
+    
+    void launchLaneControlEditor(ScheduleEntry entry, boolean isnew) {
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(laneControlEditorScene);
+        laneControlEditorController.initWithScenarioAndLanePolicyData(myScenario, selectedPolicy, entry, isnew);
+        String title = "New Lane Control Entry";
+        if (!isnew)
+            title = "Lane Control Editor";
+        inputStage.setTitle(title);
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+        fillLanePolicySchedule();
     }
     
     
@@ -397,12 +433,88 @@ public class ScenarioEditorController {
     }
     
     
+    private String generateRestrictedEntryDesc(Set<Long> free, Set<Long> banned) {
+        String buf = "";
+        List<Commodity> t_free = new ArrayList<Commodity>();
+        List<Commodity> t_banned = new ArrayList<Commodity>();
+        List<Commodity> t_tolled = new ArrayList<Commodity>();
+        
+        for (Commodity c : listVT) {
+            if (free.contains(c.getId()))
+                t_free.add(c);
+            else if (banned.contains(c.getId()))
+                t_banned.add(c);
+            else
+                t_tolled.add(c);
+        }
+        
+        int sz = t_free.size();
+        if (sz > 0) {
+            buf += "Free: ";
+            for (int i = 0; i < sz; i++) {
+                if (i > 0)
+                    buf += ", ";
+                buf += t_free.get(i).get_name();
+            }
+        }
+        
+        sz = t_banned.size();
+        if (sz > 0) {
+            if (t_free.size() > 0)
+                buf += "; ";
+            buf += "Banned: ";
+            for (int i = 0; i < sz; i++) {
+                if (i > 0)
+                    buf += ", ";
+                buf += t_banned.get(i).get_name();
+            }
+        }
+        
+        sz = t_tolled.size();
+        if (sz > 0) {
+            if ((t_free.size() > 0) || (t_banned.size() > 0))
+                buf += "; ";
+            buf += "Tolled: ";
+            for (int i = 0; i < sz; i++) {
+                if (i > 0)
+                    buf += ", ";
+                buf += t_tolled.get(i).get_name();
+            }
+        }
+        
+        return buf;
+    }
+    
     private void fillLanePolicySchedule() {
         listControllers.getItems().clear();
         policyEntries = selectedPolicy.get_entries();
         
         for (ScheduleEntry se : policyEntries) {
+            float start = se.get_start_time();
+            float end = se.get_end_time();
+            ControllerPolicyHOVHOT ctrl = (ControllerPolicyHOVHOT)se.get_cntrl();
+            if (ctrl == null)
+                continue;
             
+            int num_vt = listVT.size();
+            Set<Long> free = ctrl.get_free_comms();
+            Set<Long> banned = ctrl.get_disallowed_comms();
+            
+            String entry = Misc.seconds2timestring(start, ":") + " - ";
+            if (Float.isFinite(end))
+                entry += Misc.seconds2timestring(end, ":");
+            else
+                entry += "End";
+            entry += ": ";
+            
+            if (free.size() == num_vt)
+                entry += "Open for all";
+            else if (banned.size() == num_vt)
+                entry += "Closed for all";
+            else
+                entry += "Restricted - " + generateRestrictedEntryDesc(free, banned);
+            
+            listControllers.getItems().add(entry);
         }
         
         
@@ -584,11 +696,14 @@ public class ScenarioEditorController {
     }
     
     private void onPolicyNameChange(String old_nm, String nm) {
-        selectedPolicyIndex = cbPolicies.getSelectionModel().getSelectedIndex();
+        if (selectedPolicyIndex != cbPolicies.getSelectionModel().getSelectedIndex()) {
+            selectedPolicyIndex = cbPolicies.getSelectionModel().getSelectedIndex();
+            //selectedPolicy = listLanePolicies.get(selectedPolicyIndex);
+            return;
+        }
+        
         if (ignoreChange || (selectedPolicy == null) || (selectedPolicyIndex < 0) || (selectedPolicyIndex >= listLanePolicies.size()))
             return;
-        
-        selectedPolicy = listLanePolicies.get(selectedPolicyIndex);
         
         if (!nm.equals("")) {
             //System.err.println("Name = " + nm + "\t Index = " + selectedPolicyIndex + "\t Policy = " + selectedPolicy);
@@ -707,18 +822,43 @@ public class ScenarioEditorController {
     
     @FXML
     void onDeleteController(ActionEvent event) {
-
+        if ((ignoreChange) || (selectedPolicy == null))
+            return;
+        
+        int se_idx = listControllers.getSelectionModel().getSelectedIndex();
+        if ((se_idx < 0) || (se_idx >= selectedPolicy.num_entries()))
+            return;
+        
+        String header = "You are deleting entry '" + listControllers.getItems().get(se_idx) + "'...";
+        if (opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) {
+            selectedPolicy.delete_entry(se_idx);
+            this.fillLanePolicySchedule();
+            appMainController.setProjectModified(true);
+        }
     }
     
     @FXML
     void controllersOnClick(MouseEvent event) {
-
+        if (event.getClickCount() == 2) {
+            int idx = listControllers.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= selectedPolicy.num_entries()))
+                return;
+            launchLaneControlEditor(selectedPolicy.get_entries().get(idx), false);
+        }
     }
 
     
     @FXML
     void controllersOnKeyPressed(KeyEvent event) {
-
+        if (event.getCode() == KeyCode.ENTER) {
+            int idx = listControllers.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= selectedPolicy.num_entries()))
+                return;
+            launchLaneControlEditor(selectedPolicy.get_entries().get(idx), false);
+        }
+        if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
+            onDeleteController(null);
+        }
     }
 
     

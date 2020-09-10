@@ -153,7 +153,7 @@ public class ControlSchedule implements Comparable {
                         entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_rmopen(fwyscn,null)));
                         break;
                     case HOVHOT:
-                        entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null)));
+                        entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null,null)));
                         break;
                 }
             } catch (Exception e) {

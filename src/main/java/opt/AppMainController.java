@@ -100,6 +100,8 @@ public class AppMainController {
     private ScenarioPerformanceController scenarioPerformanceController = null;
     private GridPane vehicleTypePane = null;
     private VehicleTypeController vehicleTypeController = null;
+    private GridPane lanePolicyControlPane = null;
+    private LaneControlEditorController laneControlEditorController = null;
     
     private SplitPane linkEditorPane = null;
     private LinkEditorController linkEditorController = null;
@@ -428,6 +430,12 @@ public class AppMainController {
             vehicleTypeController = loader.getController();
             vehicleTypeController.setAppMainController(this);
             scenarioEditorController.setVehicleTypeControllerAndScene(vehicleTypeController, new Scene(vehicleTypePane));
+            
+            loader = new FXMLLoader(getClass().getResource("/lane_policy_editor.fxml"));
+            lanePolicyControlPane = loader.load();
+            laneControlEditorController = loader.getController();
+            laneControlEditorController.setScenarioEditorController(scenarioEditorController);
+            scenarioEditorController.setLaneControlEditorControllerAndScene(laneControlEditorController, new Scene(lanePolicyControlPane));
             
             
             loader = new FXMLLoader(getClass().getResource("/link_editor.fxml"));
