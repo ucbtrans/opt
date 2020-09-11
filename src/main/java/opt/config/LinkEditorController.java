@@ -126,6 +126,11 @@ public class LinkEditorController {
     private control.AbstractController.Algorithm controlAlgorithm;
     private ControlSchedule controlSchedule = null;
     private ScheduleEntry controlEntry = null;
+    
+    private ControlSchedule controlScheduleGP = null;
+    private ScheduleEntry controlEntryGP = null;
+    private ControlSchedule controlScheduleManaged = null;
+    private ScheduleEntry controlEntryManaged = null;
 
     private SpinnerValueFactory<Double> lengthSpinnerValueFactory = null;
     
@@ -2225,7 +2230,14 @@ public class LinkEditorController {
     private void read_controlType_and_lanegroup(){
         this.controlType = AbstractController.Type.RampMetering;
         this.controlLgType = LaneGroupType.gp;
-        this.controlSchedule = myLink.get_controller_schedule(controlLgType,controlType);
+        controlSchedule = myLink.get_controller_schedule(controlLgType,controlType);
+        if (controlSchedule == null) {
+            try {
+                controlSchedule = ControlFactory.create_empty_controller_schedule(null, "GP Ramp Metering Scheme", myLink, controlLgType, controlType);
+            } catch(Exception ex) {
+                opt.utils.Dialogs.ExceptionDialog("Error adding ramp metering scheme for GP lanes", ex);
+            }
+        }
     }
 
     /** called onOk and onCancel in NewRampMeterController **/
