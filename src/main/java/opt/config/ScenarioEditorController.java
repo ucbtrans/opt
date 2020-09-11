@@ -57,6 +57,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import opt.AppMainController;
+import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.Commodity;
 import opt.data.ControlFactory;
@@ -817,7 +818,25 @@ public class ScenarioEditorController {
 
     @FXML
     void onAddController(ActionEvent event) {
-
+        float start_time = selectedPolicy.num_entries() == 0 ? 0 :
+                Math.round(selectedPolicy.get_largest_start_time()) + 3600;
+        
+        double a0 = UserSettings.defaultLaneChoice_A0;
+        double a1 = UserSettings.defaultLaneChoice_A1;
+        double a2 = UserSettings.defaultLaneChoice_A2;
+        double v_thres = UserSettings.defaultQosSpeedThresholdKph;
+        Set<Long> free_comms = new HashSet<Long>();
+        listVT.forEach((c) -> { free_comms.add(c.getId()); });
+        int[][] vphpl_to_cents_table = new int[1][2];
+        vphpl_to_cents_table[0][0] = 0;
+        vphpl_to_cents_table[0][1] = 0;
+        try {
+            ControllerPolicyHOVHOT ctrl = ControlFactory.create_controller_hovhot(myScenario, null, new HashSet<Long>(), free_comms, a0, a1, a2, vphpl_to_cents_table, v_thres);
+            ScheduleEntry entry = new ScheduleEntry(start_time, ctrl);
+            launchLaneControlEditor(entry, true);
+        } catch(Exception ex) {
+            opt.utils.Dialogs.ExceptionDialog("Error adding new lane controller", ex);
+        }
     }
     
     @FXML

@@ -96,11 +96,18 @@ public class UserSettings {
 
     public static float defaultMaxCellLength = 100f;
 
+    public static double defaultControlDtSeconds = 30;
+    
+    public static double defaultQosSpeedThresholdKph = 72.4205;
+    
+    public static double defaultLaneChoice_A0 = -0.6931;
+    public static double defaultLaneChoice_A1 = 0.0115;
+    public static double defaultLaneChoice_A2 = -0.0053;
+    
     public static double minGPRampMeteringRatePerLaneVph = 160;
     public static double minManagedRampMeteringRatePerLaneVph = 320;
     public static double maxGPRampMeteringRatePerLaneVph = 1200;
     public static double maxManagedRampMeteringRatePerLaneVph = 1400;
-    public static double defaultControlDtSeconds = 30;
     
     public static double reportingPeriodSeconds = 300; // 5 minutes
             
