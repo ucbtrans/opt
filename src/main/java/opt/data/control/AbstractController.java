@@ -1,7 +1,5 @@
 package opt.data.control;
 
-import opt.data.ControlFactory;
-
 import java.util.*;
 
 public abstract class AbstractController {

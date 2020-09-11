@@ -39,7 +39,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
@@ -55,12 +54,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.Commodity;
-import opt.data.ControlFactory;
+import opt.data.control.ControlFactory;
 import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
 import opt.data.LinkConnector;
@@ -744,10 +742,15 @@ public class ScenarioEditorController {
         links.addAll(linksFreeForPolicy);
         try {
             selectedPolicy = ControlFactory.create_empty_controller_schedule(null, name, links, LaneGroupType.mng, AbstractController.Type.HOVHOT);
+
+            // add all links
+            if(!selectedPolicy.add_links(links))
+                throw new Exception("Error adding links.");
+
         } catch(Exception ex) {
             opt.utils.Dialogs.ExceptionDialog("Error adding new lane policy", ex);
         }
-        
+
         initLanePolicies();
         appMainController.setProjectModified(true);
     }

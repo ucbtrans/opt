@@ -35,9 +35,9 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.data.AbstractLink;
-import opt.data.ControlFactory;
 import opt.data.LaneGroupType;
 import opt.data.control.AbstractController;
+import opt.data.control.ControlFactory;
 
 
 /**

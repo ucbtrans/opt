@@ -18,8 +18,11 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 	// between vphpl_to_cents_table[i][0] and vplph_to_cents_table[i+1][0]
 	// the price for flows above vphpl_to_cents_table[last][0] = vphpl_to_cents_table[last][1]
 	// the price for flows below vphpl_to_cents_table[0][0] = 0
-        protected Double qos_speed_threshold_kph;
-        
+
+	protected Double qos_speed_threshold_kph;
+	// It is the quality of service speed threshold: when speed in a managed lane falls below this threshold,
+	// only free vehicle types are allowed in the managed lane, no tolled traffic. It is an equivalent to the infinite price.
+	// For example, for HOT lanes in CA, this threshold is 45 mph. If the speed in an HOT lane drops below that, only HOVs are admitted.
 
 	////////////////////////////////
 	// construction
@@ -33,64 +36,64 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 		this.a1 = a1;
 		this.a2 = a2;
 		this.vphpl_to_cents_table = vphpl_to_cents_table;
+		this.qos_speed_threshold_kph = qos_speed_threshold_kph;
 	}
         
-        ////////////////////////////////
+	////////////////////////////////
 	// Getters
 	////////////////////////////////
-        public Set<Long> get_disallowed_comms() {
-            return disallowed_comms;
-        }
-        
-        public Set<Long> get_free_comms() {
-            return free_comms;
-        }
-        
-        public Double get_a0() {
-            return a0;
-        }
-        
-        public Double get_a1() {
-            return a1;
-        }
-        
-        public Double get_a2() {
-            return a2;
-        }
-        
-        public int[][] get_vphpl_to_cents_table() {
-            return vphpl_to_cents_table;
-        }
-        
-        public Double get_qos_speed_threshold_kph() {
-            return qos_speed_threshold_kph;
-        }
-        
-        
-        ////////////////////////////////
+
+	public Set<Long> get_disallowed_comms() {
+		return disallowed_comms;
+	}
+
+	public Set<Long> get_free_comms() {
+		return free_comms;
+	}
+
+	public Double get_a0() {
+		return a0;
+	}
+
+	public Double get_a1() {
+		return a1;
+	}
+
+	public Double get_a2() {
+		return a2;
+	}
+
+	public int[][] get_vphpl_to_cents_table() {
+		return vphpl_to_cents_table;
+	}
+
+	public Double get_qos_speed_threshold_kph() {
+		return qos_speed_threshold_kph;
+	}
+
+	////////////////////////////////
 	// Setters
 	////////////////////////////////
-        public void set_a0(Double x) {
-            a0 = x;
-        }
-        
-        public void set_a1(Double x) {
-            a1 = x;
-        }
-        
-        public void set_a2(Double x) {
-            a2 = x;
-        }
-        
-        public void set_vphpl_to_cents_table(int[][] x) {
-            vphpl_to_cents_table = x;
-        }
-        
-        public void set_qos_speed_threshold_kph(Double x) {
-            qos_speed_threshold_kph = x;
-        }
-        
-        
+
+	public void set_a0(Double x) {
+		a0 = x;
+	}
+
+	public void set_a1(Double x) {
+		a1 = x;
+	}
+
+	public void set_a2(Double x) {
+		a2 = x;
+	}
+
+	public void set_vphpl_to_cents_table(int[][] x) {
+		vphpl_to_cents_table = x;
+	}
+
+	public void set_qos_speed_threshold_kph(Double x) {
+		qos_speed_threshold_kph = x;
+	}
 
 	////////////////////////////////
 	// AbstractController
@@ -143,11 +146,11 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 			params.add(n);
 		}
                 
-                if(qos_speed_threshold_kph!=null){
+		if(qos_speed_threshold_kph!=null){
 			Parameter n = new Parameter();
 			n.setName("qos_speed_threshold_kph");
 			n.setValue(qos_speed_threshold_kph.toString());
-			//params.add(n); //FIXME: uncomment when the schema is adjusted
+			params.add(n);
 		}
 
 		return params;

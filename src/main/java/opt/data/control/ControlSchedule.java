@@ -2,7 +2,6 @@ package opt.data.control;
 
 import jaxb.Parameter;
 import opt.data.AbstractLink;
-import opt.data.ControlFactory;
 import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
 import utils.OTMUtils;
@@ -217,6 +216,18 @@ public class ControlSchedule implements Comparable {
         return true;
 
     }
+
+
+    // return true if successful, false otherwise
+    public boolean add_links(Collection<AbstractLink> links){
+        try {
+            links.forEach(link->add_link(link));
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
 
     public void remove_link(AbstractLink link){
         this.actuator.links.remove(link);

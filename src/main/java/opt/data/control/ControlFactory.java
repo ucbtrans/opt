@@ -1,7 +1,9 @@
-package opt.data;
+package opt.data.control;
 
 import error.OTMException;
-import opt.data.control.*;
+import opt.data.AbstractLink;
+import opt.data.FreewayScenario;
+import opt.data.LaneGroupType;
 import opt.utils.BijectiveMap;
 import utils.OTMUtils;
 
@@ -41,7 +43,7 @@ public class ControlFactory {
 	// schedule
 	/////////////////////
 
-	public static ControlSchedule create_empty_controller_schedule(Long id,String name,AbstractLink link, LaneGroupType lgtype, AbstractController.Type cntrl_type) throws Exception {
+	public static ControlSchedule create_empty_controller_schedule(Long id, String name, AbstractLink link, LaneGroupType lgtype, AbstractController.Type cntrl_type) throws Exception {
 		Set<AbstractLink> links = new HashSet<>();
 		links.add(link);
 		return create_empty_controller_schedule(id,name,links,lgtype,cntrl_type);
@@ -49,9 +51,10 @@ public class ControlFactory {
 
 	public static ControlSchedule create_empty_controller_schedule(Long id,String name,Set<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type cntrl_type) throws Exception {
 
+		// check that
 		// all links should be in the same scenario
-		assert(links.stream().map(x->x.mysegment.my_fwy_scenario).distinct().count()==1);
-		FreewayScenario fwyscn = links.iterator().next().mysegment.my_fwy_scenario;
+		assert(links.stream().map(x->x.get_segment().get_scenario()).distinct().count()==1);
+		FreewayScenario fwyscn = links.iterator().next().get_segment().get_scenario();
 
 		ControlSchedule schedule = new ControlSchedule(
 				id==null ? fwyscn.new_controller_id() : id,
@@ -112,7 +115,7 @@ public class ControlFactory {
 	// sensor
 	/////////////////////
 
-	public static Sensor create_sensor(FreewayScenario fwyscn,Long sensor_id, long link_id, float offset, AbstractController myController){
+	protected static Sensor create_sensor(FreewayScenario fwyscn,Long sensor_id, long link_id, float offset, AbstractController myController){
 		return new Sensor(sensor_id!=null?sensor_id:fwyscn.new_sensor_id(),link_id,offset,myController);
 	}
 
@@ -120,7 +123,7 @@ public class ControlFactory {
 	// actuator
 	/////////////////////
 
-	public static ActuatorRampMeter create_actuator_ramp_meter(long id,AbstractLink link, LaneGroupType lgtype) throws Exception {
+	protected static ActuatorRampMeter create_actuator_ramp_meter(long id,AbstractLink link, LaneGroupType lgtype) throws Exception {
 
 		if( link.schedules.containsKey(lgtype) && link.schedules.get(lgtype).containsKey(AbstractController.Type.RampMetering))
 				throw new Exception("Controller clash in link "+ link.id);
@@ -128,7 +131,7 @@ public class ControlFactory {
 		return new ActuatorRampMeter(id, link, lgtype);
 	}
 
-	public static ActuatorHOVHOT create_actuator_hovhot_policy(long id, Collection<AbstractLink> links) throws Exception {
+	protected static ActuatorHOVHOT create_actuator_hovhot_policy(long id, Collection<AbstractLink> links) throws Exception {
 		LaneGroupType lgtype = LaneGroupType.mng;
 		for(AbstractLink link : links)
 			if( link.schedules.containsKey(lgtype) && link.schedules.get(lgtype).containsKey(AbstractController.Type.HOVHOT))
