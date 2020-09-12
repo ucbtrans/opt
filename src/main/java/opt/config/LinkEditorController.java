@@ -2234,6 +2234,8 @@ public class LinkEditorController {
         if (controlSchedule == null) {
             try {
                 controlSchedule = ControlFactory.create_empty_controller_schedule(null, "GP Ramp Metering Scheme", myLink, controlLgType, controlType);
+                if(!controlSchedule.add_link(myLink))
+                    throw new Exception("Error adding links.");
             } catch(Exception ex) {
                 opt.utils.Dialogs.ExceptionDialog("Error adding ramp metering scheme for GP lanes", ex);
             }
