@@ -37,6 +37,10 @@ public abstract class AbstractController {
 	public final String getName(){
 		return ControlFactory.cntrl_alg_name.AtoB(algorithm);
 	}
+        
+        public final Type getType() {
+            return type;
+        }
 
 	public final control.AbstractController.Algorithm getAlgorithm(){
 		return algorithm;

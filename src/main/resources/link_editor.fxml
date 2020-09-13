@@ -11,6 +11,8 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
@@ -261,7 +263,7 @@
                                     </AnchorPane>
                                 </content>
                               </TitledPane>
-                            <TitledPane id="rampsPane" fx:id="rampsPane" animated="false" expanded="false" prefHeight="198.0" prefWidth="514.0" text="On-Ramps and Off-Ramps">
+                            <TitledPane id="rampsPane" fx:id="rampsPane" animated="false" expanded="false" prefHeight="198.0" prefWidth="514.0" text="On-Ramp and Off-Ramp Configuration">
                               <content>
                                 <AnchorPane prefHeight="300.0" prefWidth="512.0">
                                        <children>
@@ -418,42 +420,87 @@
                                     </AnchorPane>
                                  </content>
                               </TitledPane>
-                              <TitledPane id="linkControllerPane" fx:id="linkControllerPane" animated="false" expanded="false" layoutX="10.0" layoutY="85.0" prefHeight="198.0" prefWidth="514.0" text="Controllers">
+                              <TitledPane id="linkControllerPane" fx:id="linkControllerPane" animated="false" expanded="false" layoutX="10.0" layoutY="606.0" prefHeight="198.0" prefWidth="514.0" text="Control">
                                  <content>
-                                    <AnchorPane prefHeight="300.0" prefWidth="512.0">
-                                       <children>
-                                          <GridPane layoutX="41.0" layoutY="70.0" prefHeight="389.0" prefWidth="896.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <columnConstraints>
-                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="540.6666870117188" minWidth="10.0" prefWidth="436.6666564941406" />
-                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="439.3333435058594" minWidth="10.0" prefWidth="439.3333435058594" />
-                                            </columnConstraints>
-                                            <rowConstraints>
-                                              <RowConstraints maxHeight="28.6666259765625" minHeight="10.0" prefHeight="16.0" vgrow="SOMETIMES" />
-                                              <RowConstraints maxHeight="62.0" minHeight="10.0" prefHeight="62.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints maxHeight="43.33331298828125" minHeight="0.33331298828125" prefHeight="33.66668701171875" vgrow="SOMETIMES" />
-                                              <RowConstraints maxHeight="87.0" minHeight="10.0" prefHeight="36.33331298828125" vgrow="SOMETIMES" />
-                                                <RowConstraints maxHeight="65.66668701171875" minHeight="0.0" prefHeight="22.66668701171875" vgrow="SOMETIMES" />
-                                            </rowConstraints>
-                                             <padding>
-                                                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-                                             </padding>
-                                             <children>
-                                                <ListView id="listControllers" fx:id="listControllers" onKeyPressed="#controllersOnKeyPressed" onMouseClicked="#controllersOnClick" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="9" />
-                                                <Button id="deleteController" fx:id="deleteController" mnemonicParsing="false" onAction="#onDeleteController" prefWidth="130.0" text="Delete Controller" GridPane.rowIndex="10" />
-                                                <Button id="addController" fx:id="addController" defaultButton="true" mnemonicParsing="false" onAction="#onAddController" prefWidth="130.0" text="Add Controller" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
-                                             </children>
-                                          </GridPane>
-                                       </children></AnchorPane>
+                                    <TabPane id="controlTabPane" fx:id="controlTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+                                      <tabs>
+                                        <Tab id="tabGPLanesControl" fx:id="tabGPLanesControl" text="GP Lanes">
+                                          <content>
+                                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                   <children>
+                                                      <GridPane prefHeight="389.0" prefWidth="896.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                        <columnConstraints>
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="540.6666870117188" minWidth="10.0" prefWidth="436.6666564941406" />
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="439.3333435058594" minWidth="10.0" prefWidth="439.3333435058594" />
+                                                        </columnConstraints>
+                                                        <rowConstraints>
+                                                          <RowConstraints maxHeight="37.0" minHeight="7.0" prefHeight="16.3333740234375" vgrow="SOMETIMES" />
+                                                          <RowConstraints maxHeight="62.0" minHeight="10.0" prefHeight="44.6666259765625" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints maxHeight="43.33331298828125" minHeight="0.33331298828125" prefHeight="33.66668701171875" vgrow="SOMETIMES" />
+                                                          <RowConstraints maxHeight="87.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints maxHeight="65.66668701171875" minHeight="0.0" prefHeight="11.0" vgrow="SOMETIMES" />
+                                                        </rowConstraints>
+                                                         <padding>
+                                                            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                                         </padding>
+                                                         <children>
+                                                            <ListView id="listControllersGP" fx:id="listControllersGP" onKeyPressed="#controllersOnKeyPressedGP" onMouseClicked="#controllersOnClickGP" prefHeight="262.0" prefWidth="876.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="9" />
+                                                            <Button id="deleteControllerGP" fx:id="deleteControllerGP" mnemonicParsing="false" onAction="#onDeleteControllerGP" prefWidth="130.0" text="Delete Controller" GridPane.rowIndex="10" />
+                                                            <Button id="addControllerGP" fx:id="addControllerGP" defaultButton="true" mnemonicParsing="false" onAction="#onAddControllerGP" prefWidth="130.0" text="Add Controller" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
+                                                         </children>
+                                                      </GridPane>
+                                                   </children>
+                                                </AnchorPane>
+                                          </content>
+                                        </Tab>
+                                          <Tab id="tabManagedLanesControl" fx:id="tabManagedLanesControl" text="Managed Lanes">
+                                             <content>
+                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                   <children>
+                                                      <GridPane prefHeight="389.0" prefWidth="896.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                         <columnConstraints>
+                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="540.6666870117188" minWidth="10.0" prefWidth="436.6666564941406" />
+                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="439.3333435058594" minWidth="10.0" prefWidth="439.3333435058594" />
+                                                         </columnConstraints>
+                                                         <rowConstraints>
+                                                            <RowConstraints maxHeight="37.0" minHeight="7.0" prefHeight="16.3333740234375" vgrow="SOMETIMES" />
+                                                            <RowConstraints maxHeight="62.0" minHeight="10.0" prefHeight="44.6666259765625" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints maxHeight="43.33331298828125" minHeight="0.33331298828125" prefHeight="33.66668701171875" vgrow="SOMETIMES" />
+                                                            <RowConstraints maxHeight="87.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints maxHeight="65.66668701171875" minHeight="0.0" prefHeight="11.0" vgrow="SOMETIMES" />
+                                                         </rowConstraints>
+                                                         <padding>
+                                                            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                                         </padding>
+                                                         <children>
+                                                            <ListView id="listControllersManaged" fx:id="listControllersManaged" onKeyPressed="#controllersOnKeyPressedManaged" onMouseClicked="#controllersOnClickManaged" prefHeight="262.0" prefWidth="876.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="9" />
+                                                            <Button id="deleteControllerManaged" fx:id="deleteControllerManaged" mnemonicParsing="false" onAction="#onDeleteControllerManaged" prefWidth="130.0" text="Delete Controller" GridPane.rowIndex="10" />
+                                                            <Button id="addControllerManaged" fx:id="addControllerManaged" defaultButton="true" mnemonicParsing="false" onAction="#onAddControllerManaged" prefWidth="130.0" text="Add Controller" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
+                                                         </children>
+                                                      </GridPane>
+                                                   </children>
+                                                </AnchorPane>
+                                             </content>
+                                          </Tab>
+                                      </tabs>
+                                    </TabPane>
                                  </content>
                               </TitledPane>
-                              <TitledPane id="linkEventPane" fx:id="linkEventPane" animated="false" disable="true" expanded="false" layoutX="10.0" layoutY="606.0" prefHeight="198.0" prefWidth="514.0" text="Events">
+                              <TitledPane id="linkEventPane" fx:id="linkEventPane1" animated="false" disable="true" expanded="false" layoutX="10.0" layoutY="135.0" prefHeight="198.0" prefWidth="514.0" text="Events">
                                  <content>
                                     <AnchorPane prefHeight="300.0" prefWidth="512.0" />
                                  </content>

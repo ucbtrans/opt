@@ -48,6 +48,8 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
@@ -121,16 +123,9 @@ public class LinkEditorController {
     private List<Commodity> listVT = new ArrayList<Commodity>();
 
     // control -- ramp metering and policies
-    private LaneGroupType controlLgType = LaneGroupType.gp; // TODO This comes from pull down
-    private AbstractController.Type controlType = AbstractController.Type.RampMetering; // TODO This comes from pull down
-    private control.AbstractController.Algorithm controlAlgorithm;
-    private ControlSchedule controlSchedule = null;
-    private ScheduleEntry controlEntry = null;
-    
     private ControlSchedule controlScheduleGP = null;
-    private ScheduleEntry controlEntryGP = null;
     private ControlSchedule controlScheduleManaged = null;
-    private ScheduleEntry controlEntryManaged = null;
+    private ScheduleEntry controlEntry = null;
 
     private SpinnerValueFactory<Double> lengthSpinnerValueFactory = null;
     
@@ -331,14 +326,32 @@ public class LinkEditorController {
     @FXML // fx:id="linkControllerPane"
     private TitledPane linkControllerPane; // Value injected by FXMLLoader
     
-    @FXML // fx:id="listControllers"
-    private ListView<String> listControllers; // Value injected by FXMLLoader
+    @FXML // fx:id="controlTabPane"
+    private TabPane controlTabPane; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="tabGPLanesControl"
+    private Tab tabGPLanesControl; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="listControllersGP"
+    private ListView<String> listControllersGP; // Value injected by FXMLLoader
 
-    @FXML // fx:id="deleteController"
-    private Button deleteController; // Value injected by FXMLLoader
+    @FXML // fx:id="deleteControllerGP"
+    private Button deleteControllerGP; // Value injected by FXMLLoader
 
-    @FXML // fx:id="addController"
-    private Button addController; // Value injected by FXMLLoader
+    @FXML // fx:id="addControllerGP"
+    private Button addControllerGP; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="tabManagedLanesControl"
+    private Tab tabManagedLanesControl; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="listControllersManaged"
+    private ListView<String> listControllersManaged; // Value injected by FXMLLoader
+
+    @FXML // fx:id="deleteControllerManaged"
+    private Button deleteControllerManaged; // Value injected by FXMLLoader
+
+    @FXML // fx:id="addControllerManaged"
+    private Button addControllerManaged; // Value injected by FXMLLoader
     
     @FXML // fx:id="linkEventPane"
     private TitledPane linkEventPane; // Value injected by FXMLLoader
@@ -2181,10 +2194,17 @@ public class LinkEditorController {
      * Controller pane: initialization and callbacks
      ***************************************************************************/
     
-    private void refreshControllerList() {
+    private void refreshControllerList(boolean isml) {
 
         read_controlType_and_lanegroup();
 
+        ControlSchedule controlSchedule = controlScheduleGP;
+        ListView<String> listControllers = listControllersGP;
+        if (isml) {
+            controlSchedule = controlScheduleManaged;
+            listControllers = listControllersManaged;
+        }
+        
         listControllers.getItems().clear();
         for (ScheduleEntry entry : controlSchedule.get_entries()) {
             float start_time = entry.get_start_time();
@@ -2192,22 +2212,26 @@ public class LinkEditorController {
             AbstractController cntrl = entry.get_cntrl();
             String ct = "";
             String rm_qc = "";
-            if (controlType==AbstractController.Type.RampMetering) {
-                ct = "Ramp meter - ";
-                if (((AbstractControllerRampMeter)cntrl).isHas_queue_control())
-                    rm_qc = " with queue control";
+            if (cntrl.getType() == AbstractController.Type.RampMetering) {
+                if (cntrl.getAlgorithm() == control.AbstractController.Algorithm.rm_open) {
+                    ct = "Ramp open";
+                    rm_qc = "";
+                } else if (cntrl.getAlgorithm() == control.AbstractController.Algorithm.rm_open) {
+                    ct = "Ramp closed";
+                    rm_qc = "";
+                } else {
+                    ct = "Ramp meter - " + cntrl.getName();
+                    if (((AbstractControllerRampMeter)cntrl).isHas_queue_control())
+                        rm_qc = " with queue control";
+                }
             }
 
             String buf = Misc.seconds2timestring(start_time, ":");
             if(Float.isFinite(end_time))
                 buf += " - " + Misc.seconds2timestring(end_time, ":");
             else
-                buf += " - 24:00";
-            buf += ": " + ct + cntrl.getName() + rm_qc;
-
-            // extra for managed lanes
-            if(controlLgType==LaneGroupType.mng)
-                buf += " (managed lanes)";
+                buf += " - End";
+            buf += ": " + ct + rm_qc;
 
             listControllers.getItems().add(buf);
         }
@@ -2217,160 +2241,158 @@ public class LinkEditorController {
     /** called iff a link is selected in the tree **/
     private void initControllers() {
         if (myLink.get_type() == AbstractLink.Type.onramp) {
+            linkControllerPane.setText("Ramp Metering");
             linkControllerPane.setDisable(false);
         } else {
+            linkControllerPane.setText("Control");
             linkControllerPane.setDisable(true);
             if (linkControllerPane.isExpanded())
                 laneProperties.setExpanded(true);
             return;
         }
-        refreshControllerList();
+        
+        if (myLink.get_mng_lanes() > 0)
+            tabManagedLanesControl.setDisable(false);
+        else {
+            tabManagedLanesControl.setDisable(true);
+            controlTabPane.getSelectionModel().selectFirst();
+        }
+        
+        refreshControllerList(false);
+        refreshControllerList(true);
     }
 
     private void read_controlType_and_lanegroup(){
-        this.controlType = AbstractController.Type.RampMetering;
-        this.controlLgType = LaneGroupType.gp;
-        controlSchedule = myLink.get_controller_schedule(controlLgType,controlType);
-        if (controlSchedule == null) {
+        controlScheduleGP = myLink.get_controller_schedule(LaneGroupType.gp, AbstractController.Type.RampMetering);
+        if (controlScheduleGP == null) {
             try {
-                controlSchedule = ControlFactory.create_empty_controller_schedule(null, "GP Ramp Metering Scheme", myLink, controlLgType, controlType);
-                if(!controlSchedule.add_link(myLink))
-                    throw new Exception("Error adding links.");
+                controlScheduleGP = ControlFactory.create_empty_controller_schedule(null, "GP Lane Ramp Metering Scheme", myLink, LaneGroupType.gp, AbstractController.Type.RampMetering);
+                if (!controlScheduleGP.add_link(myLink))
+                    throw new Exception("Error adding on-ramp to GP lane ramp metering scheme.");
             } catch(Exception ex) {
                 opt.utils.Dialogs.ExceptionDialog("Error adding ramp metering scheme for GP lanes", ex);
+            }
+        }
+        
+        controlScheduleManaged = myLink.get_controller_schedule(LaneGroupType.mng, AbstractController.Type.RampMetering);
+        if (controlScheduleManaged == null) {
+            try {
+                controlScheduleManaged = ControlFactory.create_empty_controller_schedule(null, "Managed Lane Ramp Metering Scheme", myLink, LaneGroupType.mng, AbstractController.Type.RampMetering);
+                if (!controlScheduleManaged.add_link(myLink))
+                    throw new Exception("Error adding on-ramp to Managed lane ramp metering scheme.");
+            } catch(Exception ex) {
+                opt.utils.Dialogs.ExceptionDialog("Error adding ramp metering scheme for Managed lanes", ex);
             }
         }
     }
 
     /** called onOk and onCancel in NewRampMeterController **/
-    public void prepareNewController(control.AbstractController.Algorithm ca) {
-
+    public void prepareNewController(control.AbstractController.Algorithm ca, boolean isml) {
         controlEntry = null;
-        if (ca==null)
+        if (ca == null)
             return;
 
-        controlAlgorithm = ca;
         read_controlType_and_lanegroup();
 
+        ControlSchedule controlSchedule = controlScheduleGP;
+        if (isml)
+            controlSchedule = controlScheduleManaged;
+        
         float start_time = controlSchedule.num_entries()==0 ? 0 :
                 Math.round(controlSchedule.get_largest_start_time()) + 3600;
 
-        // Ramp metering
-        if( controlType==AbstractController.Type.RampMetering){
-
-            float min_rate_vphpl,max_rate_vphpl,dt;
-            switch(controlLgType){
-                case gp:
-                    min_rate_vphpl = (float)opt.UserSettings.minGPRampMeteringRatePerLaneVph;
-                    max_rate_vphpl = (float)opt.UserSettings.maxGPRampMeteringRatePerLaneVph;
-                    dt = (float)opt.UserSettings.defaultControlDtSeconds;
+        float min_rate_vphpl, max_rate_vphpl, dt;
+        dt = (float)opt.UserSettings.defaultControlDtSeconds;
+        
+        min_rate_vphpl = (float)opt.UserSettings.minGPRampMeteringRatePerLaneVph;
+        max_rate_vphpl = (float)opt.UserSettings.maxGPRampMeteringRatePerLaneVph;
+        if (isml) {
+            min_rate_vphpl = (float)opt.UserSettings.minManagedRampMeteringRatePerLaneVph;
+            max_rate_vphpl = (float)opt.UserSettings.maxManagedRampMeteringRatePerLaneVph;
+        }
+        
+        try {
+            AbstractControllerRampMeter newController;
+            switch(ca) {
+                case rm_open:
+                    newController = ControlFactory.create_controller_rmopen(myLink.get_segment().get_scenario(), null);
                     break;
 
-                case mng:
-                    min_rate_vphpl = (float)opt.UserSettings.minManagedRampMeteringRatePerLaneVph;
-                    max_rate_vphpl = (float)opt.UserSettings.maxManagedRampMeteringRatePerLaneVph;
-                    dt = (float)opt.UserSettings.defaultControlDtSeconds;
+                case rm_closed:
+                    newController = ControlFactory.create_controller_rmclosed(myLink.get_segment().get_scenario(), null);
+                    break;
+
+                case rm_alinea:
+                    AbstractLink sensor_link = myLink.get_dn_link();
+                    newController = ControlFactory.create_controller_alinea(myLink.get_segment().get_scenario(),
+                        null,
+                        dt,
+                        false,
+                        min_rate_vphpl,
+                        max_rate_vphpl,
+                        null,
+                        sensor_link.get_id(),
+                        sensor_link.get_length_meters() / 2f);
+                    break;
+
+                case rm_fixed_rate:
+                    newController = ControlFactory.create_controller_fixed_rate(myLink.get_segment().get_scenario(),
+                        null,
+                        dt,
+                        false,
+                        min_rate_vphpl,
+                        max_rate_vphpl,
+                        max_rate_vphpl);
+
                     break;
 
                 default:
-                    min_rate_vphpl = (float)opt.UserSettings.minGPRampMeteringRatePerLaneVph;
-                    max_rate_vphpl = (float)opt.UserSettings.maxGPRampMeteringRatePerLaneVph;
-                    dt = (float)opt.UserSettings.defaultControlDtSeconds;
-                    break;
+                    throw new Exception("Bad controller type");
+
             }
 
-            float rate_vphpl = max_rate_vphpl;
+            controlEntry = new ScheduleEntry(start_time, newController);
 
-
-            try {
-
-                AbstractControllerRampMeter newController;
-                switch(controlAlgorithm){
-
-                    case rm_open:
-                        newController = ControlFactory.create_controller_rmopen(myLink.get_segment().get_scenario(),null);
-                        break;
-
-                    case rm_closed:
-                        newController = ControlFactory.create_controller_rmclosed(myLink.get_segment().get_scenario(),null);
-                        break;
-
-                    case rm_alinea:
-                        AbstractLink sensor_link = myLink.get_dn_link();
-                        newController = ControlFactory.create_controller_alinea(myLink.get_segment().get_scenario(),
-                                null,
-                                dt,
-                                false,
-                                min_rate_vphpl,
-                                max_rate_vphpl,
-                                null,
-                                sensor_link.get_id(),
-                                sensor_link.get_length_meters() / 2f );
-                        break;
-
-                    case rm_fixed_rate:
-                        newController = ControlFactory.create_controller_fixed_rate(myLink.get_segment().get_scenario(),
-                                null,
-                                dt,
-                                false,
-                                min_rate_vphpl,
-                                max_rate_vphpl,
-                                rate_vphpl);
-
-                        break;
-
-                    default:
-                        throw new Exception("Bad controller type");
-
-                }
-
-                controlEntry = new ScheduleEntry(start_time,newController);
-
-            } catch (Exception e) {
-                controlEntry = null;
-                opt.utils.Dialogs.ExceptionDialog("Could not create new ramp meter...", e);
-            }
-
-
+        } catch (Exception e) {
+            controlEntry = null;
+            opt.utils.Dialogs.ExceptionDialog("Could not create new ramp meter...", e);
         }
-
-        // HOV policy
-        if( controlType==AbstractController.Type.HOVHOT){
-            // ...
-        }
-
 
     }
 
     
-    void launchRampMeterEditor(ScheduleEntry entry,boolean isnew) {
+    void launchRampMeterEditor(ScheduleEntry entry, boolean isml, boolean isnew) {
         Stage inputStage = new Stage();
         inputStage.initOwner(primaryStage);
+        ControlSchedule controlSchedule = controlScheduleGP;
+        if (isml)
+            controlSchedule = controlScheduleManaged;
 
         switch(entry.get_cntrl().getAlgorithm()){
             case rm_open:
                 inputStage.setScene(rampMeterOpenScene);
-                rampMeterOpen.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
-                inputStage.setTitle("Open ramp");
+                rampMeterOpen.initWithLinkAndController(myLink, controlSchedule, entry, isnew);
+                inputStage.setTitle("Open On-Ramp");
                 break;
 
             case rm_closed:
                 inputStage.setScene(rampMeterClosedScene);
-                rampMeterClosed.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
-                inputStage.setTitle("Close ramp");
+                rampMeterClosed.initWithLinkAndController(myLink, controlSchedule, entry, isnew);
+                inputStage.setTitle("Close On-Ramp");
                 break;
 
             case rm_alinea:
                 inputStage.setScene(rampMeterAlineaScene);
-                rampMeterAlinea.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
+                rampMeterAlinea.initWithLinkAndController(myLink, controlSchedule, entry, isml, isnew);
                 inputStage.setTitle("Ramp Meter ALINEA");
                 break;
 
             case rm_fixed_rate:
                 inputStage.setScene(rampMeterFixedScene);
-                rampMeterFixed.initWithLinkAndController(myLink,controlSchedule,entry,isnew);
+                rampMeterFixed.initWithLinkAndController(myLink, controlSchedule, entry, isml, isnew);
                 inputStage.setTitle("Ramp Meter Fixed Rate");
                 break;
+                
             default:
                 // should not end up here...
                 opt.utils.Dialogs.ErrorDialog("Ramp meter '" + entry.get_cntrl().getAlgorithm() + "' is not supported...", "Please, report this problem!");
@@ -2381,63 +2403,119 @@ public class LinkEditorController {
         inputStage.initModality(Modality.APPLICATION_MODAL);
         inputStage.setResizable(false);
         inputStage.showAndWait();
-        refreshControllerList();
+        refreshControllerList(isml);
     }
     
     
     @FXML
-    void onAddController(ActionEvent event) {
+    void onAddControllerGP(ActionEvent event) {
         Stage inputStage = new Stage();
         inputStage.initOwner(primaryStage);
         inputStage.setScene(newRampMeterScene);
-        newRampMeterController.initWithLink(myLink);
-        inputStage.setTitle("New Ramp Meter");
+        newRampMeterController.initWithLink(myLink, false);
+        inputStage.setTitle("New Ramp Meter for GP Lanes");
         inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         inputStage.initModality(Modality.APPLICATION_MODAL);
         inputStage.setResizable(false);
         inputStage.showAndWait();
         if (controlEntry != null)
-            launchRampMeterEditor(controlEntry,true);
+            launchRampMeterEditor(controlEntry, false, true);
+    }
+    
+    @FXML
+    void onAddControllerManaged(ActionEvent event) {
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(newRampMeterScene);
+        newRampMeterController.initWithLink(myLink, true);
+        inputStage.setTitle("New Ramp Meter for Managed Lanes");
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+        if (controlEntry != null)
+            launchRampMeterEditor(controlEntry, true, true);
     }
     
     
     @FXML
-    void onDeleteController(ActionEvent event) {
-        int idx = listControllers.getSelectionModel().getSelectedIndex();
-        if ((idx < 0) || (idx >= controlSchedule.num_entries()))
+    void onDeleteControllerGP(ActionEvent event) {
+        int idx = listControllersGP.getSelectionModel().getSelectedIndex();
+        if ((idx < 0) || (idx >= controlScheduleGP.num_entries()))
             return;
 
-        String header = "You are deleting controller '" + listControllers.getItems().get(idx) + "'...";
+        String header = "You are deleting controller '" + listControllersGP.getItems().get(idx) + "'...";
         if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?"))
             return;
 
-        controlSchedule.delete_entry(idx);
-        refreshControllerList();
+        controlScheduleGP.delete_entry(idx);
+        refreshControllerList(false);
         appMainController.setProjectModified(true);
     }
     
     
     @FXML
-    void controllersOnKeyPressed(KeyEvent event) {
+    void onDeleteControllerManaged(ActionEvent event) {
+        int idx = listControllersManaged.getSelectionModel().getSelectedIndex();
+        if ((idx < 0) || (idx >= controlScheduleManaged.num_entries()))
+            return;
+
+        String header = "You are deleting controller '" + listControllersManaged.getItems().get(idx) + "'...";
+        if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?"))
+            return;
+
+        controlScheduleManaged.delete_entry(idx);
+        refreshControllerList(true);
+        appMainController.setProjectModified(true);
+    }
+    
+    
+    @FXML
+    void controllersOnKeyPressedGP(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
-            int idx = listControllers.getSelectionModel().getSelectedIndex();
-            if ((idx < 0) || (idx >= controlSchedule.num_entries()))
+            int idx = listControllersGP.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= controlScheduleGP.num_entries()))
                 return;
-            launchRampMeterEditor(controlSchedule.get_entries().get(idx), false);
+            launchRampMeterEditor(controlScheduleGP.get_entries().get(idx), false, false);
         }
         if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
-            onDeleteController(null);
+            onDeleteControllerGP(null);
         }
     }
     
     
     @FXML
-    void controllersOnClick(MouseEvent event) {
-        if (event.getClickCount() == 2) {
-            int idx = listControllers.getSelectionModel().getSelectedIndex();
-            if ((idx < 0) || (idx >= controlSchedule.num_entries()))
+    void controllersOnKeyPressedManaged(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            int idx = listControllersManaged.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= controlScheduleManaged.num_entries()))
                 return;
-            launchRampMeterEditor(controlSchedule.get_entries().get(idx),false);
+            launchRampMeterEditor(controlScheduleManaged.get_entries().get(idx), true, false);
+        }
+        if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
+            onDeleteControllerManaged(null);
+        }
+    }
+    
+    
+    @FXML
+    void controllersOnClickGP(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            int idx = listControllersGP.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= controlScheduleGP.num_entries()))
+                return;
+            launchRampMeterEditor(controlScheduleGP.get_entries().get(idx), false, false);
+        }
+    }
+    
+    
+    @FXML
+    void controllersOnClickManaged(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            int idx = listControllersManaged.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= controlScheduleManaged.num_entries()))
+                return;
+            launchRampMeterEditor(controlScheduleManaged.get_entries().get(idx), true, false);
         }
     }
     
@@ -2477,12 +2555,15 @@ public class LinkEditorController {
             } else {
                 cbSeparated.setDisable(true);
             }
+            tabManagedLanesControl.setDisable(false);
         } else {
             cbBarrier.setDisable(true);
             cbSeparated.setDisable(true);
             capacityManagedLane.setDisable(true);
             ffSpeedManaged.setDisable(true);
             jamDensityManagedLane.setDisable(true);
+            tabManagedLanesControl.setDisable(true);
+            controlTabPane.getSelectionModel().selectFirst();
         }
         
         if (aux_lanes > 0) {

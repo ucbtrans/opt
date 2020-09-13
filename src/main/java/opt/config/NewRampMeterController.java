@@ -49,6 +49,8 @@ public class NewRampMeterController {
     private LinkEditorController linkEditorController = null;
     private AbstractLink myLink = null;
     
+    private boolean managedLanes = false;
+    
 
     @FXML // fx:id="topPane"
     private GridPane topPane; // Value injected by FXMLLoader
@@ -61,9 +63,6 @@ public class NewRampMeterController {
 
     @FXML // fx:id="buttonOK"
     private Button buttonOK; // Value injected by FXMLLoader
-
-    @FXML // fx:id="cbManagedLanes"
-    private CheckBox cbManagedLanes; // Value injected by FXMLLoader
 
     
     
@@ -91,14 +90,9 @@ public class NewRampMeterController {
     
     
     
-    public void initWithLink(AbstractLink lnk) {
+    public void initWithLink(AbstractLink lnk, boolean ml) {
         myLink = lnk;
-        cbManagedLanes.setSelected(false);
-        if (myLink.get_mng_lanes() > 0) {
-            cbManagedLanes.setDisable(false);
-        } else {
-            cbManagedLanes.setDisable(true);
-        }
+        managedLanes = ml;
         
         buttonOK.setDisable(true);
         listRM.getItems().clear();
@@ -119,7 +113,7 @@ public class NewRampMeterController {
 
     @FXML
     void onCancel(ActionEvent event) {
-        linkEditorController.prepareNewController(null);
+        linkEditorController.prepareNewController(null, managedLanes);
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
     }
@@ -134,7 +128,7 @@ public class NewRampMeterController {
         }
 
 
-        linkEditorController.prepareNewController(listRM.getItems().get(idx));
+        linkEditorController.prepareNewController(listRM.getItems().get(idx), managedLanes);
         
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();

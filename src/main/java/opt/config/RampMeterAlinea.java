@@ -60,6 +60,7 @@ public class RampMeterAlinea {
     private ControllerRampMeterAlinea myController = null;
     private List<AbstractLink> listSensorLinkCandidates = new ArrayList<AbstractLink>();
     private float origStartTime;
+    private boolean isml;
     private boolean isnew;
 
 
@@ -112,10 +113,8 @@ public class RampMeterAlinea {
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
-
         textStartTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultStartTime, "")));
-//        textEndTime.setTextFormatter(opt.utils.TextFormatting.createTimeTextFormatter(Misc.seconds2timestring((float)opt.UserSettings.defaultSimulationDuration, "")));
-        
+    
         double cap_step = 1;
         if (UserSettings.unitsFlow.equals("vps"))
             cap_step = 0.01;
@@ -135,18 +134,22 @@ public class RampMeterAlinea {
     
     
     
-    public void initWithLinkAndController(AbstractLink lnk, ControlSchedule schedule, ScheduleEntry entry,boolean isnew) {
-
+    public void initWithLinkAndController(AbstractLink lnk, ControlSchedule schedule, ScheduleEntry entry, boolean isml, boolean isnew) {
         myLink = lnk;
         mySchedule = schedule;
         myController = (ControllerRampMeterAlinea) entry.get_cntrl();
+        this.isml = isml;
         this.isnew = isnew;
 
         origStartTime = entry.get_start_time();
         textStartTime.setText(Misc.seconds2timestring(origStartTime, ""));
 
         double min_rate = myController.getMin_rate_vph();
-        double max_rate = Math.min(myLink.get_gp_capacity_vphpl(), myController.getMax_rate_vph());
+        double max_rate = myController.getMax_rate_vph();
+        if (isml)
+            Math.min(myLink.get_mng_capacity_vphpl(), max_rate);
+        else
+            Math.min(myLink.get_gp_capacity_vphpl(), max_rate);
         
         String unitsFlow = UserSettings.unitsFlow;
         labelMinRate.setText("Minimum Rate per Lane (" + unitsFlow + "):");
@@ -194,7 +197,6 @@ public class RampMeterAlinea {
 
     @FXML
     void onOK(ActionEvent event) {
-
         int startSeconds = Misc.timeString2Seconds(textStartTime.getText());
         
         double min_rate = spinnerMinRate.getValue();
@@ -202,8 +204,11 @@ public class RampMeterAlinea {
         min_rate = UserSettings.convertFlow(min_rate, UserSettings.unitsFlow, "vph");
         max_rate = UserSettings.convertFlow(max_rate, UserSettings.unitsFlow, "vph");
         
-        if (max_rate > myLink.get_gp_capacity_vphpl()) {
-            max_rate = myLink.get_gp_capacity_vphpl();
+        double lane_cap = myLink.get_gp_capacity_vphpl();
+        if (isml)
+            lane_cap = myLink.get_mng_capacity_vphpl();
+        if (max_rate > lane_cap) {
+            max_rate = lane_cap;
             spinnerMaxRate.getValueFactory().setValue(UserSettings.convertFlow(max_rate, "vph", UserSettings.unitsFlow));
         }
         
@@ -215,18 +220,18 @@ public class RampMeterAlinea {
         myController.setMin_rate_vph((float)min_rate);
         myController.setMax_rate_vph((float)max_rate);
         
-        myController.setDt((float) controlDt.getValue());
+        myController.setDt((float)controlDt.getValue());
         myController.setHas_queue_control(cbQueueControl.isSelected());
         
         AbstractLink sensor_link = listSensorLinkCandidates.get(cbSensorLink.getSelectionModel().getSelectedIndex());
         myController.setSensor_link_id(sensor_link.get_id());
         myController.setSensor_offset_m(0.5f*sensor_link.get_length_meters());
 
-        mySchedule.update(startSeconds,myController);
+        mySchedule.update(startSeconds, myController);
         
         linkEditorController.setProjectModified(true);
 
-        Stage stage = (Stage) topPane.getScene().getWindow();
+        Stage stage = (Stage)topPane.getScene().getWindow();
         stage.close();
     }
 

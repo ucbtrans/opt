@@ -55,6 +55,7 @@ public class RampMeterFixed {
     private ControlSchedule mySchedule;
     private ControllerRampMeterFixedRate myController = null;
     private float origStartTime;
+    private boolean isml;
     private boolean isnew;
 
 
@@ -125,18 +126,22 @@ public class RampMeterFixed {
     
     
     
-    public void initWithLinkAndController(AbstractLink lnk, ControlSchedule schedule, ScheduleEntry entry,boolean isnew) {
+    public void initWithLinkAndController(AbstractLink lnk, ControlSchedule schedule, ScheduleEntry entry, boolean isml, boolean isnew) {
         myLink = lnk;
         mySchedule = schedule;
         myController = (ControllerRampMeterFixedRate) entry.get_cntrl();
+        this.isml = isml;
         this.isnew = isnew;
-
+        
         origStartTime = entry.get_start_time();
         textStartTime.setText(Misc.seconds2timestring(origStartTime, ""));
 
         double rate_vphpl = myController.get_rate_vphpl();
-        double ctrl_max_rate = myController.getMax_rate_vph();
-        double max_rate = Math.min(myLink.get_gp_capacity_vphpl(), myController.getMax_rate_vph());
+        double max_rate = myController.getMax_rate_vph();
+        if (isml)
+            max_rate = Math.min(myLink.get_mng_capacity_vphpl(), max_rate);
+        else
+            max_rate = Math.min(myLink.get_gp_capacity_vphpl(), max_rate);
         
         String unitsFlow = UserSettings.unitsFlow;
         labelRecRate.setText("Metering Rate per Lane (" + unitsFlow + "):");
@@ -171,8 +176,11 @@ public class RampMeterFixed {
         rate_vphpl = UserSettings.convertFlow(rate_vphpl, UserSettings.unitsFlow, "vph");
         max_rate = UserSettings.convertFlow(max_rate, UserSettings.unitsFlow, "vph");
         
-        if (max_rate > myLink.get_gp_capacity_vphpl()) {
-            max_rate = myLink.get_gp_capacity_vphpl();
+        double lane_cap = myLink.get_gp_capacity_vphpl();
+        if (isml)
+            lane_cap = myLink.get_mng_capacity_vphpl();
+        if (max_rate > lane_cap) {
+            max_rate = lane_cap;
             spinnerMaxRate.getValueFactory().setValue(UserSettings.convertFlow(max_rate, "vph", UserSettings.unitsFlow));
         }
         
@@ -195,4 +203,3 @@ public class RampMeterFixed {
     }
 
 }
-
