@@ -41,7 +41,7 @@ public class Benchmarker {
             fwyscenario.set_start_time(0f);
             fwyscenario.set_sim_duration(duration);
 
-            OTMTask task = new OTMTask(null,fwyscenario,300f,-1,this);
+            OTMTask task = new OTMTask(null,fwyscenario,300f,-1,true,true,this);
 
             task.run_simulation(this,celloutput,lgoutput);
 

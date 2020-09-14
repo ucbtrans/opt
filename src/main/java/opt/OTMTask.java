@@ -15,17 +15,22 @@ public class OTMTask  extends Task {
 	private FreewayScenario fwyscenario;
 	private OTMdev otmdev;
 
+	private boolean celloutput;
+	private boolean lgoutput;
+
 	private int simsteps;
 	private float outdt;
 	private int step_per_progbar_update;
 
 	private Exception exception;
 
-	public OTMTask(AppMainController mainController, FreewayScenario fwyscenario, float outdt, int progbar_steps, Benchmarker logger) throws Exception {
+	public OTMTask(AppMainController mainController, FreewayScenario fwyscenario, float outdt, int progbar_steps, boolean celloutput, boolean lgoutput, Benchmarker logger) throws Exception {
 
 		this.mainController = mainController;
 		this.fwyscenario = fwyscenario;
 		this.outdt = outdt;
+		this.celloutput = celloutput;
+		this.lgoutput = lgoutput;
 
 		assert(outdt==300f);
 
@@ -79,7 +84,7 @@ public class OTMTask  extends Task {
 
 	@Override
 	protected Object call()  {
-		this.run_simulation(null,true,false);
+		this.run_simulation(null,celloutput,lgoutput);
 		return null;
 	}
 
@@ -121,7 +126,8 @@ public class OTMTask  extends Task {
 			if(lgoutput)
 				for(Long commid : otmdev.scenario.commodities.keySet()){
 					otmdev.otm.output().request_lanegroup_flw(commid,linkids,sim_dt);
-					otmdev.otm.output().request_lanegroup_veh(commid,linkids,sim_dt);
+//					otmdev.otm.output().request_lanegroup_veh(commid,linkids,sim_dt);
+					otmdev.otm.output().request_lanegroup_avg_veh(commid,linkids,sim_dt);
 				}
 
 			if(logger!=null)
@@ -156,8 +162,7 @@ public class OTMTask  extends Task {
 			if(logger!=null)
 				logger.write("run");
 
-			if(celloutput)
-				simdata = new SimDataScenario(fwyscenario,otmdev,outdt);
+			simdata = new SimDataScenario(fwyscenario,otmdev,outdt,celloutput,lgoutput);
 
 			if(logger!=null)
 				logger.write("output");

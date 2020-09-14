@@ -26,20 +26,20 @@ public class TestSimData extends AbstractTest {
         // load
         OTMTask task = null;
 //        String project_file_name = get_test_fullpath("project.opt");
-        String project_file_name = "/home/gomes/Desktop/testrc/config/Y.opt";
+        String project_file_name = "/home/gomes/Desktop/xxx/test.opt";
         boolean validate = true;
         try {
             Project project = ProjectFactory.load_project(project_file_name,validate);
             FreewayScenario fwyscenario = project.get_scenarios().iterator().next();
             fwyscenario.set_start_time(0f);
             fwyscenario.set_sim_duration(3600f);
-            task = new OTMTask(null,fwyscenario,300f,10, null);
+            task = new OTMTask(null,fwyscenario,300f,10, false,true,null);
         } catch (Exception e) {
             fail(e.getMessage());
         }
 
         // run and retrieve data
-        simdata = task.run_simulation(null,true,false);
+        simdata = task.run_simulation(null,false,true);
         simdatalink = simdata.linkdata.get(linkid);
     }
 

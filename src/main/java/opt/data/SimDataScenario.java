@@ -14,10 +14,14 @@ public class SimDataScenario {
     public float outdt;
     public List<Float> time;
     public Map<Long,SimDataLink> linkdata;
+    public boolean hascelldata;
+    public boolean haslgdata;
 
-    public SimDataScenario(FreewayScenario fwyscenario, OTMdev otmdev,float outdt){
+    public SimDataScenario(FreewayScenario fwyscenario, OTMdev otmdev,float outdt,boolean hascelldata,boolean haslgdata){
         this.fwyscenario = fwyscenario;
         this.outdt = outdt;
+        this.hascelldata = hascelldata;
+        this.haslgdata = haslgdata;
 
         // initialize linkdata
         Set<Long> commids = otmdev.scenario.commodities.keySet();
@@ -47,6 +51,20 @@ public class SimDataScenario {
             currindex += step;
         }
 
+        if(hascelldata)
+            read_cell_data(otmdev,commids,time_index,sim_dt);
+
+        if(haslgdata)
+            read_lg_data();
+
+    }
+
+    private void read_lg_data(){
+
+    }
+
+    private void read_cell_data(OTMdev otmdev,Set<Long> commids,List<Integer> time_index,float sim_dt){
+
         Set<OutputCellFlow> flws = otmdev.otm.output.get_data().stream()
                 .filter(s->s.type==AbstractOutput.Type.cell_flw)
                 .map(s->(OutputCellFlow)s)
@@ -58,12 +76,16 @@ public class SimDataScenario {
                 .collect(toSet());
 
         for(Long commid : commids){
-            OutputCellFlow flw = flws.stream().filter(s->s.get_commodity_id()==commid).findFirst().get();
-            OutputCellVehicles veh = vehs.stream().filter(s->s.get_commodity_id()==commid).findFirst().get();
+            Optional<OutputCellFlow> oflw = flws.stream().filter(s->s.get_commodity_id()==commid).findFirst();
+            Optional<OutputCellVehicles> oveh = vehs.stream().filter(s->s.get_commodity_id()==commid).findFirst();
 
-            ArrayList<FluidLaneGroup> lgs = flw.ordered_lgs;
+            if(!oflw.isPresent() || !oveh.isPresent())
+                continue;
 
-            for(FluidLaneGroup flg : lgs) {
+            OutputCellFlow flw = oflw.get();
+            OutputCellVehicles veh = oveh.get();
+
+            for(FluidLaneGroup flg : flw.ordered_lgs) {
 
                 if(!linkdata.containsKey(flg.link.getId()))
                     continue;
@@ -76,8 +98,6 @@ public class SimDataScenario {
             }
 
         }
-
-
     }
 
     protected double [] nan(){
