@@ -230,7 +230,6 @@ public class TSTableHandler {
         //myTable.getSelectionModel().clearSelection();
         //myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
         //myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
-        System.err.println("onFocusChanged: row = " + row + ";\t col = " + col);
     }
     
     

@@ -116,14 +116,17 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <TableView id="tableFlowPrice" fx:id="tableFlowPrice" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="13">
+                              <TableView id="tableFlowPrice" fx:id="tableFlowPrice" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="13">
                                 <columns>
                                   <TableColumn id="colFlow" fx:id="colFlow" prefWidth="235.0" text="Flow per Lane" />
-                                  <TableColumn id="colPrice" fx:id="coplPrice" prefWidth="244.0" sortable="false" text="Price (cents per mile)" />
+                                  <TableColumn id="colPrice" fx:id="colPrice" prefWidth="244.0" sortable="false" text="Price (cents per mile)" />
                                 </columns>
                                  <GridPane.margin>
                                     <Insets right="20.0" />
                                  </GridPane.margin>
+                                 <tooltip>
+                                    <Tooltip text="Ctrl+C - copy selected table cells to clipboard&#10;Ctrl+V - paste items into table from clipboard&#10;Ctrl+D - duplicate table row&#10;DEL - delete selected rows&#10;Shift+Mouse Click - select table cells&#10;Ctrl+A - select all table entries" wrapText="true" />
+                                 </tooltip>
                               </TableView>
                               <Label text="Parameters" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                                  <font>
@@ -140,25 +143,37 @@
                                     <Insets left="20.0" />
                                  </GridPane.margin>
                               </Label>
-                              <Spinner id="spA0" fx:id="spA0" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+                              <Spinner id="spA0" fx:id="spA0" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6">
+                                 <tooltip>
+                                    <Tooltip text="Lane Choice Model intercept" wrapText="true" />
+                                 </tooltip></Spinner>
                               <Label text="Lane Choice Model a1:" GridPane.columnIndex="2" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
                                  <GridPane.margin>
                                     <Insets left="20.0" />
                                  </GridPane.margin>
                               </Label>
-                              <Spinner id="spA1" fx:id="spA1" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
+                              <Spinner id="spA1" fx:id="spA1" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8">
+                                 <tooltip>
+                                    <Tooltip text="Lane Choice Model - coefficient for vehicle density difference between GP and Managed lanes" wrapText="true" />
+                                 </tooltip></Spinner>
                               <Label text="Lane Choice Model a2:" GridPane.columnIndex="2" GridPane.rowIndex="9" GridPane.valignment="BOTTOM">
                                  <GridPane.margin>
                                     <Insets left="20.0" />
                                  </GridPane.margin>
                               </Label>
-                              <Spinner id="spA2" fx:id="spA2" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
-                              <Label id="labelSpeedThreshold" fx:id="labelSpeedThreshold" text="QOS Speed Threshold:" GridPane.columnIndex="2" GridPane.rowIndex="12" GridPane.valignment="BOTTOM">
+                              <Spinner id="spA2" fx:id="spA2" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="10">
+                                 <tooltip>
+                                    <Tooltip text="Lane Choice Model - coefficient for per-mile pricing" wrapText="true" />
+                                 </tooltip></Spinner>
+                              <Label id="labelSpeedThreshold" fx:id="labelSpeedThreshold" text="QoS Speed Threshold:" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="12" GridPane.valignment="BOTTOM">
                                  <GridPane.margin>
                                     <Insets left="20.0" />
                                  </GridPane.margin>
                               </Label>
-                              <Spinner id="spSpeedThreshold" fx:id="spSpeedThreshold" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="13" />
+                              <Spinner id="spSpeedThreshold" fx:id="spSpeedThreshold" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="13">
+                                 <tooltip>
+                                    <Tooltip text="Quality of Service speed threshold:&#10;When speed falls below this threshold,&#10;tolled vehicles are no longer allowed&#10;into managed lanes" wrapText="true" />
+                                 </tooltip></Spinner>
                               <Label text="Invocation Period (seconds):" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.valignment="BOTTOM">
                                  <GridPane.margin>
                                     <Insets left="20.0" />

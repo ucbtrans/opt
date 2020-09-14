@@ -27,9 +27,11 @@
 package opt.config;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -41,15 +43,19 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
+import javafx.scene.control.TablePosition;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.UserSettings;
@@ -58,10 +64,13 @@ import opt.data.FreewayScenario;
 import opt.data.control.ControlSchedule;
 import opt.data.control.ControllerPolicyHOVHOT;
 import opt.data.control.ScheduleEntry;
+import opt.utils.EditCell;
 import opt.utils.Misc;
 import opt.utils.ModifiedDoubleStringConverter;
 import opt.utils.ModifiedIntegerStringConverter;
+import opt.utils.ModifiedNumberStringConverter;
 import opt.utils.RadioButtonCell;
+import opt.utils.STableHandler;
 
 public class LaneControlEditorController {
     
@@ -76,6 +85,8 @@ public class LaneControlEditorController {
     private ControllerPolicyHOVHOT myController = null;
     private float origStartTime;
     private boolean isnew;
+    
+    STableHandler fpTableHandler = new STableHandler();
 
 
     @FXML // fx:id="topPane"
@@ -115,13 +126,13 @@ public class LaneControlEditorController {
     private Tab tabTolling; // Value injected by FXMLLoader
 
     @FXML // fx:id="tableFlowPrice"
-    private TableView<?> tableFlowPrice; // Value injected by FXMLLoader
+    private TableView<ObservableList<Object>> tableFlowPrice; // Value injected by FXMLLoader
 
     @FXML // fx:id="colFlow"
-    private TableColumn<?, ?> colFlow; // Value injected by FXMLLoader
+    private TableColumn<ObservableList<Object>, Number> colFlow; // Value injected by FXMLLoader
 
-    @FXML // fx:id="coplPrice"
-    private TableColumn<?, ?> coplPrice; // Value injected by FXMLLoader
+    @FXML // fx:id="colPrice"
+    private TableColumn<ObservableList<Object>, Number> colPrice; // Value injected by FXMLLoader
 
     @FXML // fx:id="spA0"
     private Spinner<Double> spA0; // Value injected by FXMLLoader
@@ -207,6 +218,75 @@ public class LaneControlEditorController {
         SpinnerValueFactory<Double> v_thresh = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 120, 0.0, 1);
         v_thresh.setConverter(new ModifiedDoubleStringConverter("#.##", 0.0));
         spSpeedThreshold.setValueFactory(v_thresh);
+        
+        fpTableHandler.setTable(tableFlowPrice);
+        tableFlowPrice.setOnKeyPressed(event -> {
+            if (ignoreChange)
+                return;
+
+            fpTableHandler.onKeyPressed(event);
+            
+            TablePosition<ObservableList<Object>, ?> focusedCell = tableFlowPrice.focusModelProperty().get().focusedCellProperty().get();
+            
+            if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
+                int del_num = fpTableHandler.deleteRows();
+            }
+
+            if (event.getCode().isDigitKey()) {              
+                tableFlowPrice.edit(focusedCell.getRow(), focusedCell.getTableColumn());
+            } 
+        });
+        
+        tableFlowPrice.setOnMouseClicked(event -> {
+            if (ignoreChange)
+                return;
+            fpTableHandler.onMouseClicked(event);
+        });
+        
+        tableFlowPrice.setRowFactory(tv -> {
+            TableRow<ObservableList<Object>> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if ((event.getClickCount() == 2) && (row.isEmpty())) {
+                    fpTableHandler.addRow();
+                }
+            });
+            return row ;
+        });
+        
+        tableFlowPrice.getSelectionModel().setCellSelectionEnabled(true);
+        tableFlowPrice.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        
+        double width_scale = 0.49;
+        
+        colFlow.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter(), true));
+        colFlow.setCellValueFactory(data -> new SimpleDoubleProperty((Double)data.getValue().get(0)));
+        colFlow.prefWidthProperty().bind(tableFlowPrice.widthProperty().multiply(width_scale));
+        colFlow.setEditable(true);
+        colFlow.setSortable(false);
+        colFlow.setOnEditCommit(event -> {
+            if (ignoreChange)
+                return;
+            TablePosition<ObservableList<Object>, ?> focusedCell = event.getTablePosition();
+            if ((event.getNewValue() != null) && (!event.getNewValue().equals("")))
+                tableFlowPrice.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), event.getNewValue().doubleValue());
+            tableFlowPrice.refresh();
+        });
+        colFlow.setReorderable(false);
+        
+        colPrice.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter(), true));
+        colPrice.setCellValueFactory(data -> new SimpleDoubleProperty((Double)data.getValue().get(1)));
+        colPrice.prefWidthProperty().bind(tableFlowPrice.widthProperty().multiply(width_scale));
+        colPrice.setEditable(true);
+        colPrice.setSortable(false);
+        colPrice.setOnEditCommit(event -> {
+            if (ignoreChange)
+                return;
+            TablePosition<ObservableList<Object>, ?> focusedCell = event.getTablePosition();
+            if ((event.getNewValue() != null) && (!event.getNewValue().equals("")))
+                tableFlowPrice.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), event.getNewValue().doubleValue());
+            tableFlowPrice.refresh();
+        });
+        colPrice.setReorderable(false);
     }
     
     
@@ -274,18 +354,42 @@ public class LaneControlEditorController {
         tablePermsVT.getItems().addAll(vt_entries);
         tablePermsVT.refresh();
         
+        restrictedPane.getSelectionModel().selectFirst();
+        
         if (countTolled() > 0)
             tabTolling.setDisable(false);
         else
             tabTolling.setDisable(true);
     }
     
-    private void initTolling() {
+    
+    private void fillFlowPriceTable() {
         String unitsFlow = UserSettings.unitsFlow;
         double cc = UserSettings.flowConversionMap.get("vph" + unitsFlow);
         colFlow.setText("Flow per Lane (" + unitsFlow + ")");
         
+        tableFlowPrice.getItems().clear();
         
+        int[][] fpt = myController.get_vphpl_to_cents_table();
+        if ((fpt == null) || (fpt.length < 1) || (fpt[0].length < 2)) {
+            fpt = new int[1][2];
+            fpt[0][0] = 0;
+            fpt[0][1] = 0;
+        }
+        
+        int sz = fpt.length;
+        ObservableList<Object> row;
+        for (int i = 0; i < sz; i++) {
+            row = FXCollections.observableArrayList();
+            row.add(new Double(cc*fpt[i][0]));
+            row.add(new Double(fpt[i][1]));
+            tableFlowPrice.getItems().add(row);
+        }
+        
+    }
+    
+    private void initTolling() {
+        fillFlowPriceTable();
         
         Float dt = myController.getDt();
         if (dt == null)
@@ -308,8 +412,8 @@ public class LaneControlEditorController {
         spA2.getValueFactory().setValue(a2);
         
         String unitsSpeed = UserSettings.unitsSpeed;
-        labelSpeedThreshold.setText("QOS Speed Threshold (" + unitsSpeed + "):");
-        cc = UserSettings.speedConversionMap.get("kph" + unitsSpeed);
+        labelSpeedThreshold.setText("QoS Speed Threshold (" + unitsSpeed + "):");
+        double cc = UserSettings.speedConversionMap.get("kph" + unitsSpeed);
         Double speed_threshold = myController.get_qos_speed_threshold_kph();
         if (speed_threshold == null)
             speed_threshold = UserSettings.defaultQosSpeedThresholdKph;
@@ -345,6 +449,36 @@ public class LaneControlEditorController {
         for (int i = 0; i < sz; i++)
             listPermsVT.set(i, Permission.Banned);
         restrictedPane.setVisible(false);
+    }
+    
+    private int[][] generateFlowPriceIntegerMatrix() {
+        double cc = UserSettings.flowConversionMap.get(UserSettings.unitsFlow + "vph");
+        int sz = tableFlowPrice.getItems().size();
+        int[][] res = new int[sz][2];
+        List<Double> flows = new ArrayList<Double>();
+        List<Double> prices = new ArrayList<Double>();
+        
+        for (int i = 0; i < sz; i++) {
+            ObservableList<Object> row = tableFlowPrice.getItems().get(i);
+            double val = (Double)row.get(0);
+            if (Double.isNaN(val))
+                val = 0;
+            flows.add(val);
+            val = (Double)row.get(1);
+            if (Double.isNaN(val))
+                val = 0;
+            prices.add(val);
+        }
+        
+        Collections.sort(flows);
+        Collections.sort(prices);
+        
+        for (int i = 0; i < sz; i++) {
+            res[i][0] = (int) Math.round(cc * flows.get(i));
+            res[i][1] = (int) Math.round(prices.get(i));
+        }
+        
+        return res;
     }
     
     
@@ -408,6 +542,9 @@ public class LaneControlEditorController {
             if (listPermsVT.get(i) == Permission.Banned)
                 myController.get_disallowed_comms().add(listVT.get(i).getId());
         }
+        
+        int[][] fpm = generateFlowPriceIntegerMatrix();
+        myController.set_vphpl_to_cents_table(fpm);
 
         myController.setDt((float)controlDt.getValue());
         myController.set_a0(spA0.getValue());
