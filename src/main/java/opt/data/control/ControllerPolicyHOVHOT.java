@@ -1,6 +1,7 @@
 package opt.data.control;
 
 import jaxb.Parameter;
+import opt.UserSettings;
 import opt.data.FreewayScenario;
 import utils.OTMUtils;
 
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ControllerPolicyHOVHOT extends AbstractController {
+
 
 	protected Set<Long> disallowed_comms;
 	protected Set<Long> free_comms;
@@ -28,15 +30,15 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 	// construction
 	////////////////////////////////
 
-	public ControllerPolicyHOVHOT(FreewayScenario scn, Long id, Set<Long> disallowed_comms,Set<Long> free_comms,Double a0,Double a1,Double a2,int [][] vphpl_to_cents_table, Double qos_speed_threshold_kph) {
-		super(id!=null ? id : scn.new_controller_id(),Type.HOVHOT,null, control.AbstractController.Algorithm.lg_restrict);
+	public ControllerPolicyHOVHOT(FreewayScenario scn, Long id, Set<Long> disallowed_comms,Set<Long> free_comms,Float dt, Double a0,Double a1,Double a2,int [][] vphpl_to_cents_table, Double qos_speed_threshold_kph) {
+		super(id!=null ? id : scn.new_controller_id(),Type.HOVHOT,dt, control.AbstractController.Algorithm.lg_restrict);
 		this.disallowed_comms = disallowed_comms==null ? new HashSet<>() : disallowed_comms;
 		this.free_comms =  free_comms==null ? new HashSet<>() : free_comms;
-		this.a0 = a0;
-		this.a1 = a1;
-		this.a2 = a2;
+		this.a0 = a0==null ? UserSettings.defaultLaneChoice_A0 : a0;
+		this.a1 = a1==null ? UserSettings.defaultLaneChoice_A1 : a1;
+		this.a2 = a2==null ? UserSettings.defaultLaneChoice_A2 : a2;
 		this.vphpl_to_cents_table = vphpl_to_cents_table;
-		this.qos_speed_threshold_kph = qos_speed_threshold_kph;
+		this.qos_speed_threshold_kph = qos_speed_threshold_kph==null ? UserSettings.defaultQosSpeedThresholdKph : qos_speed_threshold_kph;
 	}
         
 	////////////////////////////////
@@ -117,6 +119,8 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 			n.setValue(OTMUtils.comma_format(free_comms));
 			params.add(n);
 		}
+
+		// tolling parameters ............
 
 		if(a0!=null){
 			Parameter n = new Parameter();

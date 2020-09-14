@@ -1,6 +1,7 @@
 package opt.data.control;
 
 import error.OTMException;
+import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
@@ -73,7 +74,7 @@ public class ControlFactory {
 					break;
 
 				case HOVHOT:
-					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null,null));
+					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null,null,null));
 					break;
 
 			}
@@ -107,8 +108,8 @@ public class ControlFactory {
 		return new ControllerRampMeterAlinea(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
 	}
 
-	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn, Long id, Set<Long> disallowed_comms,Set<Long> free_comms,Double a0,Double a1,Double a2,int [][] vplph_to_cents_table, Double qos_speed_threshold_kph) throws Exception {
-		return new ControllerPolicyHOVHOT(fwyscn,id,disallowed_comms,free_comms,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
+	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn, Long id, Set<Long> disallowed_comms,Set<Long> free_comms,Float dt, Double a0,Double a1,Double a2,int [][] vplph_to_cents_table, Double qos_speed_threshold_kph) throws Exception {
+		return new ControllerPolicyHOVHOT(fwyscn,id,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
 	}
 
 	/////////////////////
@@ -298,7 +299,7 @@ public class ControlFactory {
 					case "vplph_to_cents_table":
 //						vplph_to_cents_table = OTMUtils.read_int_table(param.getValue());
 						break;
-                                        case "qos_speed_threshold_kph":
+					case "qos_speed_threshold_kph":
 						qos_speed_threshold_kph = Double.parseDouble(param.getValue());
 						break;
 					default:
@@ -307,8 +308,9 @@ public class ControlFactory {
 			}
 		}
 
+		Float dt = jentry.getDt()==null ? (float) UserSettings.defaultControlDtSeconds : jentry.getDt();
 
-		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(null,0l,disallowed_comms,free_comms,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
+		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(null,0l,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
 		return cntrl;
 	}
 
