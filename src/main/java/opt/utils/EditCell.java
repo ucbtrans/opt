@@ -227,27 +227,27 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
 		//getTableView().getSelectionModel().selectNext();
                 //getTableView().getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
 		event.consume();
-                UserSettings.linkEditorController.updateTablePositions(KeyCode.RIGHT);
+                //UserSettings.linkEditorController.updateTablePositions(KeyCode.RIGHT);
             } else if (event.getCode() == KeyCode.LEFT) {
                 moveBack(getTableView(), focusedCell);
 		//getTableView().getSelectionModel().selectPrevious();
                 //getTableView().getSelectionModel().clearSelection(focusedCell.getRow(), focusedCell.getTableColumn());
 		event.consume();
-                UserSettings.linkEditorController.updateTablePositions(KeyCode.LEFT);
+                //UserSettings.linkEditorController.updateTablePositions(KeyCode.LEFT);
             } else if (event.getCode() == KeyCode.UP) {
 		getTableView().getSelectionModel().selectPrevious();
                 //moveUp(getTableView(), focusedCell);
                 getTableView().getSelectionModel().clearSelection();
                 getTableView().getSelectionModel().select(focusedCell.getRow(), focusedCell.getTableColumn());
 		event.consume();
-                UserSettings.linkEditorController.updateTablePositions(KeyCode.UP);
+                //UserSettings.linkEditorController.updateTablePositions(KeyCode.UP);
             } else if (event.getCode() == KeyCode.DOWN) {
 		getTableView().getSelectionModel().selectBelowCell();
                 //moveDown(getTableView(), focusedCell);
                 getTableView().getSelectionModel().clearSelection();
                 getTableView().getSelectionModel().select(focusedCell.getRow(), focusedCell.getTableColumn());
 		event.consume();
-                UserSettings.linkEditorController.updateTablePositions(KeyCode.DOWN);
+                //UserSettings.linkEditorController.updateTablePositions(KeyCode.DOWN);
             }
 	});
 
