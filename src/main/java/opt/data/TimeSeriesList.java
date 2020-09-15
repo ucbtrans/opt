@@ -5,18 +5,18 @@ import java.util.List;
 
 public class TimeSeriesList {
 
-    public List<Float> time;
+    public float [] time;
     public List<LinkLaneGroupCell> space;
     public List<double[]> values;
 
-    public TimeSeriesList(List<Float> time){
+    TimeSeriesList(float [] time){
         this.time = time;
         this.space = new ArrayList<>();
         this.values = new ArrayList<>();
     }
 
     public float get_dt(){
-        return time.get(1)-time.get(0);
+        return time[1]-time[0];
     }
 
     public void add_entry(AbstractLink link,LaneGroupType lgtype,int cellindex,double[] x){

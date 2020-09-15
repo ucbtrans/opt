@@ -26,7 +26,7 @@ public class TestSimData extends AbstractTest {
         // load
         OTMTask task = null;
 //        String project_file_name = get_test_fullpath("project.opt");
-        String project_file_name = "/home/gomes/Desktop/xxx/test.opt";
+        String project_file_name = "/home/gomes/Desktop/xxx/opt_line.opt";
         boolean validate = true;
         try {
             Project project = ProjectFactory.load_project(project_file_name,validate);
@@ -39,7 +39,7 @@ public class TestSimData extends AbstractTest {
         }
 
         // run and retrieve data
-        simdata = task.run_simulation(null,true,false);
+        simdata = task.run_simulation(null,true,true);
         simdatalink = simdata.linkdata.get(linkid);
     }
 

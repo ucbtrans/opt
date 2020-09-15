@@ -1,5 +1,4 @@
 package opt.data;
-import utils.OTMUtils;
 
 import java.util.*;
 
@@ -15,7 +14,7 @@ public class SimDataLink {
     public boolean is_source;
     protected float ffspeed_mph;
 
-    public SimDataLink(SimDataScenario scndata,AbstractLink optlink, common.Link otmlink, Set<Long> commids, boolean is_source){
+    public SimDataLink(SimDataScenario scndata,AbstractLink optlink, common.Link otmlink, Set<Long> commids, boolean is_source,boolean storecelldata,boolean storelgdata,int numtime){
 
         this.id = otmlink.getId();
         this.scndata = scndata;
@@ -30,13 +29,13 @@ public class SimDataLink {
         if(optlink.has_mng()){
             lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(1);
             lgtype2id.put(LaneGroupType.mng,lg.id);
-            lgData.put(lg.id,new SimDataLanegroup(lg,commids));
+            lgData.put(lg.id,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime));
         }
 
         lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(optlink.get_mng_lanes()+1);
         int numcells = lg.cells.size();
         lgtype2id.put(LaneGroupType.gp,lg.id);
-        lgData.put(lg.id,new SimDataLanegroup(lg,commids));
+        lgData.put(lg.id,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime));
 
         float simdt_hr = scndata.fwyscenario.get_sim_dt_sec() / 3600f;
         ffspeed_mph = (float) (lg.ffspeed_cell_per_dt * link_length_miles/numcells/simdt_hr);
@@ -45,13 +44,13 @@ public class SimDataLink {
             lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(
                     optlink.get_mng_lanes() + optlink.get_gp_lanes() + 1);
             lgtype2id.put(LaneGroupType.aux,lg.id);
-            lgData.put(lg.id,new SimDataLanegroup(lg,commids));
+            lgData.put(lg.id,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime));
         }
 
     }
 
     private int numtime(){
-        return scndata.time.size();
+        return scndata.time.length;
     }
 
     protected double get_length_lg_miles(){
@@ -108,8 +107,8 @@ public class SimDataLink {
                 for(SimDataLanegroup lg : lgData.values()) {
                     for (SimCellData cd : lg.celldata) {
                         for (long commid : cd.vehs.keySet()) {
-                            sumflw += cd.flws.get(commid).get(k);
-                            sumveh += cd.vehs.get(commid).get(k);
+                            sumflw += cd.flws.get(commid)[k];
+                            sumveh += cd.vehs.get(commid)[k];
                         }
                     }
                 }
@@ -122,8 +121,8 @@ public class SimDataLink {
                 double sumveh = 0d;
                 for (SimCellData cd : lgdata.celldata) {
                     for(long commid : cd.vehs.keySet()){
-                        sumflw += cd.flws.get(commid).get(k);
-                        sumveh += cd.vehs.get(commid).get(k);
+                        sumflw += cd.flws.get(commid)[k];
+                        sumveh += cd.vehs.get(commid)[k];
                     }
                 }
                 speeds[k] = sumveh<1 || sumflw<1 ? ffspeed_mph : cell_length_miles*sumflw/sumveh;
@@ -160,8 +159,8 @@ public class SimDataLink {
                     double flw = 0d;
                     for(SimDataLanegroup lg : lgData.values())
                         for (SimCellData cd : lg.celldata)
-                            for( List<Double> lst : cd.flws.values() )
-                                flw += lst.get(k);
+                            for( double [] lst : cd.flws.values() )
+                                flw += lst[k];
                     vmt[k] = flw*cell_length_times_dt;
                 }
             }
@@ -171,7 +170,7 @@ public class SimDataLink {
                     double flw = 0d;
                     for(SimDataLanegroup lg : lgData.values())
                         for (SimCellData cd : lg.celldata)
-                            flw += cd.flws.get(commid).get(k);
+                            flw += cd.flws.get(commid)[k];
                     vmt[k] = flw*cell_length_times_dt;
                 }
             }
@@ -183,8 +182,8 @@ public class SimDataLink {
                 for(int k=0;k<scndata.numtime();k++) {
                     double flw = 0d;
                     for (SimCellData cd : lgdata.celldata)
-                        for( List<Double> lst : cd.flws.values() )
-                            flw += lst.get(k);
+                        for( double [] lst : cd.flws.values() )
+                            flw += lst[k];
                     vmt[k] = flw*cell_length_times_dt;
                 }
             }
@@ -193,7 +192,7 @@ public class SimDataLink {
                 for(int k=0;k<scndata.numtime();k++) {
                     double flw = 0d;
                     for (SimCellData cd : lgdata.celldata)
-                        flw += cd.flws.get(commid).get(k);
+                        flw += cd.flws.get(commid)[k];
                     vmt[k] = flw*cell_length_times_dt;
                 }
             }
@@ -223,8 +222,8 @@ public class SimDataLink {
                     double veh = 0d;
                     for (SimCellData cd : lg.celldata) {
                         for (long commid : cd.vehs.keySet()) {
-                            flw += cd.flws.get(commid).get(k);
-                            veh += cd.vehs.get(commid).get(k);
+                            flw += cd.flws.get(commid)[k];
+                            veh += cd.vehs.get(commid)[k];
                         }
                     }
                     delays[k] = veh==0d? 0d : Math.max( 0d, (veh-flw*cell_length_over_threshold)*dt_hr );
@@ -237,8 +236,8 @@ public class SimDataLink {
                 double veh = 0d;
                 for (SimCellData cd : lgdata.celldata) {
                     for(long commid : cd.vehs.keySet()){
-                        flw += cd.flws.get(commid).get(k);
-                        veh += cd.vehs.get(commid).get(k);
+                        flw += cd.flws.get(commid)[k];
+                        veh += cd.vehs.get(commid)[k];
                     }
                 }
                 delays[k] =  veh==0d? 0d : Math.max( 0d, (veh-flw*cell_length_over_threshold)*dt_hr );

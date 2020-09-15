@@ -1,8 +1,10 @@
 package opt.data;
 
 import api.OTMdev;
+import common.AbstractLaneGroup;
 import models.fluid.FluidLaneGroup;
 import output.*;
+import profiles.Profile1D;
 
 import java.util.*;
 
@@ -12,16 +14,30 @@ public class SimDataScenario {
 
     public FreewayScenario fwyscenario;
     public float outdt;
-    public List<Float> time;
+    public float [] time;
     public Map<Long,SimDataLink> linkdata;
     public boolean hascelldata;
     public boolean haslgdata;
 
-    public SimDataScenario(FreewayScenario fwyscenario, OTMdev otmdev,float outdt,boolean hascelldata,boolean haslgdata){
+    public SimDataScenario(FreewayScenario fwyscenario, OTMdev otmdev,float outdt,boolean storecelldata,boolean storelgdata){
         this.fwyscenario = fwyscenario;
         this.outdt = outdt;
-        this.hascelldata = hascelldata;
-        this.haslgdata = haslgdata;
+        this.hascelldata = storecelldata;
+        this.haslgdata = storelgdata;
+
+        // time vector
+        float start_time = fwyscenario.get_start_time();
+        float sim_dt = fwyscenario.get_sim_dt_sec();
+        float duration = fwyscenario.get_sim_duration();
+
+        int step = (int) (outdt/sim_dt);
+        int numtime = ((int)(duration/outdt)) + 1;
+        time = new float[numtime];
+        int [] time_index = new int[numtime];
+        for(int i=0;i<numtime;i++){
+            time[i] = start_time + i*outdt;
+            time_index[i] = i*step;
+        }
 
         // initialize linkdata
         Set<Long> commids = otmdev.scenario.commodities.keySet();
@@ -30,40 +46,66 @@ public class SimDataScenario {
             if(optlink.get_type()== AbstractLink.Type.ghost)
                 continue;
             boolean is_source = fwyscenario.ghost_pieces.links.contains(optlink.get_up_link());
-            linkdata.put(optlink.id, new SimDataLink(this, optlink, otmdev.scenario.network.links.get(optlink.id), commids,is_source));
-        }
-
-        float start_time = fwyscenario.get_start_time();
-        float sim_dt = fwyscenario.get_sim_dt_sec();
-        float duration = fwyscenario.get_sim_duration();
-
-        this.time= new ArrayList();
-        List<Integer> time_index = new ArrayList<>();
-        float currtime = start_time;
-        int currindex = 0;
-        int step = (int) (outdt/sim_dt);
-
-        float end_time = start_time + duration;
-        while(currtime<=end_time) {
-            time.add(currtime);
-            time_index.add(currindex);
-            currtime += outdt;
-            currindex += step;
+            linkdata.put(optlink.id, new SimDataLink(this, optlink, otmdev.scenario.network.links.get(optlink.id), commids,is_source,storecelldata,storelgdata,numtime));
         }
 
         if(hascelldata)
             read_cell_data(otmdev,commids,time_index,sim_dt);
 
         if(haslgdata)
-            read_lg_data();
+            read_lg_data(otmdev,commids);
 
     }
 
-    private void read_lg_data(){
+    private void read_lg_data(OTMdev otmdev,Set<Long> commids){
+
+        Set<OutputLaneGroupFlow> flws = otmdev.otm.output.get_data().stream()
+                .filter(s->s.type==AbstractOutput.Type.lanegroup_flw)
+                .map(s->(OutputLaneGroupFlow)s)
+                .collect(toSet());
+
+        Set<OutputLaneGroupAvgVehicles> vehs = otmdev.otm.output.get_data().stream()
+                .filter(s->s.type==AbstractOutput.Type.lanegroup_avgveh)
+                .map(s->(OutputLaneGroupAvgVehicles)s)
+                .collect(toSet());
+
+        for(Long commid : commids){
+            Optional<OutputLaneGroupFlow> oflw = flws.stream().filter(s->s.get_commodity_id()==commid).findFirst();
+            Optional<OutputLaneGroupAvgVehicles> oveh = vehs.stream().filter(s->s.get_commodity_id()==commid).findFirst();
+
+            if(!oflw.isPresent() || !oveh.isPresent())
+                continue;
+
+            OutputLaneGroupFlow flw = oflw.get();
+            OutputLaneGroupAvgVehicles veh = oveh.get();
+
+            for(AbstractLaneGroup alg : veh.ordered_lgs) {
+
+                FluidLaneGroup flg = (FluidLaneGroup) alg;
+
+                if(!linkdata.containsKey(flg.link.getId()))
+                    continue;
+
+                SimDataLanegroup lgdata = linkdata.get(flg.link.getId()).lgData.get(flg.id);
+                lgdata.set_lg_data(flw.lgprofiles.get(alg.id).profile,veh.lgprofiles.get(alg.id).profile);
+
+
+//                lgdata.flws.put(commid,flw.lgprofiles.get(alg.id).profile.values);
+//                lgdata.vehs.put(commid,veh.lgprofiles.get(alg.id).profile.values);
+
+                System.out.println("ASD");
+
+//                List<AbstractOutputTimedCell.CellProfile> flw_cellprofs = flw.lgprofiles.get(flg.id);
+//                List<AbstractOutputTimedCell.CellProfile> veh_cellprofs = veh.lgprofiles.get(flg.id);
+//                for(int i=0;i<flw_cellprofs.size();i++)
+//                    lgdata.celldata.get(i).set(commid,time_index,flw_cellprofs.get(i).profile.values,veh_cellprofs.get(i).profile.values,sim_dt);
+            }
+
+        }
 
     }
 
-    private void read_cell_data(OTMdev otmdev,Set<Long> commids,List<Integer> time_index,float sim_dt){
+    private void read_cell_data(OTMdev otmdev,Set<Long> commids,int [] time_index,float sim_dt){
 
         Set<OutputCellFlow> flws = otmdev.otm.output.get_data().stream()
                 .filter(s->s.type==AbstractOutput.Type.cell_flw)
@@ -113,15 +155,15 @@ public class SimDataScenario {
             for (SimDataLanegroup lgdata : lkdata.lgData.values())
                 for (SimCellData celldata : lgdata.celldata) {
                     if(commid==null){
-                        for(List<Double> list : celldata.vehs.values()){
-                            for (int k = 0; k < list.size(); k++)
-                                vehs[k] += list.get(k);
+                        for(double[] list : celldata.vehs.values()){
+                            for (int k = 0; k < list.length; k++)
+                                vehs[k] += list[k];
                         }
                     } else {
                         if (celldata.vehs.containsKey(commid)) {
-                            List<Double> list = celldata.vehs.get(commid);
-                            for (int k = 0; k < list.size(); k++)
-                                vehs[k] += list.get(k);
+                            double[] list = celldata.vehs.get(commid);
+                            for (int k = 0; k < list.length; k++)
+                                vehs[k] += list[k];
                         }
                     }
                 }
@@ -151,13 +193,13 @@ public class SimDataScenario {
             double cell_length_miles = lkdata.cell_length();
             for (SimDataLanegroup lgdata : lkdata.lgData.values()) {
                 for (SimCellData celldata : lgdata.celldata) {
-                    for (List<Double> v : celldata.vehs.values())
+                    for (double[] v : celldata.vehs.values())
                         for (int k = 0; k < numtime() ; k++)
-                            vehs[k] += v.get(k);
+                            vehs[k] += v[k];
 
-                    for (List<Double> f : celldata.flws.values())
+                    for (double[] f : celldata.flws.values())
                         for (int k = 0; k < numtime() ; k++)
-                            flw_length[k] += f.get(k) * cell_length_miles;
+                            flw_length[k] += f[k] * cell_length_miles;
                 }
             }
         }
@@ -184,25 +226,25 @@ public class SimDataScenario {
             if(globallgtype==null){
                 for (SimDataLanegroup lgdata : lkdata.lgData.values()) {
                     for (SimCellData celldata : lgdata.celldata) {
-                        for (List<Double> v : celldata.vehs.values())
+                        for (double[] v : celldata.vehs.values())
                             for (int k = 0; k < numtime() ; k++)
-                                vehs[k] += v.get(k);
+                                vehs[k] += v[k];
 
-                        for (List<Double> f : celldata.flws.values())
+                        for (double[] f : celldata.flws.values())
                             for (int k = 0; k < numtime() ; k++)
-                                flw_length[k] += f.get(k) * cell_length_miles;
+                                flw_length[k] += f[k] * cell_length_miles;
                     }
                 }
             } else {
                 LaneGroupType lgtype = lkdata.lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
                 for (SimCellData celldata : lkdata.lgData.get(lkdata.lgtype2id.get(lgtype)).celldata) {
-                    for (List<Double> v : celldata.vehs.values())
+                    for (double[] v : celldata.vehs.values())
                         for (int k = 0; k < numtime() ; k++)
-                            vehs[k] += v.get(k);
+                            vehs[k] += v[k];
 
-                    for (List<Double> f : celldata.flws.values())
+                    for (double[] f : celldata.flws.values())
                         for (int k = 0; k < numtime() ; k++)
-                            flw_length[k] += f.get(k) * cell_length_miles;
+                            flw_length[k] += f[k] * cell_length_miles;
                 }
             }
         }
@@ -219,11 +261,12 @@ public class SimDataScenario {
     /////////////////////////////////////////////////
 
     public int numtime(){
-        return time.size();
+        return time.length;
     }
 
     public double get_dt_sec(){
-        return time.size()<2 ? Double.NaN : time.get(1)-time.get(0);
+//        return time.size()<2 ? Double.NaN : time.get(1)-time.get(0);
+        return time.length<2 ? Double.NaN : time[1]-time[0];
     }
 
     public TimeSeries get_vht_for_network(Long commid){

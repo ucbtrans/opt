@@ -1,32 +1,52 @@
 package opt.data;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import profiles.Profile1D;
+
+import java.util.*;
 
 public class SimDataLanegroup {
 
+    public Map<Long, double []> vehs;    // commid->vehs over time [veh]
+    public Map<Long, double []> flws;    // commid->flw over time [vph]
+
     public List<SimCellData> celldata;
 
-    public SimDataLanegroup(models.fluid.FluidLaneGroup lg, Set<Long> commids){
-        celldata = new ArrayList<>();
-        for(int i=0;i<lg.cells.size();i++)
-            celldata.add(new SimCellData(commids));
+    public SimDataLanegroup(models.fluid.FluidLaneGroup lg, Set<Long> commids,boolean storecelldata,boolean storelgdata,int numtime){
+
+        if(storelgdata){
+            vehs = new HashMap<>();
+            flws = new HashMap<>();
+            for(Long commid : commids) {
+                vehs.put(commid, new double[numtime]);
+                flws.put(commid, new double[numtime]);
+            }
+        }
+
+        if(storecelldata){
+            celldata = new ArrayList<>();
+            for(int i=0;i<lg.cells.size();i++)
+                celldata.add(new SimCellData(commids,numtime));
+        }
+
+    }
+
+    protected void set_lg_data(Profile1D cummflw, Profile1D cummveh){
+        System.out.println("ASD");
     }
 
     protected double [] get_veh(Long commid,int numtime){
         double [] X = new double[numtime];
         for (SimCellData simcell : celldata) {
             if(commid==null){
-                for(List<Double> list : simcell.vehs.values()){
-                    for (int k = 0; k < list.size(); k++)
-                        X[k] += list.get(k);
+                for(double[] list : simcell.vehs.values()){
+                    for (int k = 0; k < list.length; k++)
+                        X[k] += list[k];
                 }
             } else {
                 if (simcell.vehs.containsKey(commid)) {
-                    List<Double> list = simcell.vehs.get(commid);
-                    for (int k = 0; k < list.size(); k++)
-                        X[k] += list.get(k);
+                    double[] list = simcell.vehs.get(commid);
+                    for (int k = 0; k < list.length; k++)
+                        X[k] += list[k];
                 }
             }
         }
@@ -40,9 +60,9 @@ public class SimDataLanegroup {
             X = lastcell.get_total_flw();
         } else {
             if (lastcell.vehs.containsKey(commid)) {
-                List<Double> list = lastcell.flws.get(commid);
-                for (int k = 0; k < list.size(); k++)
-                    X[k] += list.get(k);
+                double[] list = lastcell.flws.get(commid);
+                for (int k = 0; k < list.length; k++)
+                    X[k] += list[k];
             }
         }
         return X;

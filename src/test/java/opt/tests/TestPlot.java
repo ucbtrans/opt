@@ -27,14 +27,14 @@ public class TestPlot {
 
     @Before
     public void setup(){
-        java.util.List<Float> time = new ArrayList<>();
-        List<Double> values = new ArrayList<>();
         float dt = 1f;
         int numvalues = 100;
+        float [] time = new float[numvalues];
+        double [] values = new double[numvalues];
         for(int k=0;k<numvalues;k++){
             float t = k*dt;
-            time.add(t);
-            values.add(Math.exp(-t/30)*Math.sin(t/5));
+            time[k]=t;
+            values[k] = Math.exp(-t/30)*Math.sin(t/5);
         }
         timeseries = new TimeSeries(time,values);
     }

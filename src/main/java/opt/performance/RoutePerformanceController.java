@@ -312,15 +312,15 @@ public class RoutePerformanceController {
             ffspeed_mng_mph[i] = Double.NaN;
             if (l.get_mng_lanes() > 0)
                 ffspeed_mng_mph[i] = UserSettings.speedConversionMap.get("kphmph")*l.get_mng_freespeed_kph();
-            ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.gp).time.size());
+            ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.gp).time.length);
             
             if (l.get_mng_lanes() > 0) {
                 hasManagedLanes = true;
-                ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.mng).time.size());
+                ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.mng).time.length);
             }
             if (l.get_aux_lanes() > 0) {
                 hasAuxLanes = true;
-                ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.aux).time.size());
+                ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.aux).time.length);
             }
         }
         
