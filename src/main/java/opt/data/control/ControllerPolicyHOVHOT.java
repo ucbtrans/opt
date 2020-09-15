@@ -5,15 +5,15 @@ import opt.UserSettings;
 import opt.data.FreewayScenario;
 import utils.OTMUtils;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class ControllerPolicyHOVHOT extends AbstractController {
 
 
-	protected Set<Long> disallowed_comms;
-	protected Set<Long> free_comms;
+	public enum Permission { Free, Banned, Tolled }
+	protected Permission permission;
+	protected Map<Long,Permission> comm2permission;
+
 	protected Double a0,a1,a2;
 	protected int [][] vphpl_to_cents_table;
 	// vphpl_to_cents_table[i][1] is the price for all flows
@@ -32,8 +32,19 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 
 	public ControllerPolicyHOVHOT(FreewayScenario scn, Long id, Set<Long> disallowed_comms,Set<Long> free_comms,Float dt, Double a0,Double a1,Double a2,int [][] vphpl_to_cents_table, Double qos_speed_threshold_kph) {
 		super(id!=null ? id : scn.new_controller_id(),Type.HOVHOT,dt, control.AbstractController.Algorithm.lg_restrict);
-		this.disallowed_comms = disallowed_comms==null ? new HashSet<>() : disallowed_comms;
-		this.free_comms =  free_comms==null ? new HashSet<>() : free_comms;
+
+		this.comm2permission = new HashMap<>();
+
+		// all are tolled by default
+		for(Long cid : scn.get_commodities().keySet())
+			comm2permission.put(cid,Permission.Tolled);
+		for(Long cid : disallowed_comms)
+			comm2permission.put(cid,Permission.Banned);
+		for(Long cid : free_comms)
+			comm2permission.put(cid,Permission.Free);
+
+		refresh_type();
+
 		this.a0 = a0==null ? UserSettings.defaultLaneChoice_A0 : a0;
 		this.a1 = a1==null ? UserSettings.defaultLaneChoice_A1 : a1;
 		this.a2 = a2==null ? UserSettings.defaultLaneChoice_A2 : a2;
@@ -44,14 +55,6 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 	////////////////////////////////
 	// Getters
 	////////////////////////////////
-
-	public Set<Long> get_disallowed_comms() {
-		return disallowed_comms;
-	}
-
-	public Set<Long> get_free_comms() {
-		return free_comms;
-	}
 
 	public Double get_a0() {
 		return a0;
@@ -97,6 +100,15 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 		qos_speed_threshold_kph = x;
 	}
 
+	public void set_comm_permission(Long commid,Permission perm){
+		comm2permission.put(commid,perm);
+	}
+
+	public void refresh_type(){
+		Set<Permission> unique_types = new HashSet(comm2permission.values());
+		permission = unique_types.size()>1 ? Permission.Tolled :  unique_types.iterator().next();
+	}
+
 	////////////////////////////////
 	// AbstractController
 	////////////////////////////////
@@ -106,10 +118,25 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 
 		Set<Parameter> params = new HashSet<>();
 
-		if(!disallowed_comms.isEmpty()){
+		Set<Long> banned_comms = new HashSet<>();
+		Set<Long> free_comms = new HashSet<>();
+		for(Map.Entry<Long,Permission> e : comm2permission.entrySet()){
+			switch(e.getValue()){
+				case Free:
+					free_comms.add(e.getKey());
+					break;
+				case Banned:
+					banned_comms.add(e.getKey());
+					break;
+				default:
+					break;
+			}
+		}
+
+		if(!banned_comms.isEmpty()){
 			Parameter n = new Parameter();
 			n.setName("disallowed_comms");
-			n.setValue(OTMUtils.comma_format(disallowed_comms));
+			n.setValue(OTMUtils.comma_format(banned_comms));
 			params.add(n);
 		}
 
