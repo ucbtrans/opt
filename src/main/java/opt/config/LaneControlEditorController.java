@@ -75,8 +75,8 @@ import opt.utils.STableHandler;
 public class LaneControlEditorController {
     
     private ScenarioEditorController scenarioEditorController = null;
-    private List<Commodity> listVT = new ArrayList<Commodity>();
-    private List<Permission> listPermsVT = new ArrayList<Permission>();
+    private List<Commodity> listVT = new ArrayList<>();
+    private List<ControllerPolicyHOVHOT.Permission> listPermsVT = new ArrayList<>();
     
     
     private FreewayScenario myScenario = null;
@@ -117,7 +117,7 @@ public class LaneControlEditorController {
     private TableColumn<PermsVT, String> colVT; // Value injected by FXMLLoader
     
     @FXML // fx:id="colPermission"
-    private TableColumn<PermsVT, Permission> colPermission; // Value injected by FXMLLoader
+    private TableColumn<PermsVT, ControllerPolicyHOVHOT.Permission> colPermission; // Value injected by FXMLLoader
     
     @FXML // fx:id="controlDt"
     private Spinner<Integer> controlDt; // Value injected by FXMLLoader
@@ -179,15 +179,15 @@ public class LaneControlEditorController {
         colPermission.setReorderable(false);
         colPermission.setSortable(false);
         colPermission.setEditable(true);
-        colPermission.setCellFactory((TableColumn<PermsVT, Permission> param) -> {
-            return new RadioButtonCell<>(EnumSet.allOf(Permission.class));
+        colPermission.setCellFactory((TableColumn<PermsVT, ControllerPolicyHOVHOT.Permission> param) -> {
+            return new RadioButtonCell<>(EnumSet.allOf(ControllerPolicyHOVHOT.Permission.class));
         });
         colPermission.setCellValueFactory(data -> new SimpleObjectProperty(data.getValue().permission.getValue()));
-        colPermission.setOnEditCommit(new EventHandler<CellEditEvent<PermsVT, Permission>>() {
+        colPermission.setOnEditCommit(new EventHandler<CellEditEvent<PermsVT, ControllerPolicyHOVHOT.Permission>>() {
             @Override
-            public void handle(CellEditEvent<PermsVT, Permission> t) {
+            public void handle(CellEditEvent<PermsVT, ControllerPolicyHOVHOT.Permission> t) {
                 int row = t.getTablePosition().getRow();
-                Permission p = t.getNewValue();
+                ControllerPolicyHOVHOT.Permission p = t.getNewValue();
                 ((PermsVT) t.getTableView().getItems().get(row)).setPermission(p);
                 if ((row >= 0) && (row < listPermsVT.size()))
                     listPermsVT.set(row, p);
@@ -333,16 +333,8 @@ public class LaneControlEditorController {
     
     private void fillListPermsVT() {
         listPermsVT.clear();
-        listVT.forEach((c) -> {
-            if (myController.get_free_comms().contains(c.getId())) {
-                listPermsVT.add(Permission.Free);
-            } else if (myController.get_disallowed_comms().contains(c.getId())) {
-                listPermsVT.add(Permission.Banned);
-                
-            } else {
-                listPermsVT.add(Permission.Tolled);
-            }
-        });
+        for(Commodity comm : listVT)
+            listPermsVT.add(myController.get_comm_permission(comm.getId()));
     }
     
     private void initPermsVT() {
@@ -424,30 +416,30 @@ public class LaneControlEditorController {
     
     private int countFree() {
         int count = 0;
-        return listPermsVT.stream().filter((p) -> (p == Permission.Free)).map((_item) -> 1).reduce(count, Integer::sum);
+        return listPermsVT.stream().filter((p) -> (p == ControllerPolicyHOVHOT.Permission.Free)).map((_item) -> 1).reduce(count, Integer::sum);
     }
     
     private int countBanned() {
         int count = 0;
-        return listPermsVT.stream().filter((p) -> (p == Permission.Banned)).map((_item) -> 1).reduce(count, Integer::sum);
+        return listPermsVT.stream().filter((p) -> (p == ControllerPolicyHOVHOT.Permission.Banned)).map((_item) -> 1).reduce(count, Integer::sum);
     }
     
     private int countTolled() {
         int count = 0;
-        return listPermsVT.stream().filter((p) -> (p == Permission.Tolled)).map((_item) -> 1).reduce(count, Integer::sum);
+        return listPermsVT.stream().filter((p) -> (p == ControllerPolicyHOVHOT.Permission.Tolled)).map((_item) -> 1).reduce(count, Integer::sum);
     }
     
     private void setAllPersToFree() {
         int sz = listVT.size();
         for (int i = 0; i < sz; i++)
-            listPermsVT.set(i, Permission.Free);
+            listPermsVT.set(i, ControllerPolicyHOVHOT.Permission.Free);
         restrictedPane.setVisible(false);
     }
     
     private void setAllPersToBanned() {
         int sz = listVT.size();
         for (int i = 0; i < sz; i++)
-            listPermsVT.set(i, Permission.Banned);
+            listPermsVT.set(i, ControllerPolicyHOVHOT.Permission.Banned);
         restrictedPane.setVisible(false);
     }
     
@@ -532,16 +524,12 @@ public class LaneControlEditorController {
             return;
 
         int startSeconds = Misc.timeString2Seconds(textStartTime.getText());
-        
-        myController.get_free_comms().clear();
-        myController.get_disallowed_comms().clear();
+
         int sz = listVT.size();
-        for (int i = 0; i < sz; i++) {
-            if (listPermsVT.get(i) == Permission.Free)
-                myController.get_free_comms().add(listVT.get(i).getId());
-            if (listPermsVT.get(i) == Permission.Banned)
-                myController.get_disallowed_comms().add(listVT.get(i).getId());
-        }
+        for (int i = 0; i < sz; i++)
+            myController.set_comm_permission(listVT.get(i).getId(),listPermsVT.get(i));
+        myController.refresh_type();
+
         
         int[][] fpm = generateFlowPriceIntegerMatrix();
         myController.set_vphpl_to_cents_table(fpm);
@@ -570,25 +558,25 @@ public class LaneControlEditorController {
     
     
     
-    public static enum Permission {
-        Free,
-        Banned,
-        Tolled;
-
-        public String toString() { return super.toString(); };
-    }
-    
+//    public static enum Permission {
+//        Free,
+//        Banned,
+//        Tolled;
+//
+//        public String toString() { return super.toString(); };
+//    }
+//
     
     public static class PermsVT {
         private final SimpleStringProperty vt_name = new SimpleStringProperty();
-        private final SimpleObjectProperty<LaneControlEditorController.Permission> permission = new SimpleObjectProperty<LaneControlEditorController.Permission>();
+        private final SimpleObjectProperty<ControllerPolicyHOVHOT.Permission> permission = new SimpleObjectProperty<>();
 
-        PermsVT(String nm, LaneControlEditorController.Permission p) {
+        PermsVT(String nm, ControllerPolicyHOVHOT.Permission p) {
             vt_name.set(nm);
             permission.set(p);
         }
 
-        public void setPermission(LaneControlEditorController.Permission p) {
+        public void setPermission(ControllerPolicyHOVHOT.Permission p) {
             permission.set(p);
         }
     }

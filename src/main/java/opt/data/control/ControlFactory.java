@@ -268,7 +268,7 @@ public class ControlFactory {
 
 	}
 
-	public static ControllerPolicyHOVHOT create_controller_hovhot(jaxb.Entry jentry) throws Exception {
+	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn,jaxb.Entry jentry) throws Exception {
 
 		// read parameters
 		Set<Long> disallowed_comms = new HashSet<>();
@@ -297,7 +297,7 @@ public class ControlFactory {
 						a2 = Double.parseDouble(param.getValue());
 						break;
 					case "vplph_to_cents_table":
-//						vplph_to_cents_table = OTMUtils.read_int_table(param.getValue());
+						vplph_to_cents_table = OTMUtils.read_int_table(param.getValue());
 						break;
 					case "qos_speed_threshold_kph":
 						qos_speed_threshold_kph = Double.parseDouble(param.getValue());
@@ -310,7 +310,7 @@ public class ControlFactory {
 
 		Float dt = jentry.getDt()==null ? (float) UserSettings.defaultControlDtSeconds : jentry.getDt();
 
-		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(null,0l,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
+		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(fwyscn,0l,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
 		return cntrl;
 	}
 

@@ -48,7 +48,13 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 		this.a0 = a0==null ? UserSettings.defaultLaneChoice_A0 : a0;
 		this.a1 = a1==null ? UserSettings.defaultLaneChoice_A1 : a1;
 		this.a2 = a2==null ? UserSettings.defaultLaneChoice_A2 : a2;
-		this.vphpl_to_cents_table = vphpl_to_cents_table;
+
+		if(vphpl_to_cents_table==null){
+			this.vphpl_to_cents_table = new int[1][2];
+			this.vphpl_to_cents_table[0][0] = 0;
+			this.vphpl_to_cents_table[0][1] = 0;
+		} else
+			this.vphpl_to_cents_table = vphpl_to_cents_table;
 		this.qos_speed_threshold_kph = qos_speed_threshold_kph==null ? UserSettings.defaultQosSpeedThresholdKph : qos_speed_threshold_kph;
 	}
         
@@ -75,6 +81,15 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 	public Double get_qos_speed_threshold_kph() {
 		return qos_speed_threshold_kph;
 	}
+
+	public Permission get_global_permission(){
+		return permission;
+	}
+
+	public Permission get_comm_permission(Long commid){
+		return comm2permission.get(commid);
+	}
+
 
 	////////////////////////////////
 	// Setters

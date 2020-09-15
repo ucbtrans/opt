@@ -347,7 +347,7 @@ public class FreewayScenario {
                             break;
 
                         case lg_restrict:
-                            ctrl = ControlFactory.create_controller_hovhot(jentry);
+                            ctrl = ControlFactory.create_controller_hovhot(this,jentry);
 
                     }
 

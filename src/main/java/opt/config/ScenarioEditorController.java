@@ -432,19 +432,24 @@ public class ScenarioEditorController {
     }
     
     
-    private String generateRestrictedEntryDesc(Set<Long> free, Set<Long> banned) {
+    private String generateRestrictedEntryDesc(ControllerPolicyHOVHOT ctrl) {
         String buf = "";
         List<Commodity> t_free = new ArrayList<Commodity>();
         List<Commodity> t_banned = new ArrayList<Commodity>();
         List<Commodity> t_tolled = new ArrayList<Commodity>();
-        
+
         for (Commodity c : listVT) {
-            if (free.contains(c.getId()))
-                t_free.add(c);
-            else if (banned.contains(c.getId()))
-                t_banned.add(c);
-            else
-                t_tolled.add(c);
+            switch(ctrl.get_comm_permission(c.getId())){
+                case Free:
+                    t_free.add(c);
+                    break;
+                case Banned:
+                    t_banned.add(c);
+                    break;
+                case Tolled:
+                    t_tolled.add(c);
+                    break;
+            }
         }
         
         int sz = t_free.size();
@@ -495,24 +500,25 @@ public class ScenarioEditorController {
             if (ctrl == null)
                 continue;
             
-            int num_vt = listVT.size();
-            Set<Long> free = ctrl.get_free_comms();
-            Set<Long> banned = ctrl.get_disallowed_comms();
-            
             String entry = Misc.seconds2timestring(start, ":") + " - ";
             if (Float.isFinite(end))
                 entry += Misc.seconds2timestring(end, ":");
             else
                 entry += "End";
             entry += ": ";
-            
-            if (free.size() == num_vt)
-                entry += "Open for all";
-            else if (banned.size() == num_vt)
-                entry += "Closed for all";
-            else
-                entry += "Restricted - " + generateRestrictedEntryDesc(free, banned);
-            
+
+            switch(ctrl.get_global_permission()){
+                case Free:
+                    entry += "Open for all";
+                    break;
+                case Banned:
+                    entry += "Closed for all";
+                    break;
+                case Tolled:
+                    entry += "Restricted - " + generateRestrictedEntryDesc(ctrl);
+                    break;
+            }
+
             listControllers.getItems().add(entry);
         }
         
