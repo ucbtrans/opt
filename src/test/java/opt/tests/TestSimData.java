@@ -39,7 +39,7 @@ public class TestSimData extends AbstractTest {
         }
 
         // run and retrieve data
-        simdata = task.run_simulation(null,false,true);
+        simdata = task.run_simulation(null,true,false);
         simdatalink = simdata.linkdata.get(linkid);
     }
 

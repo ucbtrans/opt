@@ -335,7 +335,7 @@ public class AppMainController {
             // Set the number of divisions of the progress bar
             int progbar_steps = 50;
             boolean celloutput = true;
-            boolean lgoutput = true;
+            boolean lgoutput = false;
 
             Thread th = new Thread(new OTMTask(this,selectedScenario,(float) UserSettings.reportingPeriodSeconds,progbar_steps,celloutput,lgoutput,null));
             th.setDaemon(true);
