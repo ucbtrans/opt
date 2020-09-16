@@ -4,10 +4,10 @@ import java.util.*;
 
 public class SimDataLanegroup {
 
-    public Map<Long, double []> vehs;    // commid->vehs over time [veh]
-    public Map<Long, double []> flws;    // commid->flw over time [vph]
+    private Map<Long, double []> vehs;    // commid->vehs over time [veh]
+    private Map<Long, double []> flws;    // commid->flw over time [vph]
 
-    public List<SimCellData> celldata;
+    protected List<SimCellData> celldata;
 
     public SimDataLanegroup(models.fluid.FluidLaneGroup lg, Set<Long> commids,boolean storecelldata,boolean storelgdata,int numtime){
 
@@ -26,6 +26,15 @@ public class SimDataLanegroup {
                 celldata.add(new SimCellData(commids,numtime));
         }
 
+    }
+
+    protected Set<Long> get_comm_ids(){
+        if(vehs!=null)
+            return vehs.keySet();
+        else if(celldata!=null && !celldata.isEmpty())
+            return celldata.iterator().next().vehs.keySet();
+        else
+            return new HashSet<>();
     }
 
     protected void set_lg_data(long commid,int [] time_indices,List<Double> flwdata,List<Double> vehdata,float dt_sec){
@@ -47,51 +56,16 @@ public class SimDataLanegroup {
         flws.put(commid,flw);
     }
 
-    protected double [] get_veh(Long commid,int numtime, boolean usecells){
+    protected double [] get_flw_exiting_lg(Long commid, int numtime, boolean uselgs){
         double [] X = new double[numtime];
-
-        if(usecells){
-            for (SimCellData simcell : celldata) {
-                if(commid==null){
-                    for(double[] list : simcell.vehs.values()){
-                        for (int k = 0; k < list.length; k++)
-                            X[k] += list[k];
-                    }
-                } else {
-                    if (simcell.vehs.containsKey(commid)) {
-                        double[] list = simcell.vehs.get(commid);
-                        for (int k = 0; k < list.length; k++)
-                            X[k] += list[k];
-                    }
-                }
-            }
-        }
-        else{
-            System.out.println("USE LANEGROUP DATA");
-        }
-
-        return X;
-    }
-
-    protected double [] get_flw_exiting(Long commid,int numtime, boolean usecells){
-        double [] X = new double[numtime];
-
-        if(usecells){
-            SimCellData lastcell = celldata.get(celldata.size()-1);
-            if(commid==null){
-                X = lastcell.get_total_flw();
-            } else {
-                if (lastcell.vehs.containsKey(commid)) {
-                    double[] list = lastcell.flws.get(commid);
-                    for (int k = 0; k < list.length; k++)
-                        X[k] += list[k];
-                }
-            }
-        }
-        else{
-            System.out.println("USE LANEGROUP DATA");
-        }
-
+        Map<Long, double[]> myflws = uselgs ? flws : celldata.get(celldata.size()-1).flws;
+        if(commid==null)
+            for(double [] list : myflws.values())
+                for (int k = 0; k <numtime; k++)
+                    X[k] += list[k];
+        else
+            if (myflws.containsKey(commid))
+                X = myflws.get(commid);
         return X;
     }
 
@@ -101,5 +75,34 @@ public class SimDataLanegroup {
             speeds.add(cd.get_speed(ffspeed_mph,cell_length_miles));
         return speeds;
     }
+
+    protected double get_sum_flw(Set<Long> commids, int k, boolean uselg) {
+        if(commids==null)
+            commids = get_comm_ids();
+        double X = 0d;
+        if(uselg)
+            for(Long cid : commids)
+                X += flws.get(cid)[k];
+        else
+            for (SimCellData cd : celldata)
+                for(Long cid : commids)
+                    X += cd.flws.get(cid)[k];
+        return X;
+    }
+
+    protected double get_sum_veh(Set<Long> commids, int k, boolean uselg) {
+        if(commids==null)
+            commids = get_comm_ids();
+        double X = 0d;
+        if(uselg)
+            for(Long cid : commids)
+                X += vehs.get(cid)[k];
+        else
+            for (SimCellData cd : celldata)
+                for(Long cid : commids)
+                    X += cd.vehs.get(cid)[k];
+        return X;
+    }
+
 
 }

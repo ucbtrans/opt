@@ -35,25 +35,7 @@ public class SimCellData {
         flws.put(commid,flw);
     }
 
-    public double [] get_total_flw(){
-        int numtime = flws.values().iterator().next().length;
-        double [] X = new double[numtime];
-        for( double [] c : flws.values())
-            for(int k=0;k<numtime;k++)
-                X[k] += c[k];
-        return X;
-    }
-
-    public double [] get_total_veh(){
-        int numtime = vehs.values().iterator().next().length;
-        double [] X = new double[numtime];
-        for( double [] c : vehs.values())
-            for(int k=0;k<numtime;k++)
-                X[k] += c[k];
-        return X;
-    }
-
-    public double[] get_speed(float ffspeed_mph,double cell_length_miles){
+    protected double[] get_speed(float ffspeed_mph,double cell_length_miles){
         int numtime = vehs.values().iterator().next().length;
         double [] speeds = new double[numtime];
         for(int k=0;k<numtime;k++) {
@@ -68,25 +50,6 @@ public class SimCellData {
                 speeds[k] = ffspeed_mph;
         }
         return speeds;
-    }
-
-    /** returns flow*(TT-TTt), in unit [veh]. Should be multiplied by dt for delay units [veh.hr]
-     * http://pems.dot.ca.gov/?dnode=Help&content=help_calc#perf **/
-    public double[] get_delay_vehhr(float ffspeed_mph,double cell_length_miles,float threshold_mph,float dt_sec){
-        double dt_hr = dt_sec/3600d;
-        double cell_length_over_threshold = cell_length_miles / threshold_mph;
-        int numtime = vehs.values().iterator().next().length;
-        double [] delays = new double[numtime];
-        for(int k=0;k<numtime;k++) {
-            double flw = 0d;
-            double veh = 0d;
-            for (long commid : vehs.keySet()) {
-                flw += flws.get(commid)[k];
-                veh += vehs.get(commid)[k];
-            }
-            delays[k] =  veh==0d? 0d : Math.max(0d,(veh-flw*cell_length_over_threshold)*dt_hr);
-        }
-        return delays;
     }
 
 }

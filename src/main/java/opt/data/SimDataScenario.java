@@ -70,6 +70,7 @@ public class SimDataScenario {
                 .collect(toSet());
 
         for(Long commid : commids){
+
             Optional<OutputLaneGroupFlow> oflw = flws.stream().filter(s->s.get_commodity_id()==commid).findFirst();
             Optional<OutputLaneGroupAvgVehicles> oveh = vehs.stream().filter(s->s.get_commodity_id()==commid).findFirst();
 
@@ -142,63 +143,53 @@ public class SimDataScenario {
     }
 
     protected double[] get_vehs_for_network_array(Long commid){
-        double[] vehs = new double[numtime()];
-        for(SimDataLink lkdata : linkdata.values())
-            for (SimDataLanegroup lgdata : lkdata.lgData.values())
-                for (SimCellData celldata : lgdata.celldata) {
-                    if(commid==null){
-                        for(double[] list : celldata.vehs.values()){
-                            for (int k = 0; k < list.length; k++)
-                                vehs[k] += list[k];
-                        }
-                    } else {
-                        if (celldata.vehs.containsKey(commid)) {
-                            double[] list = celldata.vehs.get(commid);
-                            for (int k = 0; k < list.length; k++)
-                                vehs[k] += list[k];
-                        }
-                    }
-                }
-        return vehs;
+        Set<Long> commids = new HashSet<>();
+        if(commid==null)
+            commids.addAll(fwyscenario.get_commodities().keySet());
+        else
+            commids.add(commid);
+        double[] X = new double[numtime()];
+        for (int k = 0; k < numtime(); k++)
+            for(SimDataLink lkdata : linkdata.values())
+                for (SimDataLanegroup lgdata : lkdata.lgData.values())
+                    X[k] += lgdata.get_sum_veh(commids,  k, haslgdata);
+        return X;
     }
 
-    protected double[] get_vehs_for_route_array(List<AbstractLink> links,LaneGroupType globallgtype,Long commid,boolean usecells){
-        double [] route_vehs = new double[numtime()];
-        for(AbstractLink link : links){
-            SimDataLink lkdata = linkdata.get(link.id);
-            LaneGroupType lgtype = lkdata.lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
-            double [] link_veh = lkdata.get_veh_array(lgtype,commid,usecells);
-            for(int k=0;k<numtime();k++)
-                route_vehs[k] += link_veh[k];
-        }
-        return route_vehs;
+    protected double[] get_vehs_for_route_array(List<AbstractLink> links,LaneGroupType globallgtype,Long commid){
+
+        Set<Long> commids = new HashSet<>();
+        if(commid==null)
+            commids.addAll(fwyscenario.get_commodities().keySet());
+        else
+            commids.add(commid);
+
+        double [] X = new double[numtime()];
+        for(int k=0;k<numtime();k++)
+            for(AbstractLink link : links){
+                SimDataLink lkdata = linkdata.get(link.id);
+                LaneGroupType lgtype = lkdata.lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
+                SimDataLanegroup lgdata = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
+                X[k] += lgdata.get_sum_veh(commids,  k, haslgdata);
+            }
+        return X;
     }
 
     protected double[] get_speed_for_network_array(){
 
-        double[] vehs = new double[numtime()];
-        double[] flw_length = new double[numtime()];
-
-        for(SimDataLink lkdata : linkdata.values()) {
-//            if(lkdata.is_source)
-//                continue;
-            double cell_length_miles = lkdata.cell_length();
-            for (SimDataLanegroup lgdata : lkdata.lgData.values()) {
-                for (SimCellData celldata : lgdata.celldata) {
-                    for (double[] v : celldata.vehs.values())
-                        for (int k = 0; k < numtime() ; k++)
-                            vehs[k] += v[k];
-
-                    for (double[] f : celldata.flws.values())
-                        for (int k = 0; k < numtime() ; k++)
-                            flw_length[k] += f[k] * cell_length_miles;
+        double[] speed = new double[numtime()];
+        for (int k = 0; k < numtime() ; k++){
+            double vehs = 0d;
+            double flw_length = 0d;
+            for(SimDataLink lkdata : linkdata.values()) {
+                double length_miles = haslgdata ? lkdata.link_length_miles : lkdata.cell_length();
+                for (SimDataLanegroup lgdata : lkdata.lgData.values()) {
+                    vehs += lgdata.get_sum_veh(null,k,haslgdata);
+                    flw_length += lgdata.get_sum_flw(null,k,haslgdata) * length_miles;
                 }
             }
+            speed[k] = vehs<1 || flw_length<1 ? Double.NaN : flw_length/vehs;
         }
-
-        double[] speed = new double[numtime()];
-        for (int k = 0; k < numtime(); k++)
-            speed[k] = vehs[k]<1 || flw_length[k]<1 ? Double.NaN : flw_length[k]/vehs[k];
 
         return speed;
     }
@@ -209,36 +200,28 @@ public class SimDataScenario {
         double[] flw_length = new double[numtime()];
 
         for(AbstractLink link : links) {
-            if(link.is_source())
+            if (link.is_source())
                 continue;
             SimDataLink lkdata = linkdata.get(link.id);
 
-            double cell_length_miles = lkdata.cell_length();
+            double length_miles = haslgdata ? lkdata.link_length_miles : lkdata.cell_length();
 
-            if(globallgtype==null){
-                for (SimDataLanegroup lgdata : lkdata.lgData.values()) {
-                    for (SimCellData celldata : lgdata.celldata) {
-                        for (double[] v : celldata.vehs.values())
-                            for (int k = 0; k < numtime() ; k++)
-                                vehs[k] += v[k];
+            Set<SimDataLanegroup> lgDatas = new HashSet<>();
 
-                        for (double[] f : celldata.flws.values())
-                            for (int k = 0; k < numtime() ; k++)
-                                flw_length[k] += f[k] * cell_length_miles;
-                    }
-                }
-            } else {
+            if(globallgtype==null)
+                lgDatas.addAll(lkdata.lgData.values());
+            else {
                 LaneGroupType lgtype = lkdata.lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
-                for (SimCellData celldata : lkdata.lgData.get(lkdata.lgtype2id.get(lgtype)).celldata) {
-                    for (double[] v : celldata.vehs.values())
-                        for (int k = 0; k < numtime() ; k++)
-                            vehs[k] += v[k];
+                lgDatas.add(lkdata.lgData.get(lkdata.lgtype2id.get(lgtype)));
+            }
 
-                    for (double[] f : celldata.flws.values())
-                        for (int k = 0; k < numtime() ; k++)
-                            flw_length[k] += f[k] * cell_length_miles;
+            for (int k = 0; k < numtime() ; k++){
+                for (SimDataLanegroup lgdata : lkdata.lgData.values()) {
+                    vehs[k] += lgdata.get_sum_veh(null,k, haslgdata);
+                    flw_length[k] += lgdata.get_sum_flw(null,k,haslgdata) * length_miles;
                 }
             }
+
         }
 
         double[] speed = new double[numtime()];
@@ -257,7 +240,6 @@ public class SimDataScenario {
     }
 
     public double get_dt_sec(){
-//        return time.size()<2 ? Double.NaN : time.get(1)-time.get(0);
         return time.length<2 ? Double.NaN : time[1]-time[0];
     }
 
@@ -320,8 +302,7 @@ public class SimDataScenario {
     /** To get VHT just apply X.mult(X.get_dt()) to this **/
     public TimeSeries get_vehs_for_route(long routeid,LaneGroupType lgtype,Long commid){
         List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
-        boolean usecells = !haslgdata;
-        return new TimeSeries(time,get_vehs_for_route_array(routelinks,lgtype,commid,usecells));
+        return new TimeSeries(time,get_vehs_for_route_array(routelinks,lgtype,commid));
     }
 
     /** ....... **/
@@ -361,17 +342,6 @@ public class SimDataScenario {
         }
 
         return X;
-    }
-
-    public TimeSeries get_delay_for_route(long routeid,LaneGroupType lgtype,float speed_threshold_kph){
-        TimeSeries delay = new TimeSeries(time);
-        try {
-            for(AbstractLink link : fwyscenario.routes.get(routeid).get_link_sequence())
-                delay.add(linkdata.get(link.id).get_delay(lgtype,speed_threshold_kph));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return delay;
     }
 
 }

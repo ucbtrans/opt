@@ -267,177 +267,180 @@ public class RoutePerformanceController {
 
     
     private void processLinkSequence() {
-        maxCellLength = 0;
-        maxLinkLength = 0;
-        routeLength = 0;
-        minSpeed = Double.MAX_VALUE;
-        maxSpeed = 0;
-        minFlow = Double.MAX_VALUE;
-        maxFlow = 0;
-        minVeh = Double.MAX_VALUE;
-        maxVeh = 0;
-        hasManagedLanes = false;
-        hasAuxLanes = false;
-        List<AbstractLink> links = myRoute.get_link_sequence();
-        int lSize = links.size();
-        int xSize = 0;
-        int ySize = 0;
-        double lcc = UserSettings.lengthConversionMap.get("meters"+UserSettings.unitsLength);
-        double scc = UserSettings.speedConversionMap.get("mph"+UserSettings.unitsSpeed);
-        double fcc = UserSettings.flowConversionMap.get("vph"+UserSettings.unitsFlow);
-        SimDataLink[] sdl = new SimDataLink[lSize];
-        double[] cellLengths = new double[lSize];
-        double[] ffspeed_gp_mph = new double[lSize];
-        double[] ffspeed_mng_mph = new double[lSize];
-        int[] begCellIdx = new int[lSize];
-        
-        int prev_num_cells = 0;
-        for (int i = 0; i < lSize; i++) {
-            AbstractLink l = links.get(i);
-            maxLinkLength = Math.max(maxLinkLength, lcc*l.get_length_meters());
-            routeLength += lcc*l.get_length_meters();
-            sdl[i] = mySimData.linkdata.get(l.id);
-            List<SimCellData> scd = sdl[i].lgData.get(sdl[i].lgtype2id.get(LaneGroupType.gp)).celldata;
-            int num_cells = scd.size();
-            double cell_length = lcc * l.get_length_meters() / (double)num_cells;
-            maxCellLength = Math.max(maxCellLength, cell_length);
-            cellLengths[i] = cell_length;
-            xSize += num_cells;
-            if (i == 0)
-                begCellIdx[i] = 0;
-            else
-                begCellIdx[i] = begCellIdx[i-1] + prev_num_cells;
-            prev_num_cells = num_cells;
-            ffspeed_gp_mph[i] = UserSettings.speedConversionMap.get("kphmph")*l.get_gp_freespeed_kph();
-            ffspeed_mng_mph[i] = Double.NaN;
-            if (l.get_mng_lanes() > 0)
-                ffspeed_mng_mph[i] = UserSettings.speedConversionMap.get("kphmph")*l.get_mng_freespeed_kph();
-            ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.gp).time.length);
-            
-            if (l.get_mng_lanes() > 0) {
-                hasManagedLanes = true;
-                ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.mng).time.length);
-            }
-            if (l.get_aux_lanes() > 0) {
-                hasAuxLanes = true;
-                ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.aux).time.length);
-            }
-        }
-        
-        float dt = sdl[0].get_speed(LaneGroupType.gp).get_dt();
-        myDt = dt / (float)timeDivider;
-        speedDataGP = new double[3][xSize*ySize];
-        speedDataManaged = new double[3][xSize*ySize];
-        speedDataAux = new double[3][xSize*ySize];
-        flowDataGP = new double[3][xSize*ySize];
-        flowDataManaged = new double[3][xSize*ySize];
-        flowDataAux = new double[3][xSize*ySize];
-        vehDataGP = new double[3][xSize*ySize];
-        vehDataManaged = new double[3][xSize*ySize];
-        vehDataAux = new double[3][xSize*ySize];
-        
-        for (int j = 0; j < ySize; j++) {
-            double dd = 0.0;
-            float hour = (start+j*dt) / (float)timeDivider;
-            for (int i = 0; i < lSize; i++) {
-                List<SimCellData> scd_gp = sdl[i].lgData.get(sdl[i].lgtype2id.get(LaneGroupType.gp)).celldata;
-                List<SimCellData> scd_mng = null;
-                List<SimCellData> scd_aux = null;
-                if (links.get(i).get_mng_lanes() > 0)
-                    scd_mng = sdl[i].lgData.get(sdl[i].lgtype2id.get(LaneGroupType.mng)).celldata;
-                if (links.get(i).get_aux_lanes() > 0)
-                    scd_aux = sdl[i].lgData.get(sdl[i].lgtype2id.get(LaneGroupType.aux)).celldata;
-                int num_cells = scd_gp.size();
-                for (int k = 0; k < num_cells; k++) {
-                    double[] vv = scd_gp.get(k).get_speed((float)ffspeed_gp_mph[i], cellLengths[i]);
-                    double v = Double.NaN;
-                    if ((vv != null) && (j < vv.length))
-                        v = scc*vv[j];
-                    if (!Double.isNaN(v)) {
-                        minSpeed = Math.min(minSpeed, v);
-                        maxSpeed = Math.max(maxSpeed, v);
-                    }
-                    
-                    double[] ff = scd_gp.get(k).get_total_flw();
-                    double f = Double.NaN;
-                    if ((ff != null) && (j < ff.length))
-                        f = fcc*ff[j];
-                    if ((scd_aux != null) && (k < scd_aux.size())) {
-                        ff = scd_aux.get(k).get_total_flw();
-                        if ((ff != null) && (j < ff.length))
-                            if (!Double.isNaN(f)) {
-                                if (!Double.isNaN(ff[j]))
-                                    f += fcc*ff[j];
-                            } else
-                                f = fcc*ff[j];
-                    }
-                    if (!Double.isNaN(f)) {
-                        minFlow = Math.min(minFlow, f);
-                        maxFlow = Math.max(maxFlow, f);
-                    }      
 
-                    speedDataGP[0][j * xSize + begCellIdx[i] + k] = dd;
-                    speedDataGP[1][j * xSize + begCellIdx[i] + k] = hour;
-                    speedDataGP[2][j * xSize + begCellIdx[i] + k] = v;
-                    flowDataGP[0][j * xSize + begCellIdx[i] + k] = dd;
-                    flowDataGP[1][j * xSize + begCellIdx[i] + k] = hour;
-                    flowDataGP[2][j * xSize + begCellIdx[i] + k] = f;
-                    vehDataGP[0][j * xSize + begCellIdx[i] + k] = dd;
-                    vehDataGP[1][j * xSize + begCellIdx[i] + k] = hour;
+        // TODO TEMPORARILY REMOVED BY GABRIEL UNTIL DATA ISSUES ARE FIXED
 
-                    if (hasManagedLanes) {
-                        v = Double.NaN;
-                        if (links.get(i).get_mng_lanes() > 0) {
-                            vv = null;
-                            if (scd_mng != null)
-                                vv = scd_mng.get(k).get_speed((float)ffspeed_mng_mph[i], cellLengths[i]);
-                            if ((vv != null) && (j < vv.length))
-                                v = scc*vv[j];
-                            if (!Double.isNaN(v)) {
-                                minSpeed = Math.min(minSpeed, v);
-                                maxSpeed = Math.max(maxSpeed, v);
-                            }
-                        }
-                        
-                        f = Double.NaN;
-                        if (links.get(i).get_mng_lanes() > 0) {
-                            ff = null;
-                            if (scd_mng != null)
-                                ff = scd_mng.get(k).get_total_flw();
-                            if ((ff != null) && (j < ff.length))
-                                f = fcc*ff[j];
-                            if (!Double.isNaN(f)) {
-                                minFlow = Math.min(minFlow, f);
-                                maxFlow = Math.max(maxFlow, f);
-                            }
-                        }
-                    
-                        speedDataManaged[0][j * xSize + begCellIdx[i] + k] = dd;
-                        speedDataManaged[1][j * xSize + begCellIdx[i] + k] = hour;
-                        speedDataManaged[2][j * xSize + begCellIdx[i] + k] = v;
-                        flowDataManaged[0][j * xSize + begCellIdx[i] + k] = dd;
-                        flowDataManaged[1][j * xSize + begCellIdx[i] + k] = hour;
-                        flowDataManaged[2][j * xSize + begCellIdx[i] + k] = f;
-                        vehDataManaged[0][j * xSize + begCellIdx[i] + k] = dd;
-                        vehDataManaged[1][j * xSize + begCellIdx[i] + k] = hour;
-                    }
-
-                    if (hasAuxLanes) {
-                        speedDataAux[0][j * xSize + i] = dd;
-                        speedDataAux[1][j * xSize + i] = hour;
-                        flowDataAux[0][j * xSize + i] = dd;
-                        flowDataAux[1][j * xSize + i] = hour;
-                        vehDataAux[0][j * xSize + i] = dd;
-                        vehDataAux[1][j * xSize + i] = hour;
-                    }
-
-                    dd += cellLengths[i];
-                }
-            }
-	    }
-
-        // HACK
-        minSpeed = 0d;
+//        maxCellLength = 0;
+//        maxLinkLength = 0;
+//        routeLength = 0;
+//        minSpeed = Double.MAX_VALUE;
+//        maxSpeed = 0;
+//        minFlow = Double.MAX_VALUE;
+//        maxFlow = 0;
+//        minVeh = Double.MAX_VALUE;
+//        maxVeh = 0;
+//        hasManagedLanes = false;
+//        hasAuxLanes = false;
+//        List<AbstractLink> links = myRoute.get_link_sequence();
+//        int lSize = links.size();
+//        int xSize = 0;
+//        int ySize = 0;
+//        double lcc = UserSettings.lengthConversionMap.get("meters"+UserSettings.unitsLength);
+//        double scc = UserSettings.speedConversionMap.get("mph"+UserSettings.unitsSpeed);
+//        double fcc = UserSettings.flowConversionMap.get("vph"+UserSettings.unitsFlow);
+//        SimDataLink[] sdl = new SimDataLink[lSize];
+//        double[] cellLengths = new double[lSize];
+//        double[] ffspeed_gp_mph = new double[lSize];
+//        double[] ffspeed_mng_mph = new double[lSize];
+//        int[] begCellIdx = new int[lSize];
+//
+//        int prev_num_cells = 0;
+//        for (int i = 0; i < lSize; i++) {
+//            AbstractLink l = links.get(i);
+//            maxLinkLength = Math.max(maxLinkLength, lcc*l.get_length_meters());
+//            routeLength += lcc*l.get_length_meters();
+//            sdl[i] = mySimData.linkdata.get(l.id);
+//            List<SimCellData> scd = sdl[i].lgData.get(sdl[i].lgtype2id.get(LaneGroupType.gp)).celldata;
+//            int num_cells = scd.size();
+//            double cell_length = lcc * l.get_length_meters() / (double)num_cells;
+//            maxCellLength = Math.max(maxCellLength, cell_length);
+//            cellLengths[i] = cell_length;
+//            xSize += num_cells;
+//            if (i == 0)
+//                begCellIdx[i] = 0;
+//            else
+//                begCellIdx[i] = begCellIdx[i-1] + prev_num_cells;
+//            prev_num_cells = num_cells;
+//            ffspeed_gp_mph[i] = UserSettings.speedConversionMap.get("kphmph")*l.get_gp_freespeed_kph();
+//            ffspeed_mng_mph[i] = Double.NaN;
+//            if (l.get_mng_lanes() > 0)
+//                ffspeed_mng_mph[i] = UserSettings.speedConversionMap.get("kphmph")*l.get_mng_freespeed_kph();
+//            ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.gp).time.length);
+//
+//            if (l.get_mng_lanes() > 0) {
+//                hasManagedLanes = true;
+//                ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.mng).time.length);
+//            }
+//            if (l.get_aux_lanes() > 0) {
+//                hasAuxLanes = true;
+//                ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.aux).time.length);
+//            }
+//        }
+//
+//        float dt = sdl[0].get_speed(LaneGroupType.gp).get_dt();
+//        myDt = dt / (float)timeDivider;
+//        speedDataGP = new double[3][xSize*ySize];
+//        speedDataManaged = new double[3][xSize*ySize];
+//        speedDataAux = new double[3][xSize*ySize];
+//        flowDataGP = new double[3][xSize*ySize];
+//        flowDataManaged = new double[3][xSize*ySize];
+//        flowDataAux = new double[3][xSize*ySize];
+//        vehDataGP = new double[3][xSize*ySize];
+//        vehDataManaged = new double[3][xSize*ySize];
+//        vehDataAux = new double[3][xSize*ySize];
+//
+//        for (int j = 0; j < ySize; j++) {
+//            double dd = 0.0;
+//            float hour = (start+j*dt) / (float)timeDivider;
+//            for (int i = 0; i < lSize; i++) {
+//                List<SimCellData> scd_gp = sdl[i].lgData.get(sdl[i].lgtype2id.get(LaneGroupType.gp)).celldata;
+//                List<SimCellData> scd_mng = null;
+//                List<SimCellData> scd_aux = null;
+//                if (links.get(i).get_mng_lanes() > 0)
+//                    scd_mng = sdl[i].lgData.get(sdl[i].lgtype2id.get(LaneGroupType.mng)).celldata;
+//                if (links.get(i).get_aux_lanes() > 0)
+//                    scd_aux = sdl[i].lgData.get(sdl[i].lgtype2id.get(LaneGroupType.aux)).celldata;
+//                int num_cells = scd_gp.size();
+//                for (int k = 0; k < num_cells; k++) {
+//                    double[] vv = scd_gp.get(k).get_speed((float)ffspeed_gp_mph[i], cellLengths[i]);
+//                    double v = Double.NaN;
+//                    if ((vv != null) && (j < vv.length))
+//                        v = scc*vv[j];
+//                    if (!Double.isNaN(v)) {
+//                        minSpeed = Math.min(minSpeed, v);
+//                        maxSpeed = Math.max(maxSpeed, v);
+//                    }
+//
+//                    double[] ff = scd_gp.get(k).get_total_flw();
+//                    double f = Double.NaN;
+//                    if ((ff != null) && (j < ff.length))
+//                        f = fcc*ff[j];
+//                    if ((scd_aux != null) && (k < scd_aux.size())) {
+//                        ff = scd_aux.get(k).get_total_flw();
+//                        if ((ff != null) && (j < ff.length))
+//                            if (!Double.isNaN(f)) {
+//                                if (!Double.isNaN(ff[j]))
+//                                    f += fcc*ff[j];
+//                            } else
+//                                f = fcc*ff[j];
+//                    }
+//                    if (!Double.isNaN(f)) {
+//                        minFlow = Math.min(minFlow, f);
+//                        maxFlow = Math.max(maxFlow, f);
+//                    }
+//
+//                    speedDataGP[0][j * xSize + begCellIdx[i] + k] = dd;
+//                    speedDataGP[1][j * xSize + begCellIdx[i] + k] = hour;
+//                    speedDataGP[2][j * xSize + begCellIdx[i] + k] = v;
+//                    flowDataGP[0][j * xSize + begCellIdx[i] + k] = dd;
+//                    flowDataGP[1][j * xSize + begCellIdx[i] + k] = hour;
+//                    flowDataGP[2][j * xSize + begCellIdx[i] + k] = f;
+//                    vehDataGP[0][j * xSize + begCellIdx[i] + k] = dd;
+//                    vehDataGP[1][j * xSize + begCellIdx[i] + k] = hour;
+//
+//                    if (hasManagedLanes) {
+//                        v = Double.NaN;
+//                        if (links.get(i).get_mng_lanes() > 0) {
+//                            vv = null;
+//                            if (scd_mng != null)
+//                                vv = scd_mng.get(k).get_speed((float)ffspeed_mng_mph[i], cellLengths[i]);
+//                            if ((vv != null) && (j < vv.length))
+//                                v = scc*vv[j];
+//                            if (!Double.isNaN(v)) {
+//                                minSpeed = Math.min(minSpeed, v);
+//                                maxSpeed = Math.max(maxSpeed, v);
+//                            }
+//                        }
+//
+//                        f = Double.NaN;
+//                        if (links.get(i).get_mng_lanes() > 0) {
+//                            ff = null;
+//                            if (scd_mng != null)
+//                                ff = scd_mng.get(k).get_total_flw();
+//                            if ((ff != null) && (j < ff.length))
+//                                f = fcc*ff[j];
+//                            if (!Double.isNaN(f)) {
+//                                minFlow = Math.min(minFlow, f);
+//                                maxFlow = Math.max(maxFlow, f);
+//                            }
+//                        }
+//
+//                        speedDataManaged[0][j * xSize + begCellIdx[i] + k] = dd;
+//                        speedDataManaged[1][j * xSize + begCellIdx[i] + k] = hour;
+//                        speedDataManaged[2][j * xSize + begCellIdx[i] + k] = v;
+//                        flowDataManaged[0][j * xSize + begCellIdx[i] + k] = dd;
+//                        flowDataManaged[1][j * xSize + begCellIdx[i] + k] = hour;
+//                        flowDataManaged[2][j * xSize + begCellIdx[i] + k] = f;
+//                        vehDataManaged[0][j * xSize + begCellIdx[i] + k] = dd;
+//                        vehDataManaged[1][j * xSize + begCellIdx[i] + k] = hour;
+//                    }
+//
+//                    if (hasAuxLanes) {
+//                        speedDataAux[0][j * xSize + i] = dd;
+//                        speedDataAux[1][j * xSize + i] = hour;
+//                        flowDataAux[0][j * xSize + i] = dd;
+//                        flowDataAux[1][j * xSize + i] = hour;
+//                        vehDataAux[0][j * xSize + i] = dd;
+//                        vehDataAux[1][j * xSize + i] = hour;
+//                    }
+//
+//                    dd += cellLengths[i];
+//                }
+//            }
+//	    }
+//
+//        // HACK
+//        minSpeed = 0d;
         
     }
     
