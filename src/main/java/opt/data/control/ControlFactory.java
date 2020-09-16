@@ -62,9 +62,7 @@ public class ControlFactory {
 				name,
 				links,
 				lgtype,
-				cntrl_type,
-				fwyscn.new_actuator_id()
-				);
+				cntrl_type );
 
 		try {
 			switch(cntrl_type){
@@ -118,26 +116,6 @@ public class ControlFactory {
 
 	protected static Sensor create_sensor(FreewayScenario fwyscn,Long sensor_id, long link_id, float offset, AbstractController myController){
 		return new Sensor(sensor_id!=null?sensor_id:fwyscn.new_sensor_id(),link_id,offset,myController);
-	}
-
-	/////////////////////
-	// actuator
-	/////////////////////
-
-	protected static ActuatorRampMeter create_actuator_ramp_meter(long id,AbstractLink link, LaneGroupType lgtype) throws Exception {
-
-		if( link.schedules.containsKey(lgtype) && link.schedules.get(lgtype).containsKey(AbstractController.Type.RampMetering))
-				throw new Exception("Controller clash in link "+ link.id);
-
-		return new ActuatorRampMeter(id, link, lgtype);
-	}
-
-	protected static ActuatorHOVHOT create_actuator_hovhot_policy(long id, Collection<AbstractLink> links) throws Exception {
-		LaneGroupType lgtype = LaneGroupType.mng;
-		for(AbstractLink link : links)
-			if( link.schedules.containsKey(lgtype) && link.schedules.get(lgtype).containsKey(AbstractController.Type.HOVHOT))
-				throw new Exception("Controller clash in link "+ link.id);
-		return new ActuatorHOVHOT(id, links, lgtype);
 	}
 
 	/////////////////////////

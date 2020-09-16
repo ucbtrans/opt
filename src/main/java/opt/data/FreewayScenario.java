@@ -17,7 +17,6 @@ public class FreewayScenario {
     private Long max_seg_id;
     private Long max_controller_id;
     private Long max_sensor_id;
-    private Long max_actuator_id;
     private Long max_rc_id;
 
     public String name;
@@ -273,7 +272,7 @@ public class FreewayScenario {
                 long act_id = Long.parseLong(jcnt.getTargetActuators().getIds());
                 jaxb.Actuator jact = actuators.get(act_id);
 
-                // read link ids
+                // read link ids from the opt schedule item
                 List<AbstractLink> links = new ArrayList<>();
                 List<LaneGroupType> lgtypes = new ArrayList<>();
                 for(String e : jact.getActuatorTarget().getContent().split(",")){
@@ -313,7 +312,7 @@ public class FreewayScenario {
                 // create the schedule
                 long sch_id = jcnt.getId();
                 String sch_name = sch_names.containsKey(sch_id) ? sch_names.get(sch_id) : "";
-                ControlSchedule sch = new ControlSchedule(sch_id,sch_name,links,lg_type,cntr_type,jact.getId());
+                ControlSchedule sch = new ControlSchedule(sch_id,sch_name,links,lg_type,cntr_type);
 
                 for(jaxb.Entry jentry : jcnt.getSchedule().getEntry()){
 
@@ -376,7 +375,6 @@ public class FreewayScenario {
         scn_cpy.max_seg_id = max_seg_id;
         scn_cpy.max_controller_id = max_controller_id;
         scn_cpy.max_sensor_id = max_sensor_id;
-        scn_cpy.max_actuator_id = max_actuator_id;
         scn_cpy.max_rc_id = max_rc_id;
         scn_cpy.scenario = scenario.clone();
         for(Map.Entry<Long,Segment> e : segments.entrySet()) {
@@ -927,7 +925,6 @@ public class FreewayScenario {
             max_seg_id = 0l;
             max_controller_id = 0l;
             max_sensor_id = 0l;
-            max_actuator_id = 0l;
             max_rc_id = 0l;
             return;
         }
@@ -953,12 +950,6 @@ public class FreewayScenario {
                 .max(Comparator.comparing(Long::valueOf));
         max_controller_id = opt_max_cntrl_id.isPresent() ? opt_max_cntrl_id.get() : 0l;
 
-        // actuator
-        Optional<Long> opt_max_act_id = scenario.links.values().stream()
-                .flatMap(link->link.get_actuator_ids().stream())
-                .max(Comparator.comparing(Long::valueOf));
-        max_actuator_id = opt_max_act_id.isPresent() ? opt_max_act_id.get() : 0l;
-
         // sensor
         Optional<Long> opt_max_sens_id = scenario.links.values().stream()
                 .flatMap(link->link.get_sensor_ids().stream())
@@ -983,10 +974,6 @@ public class FreewayScenario {
 
     public long new_controller_id(){
         return ++max_controller_id;
-    }
-
-    public long new_actuator_id(){
-        return ++max_actuator_id;
     }
 
     public long new_sensor_id(){
