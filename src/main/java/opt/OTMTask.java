@@ -120,17 +120,15 @@ public class OTMTask  extends Task {
 					.filter(link->link.get_type()!= AbstractLink.Type.ghost)
 					.map(x->x.id).collect(Collectors.toSet());
 
-			if(celloutput)
-				for(Long commid : otmdev.scenario.commodities.keySet()){
-					otmdev.otm.output().request_cell_flw(commid,linkids,sim_dt);
-					otmdev.otm.output().request_cell_sum_veh(commid,linkids,sim_dt);
-				}
+			if(celloutput) {
+				otmdev.otm.output().request_cell_flw(null, linkids, sim_dt);
+				otmdev.otm.output().request_cell_sum_veh(null, linkids, sim_dt);
+			}
 
-			if(lgoutput)
-				for(Long commid : otmdev.scenario.commodities.keySet()){
-					otmdev.otm.output().request_lanegroup_flw(commid,linkids,sim_dt);
-					otmdev.otm.output().request_lanegroup_sum_veh(commid,linkids,sim_dt);
-				}
+			if(lgoutput) {
+				otmdev.otm.output().request_lanegroup_flw(null, linkids, sim_dt);
+				otmdev.otm.output().request_lanegroup_sum_veh(null, linkids, sim_dt);
+			}
 
 			if(logger!=null)
 				logger.write("requests");

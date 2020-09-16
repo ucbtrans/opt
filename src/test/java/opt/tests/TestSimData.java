@@ -15,7 +15,7 @@ public class TestSimData extends AbstractTest {
     final long car = 0l;
     final long truck = 1l;
     final long linkid = 3l;
-    final long routeA = 3l;
+    final long routeA = 1l;
     final long routeB = 2l;
     SimDataScenario simdata;
     SimDataLink simdatalink;
@@ -32,7 +32,7 @@ public class TestSimData extends AbstractTest {
             Project project = ProjectFactory.load_project(project_file_name,validate);
             FreewayScenario fwyscenario = project.get_scenarios().iterator().next();
             fwyscenario.set_start_time(0f);
-            fwyscenario.set_sim_duration(3600f);
+            fwyscenario.set_sim_duration(2000f);
             task = new OTMTask(null,fwyscenario,300f,10, false,true,null);
         } catch (Exception e) {
             fail(e.getMessage());
@@ -190,27 +190,6 @@ public class TestSimData extends AbstractTest {
         System.out.println(X.print_values());
     }
 
-    @Test
-    public void route_delay(){
-//        // get delay on route A for various lane group types
-//        XYSeriesCollection A = new XYSeriesCollection();
-//        A.addSeries(simdata.get_speed_for_route(routeA,LaneGroupType.gp).get_XYSeries("gp lanes"));
-//        A.addSeries(simdata.get_speed_for_route(routeA,LaneGroupType.mng).get_XYSeries("mng lanes"));
-//        A.addSeries(simdata.get_speed_for_route(routeA,LaneGroupType.aux).get_XYSeries("aux lanes"));
-//        TestPlot.plot(A,
-//                "route A speed",
-//                "speed [mph]",
-//                "temp/routeA_speed.png");
-//
-//        // get speed on route for all lane group types
-//        A = new XYSeriesCollection();
-//        A.addSeries(simdata.get_speed_for_route(routeA,null).get_XYSeries("all lanes"));
-//        TestPlot.plot(A,
-//                "route A speed",
-//                "speed [mph]",
-//                "temp/routeA_speed_all.png");
-    }
-
     /////////////////////////////////
     // link level
     /////////////////////////////////
@@ -272,7 +251,7 @@ public class TestSimData extends AbstractTest {
     }
 
     @Test
-    public void link_flows(){
+    public void link_flow_exiting(){
         for(Map.Entry<Long,SimDataLink> e :  simdata.linkdata.entrySet()){
             Long linkid = e.getKey();
             SimDataLink data = e.getValue();
