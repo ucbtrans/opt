@@ -90,12 +90,11 @@ public class STableHandler {
         
         int i0 = focusedCell.getRow();
         int j0 = focusedCell.getColumn();
-        if (true)
-            return;
+        //if (true)
+        //    return;
         
         minSelectedRow = maxSelectedRow = i0;
-        minSelectedColumn = 0;
-        maxSelectedColumn = myTable.getColumns().size() - 1;
+        minSelectedColumn = maxSelectedColumn = j0;
         selectBox();
         myTable.getFocusModel().focus(i0, myTable.getColumns().get(j0));
         event.consume();
@@ -693,7 +692,7 @@ public class STableHandler {
         if (col == 0) {
             minSelectedRow = maxSelectedRow = row;
             minSelectedColumn = 0;
-            maxSelectedColumn = myTable.getColumns().size() - 1;
+            maxSelectedColumn = col;
             selectBox();
             myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
         }
@@ -729,7 +728,7 @@ public class STableHandler {
         if (col == 0) {
             minSelectedRow = maxSelectedRow = row;
             minSelectedColumn = 0;
-            maxSelectedColumn = myTable.getColumns().size() - 1;
+            maxSelectedColumn = col;
             selectBox();
             myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
         }

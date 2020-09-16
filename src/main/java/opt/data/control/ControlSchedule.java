@@ -16,32 +16,32 @@ public class ControlSchedule implements Comparable {
     protected FreewayScenario fwyscn;
     protected AbstractController.Type controlType;
     protected List<ScheduleEntry> entries;
-    protected AbstractActuator actuator;
+
+    protected long actuator_id;
+    protected Set<AbstractLink> links;
+    protected LaneGroupType lgtype;
 
     ////////////////////////////////
     // construction
     ////////////////////////////////
 
-    public ControlSchedule(long id,String name,Collection<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type controlType,long act_id) throws Exception {
+    public ControlSchedule(long id,String name,Collection<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type controlType) throws Exception {
         this.id = id;
+        this.actuator_id = id;
         this.name = name;
         this.controlType = controlType;
         this.entries = new ArrayList<>();
+        this.links = new HashSet<>(links);
+        this.lgtype = lgtype;
+
+        // controlType=HOVHOT -> lgtype=managed
+        assert( controlType!=AbstractController.Type.HOVHOT || lgtype==LaneGroupType.mng );
 
         // all links should belong to the same scenario
         assert(!links.isEmpty());
         assert(links.stream().map(x->x.get_segment().get_scenario()).distinct().count()==1);
         this.fwyscn = links.iterator().next().get_segment().get_scenario();
 
-        switch(controlType){
-            case RampMetering:
-                assert(links.size()==1); // ramp metering controllers refer to a single onramp
-                actuator = ControlFactory.create_actuator_ramp_meter(act_id,links.iterator().next(),lgtype);
-                break;
-            case HOVHOT:
-                actuator = ControlFactory.create_actuator_hovhot_policy(act_id,links);
-                break;
-        }
     }
 
     public jaxb.Schd to_jaxb(){
@@ -49,6 +49,68 @@ public class ControlSchedule implements Comparable {
         jsch.setId(id);
         jsch.setName(name);
         return jsch;
+    }
+
+    public boolean ignore(){
+
+        if(links.isEmpty())
+            return true;
+
+        if( controlType== AbstractController.Type.RampMetering
+                && lgtype==LaneGroupType.mng
+                && links.iterator().next().get_mng_lanes() == 0)
+            return true;
+
+        return false;
+    }
+
+    public jaxb.Actuator to_jaxb_actuator(Set<AbstractLink> links_to_write){
+
+        if(links_to_write==null)
+            links_to_write=links;
+
+        jaxb.Actuator jact = new jaxb.Actuator();
+        jact.setId(actuator_id);
+
+//        jact.setDt();
+//        jact.setLanegroups();
+//        jact.setMaxValue();
+//        jact.setMinValue();
+//        jact.setSignal();
+
+        // set type, target
+        jaxb.ActuatorTarget jtgt;
+        switch(controlType){
+
+            case RampMetering:
+                jact.setType("meter");
+                jtgt = new jaxb.ActuatorTarget();
+                jact.setActuatorTarget(jtgt);
+                jtgt.setType("lanegroups");
+                AbstractLink link = links_to_write.iterator().next();
+                int [] lanes = link.lgtype2lanes(lgtype);
+                jtgt.setContent(String.format("%d(%d#%d)",link.id,lanes[0],lanes[1]));
+                break;
+
+            case HOVHOT:
+                jact.setType("lg_restrict");
+                jtgt = new jaxb.ActuatorTarget();
+                jact.setActuatorTarget(jtgt);
+                jtgt.setType("lanegroups");
+
+                String str = "";
+                for(AbstractLink lk : links_to_write){
+                    int [] lns = lk.lgtype2lanes(lgtype);
+                    String str2 = String.format("%d(%d#%d)",lk.id,lns[0],lns[1]);
+                    str += str2 + ",";
+                }
+                if(!str.isEmpty())
+                    str = str.substring(0, str.length() - 1);
+                jtgt.setContent(str);
+                break;
+        }
+
+        return jact;
     }
 
     public jaxb.Controller to_jaxb_controller(){
@@ -63,7 +125,7 @@ public class ControlSchedule implements Comparable {
 
         // target actuator
         jaxb.TargetActuators tacts = new jaxb.TargetActuators();
-        tacts.setIds(String.format("%d",actuator.id));
+        tacts.setIds(String.format("%d",actuator_id));
         jcntrl.setTargetActuators(tacts);
 
         // schedule
@@ -122,7 +184,7 @@ public class ControlSchedule implements Comparable {
     }
 
     public LaneGroupType get_lgtype(){
-        return actuator.lgtype;
+        return lgtype;
     }
 
     public AbstractController.Type get_controlType(){
@@ -178,10 +240,6 @@ public class ControlSchedule implements Comparable {
         update(0f,null);
     }
 
-    public AbstractActuator get_actuator(){
-        return actuator;
-    }
-
     public float get_largest_start_time(){
         return entries.get(entries.size()-1).start_time;
     }
@@ -191,12 +249,12 @@ public class ControlSchedule implements Comparable {
     }
 
     public Set<AbstractLink> get_links(){
-        return actuator.links;
+        return links;
     }
 
     public List<AbstractLink> get_ordered_links(){
         List<AbstractLink> X = new ArrayList<>();
-        X.addAll(actuator.links);
+        X.addAll(links);
         Collections.sort(X);
         return X;
     }
@@ -212,7 +270,7 @@ public class ControlSchedule implements Comparable {
         }
 
         // if it works, add link to actuator
-        actuator.links.add(link);
+        links.add(link);
         return true;
 
     }
@@ -230,7 +288,7 @@ public class ControlSchedule implements Comparable {
 
 
     public void remove_link(AbstractLink link){
-        this.actuator.links.remove(link);
+        links.remove(link);
         link.remove_schedule( get_lgtype(),get_controlType());
     }
 

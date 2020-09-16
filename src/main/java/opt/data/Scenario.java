@@ -463,20 +463,40 @@ public class Scenario {
 
         Set<Sensor> all_sensors = new HashSet<>();
 
-        Set<ControlSchedule> all_schedules = links.values().stream()
+        // collect controllers and filter out invalid ones
+        Set<ControlSchedule> controllers = links.values().stream()
                 .flatMap(link->link.get_all_schedules().stream())
                 .collect(Collectors.toSet());
 
-        for(ControlSchedule schedule : all_schedules){
+        for(ControlSchedule controller : controllers){
 
-            jcntrls.getController().add(schedule.to_jaxb_controller());
-            AbstractActuator actuator = schedule.get_actuator();
+            // determine which links to write to the actuator.
+            // This is usually all of the links in the cotnroller. But in the case of HOVHOT controller
+            // we ignore links without managed lanes
+            Set<AbstractLink> links_to_write = new HashSet<>();
+
+            switch(controller.get_controlType()){
+                case RampMetering:
+                    links_to_write.addAll(controller.get_links());
+                    break;
+
+                case HOVHOT:
+                    links_to_write = controller.get_links().stream()
+                            .filter(lk->lk.get_mng_lanes()>0)
+                            .collect(Collectors.toSet());
+                    break;
+            }
+
+            if(controller.ignore())
+                continue;
+
+            jcntrls.getController().add(controller.to_jaxb_controller());
 
             // actuator
-            jacts.getActuator().add(actuator.to_jaxb());
+            jacts.getActuator().add(controller.to_jaxb_actuator(links_to_write));
 
             // sensors
-            all_sensors.addAll(schedule.get_sensors());
+            all_sensors.addAll(controller.get_sensors());
         }
 
         jaxb.Sensors jsnss = new jaxb.Sensors();
@@ -509,24 +529,5 @@ public class Scenario {
         int[] lanes = link.lgtype2lanes(lg);
         return String.format("%d#%d",lanes[0],lanes[1]);
     }
-
-    /////////////////////////////////////
-    // override
-    /////////////////////////////////////
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        Scenario scenario = (Scenario) o;
-//        return nodes.equals(scenario.nodes) &&
-//                links.equals(scenario.links) &&
-//                commodities.equals(scenario.commodities);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(nodes, links, commodities);
-//    }
 
 }
