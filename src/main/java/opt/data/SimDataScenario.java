@@ -53,11 +53,11 @@ public class SimDataScenario {
             read_cell_data(otmdev,commids,time_index,sim_dt);
 
         if(haslgdata)
-            read_lg_data(otmdev,commids);
+            read_lg_data(otmdev,commids,time_index,sim_dt);
 
     }
 
-    private void read_lg_data(OTMdev otmdev,Set<Long> commids){
+    private void read_lg_data(OTMdev otmdev,Set<Long> commids,int [] time_index,float sim_dt){
 
         Set<OutputLaneGroupFlow> flws = otmdev.otm.output.get_data().stream()
                 .filter(s->s.type==AbstractOutput.Type.lanegroup_flw)
@@ -87,20 +87,12 @@ public class SimDataScenario {
                     continue;
 
                 SimDataLanegroup lgdata = linkdata.get(flg.link.getId()).lgData.get(flg.id);
-                lgdata.set_lg_data(flw.lgprofiles.get(alg.id).profile,veh.lgprofiles.get(alg.id).profile);
+                lgdata.set_lg_data(commid,time_index,
+                        flw.lgprofiles.get(alg.id).profile.values,
+                        veh.lgprofiles.get(alg.id).profile.values,
+                        sim_dt);
 
-
-//                lgdata.flws.put(commid,flw.lgprofiles.get(alg.id).profile.values);
-//                lgdata.vehs.put(commid,veh.lgprofiles.get(alg.id).profile.values);
-
-                System.out.println("ASD");
-
-//                List<AbstractOutputTimedCell.CellProfile> flw_cellprofs = flw.lgprofiles.get(flg.id);
-//                List<AbstractOutputTimedCell.CellProfile> veh_cellprofs = veh.lgprofiles.get(flg.id);
-//                for(int i=0;i<flw_cellprofs.size();i++)
-//                    lgdata.celldata.get(i).set(commid,time_index,flw_cellprofs.get(i).profile.values,veh_cellprofs.get(i).profile.values,sim_dt);
             }
-
         }
 
     }
@@ -170,12 +162,12 @@ public class SimDataScenario {
         return vehs;
     }
 
-    protected double[] get_vehs_for_route_array(List<AbstractLink> links,LaneGroupType globallgtype,Long commid){
+    protected double[] get_vehs_for_route_array(List<AbstractLink> links,LaneGroupType globallgtype,Long commid,boolean usecells){
         double [] route_vehs = new double[numtime()];
         for(AbstractLink link : links){
             SimDataLink lkdata = linkdata.get(link.id);
             LaneGroupType lgtype = lkdata.lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
-            double [] link_veh = lkdata.get_veh_array(lgtype,commid);
+            double [] link_veh = lkdata.get_veh_array(lgtype,commid,usecells);
             for(int k=0;k<numtime();k++)
                 route_vehs[k] += link_veh[k];
         }
@@ -328,7 +320,8 @@ public class SimDataScenario {
     /** To get VHT just apply X.mult(X.get_dt()) to this **/
     public TimeSeries get_vehs_for_route(long routeid,LaneGroupType lgtype,Long commid){
         List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
-        return new TimeSeries(time,get_vehs_for_route_array(routelinks,lgtype,commid));
+        boolean usecells = !haslgdata;
+        return new TimeSeries(time,get_vehs_for_route_array(routelinks,lgtype,commid,usecells));
     }
 
     /** ....... **/

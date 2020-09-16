@@ -61,33 +61,33 @@ public class SimDataLink {
         return link_length_miles/lgData.values().iterator().next().celldata.size();
     }
 
-    protected double[] get_veh_array(LaneGroupType lgtype,Long commid){
+    protected double[] get_veh_array(LaneGroupType lgtype,Long commid,boolean usecells){
         assert(lgtype2id.containsKey(lgtype) || lgtype==null);
         if(lgtype==null){
             double [] X = new double[scndata.numtime()];
             for(SimDataLanegroup data : lgData.values()){
-                double [] XX = data.get_veh(commid,numtime());
+                double [] XX = data.get_veh(commid,numtime(),usecells);
                 for(int k=0;k<X.length;k++)
                     X[k] += XX[k];
             }
             return X;
         } else {
-            return lgData.get(lgtype2id.get(lgtype)).get_veh(commid,numtime());
+            return lgData.get(lgtype2id.get(lgtype)).get_veh(commid,numtime(),usecells);
         }
     }
 
-    protected double [] get_flw_array(LaneGroupType lgtype,Long commid) {
+    protected double [] get_flw_array(LaneGroupType lgtype,Long commid,boolean usecells) {
         assert(lgtype2id.containsKey(lgtype) || lgtype==null);
         if(lgtype==null){
             double [] X = new double[scndata.numtime()];
             for(SimDataLanegroup data : lgData.values()){
-                double [] XX = data.get_flw_exiting(commid,numtime());
+                double [] XX = data.get_flw_exiting(commid,numtime(),usecells);
                 for(int k=0;k<X.length;k++)
                     X[k] += XX[k];
             }
             return X;
         } else {
-            return lgData.get(lgtype2id.get(lgtype)).get_flw_exiting(commid,numtime());
+            return lgData.get(lgtype2id.get(lgtype)).get_flw_exiting(commid,numtime(),usecells);
         }
     }
 
@@ -137,7 +137,8 @@ public class SimDataLink {
     /////////////////////////////////////////////////
 
     public TimeSeries get_vht(LaneGroupType lgtype,Long commid){
-        double[] vehs = get_veh_array(lgtype,commid);
+        boolean usecells = !scndata.haslgdata;
+        double[] vehs = get_veh_array(lgtype,commid,usecells);
         double dt_hr = scndata.get_dt_sec() / 3600d;
         for(int k=0;k<vehs.length;k++)
             vehs[k] = vehs[k]*dt_hr;
@@ -254,8 +255,9 @@ public class SimDataLink {
      * NOTE: if the lane group does not exist, returns a list of ZEROS
      */
     public TimeSeries get_veh(LaneGroupType lgtype,Long commid){
+        boolean usecells = !scndata.haslgdata;
         return new TimeSeries(scndata.time,lgtype2id.containsKey(lgtype)||lgtype==null ?
-                get_veh_array(lgtype,commid) :
+                get_veh_array(lgtype,commid,usecells) :
                 new double[scndata.numtime()] );
     }
 
@@ -265,8 +267,10 @@ public class SimDataLink {
      * NOTE: if the lane group does not exist, returns a list of ZEROS
      */
     public TimeSeries get_flw_exiting(LaneGroupType lgtype, Long commid){
+        // use cell data only if there is no lg data
+        boolean usecells = !scndata.haslgdata;
         return new TimeSeries(scndata.time,lgtype2id.containsKey(lgtype)||lgtype==null ?
-                get_flw_array(lgtype,commid) :
+                get_flw_array(lgtype,commid,usecells) :
                 new double[scndata.numtime()] );
     }
 

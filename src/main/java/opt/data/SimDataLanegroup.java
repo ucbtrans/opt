@@ -1,7 +1,5 @@
 package opt.data;
 
-import profiles.Profile1D;
-
 import java.util.*;
 
 public class SimDataLanegroup {
@@ -30,41 +28,70 @@ public class SimDataLanegroup {
 
     }
 
-    protected void set_lg_data(Profile1D cummflw, Profile1D cummveh){
-        System.out.println("ASD");
+    protected void set_lg_data(long commid,int [] time_indices,List<Double> flwdata,List<Double> vehdata,float dt_sec){
+        int numtime = time_indices.length;
+        double [] veh = new double[numtime];
+        double [] flw = new double[numtime];
+        double alpha = 3600d/dt_sec;
+
+        if(!vehdata.isEmpty()) {
+            for(int k=0;k<numtime;k++){
+                int time_index = time_indices[k];
+                double this_flow = time_index == 0 ? 0d : (flwdata.get(time_index) - flwdata.get(time_index - 1)) * alpha;
+                flw[k] = this_flow;
+                veh[k] = vehdata.get(time_index);
+            }
+        }
+
+        vehs.put(commid,veh);
+        flws.put(commid,flw);
     }
 
-    protected double [] get_veh(Long commid,int numtime){
+    protected double [] get_veh(Long commid,int numtime, boolean usecells){
         double [] X = new double[numtime];
-        for (SimCellData simcell : celldata) {
-            if(commid==null){
-                for(double[] list : simcell.vehs.values()){
-                    for (int k = 0; k < list.length; k++)
-                        X[k] += list[k];
-                }
-            } else {
-                if (simcell.vehs.containsKey(commid)) {
-                    double[] list = simcell.vehs.get(commid);
-                    for (int k = 0; k < list.length; k++)
-                        X[k] += list[k];
+
+        if(usecells){
+            for (SimCellData simcell : celldata) {
+                if(commid==null){
+                    for(double[] list : simcell.vehs.values()){
+                        for (int k = 0; k < list.length; k++)
+                            X[k] += list[k];
+                    }
+                } else {
+                    if (simcell.vehs.containsKey(commid)) {
+                        double[] list = simcell.vehs.get(commid);
+                        for (int k = 0; k < list.length; k++)
+                            X[k] += list[k];
+                    }
                 }
             }
         }
+        else{
+            System.out.println("USE LANEGROUP DATA");
+        }
+
         return X;
     }
 
-    protected double [] get_flw_exiting(Long commid,int numtime){
+    protected double [] get_flw_exiting(Long commid,int numtime, boolean usecells){
         double [] X = new double[numtime];
-        SimCellData lastcell = celldata.get(celldata.size()-1);
-        if(commid==null){
-            X = lastcell.get_total_flw();
-        } else {
-            if (lastcell.vehs.containsKey(commid)) {
-                double[] list = lastcell.flws.get(commid);
-                for (int k = 0; k < list.length; k++)
-                    X[k] += list[k];
+
+        if(usecells){
+            SimCellData lastcell = celldata.get(celldata.size()-1);
+            if(commid==null){
+                X = lastcell.get_total_flw();
+            } else {
+                if (lastcell.vehs.containsKey(commid)) {
+                    double[] list = lastcell.flws.get(commid);
+                    for (int k = 0; k < list.length; k++)
+                        X[k] += list[k];
+                }
             }
         }
+        else{
+            System.out.println("USE LANEGROUP DATA");
+        }
+
         return X;
     }
 

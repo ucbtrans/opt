@@ -34,6 +34,9 @@ public class OTMTask  extends Task {
 
 		assert(outdt==300f);
 
+		if(!celloutput && !lgoutput)
+			throw new Exception("No data requested");
+
 		// bind the progress bar and make it visible
 		if(mainController!=null)
 			mainController.bindProgressBar(progressProperty());
