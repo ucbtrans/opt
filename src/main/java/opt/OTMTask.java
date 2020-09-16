@@ -123,13 +123,13 @@ public class OTMTask  extends Task {
 			if(celloutput)
 				for(Long commid : otmdev.scenario.commodities.keySet()){
 					otmdev.otm.output().request_cell_flw(commid,linkids,sim_dt);
-					otmdev.otm.output().request_cell_veh(commid,linkids,sim_dt);
+					otmdev.otm.output().request_cell_sum_veh(commid,linkids,sim_dt);
 				}
 
 			if(lgoutput)
 				for(Long commid : otmdev.scenario.commodities.keySet()){
 					otmdev.otm.output().request_lanegroup_flw(commid,linkids,sim_dt);
-					otmdev.otm.output().request_lanegroup_avg_veh(commid,linkids,sim_dt);
+					otmdev.otm.output().request_lanegroup_sum_veh(commid,linkids,sim_dt);
 				}
 
 			if(logger!=null)

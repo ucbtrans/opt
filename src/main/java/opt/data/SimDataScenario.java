@@ -64,21 +64,21 @@ public class SimDataScenario {
                 .map(s->(OutputLaneGroupFlow)s)
                 .collect(toSet());
 
-        Set<OutputLaneGroupAvgVehicles> vehs = otmdev.otm.output.get_data().stream()
-                .filter(s->s.type==AbstractOutput.Type.lanegroup_avgveh)
-                .map(s->(OutputLaneGroupAvgVehicles)s)
+        Set<OutputLaneGroupSumVehicles> vehs = otmdev.otm.output.get_data().stream()
+                .filter(s->s.type==AbstractOutput.Type.lanegroup_sumveh)
+                .map(s->(OutputLaneGroupSumVehicles)s)
                 .collect(toSet());
 
         for(Long commid : commids){
 
             Optional<OutputLaneGroupFlow> oflw = flws.stream().filter(s->s.get_commodity_id()==commid).findFirst();
-            Optional<OutputLaneGroupAvgVehicles> oveh = vehs.stream().filter(s->s.get_commodity_id()==commid).findFirst();
+            Optional<OutputLaneGroupSumVehicles> oveh = vehs.stream().filter(s->s.get_commodity_id()==commid).findFirst();
 
             if(!oflw.isPresent() || !oveh.isPresent())
                 continue;
 
             OutputLaneGroupFlow flw = oflw.get();
-            OutputLaneGroupAvgVehicles veh = oveh.get();
+            OutputLaneGroupSumVehicles veh = oveh.get();
 
             for(AbstractLaneGroup alg : veh.ordered_lgs) {
 
@@ -105,20 +105,20 @@ public class SimDataScenario {
                 .map(s->(OutputCellFlow)s)
                 .collect(toSet());
 
-        Set<OutputCellVehicles> vehs = otmdev.otm.output.get_data().stream()
-                .filter(s->s.type==AbstractOutput.Type.cell_veh)
-                .map(s->(OutputCellVehicles)s)
+        Set<OutputCellSumVehicles> vehs = otmdev.otm.output.get_data().stream()
+                .filter(s->s.type==AbstractOutput.Type.cell_sumveh)
+                .map(s->(OutputCellSumVehicles)s)
                 .collect(toSet());
 
         for(Long commid : commids){
             Optional<OutputCellFlow> oflw = flws.stream().filter(s->s.get_commodity_id()==commid).findFirst();
-            Optional<OutputCellVehicles> oveh = vehs.stream().filter(s->s.get_commodity_id()==commid).findFirst();
+            Optional<OutputCellSumVehicles> oveh = vehs.stream().filter(s->s.get_commodity_id()==commid).findFirst();
 
             if(!oflw.isPresent() || !oveh.isPresent())
                 continue;
 
             OutputCellFlow flw = oflw.get();
-            OutputCellVehicles veh = oveh.get();
+            OutputCellSumVehicles veh = oveh.get();
 
             for(FluidLaneGroup flg : flw.ordered_lgs) {
 
