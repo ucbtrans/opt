@@ -481,13 +481,9 @@ public class Scenario {
                     break;
 
                 case HOVHOT:
-                    System.out.println("HOVHOT controller links: "+controller.get_links().size());
-
                     links_to_write = controller.get_links().stream()
                             .filter(lk->lk.get_mng_lanes()>0)
                             .collect(Collectors.toSet());
-
-                    System.out.println("HOVHOT controller links: "+links_to_write.size());
                     break;
             }
 
