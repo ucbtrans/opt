@@ -422,12 +422,12 @@ public class ScenarioEditorController {
         for (List<Segment> segments : seg_list)
             for(Segment segment : segments)
                 for (AbstractLink link : segment.get_links())
-                    if (!linksUnderPolicy.contains(link))
+                    if ((link.get_mng_lanes() > 0) && (!linksUnderPolicy.contains(link)))
                         linksFreeForPolicy.add(link);
         
         List<LinkConnector> connectors = myScenario.get_connectors();
         for (AbstractLink link : connectors)
-            if (!linksUnderPolicy.contains(link))
+            if ((link.get_mng_lanes() > 0) && (!linksUnderPolicy.contains(link)))
                 linksFreeForPolicy.add(link);
     }
     

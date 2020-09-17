@@ -90,8 +90,6 @@ public class STableHandler {
         
         int i0 = focusedCell.getRow();
         int j0 = focusedCell.getColumn();
-        //if (true)
-        //    return;
         
         minSelectedRow = maxSelectedRow = i0;
         minSelectedColumn = maxSelectedColumn = j0;

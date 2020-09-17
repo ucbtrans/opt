@@ -122,7 +122,7 @@ public class ControlFactory {
 	// jaxb
 	/////////////////////////
 
-	public static ControllerRampMeterAlinea create_controller_alinea(jaxb.Entry jentry,jaxb.Sensor jsn) throws Exception {
+	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn,jaxb.Entry jentry,jaxb.Sensor jsn,Long id) throws Exception {
 
 		// read parameters
 		boolean has_queue_control = false;
@@ -145,7 +145,7 @@ public class ControlFactory {
 				}
 			}
 
-		ControllerRampMeterAlinea cntrl = create_controller_alinea(null,0l,
+		ControllerRampMeterAlinea cntrl = create_controller_alinea(fwyscn,id,
 				jentry.getDt(),
 				has_queue_control,
 				min_rate_vphpl,
@@ -157,62 +157,7 @@ public class ControlFactory {
 		return cntrl;
 	}
 
-//		public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn, jaxb.Controller jcnt, Map<Long,jaxb.Actuator> actuator_pool, Map<Long,jaxb.Sensor> sensor_pool) throws Exception {
-//
-//		// complex sensors : check that there are none
-//		if(jcnt.getFeedbackSensors()!=null)
-//			assert(jcnt.getFeedbackSensors().getFeedbackSensor().isEmpty());
-//
-//		// complex actuators : check that there are none
-//		if(jcnt.getTargetActuators()!=null)
-//			assert(jcnt.getTargetActuators().getTargetActuator().isEmpty());
-//
-//		// read parameters
-//		boolean has_queue_control = false;
-//		LaneGroupType lgtype = LaneGroupType.gp;
-//		if(jcnt.getParameters()!=null)
-//			for(jaxb.Parameter param : jcnt.getParameters().getParameter()){
-//				switch(param.getName()){
-//					case "queue_control":
-//						has_queue_control = param.getValue().equals("true");
-//						break;
-//					case "lane_group":
-//						lgtype = LaneGroupType.valueOf(param.getValue());
-//						break;
-//					default:
-//						throw new Exception("Unknown controller parameter");
-//				}
-//			}
-//
-//		float min_rate_vph = -1f;
-//		float max_rate_vph = -1f;
-//		List<Long> act_ids = OTMUtils.csv2longlist(jcnt.getTargetActuators().getIds());
-//		assert(act_ids.size()==1);
-//		for(long a : act_ids) {
-//			jaxb.Actuator jact = actuator_pool.get(a);
-//			min_rate_vph = jact.getMinValue();
-//			max_rate_vph = jact.getMaxValue();
-//		}
-//
-//		// read sensors
-//		long sensor_id = -1l;
-//		long sensor_link_id = -1l;
-//		float sensor_offset = -1f;
-//		List<Long> sens_ids = OTMUtils.csv2longlist(jcnt.getFeedbackSensors().getIds());
-//		assert(sens_ids.size()==1);
-//		for(long sens_id :sens_ids) {
-//			jaxb.Sensor jsns = sensor_pool.get(sens_id);
-//			sensor_id = jsns.getId();
-//			sensor_link_id = jsns.getLinkId();
-//			sensor_offset = jsns.getPosition();
-//		}
-//
-//		ControllerRampMeterAlinea cntrl = create_controller_alinea(fwyscn,jcnt.getId(),jcnt.getDt(),has_queue_control,min_rate_vph,max_rate_vph,sensor_id,sensor_link_id,sensor_offset);
-//		cntrl.setId( jcnt.getId() );
-//		return cntrl;
-//	}
-
-	public static ControllerRampMeterFixedRate create_controller_fixed_rate(jaxb.Entry jentry) throws Exception {
+	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn,jaxb.Entry jentry,Long id) throws Exception {
 
 		// read parameters
 		boolean has_queue_control = false;
@@ -239,14 +184,14 @@ public class ControlFactory {
 				}
 			}
 
-		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(null,0l,
+		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(fwyscn,id,
 				jentry.getDt(),has_queue_control,min_rate_vphpl,max_rate_vphpl,rate_vphpl);
 
 		return cntrl;
 
 	}
 
-	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn,jaxb.Entry jentry) throws Exception {
+	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn,jaxb.Entry jentry,Long id) throws Exception {
 
 		// read parameters
 		Set<Long> disallowed_comms = new HashSet<>();
@@ -288,7 +233,7 @@ public class ControlFactory {
 
 		Float dt = jentry.getDt()==null ? (float) UserSettings.defaultControlDtSeconds : jentry.getDt();
 
-		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(fwyscn,0l,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
+		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(fwyscn,id,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
 		return cntrl;
 	}
 

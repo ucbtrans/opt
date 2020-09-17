@@ -473,21 +473,9 @@ public class Scenario {
             // determine which links to write to the actuator.
             // This is usually all of the links in the cotnroller. But in the case of HOVHOT controller
             // we ignore links without managed lanes
-            Set<AbstractLink> links_to_write = new HashSet<>();
+            Set<AbstractLink> links_to_write = controller.links_to_write();
 
-            switch(controller.get_controlType()){
-                case RampMetering:
-                    links_to_write.addAll(controller.get_links());
-                    break;
-
-                case HOVHOT:
-                    links_to_write = controller.get_links().stream()
-                            .filter(lk->lk.get_mng_lanes()>0)
-                            .collect(Collectors.toSet());
-                    break;
-            }
-
-            if(controller.ignore())
+            if(controller.ignore() || links_to_write.isEmpty())
                 continue;
 
             jcntrls.getController().add(controller.to_jaxb_controller());

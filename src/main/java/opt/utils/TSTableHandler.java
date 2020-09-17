@@ -98,12 +98,11 @@ public class TSTableHandler {
         
         int i0 = focusedCell.getRow();
         int j0 = focusedCell.getColumn();
-        if (j0 > 0)
-            return;
         
         minSelectedRow = maxSelectedRow = i0;
-        minSelectedColumn = 0;
-        maxSelectedColumn = myTable.getColumns().size() - 1;
+        minSelectedColumn = maxSelectedColumn = j0;
+        if (j0 == 0)
+            maxSelectedColumn = myTable.getColumns().size() - 1;
         selectBox();
         myTable.getFocusModel().focus(i0, myTable.getColumns().get(j0));
         event.consume();

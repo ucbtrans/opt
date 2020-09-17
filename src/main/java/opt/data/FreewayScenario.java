@@ -272,7 +272,6 @@ public class FreewayScenario {
                 long act_id = Long.parseLong(jcnt.getTargetActuators().getIds());
                 jaxb.Actuator jact = actuators.get(act_id);
 
-                // read link ids from the opt schedule item
                 List<AbstractLink> links = new ArrayList<>();
                 List<LaneGroupType> lgtypes = new ArrayList<>();
                 for(String e : jact.getActuatorTarget().getContent().split(",")){
@@ -322,11 +321,11 @@ public class FreewayScenario {
                     switch( algorithm ){
 
                         case rm_open:
-                            ctrl = ControlFactory.create_controller_rmopen(null,0l);
+                            ctrl = ControlFactory.create_controller_rmopen(this,null);
                             break;
 
                         case rm_closed:
-                            ctrl = ControlFactory.create_controller_rmclosed(null,0l);
+                            ctrl = ControlFactory.create_controller_rmclosed(this,null);
                             break;
 
                         case rm_alinea:
@@ -338,15 +337,15 @@ public class FreewayScenario {
                                 jsns = sensors.get(sensor_id);
                             }
 
-                            ctrl = ControlFactory.create_controller_alinea(jentry,jsns);
+                            ctrl = ControlFactory.create_controller_alinea(this,jentry,jsns,null);
                             break;
 
                         case rm_fixed_rate:
-                            ctrl = ControlFactory.create_controller_fixed_rate(jentry);
+                            ctrl = ControlFactory.create_controller_fixed_rate(this,jentry,null);
                             break;
 
                         case lg_restrict:
-                            ctrl = ControlFactory.create_controller_hovhot(this,jentry);
+                            ctrl = ControlFactory.create_controller_hovhot(this,jentry,null);
 
                     }
 
@@ -879,8 +878,12 @@ public class FreewayScenario {
 
         jaxb.Schds schds = new jaxb.Schds();
         scn.setSchds(schds);
-        for(ControlSchedule sch : get_all_schedules())
+        for(ControlSchedule sch : get_all_schedules()) {
+            Set<AbstractLink> links_to_write = sch.links_to_write();
+            if(sch.ignore() || links_to_write.isEmpty())
+                continue;
             schds.getSchd().add(sch.to_jaxb());
+        }
 
         jaxb.Routes rts = new jaxb.Routes();
         scn.setRoutes(rts);
