@@ -337,11 +337,11 @@ public class FreewayScenario {
                                 jsns = sensors.get(sensor_id);
                             }
 
-                            ctrl = ControlFactory.create_controller_alinea(jentry,jsns,null);
+                            ctrl = ControlFactory.create_controller_alinea(this,jentry,jsns,null);
                             break;
 
                         case rm_fixed_rate:
-                            ctrl = ControlFactory.create_controller_fixed_rate(jentry,null);
+                            ctrl = ControlFactory.create_controller_fixed_rate(this,jentry,null);
                             break;
 
                         case lg_restrict:

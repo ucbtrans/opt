@@ -122,7 +122,7 @@ public class ControlFactory {
 	// jaxb
 	/////////////////////////
 
-	public static ControllerRampMeterAlinea create_controller_alinea(jaxb.Entry jentry,jaxb.Sensor jsn,Long id) throws Exception {
+	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn,jaxb.Entry jentry,jaxb.Sensor jsn,Long id) throws Exception {
 
 		// read parameters
 		boolean has_queue_control = false;
@@ -145,7 +145,7 @@ public class ControlFactory {
 				}
 			}
 
-		ControllerRampMeterAlinea cntrl = create_controller_alinea(null,id,
+		ControllerRampMeterAlinea cntrl = create_controller_alinea(fwyscn,id,
 				jentry.getDt(),
 				has_queue_control,
 				min_rate_vphpl,
@@ -157,7 +157,7 @@ public class ControlFactory {
 		return cntrl;
 	}
 
-	public static ControllerRampMeterFixedRate create_controller_fixed_rate(jaxb.Entry jentry,Long id) throws Exception {
+	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn,jaxb.Entry jentry,Long id) throws Exception {
 
 		// read parameters
 		boolean has_queue_control = false;
@@ -184,7 +184,7 @@ public class ControlFactory {
 				}
 			}
 
-		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(null,id,
+		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(fwyscn,id,
 				jentry.getDt(),has_queue_control,min_rate_vphpl,max_rate_vphpl,rate_vphpl);
 
 		return cntrl;
