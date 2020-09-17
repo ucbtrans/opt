@@ -35,9 +35,9 @@ public class TestTimeSeries extends AbstractTest {
 
     @Test
     public void test_mult(){
-        double value = timeseries.values.get(10);
+        double value = timeseries.values[10];
         timeseries.mult(2f);
-        assertEquals(timeseries.values.get(10),value*2d,0.001);
+        assertEquals(timeseries.values[10],value*2d,0.001);
     }
 
     @Test

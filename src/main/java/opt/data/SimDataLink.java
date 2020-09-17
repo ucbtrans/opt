@@ -63,9 +63,9 @@ public class SimDataLink {
         return link_length_miles/lgData.values().iterator().next().celldata.size();
     }
 
-    protected double[] get_veh_array(LaneGroupType lgtype,Long commid){
+    protected double[] get_veh_array(LaneGroupType lgtype,Set<Long> commids){
         assert(lgtype2id.containsKey(lgtype) || lgtype==null);
-        LaneGroupsAndCommodities X = choose_lgs_and_comms(lgtype,commid);
+        LaneGroupsAndCommodities X = choose_lgs_and_comms(lgtype,commids);
         double [] Y = new double[scndata.numtime()];
         for(SimDataLanegroup lgData : X.lgDatas){
             for(int k=0;k<scndata.numtime();k++)
@@ -74,18 +74,18 @@ public class SimDataLink {
         return Y;
     }
 
-    protected double [] get_exit_flw_array(LaneGroupType lgtype, Long commid) {
+    protected double [] get_exit_flw_array(LaneGroupType lgtype,Set<Long> commids) {
         assert(lgtype2id.containsKey(lgtype) || lgtype==null);
         if(lgtype==null){
             double [] X = new double[scndata.numtime()];
             for(SimDataLanegroup data : lgData.values()){
-                double [] XX = data.get_flw_exiting_lg(commid,numtime(), scndata.haslgdata);
+                double [] XX = data.get_flw_exiting_lg(commids,numtime(), scndata.haslgdata);
                 for(int k=0;k<X.length;k++)
                     X[k] += XX[k];
             }
             return X;
         } else {
-            return lgData.get(lgtype2id.get(lgtype)).get_flw_exiting_lg(commid,numtime(),scndata.haslgdata);
+            return lgData.get(lgtype2id.get(lgtype)).get_flw_exiting_lg(commids,numtime(),scndata.haslgdata);
         }
     }
 
@@ -115,19 +115,31 @@ public class SimDataLink {
     // API
     /////////////////////////////////////////////////
 
-    public TimeSeries get_vht(LaneGroupType lgtype,Long commid){
-        double[] vehs = get_veh_array(lgtype,commid);
+    public TimeSeries get_vht(LaneGroupType lgtype,long commid){
+        Set<Long> commids = new HashSet<>();
+        commids.add(commid);
+        return get_vht(lgtype,commids);
+    }
+
+    public TimeSeries get_vht(LaneGroupType lgtype,Set<Long> commids){
+        double[] vehs = get_veh_array(lgtype,commids);
         double dt_hr = scndata.get_dt_sec() / 3600d;
         for(int k=0;k<vehs.length;k++)
             vehs[k] = vehs[k]*dt_hr;
         return new TimeSeries(scndata.time,vehs);
     }
 
-    public TimeSeries get_vmt(LaneGroupType lgtype,Long commid){
+    public TimeSeries get_vmt(LaneGroupType lgtype,long commid){
+        Set<Long> commids = new HashSet<>();
+        commids.add(commid);
+        return get_vmt(lgtype,commids);
+    }
+
+    public TimeSeries get_vmt(LaneGroupType lgtype,Set<Long> commids){
 
         assert(lgtype2id.containsKey(lgtype) || lgtype==null);
 
-        LaneGroupsAndCommodities X = choose_lgs_and_comms(lgtype,commid);
+        LaneGroupsAndCommodities X = choose_lgs_and_comms(lgtype,commids);
 
         // collect data
         double dt_hr = scndata.get_dt_sec() / 3600d;
@@ -167,15 +179,10 @@ public class SimDataLink {
         return new TimeSeries(scndata.time,delays);
     }
 
-    /** returns a TimeSeries of vehicle numbers for the given lane group type and commodity id
-     * lgtype==null means all lanes in the link
-     * comm==null means all commodities
-     * NOTE: if the lane group does not exist, returns a list of ZEROS
-     */
-    public TimeSeries get_veh(LaneGroupType lgtype,Long commid){
-        return new TimeSeries(scndata.time,lgtype2id.containsKey(lgtype)||lgtype==null ?
-                get_veh_array(lgtype,commid) :
-                new double[scndata.numtime()] );
+    public TimeSeries get_veh(LaneGroupType lgtype,long commid){
+        Set<Long> commids = new HashSet<>();
+        commids.add(commid);
+        return get_veh(lgtype,commids);
     }
 
     /** returns a TimeSeries of vehicle numbers for the given lane group type and commodity id
@@ -183,10 +190,27 @@ public class SimDataLink {
      * comm==null means all commodities
      * NOTE: if the lane group does not exist, returns a list of ZEROS
      */
-    public TimeSeries get_flw(LaneGroupType lgtype, Long commid){
+    public TimeSeries get_veh(LaneGroupType lgtype,Set<Long> commids){
+        return new TimeSeries(scndata.time,lgtype2id.containsKey(lgtype)||lgtype==null ?
+                get_veh_array(lgtype,commids) :
+                new double[scndata.numtime()] );
+    }
+
+    public TimeSeries get_flw(LaneGroupType lgtype,long commid){
+        Set<Long> commids = new HashSet<>();
+        commids.add(commid);
+        return get_flw(lgtype,commids);
+    }
+
+    /** returns a TimeSeries of vehicle numbers for the given lane group type and commodity id
+     * lgtype==null means all lanes in the link
+     * comm==null means all commodities
+     * NOTE: if the lane group does not exist, returns a list of ZEROS
+     */
+    public TimeSeries get_flw(LaneGroupType lgtype, Set<Long> commids){
         // use cell data only if there is no lg data
         return new TimeSeries(scndata.time,lgtype2id.containsKey(lgtype)||lgtype==null ?
-                get_exit_flw_array(lgtype,commid) :
+                get_exit_flw_array(lgtype,commids) :
                 new double[scndata.numtime()] );
     }
 
@@ -215,7 +239,7 @@ public class SimDataLink {
 
 
 
-    public LaneGroupsAndCommodities choose_lgs_and_comms(LaneGroupType lgtype, Long commid){
+    public LaneGroupsAndCommodities choose_lgs_and_comms(LaneGroupType lgtype, Set<Long> commids){
 
         // choose lane groups
         Set<SimDataLanegroup> lgDatas = new HashSet<>();
@@ -225,13 +249,13 @@ public class SimDataLink {
             lgDatas.add(lgData.get(lgtype2id.get(lgtype)));
 
         // choose commodities
-        Set<Long> commids = new HashSet<>();
-        if(commid==null)
-            commids.addAll(lgDatas.stream().flatMap(x->x.get_comm_ids().stream()).collect(toSet()));
+        Set<Long> xcommids = new HashSet<>();
+        if(commids==null)
+            xcommids.addAll(lgDatas.stream().flatMap(x->x.get_comm_ids().stream()).collect(toSet()));
         else
-            commids.add(commid);
+            xcommids.addAll(commids);
 
-        return new LaneGroupsAndCommodities(lgDatas,commids);
+        return new LaneGroupsAndCommodities(lgDatas,xcommids);
     }
 
     public class LaneGroupsAndCommodities {

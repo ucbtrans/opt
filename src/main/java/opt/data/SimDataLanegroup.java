@@ -56,16 +56,19 @@ public class SimDataLanegroup {
         flws.put(commid,flw);
     }
 
-    protected double [] get_flw_exiting_lg(Long commid, int numtime, boolean uselgs){
+    protected double [] get_flw_exiting_lg(Set<Long> commids, int numtime, boolean uselgs){
         double [] X = new double[numtime];
         Map<Long, double[]> myflws = uselgs ? flws : celldata.get(celldata.size()-1).flws;
-        if(commid==null)
+        if(commids==null)
             for(double [] list : myflws.values())
                 for (int k = 0; k <numtime; k++)
                     X[k] += list[k];
         else
-            if (myflws.containsKey(commid))
-                X = myflws.get(commid);
+            for(Long commid : commids) {
+                double [] x = myflws.get(commid);
+                for (int k = 0; k < numtime; k++)
+                    X[k] += x[k];
+            }
         return X;
     }
 

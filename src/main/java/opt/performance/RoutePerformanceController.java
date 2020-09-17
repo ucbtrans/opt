@@ -267,9 +267,7 @@ public class RoutePerformanceController {
 
     
     private void processLinkSequence() {
-
-        // TODO TEMPORARILY REMOVED BY GABRIEL UNTIL DATA ISSUES ARE FIXED
-
+//
 //        maxCellLength = 0;
 //        maxLinkLength = 0;
 //        routeLength = 0;
@@ -682,459 +680,459 @@ public class RoutePerformanceController {
     
     
     public void fillTabAggregates() {
-        vbAggregates.getChildren().clear();
-        String label_gp, label_mng, label_aux;
-        XYChart.Series dataSeries_gp, dataSeries_mng, dataSeries_total;
-        List<XYDataItem> xydata_gp, xydata_mng, xydata_aux;
-        int sz_gp, sz_mng, sz_aux;
-        XYDataItem xy;
-        double dt = mySimData.get_dt_sec();
-        int num_comms = listVT.size();
-        TimeSeries[] vmt_series_gp = new TimeSeries[num_comms];
-        TimeSeries[] vmt_series_mng = new TimeSeries[num_comms];
-        TimeSeries[] vht_series_gp = new TimeSeries[num_comms];
-        TimeSeries[] vht_series_mng = new TimeSeries[num_comms];
-        TimeSeries delay_gp = null;
-        TimeSeries delay_mng = null;
-        
-        for (int i = 0; i < num_comms; i++) {
-            vmt_series_gp[i] = null;
-            vmt_series_mng[i] = null;
-            vht_series_gp[i] = null;
-            vht_series_mng[i] = null;
-        }
-        
-        List<AbstractLink> links = myRoute.get_link_sequence();
-        
-        for (AbstractLink l : links) {
-            double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;
-            if (v_thres < 0)
-                v_thres = UserSettings.speedConversionMap.get("kphmph") * l.get_gp_freespeed_kph();
-            SimDataLink sdl = mySimData.linkdata.get(l.id);
-            if (sdl != null) {
-                for (int i = 0; i < num_comms; i++) {
-                    TimeSeries ts = sdl.get_vmt(LaneGroupType.gp, listVT.get(i).getId());
-                    if (ts != null) {
-                        if (vmt_series_gp[i] == null)
-                            vmt_series_gp[i] = ts;
-                        else
-                            try {
-                                vmt_series_gp[i].add(ts);
-                            } catch(Exception e) {
-                                System.err.println("Error adding GP VMT timeseries: " + e.getMessage());
-                            }
-                    }
-                    
-                    ts = sdl.get_vht(LaneGroupType.gp, listVT.get(i).getId());
-                    if (ts != null) {
-                        if (vht_series_gp[i] == null)
-                            vht_series_gp[i] = ts;
-                        else
-                            try {
-                                vht_series_gp[i].add(ts);
-                            } catch(Exception e) {
-                                System.err.println("Error adding GP VHT timeseries: " + e.getMessage());
-                            }
-                    }
-                    
-                    if (l.get_mng_lanes() > 0) {
-                        ts = sdl.get_vmt(LaneGroupType.mng, listVT.get(i).getId());
-                        if (ts != null) {
-                            if (vmt_series_mng[i] == null)
-                                vmt_series_mng[i] = ts;
-                            else
-                                try {
-                                    vmt_series_mng[i].add(ts);
-                                } catch(Exception e) {
-                                    System.err.println("Error adding Managed Lane VMT timeseries: " + e.getMessage());
-                                }
-                        }
-                        
-                        ts = sdl.get_vht(LaneGroupType.mng, listVT.get(i).getId());
-                        if (ts != null) {
-                            if (vht_series_mng[i] == null)
-                                vht_series_mng[i] = ts;
-                            else
-                                try {
-                                    vht_series_mng[i].add(ts);
-                                } catch(Exception e) {
-                                    System.err.println("Error adding Managed Lane VHT timeseries: " + e.getMessage());
-                                }
-                        }
-                    }
-                    
-                    if (l.get_aux_lanes() > 0) {
-                        ts = sdl.get_vmt(LaneGroupType.aux, listVT.get(i).getId());
-                        if (ts != null) {
-                            if (vmt_series_gp[i] == null)
-                                vmt_series_gp[i] = ts;
-                            else
-                                try {
-                                    vmt_series_gp[i].add(ts);
-                                } catch(Exception e) {
-                                    System.err.println("Error adding Aux Lane VMT timeseries: " + e.getMessage());
-                                }
-                        }
-                        
-                        ts = sdl.get_vht(LaneGroupType.aux, listVT.get(i).getId());
-                        if (ts != null) {
-                            if (vht_series_gp[i] == null)
-                                vht_series_gp[i] = ts;
-                            else
-                                try {
-                                    vht_series_gp[i].add(ts);
-                                } catch(Exception e) {
-                                    System.err.println("Error adding Aux Lane VHT timeseries: " + e.getMessage());
-                                }
-                        }
-                    }
-                }
-                
-                TimeSeries ts = sdl.get_delay(LaneGroupType.gp, (float)v_thres);
-                if (ts != null) {
-                    if (delay_gp == null)
-                        delay_gp = ts;
-                    else
-                        try {
-                            delay_gp.add(ts);
-                        } catch(Exception e) {
-                            System.err.println("Error adding GP delay timeseries: " + e.getMessage());
-                        }
-                }
-                
-                if (l.get_mng_lanes() > 0) {
-                    ts = sdl.get_delay(LaneGroupType.mng, (float)v_thres);
-                    if (ts != null) {
-                        if (delay_mng == null)
-                            delay_mng = ts;
-                        else
-                            try {
-                                delay_mng.add(ts);
-                            } catch(Exception e) {
-                                System.err.println("Error adding Managed Lane delay timeseries: " + e.getMessage());
-                            }
-                    }
-                }
-                
-                if (l.get_aux_lanes() > 0) {
-                    ts = sdl.get_delay(LaneGroupType.aux, (float)v_thres);
-                    if (ts != null) {
-                        if (delay_gp == null)
-                            delay_gp = ts;
-                        else
-                            try {
-                                delay_gp.add(ts);
-                            } catch(Exception e) {
-                                System.err.println("Error adding Aux Lane delay timeseries: " + e.getMessage());
-                            }
-                    }
-                }
-            }
-        }
-        
-        label_gp = "VMT in GP Lanes";
-        if (hasAuxLanes)
-            label_gp = "VMT in GP and Aux Lanes";
-        label_mng = "VMT in Managed Lanes";
-        
-        NumberAxis xAxis = new NumberAxis();
-        xAxis.setLabel(timeLabel);
-        NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("VMT");
-
-        LineChart vmtChart = new LineChart(xAxis, yAxis);
-        vmtChart.setTitle(label_gp);
-        
-        int max_sz = 0;
-        for (int k = 0; k < num_comms; k++) {
-            max_sz = Math.max(max_sz, vmt_series_gp[k].values.size());
-        }
-        double[] total = new double[max_sz];
-        for (int i = 0; i < max_sz; i++)
-            total[i] = 0;
-        for (int k = 0; k < num_comms; k++) {
-            dataSeries_gp = new XYChart.Series();
-            dataSeries_gp.setName(listVT.get(k).get_name());
-            xydata_gp = vmt_series_gp[k].get_XYSeries(listVT.get(k).get_name()).getItems();
-            
-            sz_gp = xydata_gp.size();
-            
-            for (int i = 0; i < max_sz; i++) {
-                if (i < sz_gp) {
-                    xy = xydata_gp.get(i);
-                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                    total[i] += xy.getYValue();
-                } else {
-                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
-                }
-            }
-            vmtChart.getData().add(dataSeries_gp);
-        }
-        
-        dataSeries_total = new XYChart.Series();
-        dataSeries_total.setName("Total");
-        for (int i = 0; i < max_sz; i++)
-            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-        if (listVT.size() > 1)
-            vmtChart.getData().add(dataSeries_total);
-        
-        vmtChart.setCreateSymbols(false);
-        vmtChart.setLegendSide(Side.RIGHT);
-        vmtChart.setMinHeight(200);
-        vbAggregates.getChildren().add(vmtChart);
-        JFXChartUtil.setupZooming(vmtChart, (MouseEvent mouseEvent) -> {
-            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
-                    mouseEvent.isShortcutDown() )
-                mouseEvent.consume();
-        });
-        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vmtChart);
-        
-        if (hasManagedLanes) {
-            xAxis = new NumberAxis();
-            xAxis.setLabel(timeLabel);
-            yAxis = new NumberAxis();
-            yAxis.setLabel("VMT");
-
-            vmtChart = new LineChart(xAxis, yAxis);
-            vmtChart.setTitle(label_mng);
-
-            max_sz = 0;
-            for (int k = 0; k < num_comms; k++) {
-                if (vmt_series_gp[k] != null)
-                    max_sz = Math.max(max_sz, vmt_series_gp[k].values.size());
-            }
-            for (int i = 0; i < max_sz; i++)
-                total[i] = 0;
-            for (int k = 0; k < num_comms; k++) {
-                dataSeries_mng = new XYChart.Series();
-                dataSeries_mng.setName(listVT.get(k).get_name());
-                xydata_mng = vmt_series_mng[k].get_XYSeries(listVT.get(k).get_name()).getItems();
-
-                sz_mng = xydata_mng.size();
-
-                for (int i = 0; i < max_sz; i++) {
-                    if (i < sz_mng) {
-                        xy = xydata_mng.get(i);
-                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                        total[i] += xy.getYValue();
-                    } else {
-                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
-                    }
-                }
-                vmtChart.getData().add(dataSeries_mng);
-            }
-            
-            dataSeries_total = new XYChart.Series();
-            dataSeries_total.setName("Total");
-            for (int i = 0; i < max_sz; i++)
-                dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-            if (listVT.size() > 1)
-                vmtChart.getData().add(dataSeries_total);
-        
-            vmtChart.setCreateSymbols(false);
-            vmtChart.setLegendSide(Side.RIGHT);
-            vmtChart.setMinHeight(200);
-            vbAggregates.getChildren().add(vmtChart);
-            JFXChartUtil.setupZooming(vmtChart, (MouseEvent mouseEvent) -> {
-            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
-                    mouseEvent.isShortcutDown() )
-                mouseEvent.consume();
-            });
-            JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vmtChart);
-        }
-        
-        
-        label_gp = "VHT in GP Lanes";
-        if (hasAuxLanes)
-            label_gp = "VHT in GP and Aux Lanes";
-        label_mng = "VHT in Managed Lanes";
-        
-        xAxis = new NumberAxis();
-        xAxis.setLabel(timeLabel);
-        yAxis = new NumberAxis();
-        yAxis.setLabel("VHT");
-
-        LineChart vhtChart = new LineChart(xAxis, yAxis);
-        vhtChart.setTitle(label_gp);
-        
-        max_sz = 0;
-        for (int k = 0; k < num_comms; k++) {
-            max_sz = Math.max(max_sz, vht_series_gp[k].values.size());
-        }
-        total = new double[max_sz];
-        for (int i = 0; i < max_sz; i++)
-            total[i] = 0;
-        for (int k = 0; k < num_comms; k++) {
-            dataSeries_gp = new XYChart.Series();
-            dataSeries_gp.setName(listVT.get(k).get_name());
-            xydata_gp = vht_series_gp[k].get_XYSeries(listVT.get(k).get_name()).getItems();
-            
-            sz_gp = xydata_gp.size();
-            
-            for (int i = 0; i < max_sz; i++) {
-                if (i < sz_gp) {
-                    xy = xydata_gp.get(i);
-                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                    total[i] += xy.getYValue();
-                } else {
-                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
-                }
-            }
-            vhtChart.getData().add(dataSeries_gp);
-        }
-        
-        dataSeries_total = new XYChart.Series();
-        dataSeries_total.setName("Total");
-        for (int i = 0; i < max_sz; i++)
-            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-        if (listVT.size() > 1)
-            vhtChart.getData().add(dataSeries_total);
-        
-        vhtChart.setCreateSymbols(false);
-        vhtChart.setLegendSide(Side.RIGHT);
-        vhtChart.setMinHeight(200);
-        vbAggregates.getChildren().add(vhtChart);
-        JFXChartUtil.setupZooming(vhtChart, (MouseEvent mouseEvent) -> {
-            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
-                    mouseEvent.isShortcutDown() )
-                mouseEvent.consume();
-        });
-        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart);
-        
-        if (hasManagedLanes) {
-            xAxis = new NumberAxis();
-            xAxis.setLabel(timeLabel);
-            yAxis = new NumberAxis();
-            yAxis.setLabel("VHT");
-
-            vhtChart = new LineChart(xAxis, yAxis);
-            vhtChart.setTitle(label_mng);
-
-            max_sz = 0;
-            for (int k = 0; k < num_comms; k++) {
-                if (vht_series_gp[k] != null)
-                    max_sz = Math.max(max_sz, vht_series_gp[k].values.size());
-            }
-            for (int i = 0; i < max_sz; i++)
-                total[i] = 0;
-            for (int k = 0; k < num_comms; k++) {
-                dataSeries_mng = new XYChart.Series();
-                dataSeries_mng.setName(listVT.get(k).get_name());
-                xydata_mng = vht_series_mng[k].get_XYSeries(listVT.get(k).get_name()).getItems();
-
-                sz_mng = xydata_mng.size();
-
-                for (int i = 0; i < max_sz; i++) {
-                    if (i < sz_mng) {
-                        xy = xydata_mng.get(i);
-                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                        total[i] += xy.getYValue();
-                    } else {
-                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
-                    }
-                }
-                vhtChart.getData().add(dataSeries_mng);
-            }
-            
-            dataSeries_total = new XYChart.Series();
-            dataSeries_total.setName("Total");
-            for (int i = 0; i < max_sz; i++)
-                dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-            if (listVT.size() > 1)
-                vhtChart.getData().add(dataSeries_total);
-        
-            vhtChart.setCreateSymbols(false);
-            vhtChart.setLegendSide(Side.RIGHT);
-            vhtChart.setMinHeight(200);
-            vbAggregates.getChildren().add(vhtChart);
-            JFXChartUtil.setupZooming(vhtChart, (MouseEvent mouseEvent) -> {
-            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
-                    mouseEvent.isShortcutDown() )
-                mouseEvent.consume();
-            });
-            JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart);
-        }
-
-        
-        label_gp = "GP Lanes";
-        if (hasAuxLanes)
-            label_gp = "GP and Aux Lanes";
-        label_mng = "Managed Lanes";
-        
-        xAxis = new NumberAxis();
-        xAxis.setLabel(timeLabel);
-        yAxis = new NumberAxis();
-        yAxis.setLabel("Delay (veh.-hr.)");
-
-        LineChart delayChart = new LineChart(xAxis, yAxis);
-        String label_units = UserSettings.unitsSpeed;
-        double cc = UserSettings.speedConversionMap.get("mph"+label_units);
-        double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;
-        String label_thres = String.format("(Speed Threshold: %.0f %s)", cc*v_thres, label_units);
-        if (v_thres < 0)
-            label_thres = "(Speed Threshold: Free Flow Speed)";
-        delayChart.setTitle("Delay " + label_thres);
-
-        dataSeries_gp = new XYChart.Series();
-        dataSeries_gp.setName(label_gp);
-        xydata_gp = delay_gp.get_XYSeries(label_gp).getItems();
-        
-        dataSeries_mng = new XYChart.Series();
-        dataSeries_mng.setName(label_mng);
-        xydata_mng = null;
-        sz_mng = 0;
-        if (hasManagedLanes) {
-            xydata_mng = delay_mng.get_XYSeries(label_mng).getItems();
-            sz_mng = xydata_mng.size();
-        }
-        
-        sz_gp = xydata_gp.size();
-        max_sz = Math.max(sz_gp, sz_mng);
-        
-        for (int i = 0; i < max_sz; i++)
-            total[i] = 0;
-        
-        for (int i = 0; i < max_sz; i++) {
-            if (i < sz_gp) {
-                xy = xydata_gp.get(i);
-                dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                total[i] += xy.getYValue();
-            } else {
-                dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
-            }
-            if (i < sz_mng) {
-                xy = xydata_mng.get(i);
-                dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                total[i] += xy.getYValue();
-            } else {
-                dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
-            }
-        }
-        
-        dataSeries_total = new XYChart.Series();
-        dataSeries_total.setName("Total");
-        for (int i = 0; i < max_sz; i++)
-            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-
-        delayChart.getData().add(dataSeries_gp);
-        if (hasManagedLanes) {
-            delayChart.getData().add(dataSeries_mng);
-            delayChart.getData().add(dataSeries_total);
-        }
-        delayChart.setCreateSymbols(false);
-        delayChart.setLegendSide(Side.RIGHT);
-        delayChart.setMinHeight(200);
-        
-        vbAggregates.getChildren().add(delayChart);
-        
-        //Zooming works only via primary mouse button without ctrl held down
-        JFXChartUtil.setupZooming(delayChart, (MouseEvent mouseEvent) -> {
-            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
-                    mouseEvent.isShortcutDown() )
-                mouseEvent.consume();
-        });
-        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(delayChart);
-        
+//        vbAggregates.getChildren().clear();
+//        String label_gp, label_mng, label_aux;
+//        XYChart.Series dataSeries_gp, dataSeries_mng, dataSeries_total;
+//        List<XYDataItem> xydata_gp, xydata_mng, xydata_aux;
+//        int sz_gp, sz_mng, sz_aux;
+//        XYDataItem xy;
+//        double dt = mySimData.get_dt_sec();
+//        int num_comms = listVT.size();
+//        TimeSeries[] vmt_series_gp = new TimeSeries[num_comms];
+//        TimeSeries[] vmt_series_mng = new TimeSeries[num_comms];
+//        TimeSeries[] vht_series_gp = new TimeSeries[num_comms];
+//        TimeSeries[] vht_series_mng = new TimeSeries[num_comms];
+//        TimeSeries delay_gp = null;
+//        TimeSeries delay_mng = null;
+//
+//        for (int i = 0; i < num_comms; i++) {
+//            vmt_series_gp[i] = null;
+//            vmt_series_mng[i] = null;
+//            vht_series_gp[i] = null;
+//            vht_series_mng[i] = null;
+//        }
+//
+//        List<AbstractLink> links = myRoute.get_link_sequence();
+//
+//        for (AbstractLink l : links) {
+//            double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;
+//            if (v_thres < 0)
+//                v_thres = UserSettings.speedConversionMap.get("kphmph") * l.get_gp_freespeed_kph();
+//            SimDataLink sdl = mySimData.linkdata.get(l.id);
+//            if (sdl != null) {
+//                for (int i = 0; i < num_comms; i++) {
+//                    TimeSeries ts = sdl.get_vmt(LaneGroupType.gp, listVT.get(i).getId());
+//                    if (ts != null) {
+//                        if (vmt_series_gp[i] == null)
+//                            vmt_series_gp[i] = ts;
+//                        else
+//                            try {
+//                                vmt_series_gp[i].add(ts);
+//                            } catch(Exception e) {
+//                                System.err.println("Error adding GP VMT timeseries: " + e.getMessage());
+//                            }
+//                    }
+//
+//                    ts = sdl.get_vht(LaneGroupType.gp, listVT.get(i).getId());
+//                    if (ts != null) {
+//                        if (vht_series_gp[i] == null)
+//                            vht_series_gp[i] = ts;
+//                        else
+//                            try {
+//                                vht_series_gp[i].add(ts);
+//                            } catch(Exception e) {
+//                                System.err.println("Error adding GP VHT timeseries: " + e.getMessage());
+//                            }
+//                    }
+//
+//                    if (l.get_mng_lanes() > 0) {
+//                        ts = sdl.get_vmt(LaneGroupType.mng, listVT.get(i).getId());
+//                        if (ts != null) {
+//                            if (vmt_series_mng[i] == null)
+//                                vmt_series_mng[i] = ts;
+//                            else
+//                                try {
+//                                    vmt_series_mng[i].add(ts);
+//                                } catch(Exception e) {
+//                                    System.err.println("Error adding Managed Lane VMT timeseries: " + e.getMessage());
+//                                }
+//                        }
+//
+//                        ts = sdl.get_vht(LaneGroupType.mng, listVT.get(i).getId());
+//                        if (ts != null) {
+//                            if (vht_series_mng[i] == null)
+//                                vht_series_mng[i] = ts;
+//                            else
+//                                try {
+//                                    vht_series_mng[i].add(ts);
+//                                } catch(Exception e) {
+//                                    System.err.println("Error adding Managed Lane VHT timeseries: " + e.getMessage());
+//                                }
+//                        }
+//                    }
+//
+//                    if (l.get_aux_lanes() > 0) {
+//                        ts = sdl.get_vmt(LaneGroupType.aux, listVT.get(i).getId());
+//                        if (ts != null) {
+//                            if (vmt_series_gp[i] == null)
+//                                vmt_series_gp[i] = ts;
+//                            else
+//                                try {
+//                                    vmt_series_gp[i].add(ts);
+//                                } catch(Exception e) {
+//                                    System.err.println("Error adding Aux Lane VMT timeseries: " + e.getMessage());
+//                                }
+//                        }
+//
+//                        ts = sdl.get_vht(LaneGroupType.aux, listVT.get(i).getId());
+//                        if (ts != null) {
+//                            if (vht_series_gp[i] == null)
+//                                vht_series_gp[i] = ts;
+//                            else
+//                                try {
+//                                    vht_series_gp[i].add(ts);
+//                                } catch(Exception e) {
+//                                    System.err.println("Error adding Aux Lane VHT timeseries: " + e.getMessage());
+//                                }
+//                        }
+//                    }
+//                }
+//
+//                TimeSeries ts = sdl.get_delay(LaneGroupType.gp, (float)v_thres);
+//                if (ts != null) {
+//                    if (delay_gp == null)
+//                        delay_gp = ts;
+//                    else
+//                        try {
+//                            delay_gp.add(ts);
+//                        } catch(Exception e) {
+//                            System.err.println("Error adding GP delay timeseries: " + e.getMessage());
+//                        }
+//                }
+//
+//                if (l.get_mng_lanes() > 0) {
+//                    ts = sdl.get_delay(LaneGroupType.mng, (float)v_thres);
+//                    if (ts != null) {
+//                        if (delay_mng == null)
+//                            delay_mng = ts;
+//                        else
+//                            try {
+//                                delay_mng.add(ts);
+//                            } catch(Exception e) {
+//                                System.err.println("Error adding Managed Lane delay timeseries: " + e.getMessage());
+//                            }
+//                    }
+//                }
+//
+//                if (l.get_aux_lanes() > 0) {
+//                    ts = sdl.get_delay(LaneGroupType.aux, (float)v_thres);
+//                    if (ts != null) {
+//                        if (delay_gp == null)
+//                            delay_gp = ts;
+//                        else
+//                            try {
+//                                delay_gp.add(ts);
+//                            } catch(Exception e) {
+//                                System.err.println("Error adding Aux Lane delay timeseries: " + e.getMessage());
+//                            }
+//                    }
+//                }
+//            }
+//        }
+//
+//        label_gp = "VMT in GP Lanes";
+//        if (hasAuxLanes)
+//            label_gp = "VMT in GP and Aux Lanes";
+//        label_mng = "VMT in Managed Lanes";
+//
+//        NumberAxis xAxis = new NumberAxis();
+//        xAxis.setLabel(timeLabel);
+//        NumberAxis yAxis = new NumberAxis();
+//        yAxis.setLabel("VMT");
+//
+//        LineChart vmtChart = new LineChart(xAxis, yAxis);
+//        vmtChart.setTitle(label_gp);
+//
+//        int max_sz = 0;
+//        for (int k = 0; k < num_comms; k++) {
+//            max_sz = Math.max(max_sz, vmt_series_gp[k].values.size());
+//        }
+//        double[] total = new double[max_sz];
+//        for (int i = 0; i < max_sz; i++)
+//            total[i] = 0;
+//        for (int k = 0; k < num_comms; k++) {
+//            dataSeries_gp = new XYChart.Series();
+//            dataSeries_gp.setName(listVT.get(k).get_name());
+//            xydata_gp = vmt_series_gp[k].get_XYSeries(listVT.get(k).get_name()).getItems();
+//
+//            sz_gp = xydata_gp.size();
+//
+//            for (int i = 0; i < max_sz; i++) {
+//                if (i < sz_gp) {
+//                    xy = xydata_gp.get(i);
+//                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+//                    total[i] += xy.getYValue();
+//                } else {
+//                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+//                }
+//            }
+//            vmtChart.getData().add(dataSeries_gp);
+//        }
+//
+//        dataSeries_total = new XYChart.Series();
+//        dataSeries_total.setName("Total");
+//        for (int i = 0; i < max_sz; i++)
+//            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+//        if (listVT.size() > 1)
+//            vmtChart.getData().add(dataSeries_total);
+//
+//        vmtChart.setCreateSymbols(false);
+//        vmtChart.setLegendSide(Side.RIGHT);
+//        vmtChart.setMinHeight(200);
+//        vbAggregates.getChildren().add(vmtChart);
+//        JFXChartUtil.setupZooming(vmtChart, (MouseEvent mouseEvent) -> {
+//            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+//                    mouseEvent.isShortcutDown() )
+//                mouseEvent.consume();
+//        });
+//        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vmtChart);
+//
+//        if (hasManagedLanes) {
+//            xAxis = new NumberAxis();
+//            xAxis.setLabel(timeLabel);
+//            yAxis = new NumberAxis();
+//            yAxis.setLabel("VMT");
+//
+//            vmtChart = new LineChart(xAxis, yAxis);
+//            vmtChart.setTitle(label_mng);
+//
+//            max_sz = 0;
+//            for (int k = 0; k < num_comms; k++) {
+//                if (vmt_series_gp[k] != null)
+//                    max_sz = Math.max(max_sz, vmt_series_gp[k].values.size());
+//            }
+//            for (int i = 0; i < max_sz; i++)
+//                total[i] = 0;
+//            for (int k = 0; k < num_comms; k++) {
+//                dataSeries_mng = new XYChart.Series();
+//                dataSeries_mng.setName(listVT.get(k).get_name());
+//                xydata_mng = vmt_series_mng[k].get_XYSeries(listVT.get(k).get_name()).getItems();
+//
+//                sz_mng = xydata_mng.size();
+//
+//                for (int i = 0; i < max_sz; i++) {
+//                    if (i < sz_mng) {
+//                        xy = xydata_mng.get(i);
+//                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+//                        total[i] += xy.getYValue();
+//                    } else {
+//                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+//                    }
+//                }
+//                vmtChart.getData().add(dataSeries_mng);
+//            }
+//
+//            dataSeries_total = new XYChart.Series();
+//            dataSeries_total.setName("Total");
+//            for (int i = 0; i < max_sz; i++)
+//                dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+//            if (listVT.size() > 1)
+//                vmtChart.getData().add(dataSeries_total);
+//
+//            vmtChart.setCreateSymbols(false);
+//            vmtChart.setLegendSide(Side.RIGHT);
+//            vmtChart.setMinHeight(200);
+//            vbAggregates.getChildren().add(vmtChart);
+//            JFXChartUtil.setupZooming(vmtChart, (MouseEvent mouseEvent) -> {
+//            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+//                    mouseEvent.isShortcutDown() )
+//                mouseEvent.consume();
+//            });
+//            JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vmtChart);
+//        }
+//
+//
+//        label_gp = "VHT in GP Lanes";
+//        if (hasAuxLanes)
+//            label_gp = "VHT in GP and Aux Lanes";
+//        label_mng = "VHT in Managed Lanes";
+//
+//        xAxis = new NumberAxis();
+//        xAxis.setLabel(timeLabel);
+//        yAxis = new NumberAxis();
+//        yAxis.setLabel("VHT");
+//
+//        LineChart vhtChart = new LineChart(xAxis, yAxis);
+//        vhtChart.setTitle(label_gp);
+//
+//        max_sz = 0;
+//        for (int k = 0; k < num_comms; k++) {
+//            max_sz = Math.max(max_sz, vht_series_gp[k].values.size());
+//        }
+//        total = new double[max_sz];
+//        for (int i = 0; i < max_sz; i++)
+//            total[i] = 0;
+//        for (int k = 0; k < num_comms; k++) {
+//            dataSeries_gp = new XYChart.Series();
+//            dataSeries_gp.setName(listVT.get(k).get_name());
+//            xydata_gp = vht_series_gp[k].get_XYSeries(listVT.get(k).get_name()).getItems();
+//
+//            sz_gp = xydata_gp.size();
+//
+//            for (int i = 0; i < max_sz; i++) {
+//                if (i < sz_gp) {
+//                    xy = xydata_gp.get(i);
+//                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+//                    total[i] += xy.getYValue();
+//                } else {
+//                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+//                }
+//            }
+//            vhtChart.getData().add(dataSeries_gp);
+//        }
+//
+//        dataSeries_total = new XYChart.Series();
+//        dataSeries_total.setName("Total");
+//        for (int i = 0; i < max_sz; i++)
+//            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+//        if (listVT.size() > 1)
+//            vhtChart.getData().add(dataSeries_total);
+//
+//        vhtChart.setCreateSymbols(false);
+//        vhtChart.setLegendSide(Side.RIGHT);
+//        vhtChart.setMinHeight(200);
+//        vbAggregates.getChildren().add(vhtChart);
+//        JFXChartUtil.setupZooming(vhtChart, (MouseEvent mouseEvent) -> {
+//            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+//                    mouseEvent.isShortcutDown() )
+//                mouseEvent.consume();
+//        });
+//        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart);
+//
+//        if (hasManagedLanes) {
+//            xAxis = new NumberAxis();
+//            xAxis.setLabel(timeLabel);
+//            yAxis = new NumberAxis();
+//            yAxis.setLabel("VHT");
+//
+//            vhtChart = new LineChart(xAxis, yAxis);
+//            vhtChart.setTitle(label_mng);
+//
+//            max_sz = 0;
+//            for (int k = 0; k < num_comms; k++) {
+//                if (vht_series_gp[k] != null)
+//                    max_sz = Math.max(max_sz, vht_series_gp[k].values.size());
+//            }
+//            for (int i = 0; i < max_sz; i++)
+//                total[i] = 0;
+//            for (int k = 0; k < num_comms; k++) {
+//                dataSeries_mng = new XYChart.Series();
+//                dataSeries_mng.setName(listVT.get(k).get_name());
+//                xydata_mng = vht_series_mng[k].get_XYSeries(listVT.get(k).get_name()).getItems();
+//
+//                sz_mng = xydata_mng.size();
+//
+//                for (int i = 0; i < max_sz; i++) {
+//                    if (i < sz_mng) {
+//                        xy = xydata_mng.get(i);
+//                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+//                        total[i] += xy.getYValue();
+//                    } else {
+//                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+//                    }
+//                }
+//                vhtChart.getData().add(dataSeries_mng);
+//            }
+//
+//            dataSeries_total = new XYChart.Series();
+//            dataSeries_total.setName("Total");
+//            for (int i = 0; i < max_sz; i++)
+//                dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+//            if (listVT.size() > 1)
+//                vhtChart.getData().add(dataSeries_total);
+//
+//            vhtChart.setCreateSymbols(false);
+//            vhtChart.setLegendSide(Side.RIGHT);
+//            vhtChart.setMinHeight(200);
+//            vbAggregates.getChildren().add(vhtChart);
+//            JFXChartUtil.setupZooming(vhtChart, (MouseEvent mouseEvent) -> {
+//            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+//                    mouseEvent.isShortcutDown() )
+//                mouseEvent.consume();
+//            });
+//            JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart);
+//        }
+//
+//
+//        label_gp = "GP Lanes";
+//        if (hasAuxLanes)
+//            label_gp = "GP and Aux Lanes";
+//        label_mng = "Managed Lanes";
+//
+//        xAxis = new NumberAxis();
+//        xAxis.setLabel(timeLabel);
+//        yAxis = new NumberAxis();
+//        yAxis.setLabel("Delay (veh.-hr.)");
+//
+//        LineChart delayChart = new LineChart(xAxis, yAxis);
+//        String label_units = UserSettings.unitsSpeed;
+//        double cc = UserSettings.speedConversionMap.get("mph"+label_units);
+//        double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;
+//        String label_thres = String.format("(Speed Threshold: %.0f %s)", cc*v_thres, label_units);
+//        if (v_thres < 0)
+//            label_thres = "(Speed Threshold: Free Flow Speed)";
+//        delayChart.setTitle("Delay " + label_thres);
+//
+//        dataSeries_gp = new XYChart.Series();
+//        dataSeries_gp.setName(label_gp);
+//        xydata_gp = delay_gp.get_XYSeries(label_gp).getItems();
+//
+//        dataSeries_mng = new XYChart.Series();
+//        dataSeries_mng.setName(label_mng);
+//        xydata_mng = null;
+//        sz_mng = 0;
+//        if (hasManagedLanes) {
+//            xydata_mng = delay_mng.get_XYSeries(label_mng).getItems();
+//            sz_mng = xydata_mng.size();
+//        }
+//
+//        sz_gp = xydata_gp.size();
+//        max_sz = Math.max(sz_gp, sz_mng);
+//
+//        for (int i = 0; i < max_sz; i++)
+//            total[i] = 0;
+//
+//        for (int i = 0; i < max_sz; i++) {
+//            if (i < sz_gp) {
+//                xy = xydata_gp.get(i);
+//                dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+//                total[i] += xy.getYValue();
+//            } else {
+//                dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+//            }
+//            if (i < sz_mng) {
+//                xy = xydata_mng.get(i);
+//                dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
+//                total[i] += xy.getYValue();
+//            } else {
+//                dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+//            }
+//        }
+//
+//        dataSeries_total = new XYChart.Series();
+//        dataSeries_total.setName("Total");
+//        for (int i = 0; i < max_sz; i++)
+//            dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
+//
+//        delayChart.getData().add(dataSeries_gp);
+//        if (hasManagedLanes) {
+//            delayChart.getData().add(dataSeries_mng);
+//            delayChart.getData().add(dataSeries_total);
+//        }
+//        delayChart.setCreateSymbols(false);
+//        delayChart.setLegendSide(Side.RIGHT);
+//        delayChart.setMinHeight(200);
+//
+//        vbAggregates.getChildren().add(delayChart);
+//
+//        //Zooming works only via primary mouse button without ctrl held down
+//        JFXChartUtil.setupZooming(delayChart, (MouseEvent mouseEvent) -> {
+//            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+//                    mouseEvent.isShortcutDown() )
+//                mouseEvent.consume();
+//        });
+//        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(delayChart);
+//
     }
     
     
