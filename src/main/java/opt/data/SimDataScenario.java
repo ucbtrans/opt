@@ -91,7 +91,7 @@ public class SimDataScenario {
                 lgdata.set_lg_data(commid,time_index,
                         flw.lgprofiles.get(alg.id).profile.values,
                         veh.lgprofiles.get(alg.id).profile.values,
-                        sim_dt);
+                        sim_dt,outdt);
 
             }
         }
@@ -129,7 +129,10 @@ public class SimDataScenario {
                 List<AbstractOutputTimedCell.CellProfile> flw_cellprofs = flw.lgprofiles.get(flg.id);
                 List<AbstractOutputTimedCell.CellProfile> veh_cellprofs = veh.lgprofiles.get(flg.id);
                 for(int i=0;i<flw_cellprofs.size();i++)
-                    lgdata.celldata.get(i).set(commid,time_index,flw_cellprofs.get(i).profile.values,veh_cellprofs.get(i).profile.values,sim_dt);
+                    lgdata.celldata.get(i).set(commid,time_index,
+                            flw_cellprofs.get(i).profile.values,
+                            veh_cellprofs.get(i).profile.values,
+                            sim_dt,outdt);
             }
 
         }

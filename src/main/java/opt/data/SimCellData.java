@@ -16,18 +16,19 @@ public class SimCellData {
         }
     }
 
-    protected void set(long commid,int [] time_indices,List<Double> flwdata,List<Double> vehdata,float dt_sec){
+    protected void set(long commid,int [] time_indices,List<Double> flwdata,List<Double> vehdata,float sim_dt_sec,float out_dt_sec){
         int numtime = time_indices.length;
         double [] veh = new double[numtime];
         double [] flw = new double[numtime];
-        double alpha = 3600d/dt_sec;
+        double alpha = 3600d/sim_dt_sec;
+        double beta = sim_dt_sec/out_dt_sec;
 
         if(!vehdata.isEmpty()) {
             for(int k=0;k<numtime;k++){
                 int time_index = time_indices[k];
                 double this_flow = time_index == 0 ? 0d : (flwdata.get(time_index) - flwdata.get(time_index - 1)) * alpha;
                 flw[k] = this_flow;
-                veh[k] = vehdata.get(time_index);
+                veh[k] = beta * vehdata.get(time_index);
             }
         }
 
