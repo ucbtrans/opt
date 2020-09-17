@@ -20,8 +20,7 @@ public class TestSimData extends AbstractTest {
     final long routeB = 2l;
     SimDataScenario simdata;
     SimDataLink simdatalink;
-    boolean celloutput = true;
-//    boolean lgoutput = true;
+    boolean celloutput = false;
 
     @Before
     public void test_setup(){
@@ -36,7 +35,7 @@ public class TestSimData extends AbstractTest {
             FreewayScenario fwyscenario = project.get_scenarios().iterator().next();
             fwyscenario.set_start_time(0f);
             fwyscenario.set_sim_duration(5400f);
-            task = new OTMTask(null,fwyscenario,30f,10, celloutput,!celloutput,null);
+            task = new OTMTask(null,fwyscenario,300f,10, celloutput,!celloutput,null);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -186,7 +185,7 @@ public class TestSimData extends AbstractTest {
     @Ignore
     @Test
     public void route_contour(){
-        TimeSeriesList X = simdata.get_speed_contour_for_route(routeA,LaneGroupType.mng);
+        TimeMatrix X = simdata.get_speed_contour_for_route(routeA,LaneGroupType.mng);
 
         System.out.println(X.print_time());
         System.out.println(X.print_space());
@@ -268,8 +267,8 @@ public class TestSimData extends AbstractTest {
 
             SimDataLink data = e.getValue();
             XYSeriesCollection A = new XYSeriesCollection();
-            A.addSeries(data.get_flw_exiting(null,car).get_XYSeries("cars"));
-            A.addSeries(data.get_flw_exiting(null,truck).get_XYSeries("trucks"));
+            A.addSeries(data.get_flw(null,car).get_XYSeries("cars"));
+            A.addSeries(data.get_flw(null,truck).get_XYSeries("trucks"));
             TestPlot.plot(A,
                     String.format("Link %d",linkid),
                     "flw [vph]",
@@ -334,9 +333,9 @@ public class TestSimData extends AbstractTest {
 
         // get FLOWS on given lane group type and commodity
         XYSeriesCollection A = new XYSeriesCollection();
-        A.addSeries(simdatalink.get_flw_exiting(LaneGroupType.gp,car).get_XYSeries("cars in gp lanes"));
-        A.addSeries(simdatalink.get_flw_exiting(LaneGroupType.mng,car).get_XYSeries("cars in mng lanes"));
-        A.addSeries(simdatalink.get_flw_exiting(LaneGroupType.aux,car).get_XYSeries("cars in aux lanes"));
+        A.addSeries(simdatalink.get_flw(LaneGroupType.gp,car).get_XYSeries("cars in gp lanes"));
+        A.addSeries(simdatalink.get_flw(LaneGroupType.mng,car).get_XYSeries("cars in mng lanes"));
+        A.addSeries(simdatalink.get_flw(LaneGroupType.aux,car).get_XYSeries("cars in aux lanes"));
         TestPlot.plot(A,
                 "link 1 car flows",
                 "flw [vph]",
@@ -344,9 +343,9 @@ public class TestSimData extends AbstractTest {
 
         // get FLOWS on given lane group type and all commodities
         A = new XYSeriesCollection();
-        A.addSeries(simdatalink.get_flw_exiting(LaneGroupType.gp,null).get_XYSeries("gp lanes"));
-        A.addSeries(simdatalink.get_flw_exiting(LaneGroupType.mng,null).get_XYSeries("mng lanes"));
-        A.addSeries(simdatalink.get_flw_exiting(LaneGroupType.aux,null).get_XYSeries("aux lanes"));
+        A.addSeries(simdatalink.get_flw(LaneGroupType.gp,null).get_XYSeries("gp lanes"));
+        A.addSeries(simdatalink.get_flw(LaneGroupType.mng,null).get_XYSeries("mng lanes"));
+        A.addSeries(simdatalink.get_flw(LaneGroupType.aux,null).get_XYSeries("aux lanes"));
         TestPlot.plot(A,
                 "link 1 all flows",
                 "flw [vph]",
@@ -354,7 +353,7 @@ public class TestSimData extends AbstractTest {
 
         // get FLOWS on all lane groups and commodities
         A = new XYSeriesCollection();
-        A.addSeries(simdatalink.get_flw_exiting(null,null).get_XYSeries("all lanes"));
+        A.addSeries(simdatalink.get_flw(null,null).get_XYSeries("all lanes"));
         TestPlot.plot(A,
                 "link 1 all flows",
                 "flw [vph]",

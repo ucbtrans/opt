@@ -9,16 +9,16 @@ import java.util.stream.Collectors;
 
 public class TimeSeries {
     public float [] time;
-    public List<Double> values;
+    public double [] values;
 
     public TimeSeries(float [] time){
         this.time = time;
-        this.values = new ArrayList<>();
+        this.values = new double[time.length];
     }
 
     public TimeSeries(float [] time,double [] v){
         this.time = time;
-        this.values = Arrays.stream(v).boxed().collect(Collectors.toList());
+        this.values = v;
     }
 
     public float get_dt(){
@@ -29,22 +29,22 @@ public class TimeSeries {
         if (ts == null)
             return;
         
-        if(this.time.length!=ts.values.size())
+        if(this.time.length!=ts.values.length)
             throw new Exception("this.time.size()!=ts.values.size()");
 
-        if(this.values.isEmpty()) {
+        if(this.values.length==0) {
             this.values = ts.values;
             return;
         }
 
         for(int k=0;k<this.time.length;k++)
-            values.set(k,values.get(k)+ts.values.get(k));
+            values [k] = values[k] + ts.values[k];
 
     }
 
     public void mult(float alpha){
-        for(int i=0;i<time.length;i++)
-            this.values.set(i,alpha*values.get(i));
+        for(int k=0;k<time.length;k++)
+            this.values[k] = alpha*values[k];
     }
 
     public TimeSeries resample(float newdt){
@@ -65,24 +65,24 @@ public class TimeSeries {
             int index = Math.round(float_index);
 
             if(float_index>=n-1){
-                newvalues[k] = values.get(n-1);
+                newvalues[k] = values[n-1];
                 k++;
                 continue;
             }
 
             float lambda = float_index-index;
             if(Math.abs(lambda)<=epsilon)
-                newvalues[k] = values.get(index);
+                newvalues[k] = values[index];
             else {
                 if(lambda>epsilon){
                     int ind0 = index;
                     int ind1 = ind0+1;
-                    newvalues[k] = (1-lambda)*values.get(ind0) + lambda*values.get(ind1);
+                    newvalues[k] = (1-lambda)*values[ind0] + lambda*values[ind1];
                 } else {
                     int ind0 = index-1;
                     int ind1 = ind0+1;
                     lambda = -lambda;
-                    newvalues[k] = lambda*values.get(ind0) + (1-lambda)*values.get(ind1);
+                    newvalues[k] = lambda*values[ind0] + (1-lambda)*values[ind1];
                 }
             }
             k++;
@@ -96,7 +96,7 @@ public class TimeSeries {
         if(values==null)
             return series;
         for(int k=0;k<time.length;k++)
-            series.add(time[k],values.get(k));
+            series.add(time[k],values[k]);
         return series;
     }
 
@@ -104,7 +104,7 @@ public class TimeSeries {
     public String toString() {
         String str = "";
         for(int i=0;i<time.length;i++)
-            str += String.format("%.1f\t%f\n",time[i],values.get(i));
+            str += String.format("%.1f\t%f\n",time[i],values[i]);
         return str;
     }
 }

@@ -48,7 +48,7 @@ public class SimDataLanegroup {
             for(int k=0;k<numtime;k++){
                 double this_flow = k == 0 ? 0d : (flwdata.get(k) - flwdata.get(k - 1)) * alpha;
                 flw[k] = this_flow;
-                veh[k] = k == 0 ? 0d : vehdata.get(k-1)*beta;
+                veh[k] = vehdata.get(k)*beta;
             }
         }
 

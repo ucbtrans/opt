@@ -183,7 +183,7 @@ public class SimDataLink {
      * comm==null means all commodities
      * NOTE: if the lane group does not exist, returns a list of ZEROS
      */
-    public TimeSeries get_flw_exiting(LaneGroupType lgtype, Long commid){
+    public TimeSeries get_flw(LaneGroupType lgtype, Long commid){
         // use cell data only if there is no lg data
         return new TimeSeries(scndata.time,lgtype2id.containsKey(lgtype)||lgtype==null ?
                 get_exit_flw_array(lgtype,commid) :
@@ -197,6 +197,23 @@ public class SimDataLink {
     public TimeSeries get_speed(LaneGroupType lgtype){
         return new TimeSeries(scndata.time,lgtype2id.containsKey(lgtype)||lgtype==null ? get_spd_array(lgtype) : scndata.nan());
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public LaneGroupsAndCommodities choose_lgs_and_comms(LaneGroupType lgtype, Long commid){
 

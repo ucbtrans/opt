@@ -26,14 +26,10 @@
 
 package opt.performance;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import javafx.event.EventHandler;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
-import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -42,31 +38,18 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.data.AbstractLink;
 import opt.data.SimDataLink;
 import opt.data.SimDataScenario;
-import opt.data.TimeSeries;
 import opt.data.LaneGroupType;
 import opt.utils.Misc;
 import opt.UserSettings;
 import opt.data.Commodity;
 import opt.utils.jfxutils.chart.JFXChartUtil;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.fx.ChartViewer;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataItem;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import profiles.Profile1D;
 
 /**
@@ -288,9 +271,9 @@ public class LinkPerformanceController {
             
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_flw_exiting(LaneGroupType.gp, c.getId()).values.size());
+                max_sz = Math.max(max_sz, mySimData.get_flw(LaneGroupType.gp, c.getId()).values.size());
             }
-            dt = mySimData.get_flw_exiting(LaneGroupType.gp, listVT.get(0).getId()).get_dt();
+            dt = mySimData.get_flw(LaneGroupType.gp, listVT.get(0).getId()).get_dt();
             double[] total = new double[max_sz];
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
@@ -349,16 +332,16 @@ public class LinkPerformanceController {
         
         max_sz = 0;
         for (Commodity c : listVT) {
-            max_sz = Math.max(max_sz, mySimData.get_flw_exiting(LaneGroupType.gp, c.getId()).values.size());
+            max_sz = Math.max(max_sz, mySimData.get_flw(LaneGroupType.gp, c.getId()).values.size());
         }
         double[] total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
             total[i] = 0;
         for (Commodity c : listVT) {
-            dt = mySimData.get_flw_exiting(LaneGroupType.gp, c.getId()).get_dt();
+            dt = mySimData.get_flw(LaneGroupType.gp, c.getId()).get_dt();
             dataSeries_gp = new XYChart.Series();
             dataSeries_gp.setName(c.get_name());
-            xydata_gp = mySimData.get_flw_exiting(LaneGroupType.gp, c.getId()).get_XYSeries(c.get_name()).getItems();
+            xydata_gp = mySimData.get_flw(LaneGroupType.gp, c.getId()).get_XYSeries(c.get_name()).getItems();
             
             sz_gp = xydata_gp.size();
             
@@ -403,14 +386,14 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_flw_exiting(LaneGroupType.mng, c.getId()).values.size());
+                max_sz = Math.max(max_sz, mySimData.get_flw(LaneGroupType.mng, c.getId()).values.size());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
             for (Commodity c : listVT) {
                 dataSeries_mng = new XYChart.Series();
                 dataSeries_mng.setName(c.get_name());
-                xydata_mng = mySimData.get_flw_exiting(LaneGroupType.mng, c.getId()).get_XYSeries(c.get_name()).getItems();
+                xydata_mng = mySimData.get_flw(LaneGroupType.mng, c.getId()).get_XYSeries(c.get_name()).getItems();
 
                 sz_mng = xydata_mng.size();
 
@@ -456,14 +439,14 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_flw_exiting(LaneGroupType.aux, c.getId()).values.size());
+                max_sz = Math.max(max_sz, mySimData.get_flw(LaneGroupType.aux, c.getId()).values.size());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
             for (Commodity c : listVT) {
                 dataSeries_aux = new XYChart.Series();
                 dataSeries_aux.setName(c.get_name());
-                xydata_aux = mySimData.get_flw_exiting(LaneGroupType.aux, c.getId()).get_XYSeries(c.get_name()).getItems();
+                xydata_aux = mySimData.get_flw(LaneGroupType.aux, c.getId()).get_XYSeries(c.get_name()).getItems();
 
                 sz_aux = xydata_aux.size();
 

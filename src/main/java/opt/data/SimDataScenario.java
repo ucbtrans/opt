@@ -4,7 +4,6 @@ import api.OTMdev;
 import common.AbstractLaneGroup;
 import models.fluid.FluidLaneGroup;
 import output.*;
-import profiles.Profile1D;
 
 import java.util.*;
 
@@ -319,29 +318,28 @@ public class SimDataScenario {
         return new TimeSeries(time,get_speed_for_route_array(routelinks,lgtype));
     }
 
-    public TimeSeriesList get_speed_contour_for_route(long routeid,LaneGroupType globallgtype) {
+    public TimeMatrix get_speed_contour_for_route(long routeid, LaneGroupType globallgtype) {
         assert(globallgtype!=null);
 
         List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
-        TimeSeriesList X = new TimeSeriesList(time);
+        TimeMatrix X = new TimeMatrix(time,routelinks,this,haslgdata,globallgtype);
 
-        for(AbstractLink link : routelinks) {
+        int i=0;
+        while(i<X.space.size()){
+            TimeMatrix.LinkLaneGroupCell e = X.space.get(i);
+            SimDataLink lkdata = linkdata.get(e.linkid);
+            LaneGroupType lgtype = e.lgtype;
+            SimDataLanegroup lgdata = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
 
-            if(link.is_source()){
-                X.add_entry(link,LaneGroupType.gp,0,nan());
-                continue;
+            if(haslgdata)
+                X.values[i++] = lkdata.get_spd_array(lgtype);
+
+            else{
+                double cell_length_miles = lkdata.link_length_miles/lgdata.celldata.size();
+                for(double[] z : lgdata.get_cell_speeds(lkdata.ffspeed_mph,cell_length_miles))
+                    X.values[i++] = z;
             }
 
-            SimDataLink lkdata = linkdata.get(link.id);
-
-            LaneGroupType lgtype = lkdata.lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
-            SimDataLanegroup lg = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
-            double cell_length_miles = lkdata.link_length_miles/lg.celldata.size();
-
-            List<double []> cell_speeds =  lg.get_cell_speeds(lkdata.ffspeed_mph,cell_length_miles);
-
-            for(int i=0;i<cell_speeds.size();i++)
-                X.add_entry(link,lgtype,i,cell_speeds.get(i));
         }
 
         return X;
