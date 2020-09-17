@@ -377,12 +377,8 @@ public class ScenarioEditorController {
     private void initLanePolicies() {
         policyPane.setVisible(false);
         deletePolicy.setDisable(true);
-        linksUnderPolicy.clear();
-        listLanePolicies = myScenario.get_schedules_for_controltype(AbstractController.Type.HOVHOT);
         
-        for (ControlSchedule p : listLanePolicies)
-            linksUnderPolicy.addAll(p.get_links());
-        
+        populateUnderPolicyLinkList();
         populatePolicyList();
         populateFreeForPolicyLinkList();
         
@@ -413,6 +409,14 @@ public class ScenarioEditorController {
         
         if (selectedPolicyIndex >= 0)
             cbPolicies.getSelectionModel().select(selectedPolicyIndex);
+    }
+    
+    private void populateUnderPolicyLinkList() {
+        linksUnderPolicy.clear();
+        listLanePolicies = myScenario.get_schedules_for_controltype(AbstractController.Type.HOVHOT);
+        
+        for (ControlSchedule p : listLanePolicies)
+            linksUnderPolicy.addAll(p.get_links());
     }
     
     private void populateFreeForPolicyLinkList() {
