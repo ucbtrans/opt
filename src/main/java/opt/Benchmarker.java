@@ -43,7 +43,7 @@ public class Benchmarker {
 
             OTMTask task = new OTMTask(null,fwyscenario,300f,-1,true,true,this);
 
-            task.run_simulation(this,celloutput,lgoutput);
+            task.run_simulation(this);
 
         } catch (Exception e) {
             System.err.println(e.getMessage());

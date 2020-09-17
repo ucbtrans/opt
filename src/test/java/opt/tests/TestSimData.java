@@ -4,6 +4,7 @@ import opt.data.*;
 import opt.OTMTask;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
@@ -19,6 +20,8 @@ public class TestSimData extends AbstractTest {
     final long routeB = 2l;
     SimDataScenario simdata;
     SimDataLink simdatalink;
+    boolean celloutput = true;
+//    boolean lgoutput = true;
 
     @Before
     public void test_setup(){
@@ -32,14 +35,14 @@ public class TestSimData extends AbstractTest {
             Project project = ProjectFactory.load_project(project_file_name,validate);
             FreewayScenario fwyscenario = project.get_scenarios().iterator().next();
             fwyscenario.set_start_time(0f);
-            fwyscenario.set_sim_duration(2000f);
-            task = new OTMTask(null,fwyscenario,300f,10, false,true,null);
+            fwyscenario.set_sim_duration(5400f);
+            task = new OTMTask(null,fwyscenario,30f,10, celloutput,!celloutput,null);
         } catch (Exception e) {
             fail(e.getMessage());
         }
 
         // run and retrieve data
-        simdata = task.run_simulation(null,true,true);
+        simdata = task.run_simulation(null);
         simdatalink = simdata.linkdata.get(linkid);
     }
 
@@ -94,7 +97,6 @@ public class TestSimData extends AbstractTest {
                 "veh hours",
                 "temp/net_delay_sources.png");
     }
-
 
     @Test
     public void network_delay_nonsources(){
@@ -181,6 +183,7 @@ public class TestSimData extends AbstractTest {
                 "temp/routeA_speed_all.png");
     }
 
+    @Ignore
     @Test
     public void route_contour(){
         TimeSeriesList X = simdata.get_speed_contour_for_route(routeA,LaneGroupType.mng);
@@ -240,13 +243,17 @@ public class TestSimData extends AbstractTest {
     public void link_vehicles(){
         for(Map.Entry<Long,SimDataLink> e :  simdata.linkdata.entrySet()){
             Long linkid = e.getKey();
+
+            if(linkid!=4l)
+                continue;
+
             SimDataLink data = e.getValue();
             XYSeriesCollection A = new XYSeriesCollection();
             A.addSeries(data.get_veh(null,null).get_XYSeries("all"));
             TestPlot.plot(A,
                     String.format("Link %d",linkid),
                     "vehicles",
-                    String.format("temp/link%d_veh.png",linkid));
+                    String.format("temp/%s_link%d_veh.png",celloutput,linkid));
         }
     }
 
@@ -254,6 +261,11 @@ public class TestSimData extends AbstractTest {
     public void link_flow_exiting(){
         for(Map.Entry<Long,SimDataLink> e :  simdata.linkdata.entrySet()){
             Long linkid = e.getKey();
+
+            if(linkid!=4l)
+                continue;
+
+
             SimDataLink data = e.getValue();
             XYSeriesCollection A = new XYSeriesCollection();
             A.addSeries(data.get_flw_exiting(null,car).get_XYSeries("cars"));
@@ -261,7 +273,7 @@ public class TestSimData extends AbstractTest {
             TestPlot.plot(A,
                     String.format("Link %d",linkid),
                     "flw [vph]",
-                    String.format("temp/link%d_flw.png",linkid));
+                    String.format("temp/%s_link%d_flw.png",celloutput, linkid));
         }
     }
 
@@ -269,13 +281,18 @@ public class TestSimData extends AbstractTest {
     public void link_speeds(){
         for(Map.Entry<Long,SimDataLink> e :  simdata.linkdata.entrySet()){
             Long linkid = e.getKey();
+
+            if(linkid!=4l)
+                continue;
+
+
             SimDataLink data = e.getValue();
             XYSeriesCollection A = new XYSeriesCollection();
             A.addSeries(data.get_speed(null).get_XYSeries(""));
             TestPlot.plot(A,
                     String.format("Link %d",linkid),
                     "speed [mph]",
-                    String.format("temp/link%d_spd.png",linkid));
+                    String.format("temp/%s_link%d_spd.png",celloutput,linkid));
         }
     }
 

@@ -103,7 +103,9 @@ public class SimDataLink {
                 sumflw += lg.get_sum_flw(X.commids, k, scndata.haslgdata);
                 sumveh += lg.get_sum_veh(X.commids, k, scndata.haslgdata);
             }
-            speeds[k] = sumveh<1 || sumflw<1 ? ffspeed_mph : length_miles*sumflw/sumveh;
+            speeds[k] = sumveh<1 ? ffspeed_mph : length_miles*sumflw/sumveh;
+            if(speeds[k]>ffspeed_mph)
+                speeds[k] = ffspeed_mph;
         }
 
         return speeds;

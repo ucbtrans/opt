@@ -30,13 +30,13 @@ public class SimDataScenario {
         float sim_dt = fwyscenario.get_sim_dt_sec();
         float duration = fwyscenario.get_sim_duration();
 
-        int step = (int) (outdt/sim_dt);
+//        int step = (int) (outdt/sim_dt);
         int numtime = ((int)(duration/outdt)) + 1;
         time = new float[numtime];
-        int [] time_index = new int[numtime];
+//        int [] time_index = new int[numtime];
         for(int i=0;i<numtime;i++){
             time[i] = start_time + i*outdt;
-            time_index[i] = i*step;
+//            time_index[i] = i*step;
         }
 
         // initialize linkdata
@@ -50,14 +50,14 @@ public class SimDataScenario {
         }
 
         if(hascelldata)
-            read_cell_data(otmdev,commids,time_index,sim_dt);
+            read_cell_data(otmdev,commids,sim_dt);
 
         if(haslgdata)
-            read_lg_data(otmdev,commids,time_index,sim_dt);
+            read_lg_data(otmdev,commids,sim_dt);
 
     }
 
-    private void read_lg_data(OTMdev otmdev,Set<Long> commids,int [] time_index,float sim_dt){
+    private void read_lg_data(OTMdev otmdev,Set<Long> commids,float sim_dt){
 
         Set<OutputLaneGroupFlow> flws = otmdev.otm.output.get_data().stream()
                 .filter(s->s.type==AbstractOutput.Type.lanegroup_flw)
@@ -88,7 +88,7 @@ public class SimDataScenario {
                     continue;
 
                 SimDataLanegroup lgdata = linkdata.get(flg.link.getId()).lgData.get(flg.id);
-                lgdata.set_lg_data(commid,time_index,
+                lgdata.set_lg_data(commid,
                         flw.lgprofiles.get(alg.id).profile.values,
                         veh.lgprofiles.get(alg.id).profile.values,
                         sim_dt,outdt);
@@ -98,7 +98,7 @@ public class SimDataScenario {
 
     }
 
-    private void read_cell_data(OTMdev otmdev,Set<Long> commids,int [] time_index,float sim_dt){
+    private void read_cell_data(OTMdev otmdev,Set<Long> commids,float sim_dt){
 
         Set<OutputCellFlow> flws = otmdev.otm.output.get_data().stream()
                 .filter(s->s.type==AbstractOutput.Type.cell_flw)
@@ -129,7 +129,7 @@ public class SimDataScenario {
                 List<AbstractOutputTimedCell.CellProfile> flw_cellprofs = flw.lgprofiles.get(flg.id);
                 List<AbstractOutputTimedCell.CellProfile> veh_cellprofs = veh.lgprofiles.get(flg.id);
                 for(int i=0;i<flw_cellprofs.size();i++)
-                    lgdata.celldata.get(i).set(commid,time_index,
+                    lgdata.celldata.get(i).set(commid,
                             flw_cellprofs.get(i).profile.values,
                             veh_cellprofs.get(i).profile.values,
                             sim_dt,outdt);

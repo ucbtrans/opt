@@ -16,19 +16,18 @@ public class SimCellData {
         }
     }
 
-    protected void set(long commid,int [] time_indices,List<Double> flwdata,List<Double> vehdata,float sim_dt_sec,float out_dt_sec){
-        int numtime = time_indices.length;
+    protected void set(long commid,List<Double> flwdata,List<Double> vehdata,float sim_dt_sec,float out_dt_sec){
+        int numtime = vehdata.size();
         double [] veh = new double[numtime];
         double [] flw = new double[numtime];
-        double alpha = 3600d/sim_dt_sec;
+        double alpha = 3600d/out_dt_sec;
         double beta = sim_dt_sec/out_dt_sec;
 
         if(!vehdata.isEmpty()) {
             for(int k=0;k<numtime;k++){
-                int time_index = time_indices[k];
-                double this_flow = time_index == 0 ? 0d : (flwdata.get(time_index) - flwdata.get(time_index - 1)) * alpha;
+                double this_flow = k==0 ? 0d : (flwdata.get(k) - flwdata.get(k-1)) * alpha;
                 flw[k] = this_flow;
-                veh[k] = beta * vehdata.get(time_index);
+                veh[k] = k==0 ? 0d :  beta * vehdata.get(k-1);
             }
         }
 
@@ -46,7 +45,7 @@ public class SimCellData {
                 sumflw += flws.get(commid)[k];
                 sumveh += vehs.get(commid)[k];
             }
-            speeds[k] = sumveh<1 || sumflw<1 ? ffspeed_mph : cell_length_miles*sumflw/sumveh;
+            speeds[k] = sumveh<1 ? ffspeed_mph : cell_length_miles*sumflw/sumveh;
             if(speeds[k]>ffspeed_mph)
                 speeds[k] = ffspeed_mph;
         }

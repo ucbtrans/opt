@@ -32,7 +32,7 @@ public class OTMTask  extends Task {
 		this.celloutput = celloutput;
 		this.lgoutput = lgoutput;
 
-		assert(outdt==300f);
+//		assert(outdt==300f);
 
 		if(!celloutput && !lgoutput)
 			throw new Exception("No data requested");
@@ -87,7 +87,7 @@ public class OTMTask  extends Task {
 
 	@Override
 	protected Object call()  {
-		this.run_simulation(null,celloutput,lgoutput);
+		this.run_simulation(null);
 		return null;
 	}
 
@@ -107,7 +107,7 @@ public class OTMTask  extends Task {
 		});
 	}
 
-	public SimDataScenario run_simulation(Benchmarker logger,boolean celloutput, boolean lgoutput){
+	public SimDataScenario run_simulation(Benchmarker logger){
 
 		SimDataScenario simdata = null;
 		exception = null;
@@ -121,13 +121,17 @@ public class OTMTask  extends Task {
 					.map(x->x.id).collect(Collectors.toSet());
 
 			if(celloutput) {
-				otmdev.otm.output().request_cell_flw(null, linkids, sim_dt);
-				otmdev.otm.output().request_cell_sum_veh(null, linkids, sim_dt);
+				for(Long commid : fwyscenario.get_commodities().keySet()){
+					otmdev.otm.output().request_cell_flw(commid, linkids, outdt);
+					otmdev.otm.output().request_cell_sum_veh(commid, linkids, outdt);
+				}
 			}
 
 			if(lgoutput) {
-				otmdev.otm.output().request_lanegroup_flw(null, linkids, sim_dt);
-				otmdev.otm.output().request_lanegroup_sum_veh(null, linkids, sim_dt);
+				for(Long commid : fwyscenario.get_commodities().keySet()) {
+					otmdev.otm.output().request_lanegroup_flw(commid, linkids, outdt);
+					otmdev.otm.output().request_lanegroup_sum_veh(commid, linkids, outdt);
+				}
 			}
 
 			if(logger!=null)
