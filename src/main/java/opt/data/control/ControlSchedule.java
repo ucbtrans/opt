@@ -51,6 +51,23 @@ public class ControlSchedule implements Comparable {
         return jsch;
     }
 
+    public Set<AbstractLink> links_to_write(){
+
+        Set<AbstractLink> X = new HashSet<>();
+        switch(controlType){
+            case RampMetering:
+                X.addAll(links);
+                break;
+
+            case HOVHOT:
+                X = links.stream()
+                        .filter(lk->lk.get_mng_lanes()>0)
+                        .collect(Collectors.toSet());
+                break;
+        }
+        return X;
+    }
+
     public boolean ignore(){
 
         if(links.isEmpty())

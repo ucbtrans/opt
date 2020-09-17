@@ -879,7 +879,8 @@ public class FreewayScenario {
         jaxb.Schds schds = new jaxb.Schds();
         scn.setSchds(schds);
         for(ControlSchedule sch : get_all_schedules()) {
-            if(sch.ignore())
+            Set<AbstractLink> links_to_write = sch.links_to_write();
+            if(sch.ignore() || links_to_write.isEmpty())
                 continue;
             schds.getSchd().add(sch.to_jaxb());
         }
