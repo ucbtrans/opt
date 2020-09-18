@@ -1,32 +1,76 @@
 package opt.data;
 
-import java.util.ArrayList;
-import java.util.List;
+import opt.utils.Misc;
+
+import java.util.*;
 
 public class TimeMatrix {
 
     public float [] time;
     public List<LinkLaneGroupCell> space;
     public double[][] values;   // space x time
+    public double min_value;    // exclude nans
+    public double max_value;    // exclude nans
+    public List<Double> cell_lengths_miles;
 
-    TimeMatrix(float [] time, List<AbstractLink> routelinks, SimDataScenario data, boolean haslgdata, LaneGroupType globallgtype){
+    TimeMatrix(float [] time, List<AbstractLink> routelinks, SimDataScenario data, boolean haslgdata, LaneGroupType lgtype){
+        this(time,routelinks,data,haslgdata,new HashSet<>(Arrays.asList(lgtype)));
+    }
+
+    TimeMatrix(float [] time, List<AbstractLink> routelinks, SimDataScenario data, boolean haslgdata, Set<LaneGroupType> lgtypes){
         this.time = time;
 
         // determine spatial resolution
         space = new ArrayList<>();
+        cell_lengths_miles = new ArrayList<>();
+
         for(AbstractLink link : routelinks){
             SimDataLink lkdata = data.linkdata.get(link.id);
-            LaneGroupType lgtype = lkdata.lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
-            if(haslgdata)
-                space.add(new LinkLaneGroupCell(link.id,lgtype,-1));
+
+            // keep only the lanegroup types that this link actually has
+            Set<LaneGroupType> mylgtypes = new HashSet<>();
+            mylgtypes.addAll(lgtypes);
+            mylgtypes.retainAll(lkdata.lgtype2id.keySet());
+
+            if(haslgdata) {
+                space.add(new LinkLaneGroupCell(link.id, mylgtypes, -1));
+                cell_lengths_miles.add(lkdata.link_length_miles);
+            }
             else{
-                SimDataLanegroup lgdata = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
-                for(int i=0;i<lgdata.celldata.size();i++)
-                    space.add(new LinkLaneGroupCell(link.id,lgtype,i));
+                if(!mylgtypes.isEmpty()){
+                    double cl = lkdata.cell_length();
+                    for(int i=0;i<lkdata.numcells();i++) {
+                        space.add(new LinkLaneGroupCell(link.id, mylgtypes, i));
+                        cell_lengths_miles.add(cl);
+                    }
+                }
+                else{
+                    space.add(new LinkLaneGroupCell(link.id, null, -1));
+                    cell_lengths_miles.add(lkdata.link_length_miles);
+                }
             }
         }
 
         values = new double[space.size()][time.length];
+        this.min_value = Double.POSITIVE_INFINITY;
+        this.max_value = Double.NEGATIVE_INFINITY;
+
+    }
+
+    public void add_timeseries(int i,double [] v){
+
+        Misc.add_in_place(values[i],v);
+
+        double z = Arrays.stream(v).filter(x->!Double.isNaN(x)).max().getAsDouble();
+        max_value = z>max_value ? z : max_value;
+
+        z = Arrays.stream(v).filter(x->!Double.isNaN(x)).min().getAsDouble();
+        min_value = z<min_value ? z : min_value;
+    }
+
+    public void fill_with_nans(int i){
+        for(int k=0;k<time.length;k++)
+            values[i][k] = Double.NaN;
     }
 
     public float get_dt(){
@@ -37,13 +81,6 @@ public class TimeMatrix {
         String str = "";
         for(float t : time)
             str += String.format("%.2f\n",t);
-        return str;
-    }
-
-    public String print_space(){
-        String str = "";
-        for(LinkLaneGroupCell s : space)
-            str += String.format("%d\t%s\t%d\n",s.linkid,s.lgtype,s.cell);
         return str;
     }
 
@@ -59,11 +96,11 @@ public class TimeMatrix {
 
     public class LinkLaneGroupCell{
         final long linkid;
-        final LaneGroupType lgtype;
+        final Set<LaneGroupType> lgtypes;
         final int cell;
-        public LinkLaneGroupCell(long link,LaneGroupType lg,int cell){
+        public LinkLaneGroupCell(long link,Set<LaneGroupType> lgtypes,int cell){
             this.linkid =link;
-            this.lgtype = lg;
+            this.lgtypes = lgtypes;
             this.cell = cell;
         }
     }

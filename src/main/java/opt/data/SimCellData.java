@@ -1,5 +1,7 @@
 package opt.data;
 
+import opt.utils.Misc;
+
 import java.util.*;
 
 public class SimCellData {
@@ -52,4 +54,33 @@ public class SimCellData {
         return speeds;
     }
 
+    protected double[] get_cell_flw(Set<Long> commids){
+        int numtime = flws.values().iterator().next().length;
+        double [] flw = new double[numtime];
+        for(long commid :commids){
+            double [] x = flws.get(commid);
+            for(int k=0;k<numtime;k++)
+                flw[k] += x[k];
+        }
+        return flw;
+    }
+
+    protected double[] get_cell_veh(Set<Long> commids){
+        int numtime = vehs.values().iterator().next().length;
+        double [] veh = new double[numtime];
+        for(long commid :commids){
+            double [] x = vehs.get(commid);
+            for(int k=0;k<numtime;k++)
+                veh[k] += x[k];
+        }
+        return veh;
+    }
+
+    protected double[] get_cell_dty(Set<Long> commids,double cell_length_miles){
+        int numtime = vehs.values().iterator().next().length;
+        double[] veh = get_cell_veh(commids);
+        for(int k=0;k<numtime;k++)
+            veh[k] /= cell_length_miles;
+        return veh;
+    }
 }

@@ -26,10 +26,8 @@
 package opt.utils;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import opt.data.AbstractLink.Type;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
@@ -39,8 +37,26 @@ import opt.data.FreewayScenario;
  * @author Alex Kurzhanskiy
  */
 public class Misc {
-    
-    
+
+    public static void add_in_place(double [] a, double [] b){
+        for(int k=0;k<a.length;k++)
+            a[k] += b[k];
+    }
+
+    public static void mult_in_place(double [] a, double alpha){
+        for(int k=0;k<a.length;k++)
+            a[k] *= alpha;
+    }
+
+
+
+
+    public static <T> Set<T> hashset(T a){
+        Set<T> X = new HashSet<>();
+        X.add(a);
+        return X;
+    }
+
     public static String linkType2String(Type t) {
         if (t == Type.freeway)
             return "Freeway";

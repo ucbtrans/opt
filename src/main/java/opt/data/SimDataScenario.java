@@ -3,6 +3,7 @@ package opt.data;
 import api.OTMdev;
 import common.AbstractLaneGroup;
 import models.fluid.FluidLaneGroup;
+import opt.utils.Misc;
 import output.*;
 
 import java.util.*;
@@ -141,76 +142,56 @@ public class SimDataScenario {
         return X;
     }
 
-    protected double[] get_vehs_for_network_array(Set<Long> c){
-        Set<Long> commids = c==null ? fwyscenario.get_commodities().keySet() : c;
+    protected double[] get_vehs_for_network_array(Set<Long> commids){
         double[] X = new double[numtime()];
-        for (int k = 0; k < numtime(); k++)
-            for(SimDataLink lkdata : linkdata.values())
-                for (SimDataLanegroup lgdata : lkdata.lgData.values())
-                    X[k] += lgdata.get_sum_veh(commids,  k, haslgdata);
+        for(SimDataLink lkdata : linkdata.values())
+            for (SimDataLanegroup lgdata : lkdata.lgData.values())
+                Misc.add_in_place(X,lgdata.get_sum_veh(commids, haslgdata));
         return X;
     }
 
-    protected double[] get_vehs_for_route_array(List<AbstractLink> links,LaneGroupType globallgtype,Set<Long> c){
-        Set<Long> commids = c==null ? fwyscenario.get_commodities().keySet() : c;
+    protected double[] get_vehs_for_route_array(List<AbstractLink> links,Set<LaneGroupType> lgtypes,Set<Long> commids){
         double [] X = new double[numtime()];
-        for(int k=0;k<numtime();k++)
-            for(AbstractLink link : links){
-                SimDataLink lkdata = linkdata.get(link.id);
-                LaneGroupType lgtype = lkdata.lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
-                SimDataLanegroup lgdata = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
-                X[k] += lgdata.get_sum_veh(commids,  k, haslgdata);
-            }
+        for (AbstractLink link : links)
+            for(SimDataLanegroup lgdata : linkdata.get(link.id).get_lgdatas(lgtypes))
+                Misc.add_in_place(X,lgdata.get_sum_veh(commids, haslgdata));
         return X;
     }
 
     protected double[] get_speed_for_network_array(){
-
-        double[] speed = new double[numtime()];
-        for (int k = 0; k < numtime() ; k++){
-            double vehs = 0d;
-            double flw_length = 0d;
-            for(SimDataLink lkdata : linkdata.values()) {
-                double length_miles = haslgdata ? lkdata.link_length_miles : lkdata.cell_length();
-                for (SimDataLanegroup lgdata : lkdata.lgData.values()) {
-                    vehs += lgdata.get_sum_veh(null,k,haslgdata);
-                    flw_length += lgdata.get_sum_flw(null,k,haslgdata) * length_miles;
-                }
+        double[] vehs = new double[numtime()];
+        double[] flw_length = new double[numtime()];
+        Set<Long> commids = fwyscenario.get_commodities().keySet();
+        for(SimDataLink lkdata : linkdata.values()) {
+            for (SimDataLanegroup lgdata : lkdata.lgData.values()) {
+                Misc.add_in_place(vehs,lgdata.get_sum_veh(commids,haslgdata));
+                Misc.add_in_place(flw_length,lgdata.get_sum_flw(commids,haslgdata));
             }
-            speed[k] = vehs<1 || flw_length<1 ? Double.NaN : flw_length/vehs;
+            double length_miles = haslgdata ? lkdata.link_length_miles : lkdata.cell_length();
+            Misc.mult_in_place(flw_length,length_miles);
         }
-
+        double[] speed = new double[numtime()];
+        for (int k = 0; k < numtime() ; k++)
+            speed[k] = vehs[k]<1 || flw_length[k]<1 ? Double.NaN : flw_length[k]/vehs[k];
         return speed;
     }
 
-    protected double[] get_speed_for_route_array(List<AbstractLink> links,LaneGroupType globallgtype){
+    protected double[] get_speed_for_route_array(List<AbstractLink> links,Set<LaneGroupType> lgtypes){
 
         double[] vehs = new double[numtime()];
         double[] flw_length = new double[numtime()];
+        Set<Long> commids = this.fwyscenario.get_commodities().keySet();
 
         for(AbstractLink link : links) {
             if (link.is_source())
                 continue;
             SimDataLink lkdata = linkdata.get(link.id);
-
+            for(SimDataLanegroup lgdata : lkdata.get_lgdatas(lgtypes)){
+                Misc.add_in_place(vehs,lgdata.get_sum_veh(commids,haslgdata));
+                Misc.add_in_place(flw_length,lgdata.get_sum_flw(commids,haslgdata));
+            }
             double length_miles = haslgdata ? lkdata.link_length_miles : lkdata.cell_length();
-
-            Set<SimDataLanegroup> lgDatas = new HashSet<>();
-
-            if(globallgtype==null)
-                lgDatas.addAll(lkdata.lgData.values());
-            else {
-                LaneGroupType lgtype = lkdata.lgtype2id.containsKey(globallgtype) ? globallgtype : LaneGroupType.gp;
-                lgDatas.add(lkdata.lgData.get(lkdata.lgtype2id.get(lgtype)));
-            }
-
-            for (int k = 0; k < numtime() ; k++){
-                for (SimDataLanegroup lgdata : lkdata.lgData.values()) {
-                    vehs[k] += lgdata.get_sum_veh(null,k, haslgdata);
-                    flw_length[k] += lgdata.get_sum_flw(null,k,haslgdata) * length_miles;
-                }
-            }
-
+            Misc.mult_in_place(flw_length,length_miles);
         }
 
         double[] speed = new double[numtime()];
@@ -224,6 +205,8 @@ public class SimDataScenario {
     // API
     /////////////////////////////////////////////////
 
+    // time ................................................
+
     public int numtime(){
         return time.length;
     }
@@ -231,6 +214,8 @@ public class SimDataScenario {
     public double get_dt_sec(){
         return time.length<2 ? Double.NaN : time[1]-time[0];
     }
+
+    // VHT ................................................
 
     public TimeSeries get_vht_for_network(long commid){
         Set<Long> commids = new HashSet<>();
@@ -243,6 +228,8 @@ public class SimDataScenario {
         X.mult(X.get_dt()/3600.0f);
         return X;
     }
+
+    // VMT ................................................
 
     public TimeSeries get_vmt_for_network(long commid){
         Set<Long> commids = new HashSet<>();
@@ -262,6 +249,8 @@ public class SimDataScenario {
         }
         return vmt;
     }
+
+    // Delay ................................................
 
     public TimeSeries get_delay_for_network(float speed_threshold_mph){
         TimeSeries delay = new TimeSeries(time);
@@ -298,6 +287,8 @@ public class SimDataScenario {
         return delay;
     }
 
+    // Vehicles in network ................................................
+
     public TimeSeries get_vehs_for_network(long commid){
         Set<Long> commids = new HashSet<>();
         commids.add(commid);
@@ -308,49 +299,121 @@ public class SimDataScenario {
         return new TimeSeries(time,get_vehs_for_network_array(commids));
     }
 
-    public TimeSeries get_vehs_for_route(long routeid,LaneGroupType lgtype,long commid){
-        Set<Long> commids = new HashSet<>();
-        commids.add(commid);
-        return get_vehs_for_route(routeid,lgtype,commids);
-    }
+    // Vehicles on route ................................................
 
-    /** To get VHT just apply X.mult(X.get_dt()) to this **/
-    public TimeSeries get_vehs_for_route(long routeid,LaneGroupType lgtype,Set<Long> commids){
+    public TimeSeries get_vehs_for_route(long routeid,Set<LaneGroupType> lgtypes,Set<Long> commids){
+        if(lgtypes==null)
+            lgtypes = new HashSet<>(Arrays.asList(LaneGroupType.values()));
+        if(commids==null)
+            commids = fwyscenario.get_commodities().keySet();
         List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
-        return new TimeSeries(time,get_vehs_for_route_array(routelinks,lgtype,commids));
+        return new TimeSeries(time,get_vehs_for_route_array(routelinks,lgtypes,commids));
     }
 
-    /** ....... **/
-    public TimeSeries get_speed_for_network(){
-        return new TimeSeries(time,get_speed_for_network_array());
-    }
+    // Density ................................................
 
-    /** ....... **/
-    public TimeSeries get_speed_for_route(long routeid,LaneGroupType lgtype){
+    public TimeMatrix get_density_contour_for_route(long routeid, Set<LaneGroupType> lgtypes,Set<Long> commids) {
+        if(lgtypes==null)
+            lgtypes = new HashSet<>(Arrays.asList(LaneGroupType.values()));
+        if(commids==null)
+            commids = fwyscenario.get_commodities().keySet();
         List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
-        return new TimeSeries(time,get_speed_for_route_array(routelinks,lgtype));
-    }
-
-    public TimeMatrix get_speed_contour_for_route(long routeid, LaneGroupType globallgtype) {
-        assert(globallgtype!=null);
-
-        List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
-        TimeMatrix X = new TimeMatrix(time,routelinks,this,haslgdata,globallgtype);
+        TimeMatrix X = new TimeMatrix(time,routelinks,this,haslgdata,lgtypes);
 
         int i=0;
         while(i<X.space.size()){
             TimeMatrix.LinkLaneGroupCell e = X.space.get(i);
             SimDataLink lkdata = linkdata.get(e.linkid);
-            LaneGroupType lgtype = e.lgtype;
-            SimDataLanegroup lgdata = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
 
             if(haslgdata)
-                X.values[i++] = lkdata.get_spd_array(lgtype);
+                X.add_timeseries(i++,lkdata.get_dty_array(lgtypes,commids));
+            else {
+                double cell_length_miles = lkdata.cell_length();
+                int c = i;
+                for(SimDataLanegroup lgdata: lkdata.get_lgdatas(lgtypes)) {
+                    c = i;
+                    for (SimCellData cd : lgdata.celldata)
+                        X.add_timeseries(c++, cd.get_cell_dty(commids, cell_length_miles));
+                }
+                i = c;
+            }
 
+        }
+
+        return X;
+    }
+
+    // Flow [vph] ................................................
+
+    public TimeMatrix get_flow_contour_for_route(long routeid, Set<LaneGroupType> lgtypes,Set<Long> commids) {
+        if(lgtypes==null)
+            lgtypes = new HashSet<>(Arrays.asList(LaneGroupType.values()));
+        if(commids==null)
+            commids = fwyscenario.get_commodities().keySet();
+        List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
+        TimeMatrix X = new TimeMatrix(time,routelinks,this,haslgdata,lgtypes);
+
+        int i=0;
+        while(i<X.space.size()){
+            TimeMatrix.LinkLaneGroupCell e = X.space.get(i);
+            SimDataLink lkdata = linkdata.get(e.linkid);
+            if(haslgdata)
+                X.add_timeseries(i++,lkdata.get_exit_flw_array(lgtypes,commids));
+            else {
+                int c = i;
+                for(SimDataLanegroup lgdata: lkdata.get_lgdatas(lgtypes)) {
+                    c = i;
+                    for (SimCellData cd : lgdata.celldata)
+                        X.add_timeseries(c++, cd.get_cell_flw(commids));
+                }
+                i = c;
+            }
+        }
+        return X;
+    }
+
+    // Speed [mph] ................................................
+
+    public TimeSeries get_speed_for_network(){
+        return new TimeSeries(time,get_speed_for_network_array());
+    }
+
+    public TimeSeries get_speed_for_route(long routeid,Set<LaneGroupType> lgtypes){
+        if(lgtypes==null)
+            lgtypes = new HashSet<>(Arrays.asList(LaneGroupType.values()));
+        List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
+        return new TimeSeries(time,get_speed_for_route_array(routelinks,lgtypes));
+    }
+
+    public TimeMatrix get_speed_contour_for_route(long routeid, Set<LaneGroupType> lgtypes) {
+        if(lgtypes==null)
+            lgtypes = new HashSet<>(Arrays.asList(LaneGroupType.values()));
+        List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
+        TimeMatrix X = new TimeMatrix(time,routelinks,this,haslgdata,lgtypes);
+
+        int i=0;
+        while(i<X.space.size()){
+            TimeMatrix.LinkLaneGroupCell e = X.space.get(i);
+            SimDataLink lkdata = linkdata.get(e.linkid);
+
+//            // fill row with nans if lanegroup is not present in this link
+//            if(!lkdata.lgtype2id.containsKey(lgtype)) {
+//                X.fill_with_nans(i++);
+//                continue;
+//            }
+
+            if(haslgdata)
+                X.add_timeseries(i++,lkdata.get_spd_array(lgtypes));
             else{
-                double cell_length_miles = lkdata.link_length_miles/lgdata.celldata.size();
-                for(double[] z : lgdata.get_cell_speeds(lkdata.ffspeed_mph,cell_length_miles))
-                    X.values[i++] = z;
+                double cell_length_miles = lkdata.cell_length();
+                int c = i;
+                for(LaneGroupType lgtype : lgtypes){
+                    c = i;
+                    SimDataLanegroup lgdata = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
+                    for(double[] z : lgdata.get_cell_speeds(lkdata.ffspeed_mph,cell_length_miles))
+                        X.add_timeseries(c++, z);
+                }
+                i = c;
             }
 
         }

@@ -1,5 +1,7 @@
 package opt.data;
 
+import opt.utils.Misc;
+
 import java.util.*;
 
 public class SimDataLanegroup {
@@ -26,6 +28,10 @@ public class SimDataLanegroup {
                 celldata.add(new SimCellData(commids,numtime));
         }
 
+    }
+
+    private int numtime(){
+        return vehs.values().iterator().next().length;
     }
 
     protected Set<Long> get_comm_ids(){
@@ -72,14 +78,7 @@ public class SimDataLanegroup {
         return X;
     }
 
-    protected List<double[]> get_cell_speeds(float ffspeed_mph,double cell_length_miles){
-        List<double[]> speeds = new ArrayList<>();
-        for(SimCellData cd : celldata)
-            speeds.add(cd.get_speed(ffspeed_mph,cell_length_miles));
-        return speeds;
-    }
-
-    protected double get_sum_flw(Set<Long> commids, int k, boolean uselg) {
+    protected double get_sum_flw_for_time(Set<Long> commids, int k, boolean uselg) {
         if(commids==null)
             commids = get_comm_ids();
         double X = 0d;
@@ -93,7 +92,19 @@ public class SimDataLanegroup {
         return X;
     }
 
-    protected double get_sum_veh(Set<Long> commids, int k, boolean uselg) {
+    protected double [] get_sum_flw(Set<Long> commids, boolean uselg) {
+        double [] X = new double[numtime()];
+        if(uselg)
+            for(Long cid : commids)
+                Misc.add_in_place(X,flws.get(cid));
+        else
+            for (SimCellData cd : celldata)
+                for(Long cid : commids)
+                    Misc.add_in_place(X,cd.flws.get(cid));
+        return X;
+    }
+
+    protected double get_sum_veh_for_time(Set<Long> commids, int k, boolean uselg) {
         if(commids==null)
             commids = get_comm_ids();
         double X = 0d;
@@ -107,5 +118,38 @@ public class SimDataLanegroup {
         return X;
     }
 
+    protected double [] get_sum_veh(Set<Long> commids, boolean uselg) {
+
+        double [] X = new double[numtime()];
+        if(uselg)
+            for(Long cid : commids)
+                Misc.add_in_place(X,vehs.get(cid));
+        else
+            for (SimCellData cd : celldata)
+                for(Long cid : commids)
+                    Misc.add_in_place(X,cd.vehs.get(cid));
+        return X;
+    }
+
+    protected List<double[]> get_cell_speeds(float ffspeed_mph,double cell_length_miles){
+        List<double[]> speeds = new ArrayList<>();
+        for(SimCellData cd : celldata)
+            speeds.add(cd.get_speed(ffspeed_mph,cell_length_miles));
+        return speeds;
+    }
+
+    protected List<double[]> get_cell_flows(Set<Long>commids){
+        List<double[]> flows = new ArrayList<>();
+        for(SimCellData cd : celldata)
+            flows.add(cd.get_cell_flw(commids));
+        return flows;
+    }
+
+    protected List<double[]> get_cell_vehs(Set<Long>commids){
+        List<double[]> vehs = new ArrayList<>();
+        for(SimCellData cd : celldata)
+            vehs.add(cd.get_cell_veh(commids));
+        return vehs;
+    }
 
 }

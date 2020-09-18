@@ -2,11 +2,13 @@ package opt.tests;
 
 import opt.data.*;
 import opt.OTMTask;
+import opt.utils.Misc;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.HashSet;
 import java.util.Map;
 
 import static org.junit.Assert.fail;
@@ -126,8 +128,8 @@ public class TestSimData extends AbstractTest {
 
         // cars and truck on route A GP lanes
         XYSeriesCollection A = new XYSeriesCollection();
-        A.addSeries(simdata.get_vehs_for_route(routeA,LaneGroupType.gp, car).get_XYSeries("cars route A"));
-        A.addSeries(simdata.get_vehs_for_route(routeA,LaneGroupType.gp, truck).get_XYSeries("trucks route A"));
+        A.addSeries(simdata.get_vehs_for_route(routeA, Misc.hashset(LaneGroupType.gp), Misc.hashset(car)).get_XYSeries("cars route A"));
+        A.addSeries(simdata.get_vehs_for_route(routeA, Misc.hashset(LaneGroupType.gp), Misc.hashset(truck)).get_XYSeries("trucks route A"));
         TestPlot.plot(A,
                 "route A GP lanes",
                 "vehs",
@@ -135,8 +137,8 @@ public class TestSimData extends AbstractTest {
 
         // cars and truck on route B GP lanes
         A = new XYSeriesCollection();
-        A.addSeries(simdata.get_vehs_for_route(routeB,LaneGroupType.gp, car).get_XYSeries("cars route B"));
-        A.addSeries(simdata.get_vehs_for_route(routeB,LaneGroupType.gp, truck).get_XYSeries("trucks route B"));
+        A.addSeries(simdata.get_vehs_for_route(routeB,Misc.hashset(LaneGroupType.gp), Misc.hashset(car)).get_XYSeries("cars route B"));
+        A.addSeries(simdata.get_vehs_for_route(routeB,Misc.hashset(LaneGroupType.gp), Misc.hashset(truck)).get_XYSeries("trucks route B"));
         TestPlot.plot(A,
                 "route B GP lanes",
                 "vehs",
@@ -165,9 +167,9 @@ public class TestSimData extends AbstractTest {
 
         // get speed on route A for various lane group types
         XYSeriesCollection A = new XYSeriesCollection();
-        A.addSeries(simdata.get_speed_for_route(routeA,LaneGroupType.gp).get_XYSeries("gp lanes"));
-        A.addSeries(simdata.get_speed_for_route(routeA,LaneGroupType.mng).get_XYSeries("mng lanes"));
-        A.addSeries(simdata.get_speed_for_route(routeA,LaneGroupType.aux).get_XYSeries("aux lanes"));
+        A.addSeries(simdata.get_speed_for_route(routeA,Misc.hashset(LaneGroupType.gp)).get_XYSeries("gp lanes"));
+        A.addSeries(simdata.get_speed_for_route(routeA,Misc.hashset(LaneGroupType.mng)).get_XYSeries("mng lanes"));
+        A.addSeries(simdata.get_speed_for_route(routeA,Misc.hashset(LaneGroupType.aux)).get_XYSeries("aux lanes"));
         TestPlot.plot(A,
                 "route A speed",
                 "speed [mph]",
@@ -185,10 +187,9 @@ public class TestSimData extends AbstractTest {
     @Ignore
     @Test
     public void route_contour(){
-        TimeMatrix X = simdata.get_speed_contour_for_route(routeA,LaneGroupType.mng);
+        TimeMatrix X = simdata.get_speed_contour_for_route(routeA,Misc.hashset(LaneGroupType.mng));
 
         System.out.println(X.print_time());
-        System.out.println(X.print_space());
         System.out.println(X.print_values());
     }
 
@@ -267,8 +268,8 @@ public class TestSimData extends AbstractTest {
 
             SimDataLink data = e.getValue();
             XYSeriesCollection A = new XYSeriesCollection();
-            A.addSeries(data.get_flw(null,car).get_XYSeries("cars"));
-            A.addSeries(data.get_flw(null,truck).get_XYSeries("trucks"));
+            A.addSeries(data.get_flw(null,Misc.hashset(car)).get_XYSeries("cars"));
+            A.addSeries(data.get_flw(null,Misc.hashset(truck)).get_XYSeries("trucks"));
             TestPlot.plot(A,
                     String.format("Link %d",linkid),
                     "flw [vph]",
@@ -300,9 +301,9 @@ public class TestSimData extends AbstractTest {
 
         // get cars on various lane group types
         XYSeriesCollection A = new XYSeriesCollection();
-        A.addSeries(simdatalink.get_veh(LaneGroupType.gp,car).get_XYSeries("cars in gp lanes"));
-        A.addSeries(simdatalink.get_veh(LaneGroupType.mng,car).get_XYSeries("cars in mng lanes"));
-        A.addSeries(simdatalink.get_veh(LaneGroupType.aux,car).get_XYSeries("cars in aux lanes"));
+        A.addSeries(simdatalink.get_veh(Misc.hashset(LaneGroupType.gp),Misc.hashset(car)).get_XYSeries("cars in gp lanes"));
+        A.addSeries(simdatalink.get_veh(Misc.hashset(LaneGroupType.mng),Misc.hashset(car)).get_XYSeries("cars in mng lanes"));
+        A.addSeries(simdatalink.get_veh(Misc.hashset(LaneGroupType.aux),Misc.hashset(car)).get_XYSeries("cars in aux lanes"));
         TestPlot.plot(A,
                 "link 1 cars vehicles",
                 "veh",
@@ -310,9 +311,9 @@ public class TestSimData extends AbstractTest {
 
         // get VEHICLES on given lane group type and all commodities
         A = new XYSeriesCollection();
-        A.addSeries(simdatalink.get_veh(LaneGroupType.gp,null).get_XYSeries("gp lanes"));
-        A.addSeries(simdatalink.get_veh(LaneGroupType.mng,null).get_XYSeries("mng lanes"));
-        A.addSeries(simdatalink.get_veh(LaneGroupType.aux,null).get_XYSeries("aux lanes"));
+        A.addSeries(simdatalink.get_veh(Misc.hashset(LaneGroupType.gp),null).get_XYSeries("gp lanes"));
+        A.addSeries(simdatalink.get_veh(Misc.hashset(LaneGroupType.mng),null).get_XYSeries("mng lanes"));
+        A.addSeries(simdatalink.get_veh(Misc.hashset(LaneGroupType.aux),null).get_XYSeries("aux lanes"));
         TestPlot.plot(A,
                 "link 1 all vehicles",
                 "veh",
@@ -333,9 +334,9 @@ public class TestSimData extends AbstractTest {
 
         // get FLOWS on given lane group type and commodity
         XYSeriesCollection A = new XYSeriesCollection();
-        A.addSeries(simdatalink.get_flw(LaneGroupType.gp,car).get_XYSeries("cars in gp lanes"));
-        A.addSeries(simdatalink.get_flw(LaneGroupType.mng,car).get_XYSeries("cars in mng lanes"));
-        A.addSeries(simdatalink.get_flw(LaneGroupType.aux,car).get_XYSeries("cars in aux lanes"));
+        A.addSeries(simdatalink.get_flw(Misc.hashset(LaneGroupType.gp),Misc.hashset(car)).get_XYSeries("cars in gp lanes"));
+        A.addSeries(simdatalink.get_flw(Misc.hashset(LaneGroupType.mng),Misc.hashset(car)).get_XYSeries("cars in mng lanes"));
+        A.addSeries(simdatalink.get_flw(Misc.hashset(LaneGroupType.aux),Misc.hashset(car)).get_XYSeries("cars in aux lanes"));
         TestPlot.plot(A,
                 "link 1 car flows",
                 "flw [vph]",
@@ -343,9 +344,9 @@ public class TestSimData extends AbstractTest {
 
         // get FLOWS on given lane group type and all commodities
         A = new XYSeriesCollection();
-        A.addSeries(simdatalink.get_flw(LaneGroupType.gp,null).get_XYSeries("gp lanes"));
-        A.addSeries(simdatalink.get_flw(LaneGroupType.mng,null).get_XYSeries("mng lanes"));
-        A.addSeries(simdatalink.get_flw(LaneGroupType.aux,null).get_XYSeries("aux lanes"));
+        A.addSeries(simdatalink.get_flw(Misc.hashset(LaneGroupType.gp),null).get_XYSeries("gp lanes"));
+        A.addSeries(simdatalink.get_flw(Misc.hashset(LaneGroupType.mng),null).get_XYSeries("mng lanes"));
+        A.addSeries(simdatalink.get_flw(Misc.hashset(LaneGroupType.aux),null).get_XYSeries("aux lanes"));
         TestPlot.plot(A,
                 "link 1 all flows",
                 "flw [vph]",
@@ -365,9 +366,9 @@ public class TestSimData extends AbstractTest {
 
         // get SPEEDS on given lane group type
         XYSeriesCollection A = new XYSeriesCollection();
-        A.addSeries(simdatalink.get_speed(LaneGroupType.gp).get_XYSeries("gp lanes"));
-        A.addSeries(simdatalink.get_speed(LaneGroupType.mng).get_XYSeries("mng lanes"));
-        A.addSeries(simdatalink.get_speed(LaneGroupType.aux).get_XYSeries("aux lanes"));
+        A.addSeries(simdatalink.get_speed(Misc.hashset(LaneGroupType.gp)).get_XYSeries("gp lanes"));
+        A.addSeries(simdatalink.get_speed(Misc.hashset(LaneGroupType.mng)).get_XYSeries("mng lanes"));
+        A.addSeries(simdatalink.get_speed(Misc.hashset(LaneGroupType.aux)).get_XYSeries("aux lanes"));
         TestPlot.plot(A,
                 "link 1 speed",
                 "speed [mph]",

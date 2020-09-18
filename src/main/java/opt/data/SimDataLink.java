@@ -1,8 +1,9 @@
 package opt.data;
 
-import java.util.*;
+import opt.utils.Misc;
 
-import static java.util.stream.Collectors.toSet;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SimDataLink {
 
@@ -60,48 +61,45 @@ public class SimDataLink {
     }
 
     protected double cell_length(){
-        return link_length_miles/lgData.values().iterator().next().celldata.size();
+        return link_length_miles/numcells();
     }
 
-    protected double[] get_veh_array(LaneGroupType lgtype,Set<Long> commids){
-        assert(lgtype2id.containsKey(lgtype) || lgtype==null);
-        LaneGroupsAndCommodities X = choose_lgs_and_comms(lgtype,commids);
-        double [] Y = new double[scndata.numtime()];
-        for(SimDataLanegroup lgData : X.lgDatas){
-            for(int k=0;k<scndata.numtime();k++)
-                Y[k] += lgData.get_sum_veh(X.commids,k, scndata.haslgdata);
-        }
-        return Y;
+    protected int numcells(){
+        return lgData.values().iterator().next().celldata.size();
     }
 
-    protected double [] get_exit_flw_array(LaneGroupType lgtype,Set<Long> commids) {
-        assert(lgtype2id.containsKey(lgtype) || lgtype==null);
-        if(lgtype==null){
-            double [] X = new double[scndata.numtime()];
-            for(SimDataLanegroup data : lgData.values()){
-                double [] XX = data.get_flw_exiting_lg(commids,numtime(), scndata.haslgdata);
-                for(int k=0;k<X.length;k++)
-                    X[k] += XX[k];
-            }
-            return X;
-        } else {
-            return lgData.get(lgtype2id.get(lgtype)).get_flw_exiting_lg(commids,numtime(),scndata.haslgdata);
-        }
+    protected double[] get_veh_array(Set<LaneGroupType> lgtypes,Set<Long> commids){
+        double [] X = new double[scndata.numtime()];
+        for(LaneGroupType lgtype : lgtypes)
+            Misc.add_in_place(X,lgData.get(lgtype2id.get(lgtype)).get_sum_veh(commids,scndata.haslgdata));
+        return X;
     }
 
-    protected double [] get_spd_array(LaneGroupType lgtype) {
+    protected double[] get_dty_array(Set<LaneGroupType> lgtypes,Set<Long> commids){
+        double [] X = get_veh_array(lgtypes,commids);
+        Misc.mult_in_place(X, 1/link_length_miles);
+        return X;
+    }
 
-        assert(lgtype2id.containsKey(lgtype) || lgtype==null);
+    protected double [] get_exit_flw_array(Set<LaneGroupType> lgtypes,Set<Long> commids) {
+        double [] X = new double[scndata.numtime()];
+        for(LaneGroupType lgtype : lgtypes)
+            Misc.add_in_place(X,lgData.get(lgtype2id.get(lgtype)).get_flw_exiting_lg(commids,numtime(), scndata.haslgdata));
+        return X;
+    }
 
-        LaneGroupsAndCommodities X = choose_lgs_and_comms(lgtype,null);
+    protected double [] get_spd_array(Set<LaneGroupType> lgtypes) {
+
+        LaneGroupsAndCommodities X =  extract_lgdatas_and_comms(lgtypes, null);
+
         double length_miles = scndata.haslgdata ? link_length_miles : cell_length();
-        double [] speeds = new double [scndata.numtime()];
-        for(int k=0;k<scndata.numtime();k++) {
+        double [] speeds = new double [numtime()];
+        for(int k=0;k<numtime();k++) {
             double sumflw = 0d;
             double sumveh = 0d;
             for(SimDataLanegroup lg : X.lgDatas) {
-                sumflw += lg.get_sum_flw(X.commids, k, scndata.haslgdata);
-                sumveh += lg.get_sum_veh(X.commids, k, scndata.haslgdata);
+                sumflw += lg.get_sum_flw_for_time(X.commids, k, scndata.haslgdata);
+                sumveh += lg.get_sum_veh_for_time(X.commids, k, scndata.haslgdata);
             }
             speeds[k] = sumveh<1 ? ffspeed_mph : length_miles*sumflw/sumveh;
             if(speeds[k]>ffspeed_mph)
@@ -115,49 +113,51 @@ public class SimDataLink {
     // API
     /////////////////////////////////////////////////
 
-    public TimeSeries get_vht(LaneGroupType lgtype,long commid){
-        Set<Long> commids = new HashSet<>();
-        commids.add(commid);
-        return get_vht(lgtype,commids);
+    // VHT ................................................
+    public TimeSeries get_vht(Set<LaneGroupType> lgtypes,Set<Long> commids){
+
+        // get lgtypes and comms
+        if(commids==null)
+            commids = scndata.fwyscenario.get_commodities().keySet();
+        lgtypes = extract_lgtypes(lgtypes);
+
+        // degenerate case
+        if(lgtypes.isEmpty() || commids.isEmpty())
+            return new TimeSeries(scndata.time,scndata.nan());
+
+        double[] X = get_veh_array(lgtypes,commids);
+        Misc.mult_in_place(X,scndata.get_dt_sec() / 3600d);
+        return new TimeSeries(scndata.time,X);
     }
 
-    public TimeSeries get_vht(LaneGroupType lgtype,Set<Long> commids){
-        double[] vehs = get_veh_array(lgtype,commids);
-        double dt_hr = scndata.get_dt_sec() / 3600d;
-        for(int k=0;k<vehs.length;k++)
-            vehs[k] = vehs[k]*dt_hr;
-        return new TimeSeries(scndata.time,vehs);
-    }
+    // VMT .................................................
+    public TimeSeries get_vmt(Set<LaneGroupType> lgtypes,Set<Long> commids){
 
-    public TimeSeries get_vmt(LaneGroupType lgtype,long commid){
-        Set<Long> commids = new HashSet<>();
-        commids.add(commid);
-        return get_vmt(lgtype,commids);
-    }
+        // get lgdata and comms
+        LaneGroupsAndCommodities X = extract_lgdatas_and_comms(lgtypes,commids);
 
-    public TimeSeries get_vmt(LaneGroupType lgtype,Set<Long> commids){
+        // degenerate case
+        if(X.lgDatas.isEmpty() || X.commids.isEmpty())
+            return new TimeSeries(scndata.time,scndata.nan());
 
-        assert(lgtype2id.containsKey(lgtype) || lgtype==null);
+        double [] vmt = new double [scndata.numtime()];
+        for (SimDataLanegroup lg : X.lgDatas)
+            Misc.add_in_place(vmt,lg.get_sum_flw(X.commids, scndata.haslgdata));
 
-        LaneGroupsAndCommodities X = choose_lgs_and_comms(lgtype,commids);
-
-        // collect data
         double dt_hr = scndata.get_dt_sec() / 3600d;
         double lgth_times_dt = scndata.haslgdata ? link_length_miles*dt_hr : cell_length()*dt_hr;
-        double [] vmt = new double [scndata.numtime()];
-        for(int k=0;k<scndata.numtime();k++) {
-            for (SimDataLanegroup lg : X.lgDatas)
-                vmt[k] += lg.get_sum_flw(X.commids, k, scndata.haslgdata);
-            vmt[k] *= lgth_times_dt;
-        }
+        Misc.mult_in_place(vmt,lgth_times_dt);
         return new TimeSeries(scndata.time,vmt);
     }
 
-    public TimeSeries get_delay(LaneGroupType lgtype, float threshold_mph) {
+    // Delay ..............................................
+    public TimeSeries get_delay(Set<LaneGroupType> lgtypes, float threshold_mph) {
 
-        assert(lgtype2id.containsKey(lgtype) || lgtype==null);
+        LaneGroupsAndCommodities X = extract_lgdatas_and_comms(lgtypes,null);
 
-        LaneGroupsAndCommodities X = choose_lgs_and_comms(lgtype,null);
+        // degenerate case
+        if(X.lgDatas.isEmpty() || X.commids.isEmpty())
+            return new TimeSeries(scndata.time,scndata.nan());
 
         double dt_hr = scndata.get_dt_sec() / 3600d;
         
@@ -170,8 +170,8 @@ public class SimDataLink {
         double flw,veh;
         for(int k=0;k<scndata.numtime();k++) {
             for(SimDataLanegroup lg : X.lgDatas) {
-                flw = lg.get_sum_flw(X.commids, k, scndata.haslgdata);
-                veh = lg.get_sum_veh(X.commids, k, scndata.haslgdata);
+                flw = lg.get_sum_flw_for_time(X.commids, k, scndata.haslgdata);
+                veh = lg.get_sum_veh_for_time(X.commids, k, scndata.haslgdata);
                 delays[k] += veh==0d? 0d : Math.max( 0d, (veh-flw*length_over_threshold)*dt_hr );
             }
         }
@@ -179,83 +179,78 @@ public class SimDataLink {
         return new TimeSeries(scndata.time,delays);
     }
 
-    public TimeSeries get_veh(LaneGroupType lgtype,long commid){
-        Set<Long> commids = new HashSet<>();
-        commids.add(commid);
-        return get_veh(lgtype,commids);
-    }
+    // # vehicles ...........................................
+    public TimeSeries get_veh(Set<LaneGroupType> lgtypes,Set<Long> commids){
 
-    /** returns a TimeSeries of vehicle numbers for the given lane group type and commodity id
-     * lgtype==null means all lanes in the link
-     * comm==null means all commodities
-     * NOTE: if the lane group does not exist, returns a list of ZEROS
-     */
-    public TimeSeries get_veh(LaneGroupType lgtype,Set<Long> commids){
-        return new TimeSeries(scndata.time,lgtype2id.containsKey(lgtype)||lgtype==null ?
-                get_veh_array(lgtype,commids) :
-                new double[scndata.numtime()] );
-    }
-
-    public TimeSeries get_flw(LaneGroupType lgtype,long commid){
-        Set<Long> commids = new HashSet<>();
-        commids.add(commid);
-        return get_flw(lgtype,commids);
-    }
-
-    /** returns a TimeSeries of vehicle numbers for the given lane group type and commodity id
-     * lgtype==null means all lanes in the link
-     * comm==null means all commodities
-     * NOTE: if the lane group does not exist, returns a list of ZEROS
-     */
-    public TimeSeries get_flw(LaneGroupType lgtype, Set<Long> commids){
-        // use cell data only if there is no lg data
-        return new TimeSeries(scndata.time,lgtype2id.containsKey(lgtype)||lgtype==null ?
-                get_exit_flw_array(lgtype,commids) :
-                new double[scndata.numtime()] );
-    }
-
-    /** returns a TimeSeries of vehicle numbers for the given lane group type
-     * lgtype==null means all lanes in the link
-     * NOTE: if the lane group does not exist, returns NULL
-     */
-    public TimeSeries get_speed(LaneGroupType lgtype){
-        return new TimeSeries(scndata.time,lgtype2id.containsKey(lgtype)||lgtype==null ? get_spd_array(lgtype) : scndata.nan());
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public LaneGroupsAndCommodities choose_lgs_and_comms(LaneGroupType lgtype, Set<Long> commids){
-
-        // choose lane groups
-        Set<SimDataLanegroup> lgDatas = new HashSet<>();
-        if(lgtype==null)
-            lgDatas.addAll(lgData.values());
-        else
-            lgDatas.add(lgData.get(lgtype2id.get(lgtype)));
-
-        // choose commodities
-        Set<Long> xcommids = new HashSet<>();
+        // get lgtypes and comms
         if(commids==null)
-            xcommids.addAll(lgDatas.stream().flatMap(x->x.get_comm_ids().stream()).collect(toSet()));
-        else
-            xcommids.addAll(commids);
+            commids = scndata.fwyscenario.get_commodities().keySet();
+        lgtypes = extract_lgtypes(lgtypes);
 
-        return new LaneGroupsAndCommodities(lgDatas,xcommids);
+        // degenerate case
+        if(lgtypes.isEmpty() || commids.isEmpty())
+            return new TimeSeries(scndata.time,scndata.nan());
+
+        return new TimeSeries(scndata.time,get_veh_array(lgtypes,commids));
+    }
+
+    // Flow [vph] Speed [mph] ..............................
+    public TimeSeries get_flw(Set<LaneGroupType> lgtypes, Set<Long> commids){
+
+        // get lgtypes and comms
+        if(commids==null)
+            commids = scndata.fwyscenario.get_commodities().keySet();
+        lgtypes = extract_lgtypes(lgtypes);
+
+        // degenerate case
+        if(lgtypes.isEmpty() || commids.isEmpty())
+            return new TimeSeries(scndata.time,scndata.nan());
+
+        return new TimeSeries(scndata.time,get_exit_flw_array(lgtypes,commids));
+    }
+
+    // Speed [mph] ..........................................
+    public TimeSeries get_speed(Set<LaneGroupType> lgtypes){
+
+        lgtypes = extract_lgtypes(lgtypes);
+
+        // degenerate case
+        if(lgtypes.isEmpty() )
+            return new TimeSeries(scndata.time,scndata.nan());
+
+        return new TimeSeries(scndata.time,get_spd_array(lgtypes));
+    }
+
+
+
+
+
+
+
+
+
+    public Set<SimDataLanegroup> get_lgdatas(Set<LaneGroupType> lgtypes){
+        return extract_lgtypes(lgtypes).stream().map(x->  lgData.get(lgtype2id.get(x))).collect(Collectors.toSet());
+    }
+
+    public Set<LaneGroupType> extract_lgtypes(Set<LaneGroupType> lgtypes){
+        Set<LaneGroupType> X = new HashSet<>();
+        if(lgtypes==null) {
+            X.addAll(lgtype2id.keySet());
+            return X;
+        } else {
+            X.addAll(lgtypes);
+            X.retainAll(lgtype2id.keySet());
+            return X;
+        }
+    }
+
+    private LaneGroupsAndCommodities extract_lgdatas_and_comms(Set<LaneGroupType> lgtypes,Set<Long> commids){
+        lgtypes = extract_lgtypes(lgtypes);
+        Set<SimDataLanegroup> lgDatas = lgtypes.stream()
+                .map(x->lgData.get(lgtype2id.get(x)))
+                .collect(Collectors.toSet());
+        return new LaneGroupsAndCommodities(lgDatas,commids==null? scndata.fwyscenario.get_commodities().keySet() : commids);
     }
 
     public class LaneGroupsAndCommodities {
