@@ -135,6 +135,10 @@ public class SimDataScenario {
         }
     }
 
+    public Set<Long> all_comm_ids(){
+        return fwyscenario.get_commodities().keySet();
+    }
+
     protected double [] nan(){
         double [] X = new double[numtime()];
         for(int k=0;k<X.length;k++)
@@ -159,20 +163,20 @@ public class SimDataScenario {
     }
 
     protected double[] get_speed_for_network_array(){
-        double[] vehs = new double[numtime()];
-        double[] flw_length = new double[numtime()];
+        double[] dty = new double[numtime()];
+        double[] flw = new double[numtime()];
         Set<Long> commids = fwyscenario.get_commodities().keySet();
         for(SimDataLink lkdata : linkdata.values()) {
             for (SimDataLanegroup lgdata : lkdata.lgData.values()) {
-                Misc.add_in_place(vehs,lgdata.get_sum_veh(commids,haslgdata));
-                Misc.add_in_place(flw_length,lgdata.get_sum_flw(commids,haslgdata));
+                Misc.add_in_place(dty,lgdata.get_sum_veh(commids,haslgdata));
+                Misc.add_in_place(flw,lgdata.get_sum_flw(commids,haslgdata));
             }
             double length_miles = haslgdata ? lkdata.link_length_miles : lkdata.cell_length();
-            Misc.mult_in_place(flw_length,length_miles);
+            Misc.mult_in_place(dty,1/length_miles);
         }
         double[] speed = new double[numtime()];
         for (int k = 0; k < numtime() ; k++)
-            speed[k] = vehs[k]<1 || flw_length[k]<1 ? Double.NaN : flw_length[k]/vehs[k];
+            speed[k] = dty[k]<.1 ? Double.NaN : flw[k]/dty[k];
         return speed;
     }
 
@@ -217,33 +221,22 @@ public class SimDataScenario {
 
     // VHT ................................................
 
-    public TimeSeries get_vht_for_network(long commid){
-        Set<Long> commids = new HashSet<>();
-        commids.add(commid);
-        return get_vht_for_network(commids);
-    }
-
     public TimeSeries get_vht_for_network(Set<Long> commids){
-        TimeSeries X = get_vehs_for_network(commids);
+        TimeSeries X = get_vehs_for_network(commids==null?all_comm_ids():commids);
         X.mult(X.get_dt()/3600.0f);
         return X;
     }
 
     // VMT ................................................
 
-    public TimeSeries get_vmt_for_network(long commid){
-        Set<Long> commids = new HashSet<>();
-        commids.add(commid);
-        return get_vmt_for_network(commids);
-    }
-
     /** get network vmt summed over commids
      * Pass commid=null to get sum over all commidities **/
     public TimeSeries get_vmt_for_network(Set<Long> commids){
+        commids = commids==null?all_comm_ids():commids;
         TimeSeries vmt = new TimeSeries(time);
         try {
             for(SimDataLink lkdata : linkdata.values())
-                vmt.add(lkdata.get_vmt(null,commids));
+                vmt.add(lkdata.get_vmt(null,commids));  // public
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -252,35 +245,35 @@ public class SimDataScenario {
 
     // Delay ................................................
 
-    public TimeSeries get_delay_for_network(float speed_threshold_mph){
+    public TimeSeries get_delay_for_network(Set<Long> commids,float speed_threshold_mph){
         TimeSeries delay = new TimeSeries(time);
         try {
             for(SimDataLink lkdata : linkdata.values())
-                delay.add(lkdata.get_delay(null,speed_threshold_mph));
+                delay.add(lkdata.get_delay(null,commids,speed_threshold_mph));   // public
         } catch (Exception e) {
             e.printStackTrace();
         }
         return delay;
     }
 
-    public TimeSeries get_delay_for_network_sources(float speed_threshold_mph){
+    public TimeSeries get_delay_for_network_sources(Set<Long> commids,float speed_threshold_mph){
         TimeSeries delay = new TimeSeries(time);
         try {
             for(SimDataLink lkdata : linkdata.values())
                 if(lkdata.is_source)
-                    delay.add(lkdata.get_delay(null, speed_threshold_mph));
+                    delay.add(lkdata.get_delay(null, commids,speed_threshold_mph));   //public
         } catch (Exception e) {
             e.printStackTrace();
         }
         return delay;
     }
 
-    public TimeSeries get_delay_for_network_nonsources(float speed_threshold_mph){
+    public TimeSeries get_delay_for_network_nonsources(Set<Long> commids,float speed_threshold_mph){
         TimeSeries delay = new TimeSeries(time);
         try {
             for(SimDataLink lkdata : linkdata.values())
                 if(!lkdata.is_source)
-                    delay.add(lkdata.get_delay(null, speed_threshold_mph));
+                    delay.add(lkdata.get_delay(null, commids,speed_threshold_mph));  // public
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -289,14 +282,8 @@ public class SimDataScenario {
 
     // Vehicles in network ................................................
 
-    public TimeSeries get_vehs_for_network(long commid){
-        Set<Long> commids = new HashSet<>();
-        commids.add(commid);
-        return get_vehs_for_network(commids);
-    }
-
     public TimeSeries get_vehs_for_network(Set<Long> commids){
-        return new TimeSeries(time,get_vehs_for_network_array(commids));
+        return new TimeSeries(time,get_vehs_for_network_array(commids==null?all_comm_ids():commids));
     }
 
     // Vehicles on route ................................................

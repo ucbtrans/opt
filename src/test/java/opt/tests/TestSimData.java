@@ -54,73 +54,74 @@ public class TestSimData extends AbstractTest {
     @Test
     public void network_vht(){
         XYSeriesCollection A = new XYSeriesCollection();
-        A.addSeries(simdata.get_vht_for_network(car).get_XYSeries("cars"));
-        A.addSeries(simdata.get_vht_for_network(truck).get_XYSeries("truck"));
+        A.addSeries(simdata.get_vht_for_network(Misc.hashset(car)).get_XYSeries("cars"));
+        A.addSeries(simdata.get_vht_for_network(Misc.hashset(truck)).get_XYSeries("truck"));
         A.addSeries(simdata.get_vht_for_network(null).get_XYSeries("all"));
         TestPlot.plot(A,
                 "network VHT",
                 "veh hours",
-                "temp/net_vht.png");
+                String.format("temp/%s_net_vht.png",celloutput));
     }
 
     @Test
     public void network_vmt(){
         XYSeriesCollection A = new XYSeriesCollection();
-        A.addSeries(simdata.get_vmt_for_network(car).get_XYSeries("cars"));
-        A.addSeries(simdata.get_vmt_for_network(truck).get_XYSeries("truck"));
+        A.addSeries(simdata.get_vmt_for_network(Misc.hashset(car)).get_XYSeries("cars"));
+        A.addSeries(simdata.get_vmt_for_network(Misc.hashset(truck)).get_XYSeries("truck"));
         A.addSeries(simdata.get_vmt_for_network(null).get_XYSeries("all"));
         TestPlot.plot(A,
                 "network VMT",
                 "veh miles",
-                "temp/net_vmt.png");
+                String.format("temp/%s_net_vmt.png",celloutput));
+
     }
 
     @Test
     public void network_delay(){
         XYSeriesCollection A = new XYSeriesCollection();
-        A.addSeries(simdata.get_delay_for_network(20f).get_XYSeries("20 mph"));
-        A.addSeries(simdata.get_delay_for_network(35f).get_XYSeries("35 mph"));
-        A.addSeries(simdata.get_delay_for_network(50f).get_XYSeries("50 mph"));
+        A.addSeries(simdata.get_delay_for_network(null,20f).get_XYSeries("20 mph"));
+        A.addSeries(simdata.get_delay_for_network(null,35f).get_XYSeries("35 mph"));
+        A.addSeries(simdata.get_delay_for_network(null,50f).get_XYSeries("50 mph"));
         TestPlot.plot(A,
                 "network delay",
                 "veh hours",
-                "temp/net_delay.png");
+                String.format("temp/%s_net_delay.png",celloutput));
     }
 
     @Test
     public void network_delay_sources(){
         XYSeriesCollection A = new XYSeriesCollection();
-        A.addSeries(simdata.get_delay_for_network_sources(20f).get_XYSeries("20 mph"));
-        A.addSeries(simdata.get_delay_for_network_sources(35f).get_XYSeries("35 mph"));
-        A.addSeries(simdata.get_delay_for_network_sources(50f).get_XYSeries("50 mph"));
+        A.addSeries(simdata.get_delay_for_network_sources(null,20f).get_XYSeries("20 mph"));
+        A.addSeries(simdata.get_delay_for_network_sources(null,35f).get_XYSeries("35 mph"));
+        A.addSeries(simdata.get_delay_for_network_sources(null,50f).get_XYSeries("50 mph"));
         TestPlot.plot(A,
                 "network delay",
                 "veh hours",
-                "temp/net_delay_sources.png");
+                String.format("temp/%s_net_delay_sources.png",celloutput));
     }
 
     @Test
     public void network_delay_nonsources(){
         XYSeriesCollection A = new XYSeriesCollection();
-        A.addSeries(simdata.get_delay_for_network_nonsources(20f).get_XYSeries("20 mph"));
-        A.addSeries(simdata.get_delay_for_network_nonsources(35f).get_XYSeries("35 mph"));
-        A.addSeries(simdata.get_delay_for_network_nonsources(50f).get_XYSeries("50 mph"));
+        A.addSeries(simdata.get_delay_for_network_nonsources(null,20f).get_XYSeries("20 mph"));
+        A.addSeries(simdata.get_delay_for_network_nonsources(null,35f).get_XYSeries("35 mph"));
+        A.addSeries(simdata.get_delay_for_network_nonsources(null,50f).get_XYSeries("50 mph"));
         TestPlot.plot(A,
                 "network delay",
                 "veh hours",
-                "temp/net_delay_nonsources.png");
+                String.format("temp/%s_net_delay_nonsources.png",celloutput));
     }
 
     @Test
     public void network_vehicles(){
         XYSeriesCollection A = new XYSeriesCollection();
-        A.addSeries(simdata.get_vehs_for_network(car).get_XYSeries("cars"));
-        A.addSeries(simdata.get_vehs_for_network(truck).get_XYSeries("truck"));
+        A.addSeries(simdata.get_vehs_for_network(Misc.hashset(car)).get_XYSeries("cars"));
+        A.addSeries(simdata.get_vehs_for_network(Misc.hashset(truck)).get_XYSeries("truck"));
         A.addSeries(simdata.get_vehs_for_network(null).get_XYSeries("all"));
         TestPlot.plot(A,
                 "network vehicles",
                 "vehs",
-                "temp/net_veh.png");
+                String.format("temp/%s_net_veh.png",celloutput));
     }
 
     @Test
@@ -133,7 +134,7 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(A,
                 "route A GP lanes",
                 "vehs",
-                "temp/routeA_veh.png");
+                String.format("temp/%s_routeA_veh.png",celloutput));
 
         // cars and truck on route B GP lanes
         A = new XYSeriesCollection();
@@ -142,7 +143,7 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(A,
                 "route B GP lanes",
                 "vehs",
-                "temp/routeB_veh.png");
+                String.format("temp/%s_routeB_veh.png",celloutput));
 
         // all vehicles on route A in all lanes
         A = new XYSeriesCollection();
@@ -150,7 +151,7 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(A,
                 "route A in all lanes",
                 "vehs",
-                "temp/routeA_veh_agg.png");
+                String.format("temp/%s_routeA_veh_agg.png",celloutput));
 
     }
 
@@ -159,7 +160,8 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(simdata.get_speed_for_network().get_XYSeries(""),
                 "network speeds",
                 "speed [mph]",
-                "temp/net_speed.png");
+                String.format("temp/%s_net_speed.png",celloutput));
+
     }
 
     @Test
@@ -173,7 +175,7 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(A,
                 "route A speed",
                 "speed [mph]",
-                "temp/routeA_speed.png");
+                String.format("temp/%s_routeA_speed.png",celloutput));
 
         // get speed on route for all lane group types
         A = new XYSeriesCollection();
@@ -181,16 +183,7 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(A,
                 "route A speed",
                 "speed [mph]",
-                "temp/routeA_speed_all.png");
-    }
-
-    @Ignore
-    @Test
-    public void route_contour(){
-        TimeMatrix X = simdata.get_speed_contour_for_route(routeA,Misc.hashset(LaneGroupType.mng));
-
-        System.out.println(X.print_time());
-        System.out.println(X.print_values());
+                String.format("temp/%s_routeA_speed_all.png",celloutput));
     }
 
     /////////////////////////////////
@@ -207,7 +200,8 @@ public class TestSimData extends AbstractTest {
             TestPlot.plot(A,
                     String.format("Link %d",linkid),
                     "veh hours",
-                    String.format("temp/link%d_vht.png",linkid));
+                    String.format("temp/%s_link%d_vht.png",celloutput,linkid));
+
         }
     }
 
@@ -221,7 +215,7 @@ public class TestSimData extends AbstractTest {
             TestPlot.plot(A,
                     String.format("Link %d",linkid),
                     "veh miles",
-                    String.format("temp/link%d_vmt.png",linkid));
+                    String.format("temp/%s_link%d_vmt.png",celloutput,linkid));
         }
     }
 
@@ -231,11 +225,11 @@ public class TestSimData extends AbstractTest {
             Long linkid = e.getKey();
             SimDataLink data = e.getValue();
             XYSeriesCollection A = new XYSeriesCollection();
-            A.addSeries(data.get_delay(null,30f).get_XYSeries("all"));
+            A.addSeries(data.get_delay(null,null,30f).get_XYSeries("all"));
             TestPlot.plot(A,
                     String.format("Link %d",linkid),
                     "veh hours",
-                    String.format("temp/link%d_delay.png",linkid));
+                    String.format("temp/%s_link%d_delay.png",celloutput,linkid));
         }
     }
 
@@ -307,7 +301,7 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(A,
                 "link 1 cars vehicles",
                 "veh",
-                "temp/link1_veh_car.png");
+                String.format("temp/%s_link1_veh_car.png",celloutput,linkid));
 
         // get VEHICLES on given lane group type and all commodities
         A = new XYSeriesCollection();
@@ -317,7 +311,7 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(A,
                 "link 1 all vehicles",
                 "veh",
-                "temp/link1_veh_agg1.png");
+                String.format("temp/%s_link1_veh_agg1.png",celloutput,linkid));
 
         // get VEHICLES on all lane groups and commodities
         A = new XYSeriesCollection();
@@ -325,7 +319,7 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(A,
                 "link 1 all vehicles",
                 "veh",
-                "temp/link1_veh_agg2.png");
+                String.format("temp/%s_link1_veh_agg2.png",celloutput,linkid));
 
     }
 
@@ -340,7 +334,7 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(A,
                 "link 1 car flows",
                 "flw [vph]",
-                "temp/link1_flw_car.png");
+                String.format("temp/%s_link1_flw_car.png",celloutput,linkid));
 
         // get FLOWS on given lane group type and all commodities
         A = new XYSeriesCollection();
@@ -350,7 +344,7 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(A,
                 "link 1 all flows",
                 "flw [vph]",
-                "temp/link1_flw_agg1.png");
+                String.format("temp/%s_link1_flw_agg1.png",celloutput,linkid));
 
         // get FLOWS on all lane groups and commodities
         A = new XYSeriesCollection();
@@ -358,7 +352,7 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(A,
                 "link 1 all flows",
                 "flw [vph]",
-                "temp/link1_flw_agg2.png");
+                String.format("temp/%s_link1_flw_agg2.png",celloutput,linkid));
     }
 
     @Test
@@ -372,7 +366,7 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(A,
                 "link 1 speed",
                 "speed [mph]",
-                "temp/link1_speed.png");
+                String.format("temp/%s_link1_speed.png",celloutput,linkid));
 
         // get SPEEDS on all lane group types
         A = new XYSeriesCollection();
@@ -380,7 +374,7 @@ public class TestSimData extends AbstractTest {
         TestPlot.plot(A,
                 "link 1 speed",
                 "speed [mph]",
-                "temp/link1_speed_agg.png");
+                String.format("temp/%s_link1_speed_agg.png",celloutput,linkid));
     }
 
 //    @Test

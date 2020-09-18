@@ -151,9 +151,10 @@ public class SimDataLink {
     }
 
     // Delay ..............................................
-    public TimeSeries get_delay(Set<LaneGroupType> lgtypes, float threshold_mph) {
+    public TimeSeries get_delay(Set<LaneGroupType> lgtypes, Set<Long> commids, float threshold_mph) {
 
-        LaneGroupsAndCommodities X = extract_lgdatas_and_comms(lgtypes,null);
+        // get lgdata and comms
+        LaneGroupsAndCommodities X = extract_lgdatas_and_comms(lgtypes,commids);
 
         // degenerate case
         if(X.lgDatas.isEmpty() || X.commids.isEmpty())

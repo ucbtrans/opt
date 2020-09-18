@@ -31,7 +31,10 @@ public class SimDataLanegroup {
     }
 
     private int numtime(){
-        return vehs.values().iterator().next().length;
+        if(vehs!=null)
+            return vehs.values().iterator().next().length;
+        else
+            return celldata.iterator().next().vehs.values().iterator().next().length;
     }
 
     protected Set<Long> get_comm_ids(){
