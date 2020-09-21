@@ -30,8 +30,8 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 	// construction
 	////////////////////////////////
 
-	public ControllerPolicyHOVHOT(FreewayScenario scn, Long id, Set<Long> disallowed_comms,Set<Long> free_comms,Float dt, Double a0,Double a1,Double a2,int [][] vphpl_to_cents_table, Double qos_speed_threshold_kph) {
-		super(id!=null ? id : scn.new_controller_id(),Type.HOVHOT,dt, control.AbstractController.Algorithm.lg_restrict);
+	public ControllerPolicyHOVHOT(FreewayScenario scn, Set<Long> disallowed_comms,Set<Long> free_comms,Float dt, Double a0,Double a1,Double a2,int [][] vphpl_to_cents_table, Double qos_speed_threshold_kph) {
+		super(Type.HOVHOT,dt, control.AbstractController.Algorithm.lg_restrict);
 
 		this.comm2permission = new HashMap<>();
 

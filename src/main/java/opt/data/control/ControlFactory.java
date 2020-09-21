@@ -58,7 +58,7 @@ public class ControlFactory {
 		FreewayScenario fwyscn = links.iterator().next().get_segment().get_scenario();
 
 		ControlSchedule schedule = new ControlSchedule(
-				id==null ? fwyscn.new_controller_id() : id,
+				id==null ? fwyscn.new_schedule_id() : id,
 				name,
 				links,
 				lgtype,
@@ -68,11 +68,11 @@ public class ControlFactory {
 			switch(cntrl_type){
 
 				case RampMetering:
-					schedule.update(0f,ControlFactory.create_controller_rmopen(fwyscn,null));
+					schedule.update(0f,ControlFactory.create_controller_rmopen(fwyscn));
 					break;
 
 				case HOVHOT:
-					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null,null,null));
+					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null,null));
 					break;
 
 			}
@@ -88,26 +88,26 @@ public class ControlFactory {
 	// controller
 	/////////////////////
 
-	public static ControllerRampMeterOpen create_controller_rmopen(FreewayScenario fwyscn, Long id) throws Exception {
-		return new ControllerRampMeterOpen(fwyscn,id);
+	public static ControllerRampMeterOpen create_controller_rmopen(FreewayScenario fwyscn) throws Exception {
+		return new ControllerRampMeterOpen(fwyscn);
 	}
 
-	public static ControllerRampMeterClosed create_controller_rmclosed(FreewayScenario fwyscn, Long id) throws Exception {
-		return new ControllerRampMeterClosed(fwyscn,id);
+	public static ControllerRampMeterClosed create_controller_rmclosed(FreewayScenario fwyscn) throws Exception {
+		return new ControllerRampMeterClosed(fwyscn);
 	}
 
-	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn, Long id, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl, float rate_vphpl) throws Exception {
+	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl, float rate_vphpl) throws Exception {
 		parameters_check(dt);
-		return new ControllerRampMeterFixedRate(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,rate_vphpl);
+		return new ControllerRampMeterFixedRate(fwyscn,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,rate_vphpl);
 	}
 
-	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn,Long id, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl,Long sensor_id, long sensor_link_id, float sensor_offset) throws Exception {
+	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl,Long sensor_id, long sensor_link_id, float sensor_offset) throws Exception {
 		parameters_check(dt);
-		return new ControllerRampMeterAlinea(fwyscn,id,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
+		return new ControllerRampMeterAlinea(fwyscn,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
 	}
 
-	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn, Long id, Set<Long> disallowed_comms,Set<Long> free_comms,Float dt, Double a0,Double a1,Double a2,int [][] vplph_to_cents_table, Double qos_speed_threshold_kph) throws Exception {
-		return new ControllerPolicyHOVHOT(fwyscn,id,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
+	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn, Set<Long> disallowed_comms,Set<Long> free_comms,Float dt, Double a0,Double a1,Double a2,int [][] vplph_to_cents_table, Double qos_speed_threshold_kph) throws Exception {
+		return new ControllerPolicyHOVHOT(fwyscn,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
 	}
 
 	/////////////////////
@@ -122,7 +122,7 @@ public class ControlFactory {
 	// jaxb
 	/////////////////////////
 
-	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn,jaxb.Entry jentry,jaxb.Sensor jsn,Long id) throws Exception {
+	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn,jaxb.Entry jentry,jaxb.Sensor jsn) throws Exception {
 
 		// read parameters
 		boolean has_queue_control = false;
@@ -145,7 +145,7 @@ public class ControlFactory {
 				}
 			}
 
-		ControllerRampMeterAlinea cntrl = create_controller_alinea(fwyscn,id,
+		ControllerRampMeterAlinea cntrl = create_controller_alinea(fwyscn,
 				jentry.getDt(),
 				has_queue_control,
 				min_rate_vphpl,
@@ -157,7 +157,7 @@ public class ControlFactory {
 		return cntrl;
 	}
 
-	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn,jaxb.Entry jentry,Long id) throws Exception {
+	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn,jaxb.Entry jentry) throws Exception {
 
 		// read parameters
 		boolean has_queue_control = false;
@@ -184,14 +184,14 @@ public class ControlFactory {
 				}
 			}
 
-		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(fwyscn,id,
+		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(fwyscn,
 				jentry.getDt(),has_queue_control,min_rate_vphpl,max_rate_vphpl,rate_vphpl);
 
 		return cntrl;
 
 	}
 
-	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn,jaxb.Entry jentry,Long id) throws Exception {
+	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn,jaxb.Entry jentry) throws Exception {
 
 		// read parameters
 		Set<Long> disallowed_comms = new HashSet<>();
@@ -233,7 +233,7 @@ public class ControlFactory {
 
 		Float dt = jentry.getDt()==null ? (float) UserSettings.defaultControlDtSeconds : jentry.getDt();
 
-		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(fwyscn,id,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
+		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(fwyscn,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
 		return cntrl;
 	}
 

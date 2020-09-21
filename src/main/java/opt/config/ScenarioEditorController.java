@@ -841,7 +841,7 @@ public class ScenarioEditorController {
         vphpl_to_cents_table[0][0] = 0;
         vphpl_to_cents_table[0][1] = 0;
         try {
-            ControllerPolicyHOVHOT ctrl = ControlFactory.create_controller_hovhot(myScenario, null, new HashSet<Long>(), free_comms, dt, a0, a1, a2, vphpl_to_cents_table, v_thres);
+            ControllerPolicyHOVHOT ctrl = ControlFactory.create_controller_hovhot(myScenario, null, free_comms, dt, a0, a1, a2, vphpl_to_cents_table, v_thres);
             ScheduleEntry entry = new ScheduleEntry(start_time, ctrl);
             launchLaneControlEditor(entry, true);
         } catch(Exception ex) {

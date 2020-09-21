@@ -18,8 +18,8 @@ public abstract class AbstractController {
 	// construction
 	////////////////////////////////
 
-	public AbstractController(long id, Type type, Float dt, control.AbstractController.Algorithm algorithm) {
-		this.id = id;
+	public AbstractController(Type type, Float dt, control.AbstractController.Algorithm algorithm) {
+//		this.id = id;
 		this.type = type;
 		this.dt = dt;
 		this.algorithm = algorithm;
