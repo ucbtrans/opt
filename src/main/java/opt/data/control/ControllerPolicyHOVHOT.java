@@ -35,6 +35,11 @@ public class ControllerPolicyHOVHOT extends AbstractController {
 
 		this.comm2permission = new HashMap<>();
 
+		if(disallowed_comms==null)
+			disallowed_comms = new HashSet<>();
+		if(free_comms==null)
+			free_comms = new HashSet<>();
+
 		// all are tolled by default
 		for(Long cid : scn.get_commodities().keySet())
 			comm2permission.put(cid,Permission.Tolled);
