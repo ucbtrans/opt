@@ -122,7 +122,9 @@ public class LinkPerformanceController {
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
-        
+        lgset_gp.add(LaneGroupType.gp);
+        lgset_mng.add(LaneGroupType.mng);
+        lgset_aux.add(LaneGroupType.aux);
     }
 
 
@@ -150,10 +152,6 @@ public class LinkPerformanceController {
             timeDivider = 60.0;
         }
         
-        lgset_gp.add(LaneGroupType.gp);
-        lgset_mng.add(LaneGroupType.mng);
-        lgset_aux.add(LaneGroupType.aux);
-        
         fillTabTimeseries();
         fillTabAggregates();
         //fillTabEmissions();
@@ -163,7 +161,6 @@ public class LinkPerformanceController {
     private Set<Long> cset(Commodity c) {
         Set<Long> s = new HashSet<Long>();
         s.add(c.getId());
-        
         return s;
     }
     

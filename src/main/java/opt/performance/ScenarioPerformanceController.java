@@ -197,6 +197,9 @@ public class ScenarioPerformanceController {
         ObservableList<PieChart.Data> vhtPieData2 = FXCollections.observableArrayList();
         ObservableList<PieChart.Data> delayPieData1 = FXCollections.observableArrayList();
         ObservableList<PieChart.Data> delayPieData2 = FXCollections.observableArrayList();
+        
+        double prefWidth = 0.75*scenarioPerformanceMainPane.getPrefWidth();
+        double prefHeight = scenarioPerformanceMainPane.getPrefHeight()/3;
 
         int sz = listVT.size();
         double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;
@@ -259,23 +262,23 @@ public class ScenarioPerformanceController {
 
         chart = new PieChart(vmtPieData);
         chart.setTitle("Total VMT (" + (int)Math.round(total_vmt) + ")");
-        chart.setLegendSide(Side.BOTTOM);
-        //chart.setMinWidth(300);
-        chart.setMinHeight(300);
-        double prefWidth = scenarioPerformanceMainPane.getPrefWidth();
-        double prefHeight = scenarioPerformanceMainPane.getPrefHeight()/5;
-        //chart.setPrefSize(prefWidth, prefHeight);
+        chart.setLegendVisible(false);
+        chart.setPrefSize(prefWidth, prefHeight);
+        chart.setMinWidth(prefWidth);
+        //chart.setMaxWidth(prefWidth);
+        chart.setMinHeight(prefHeight);
+        //chart.setMaxHeight(prefHeight);
         vbSummary.getChildren().add(chart);
         vbSummary.getChildren().add(new Separator());
 
         chart = new PieChart(vhtPieData1);
         chart.setTitle("Total VHT (" + (int)Math.round(total_vht) + ")");
-        chart.setLegendSide(Side.BOTTOM);
-        //chart.setMinWidth(300);
-        chart.setMinHeight(300);
-        prefWidth = scenarioPerformanceMainPane.getPrefWidth();
-        prefHeight = scenarioPerformanceMainPane.getPrefHeight()/5;
-        //chart.setPrefSize(prefWidth, prefHeight);
+        chart.setLegendVisible(false);
+        chart.setPrefSize(prefWidth, prefHeight);
+        chart.setMinWidth(prefWidth);
+        //chart.setMaxWidth(prefWidth);
+        chart.setMinHeight(prefHeight);
+        //chart.setMaxHeight(prefHeight);
         vbSummary.getChildren().add(chart);
         
         
@@ -304,12 +307,12 @@ public class ScenarioPerformanceController {
         
         chart = new PieChart(vhtPieData2);
         //chart.setTitle("Total VHT (" + (int)Math.round(total_vht) + ")");
-        //chart.setLegendSide(Side.BOTTOM);
-        //chart.setMinWidth(300);
-        chart.setMinHeight(300);
-        prefWidth = scenarioPerformanceMainPane.getPrefWidth();
-        prefHeight = scenarioPerformanceMainPane.getPrefHeight()/5;
-        //chart.setPrefSize(prefWidth, 300);
+        chart.setLegendVisible(false);      
+        chart.setPrefSize(prefWidth, prefHeight);
+        chart.setMinWidth(prefWidth);
+        //chart.setMaxWidth(prefWidth);
+        chart.setMinHeight(prefHeight);
+        //chart.setMaxHeight(prefHeight);
         vbSummary.getChildren().add(chart);
         vbSummary.getChildren().add(new Separator());
         
@@ -322,12 +325,12 @@ public class ScenarioPerformanceController {
         
         chart = new PieChart(delayPieData1);
         chart.setTitle("Total Delay " + label_thres);
-        chart.setLegendSide(Side.BOTTOM);
-        //chart.setMinWidth(300);
-        chart.setMinHeight(300);
-        prefWidth = scenarioPerformanceMainPane.getPrefWidth();
-        prefHeight = scenarioPerformanceMainPane.getPrefHeight()/5;
-        //chart.setPrefSize(prefWidth, prefHeight);
+        chart.setLegendVisible(false);
+        chart.setPrefSize(prefWidth, prefHeight);
+        chart.setMinWidth(prefWidth);
+        //chart.setMaxWidth(prefWidth);
+        chart.setMinHeight(prefHeight);
+        //chart.setMaxHeight(prefHeight);
         vbSummary.getChildren().add(chart);
         
         
@@ -356,12 +359,12 @@ public class ScenarioPerformanceController {
         
         chart = new PieChart(delayPieData2);
         //chart.setTitle("Total Delay " + label_thres);
-        chart.setLegendSide(Side.BOTTOM);
-        //chart.setMinWidth(300);
-        chart.setMinHeight(300);
-        prefWidth = scenarioPerformanceMainPane.getPrefWidth();
-        prefHeight = scenarioPerformanceMainPane.getPrefHeight()/5;
-        //chart.setPrefSize(prefWidth, prefHeight);
+        chart.setLegendVisible(false);
+        chart.setPrefSize(prefWidth, prefHeight);
+        chart.setMinWidth(prefWidth);
+        //chart.setMaxWidth(prefWidth);
+        chart.setMinHeight(prefHeight);
+        //chart.setMaxHeight(prefHeight);
         vbSummary.getChildren().add(chart);
     }
     
