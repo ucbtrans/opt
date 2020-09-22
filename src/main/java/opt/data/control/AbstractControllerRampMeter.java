@@ -15,8 +15,8 @@ public abstract class AbstractControllerRampMeter extends AbstractController {
     // construction
     ////////////////////////////////
 
-    public AbstractControllerRampMeter(long id, Float dt, control.AbstractController.Algorithm  algorithm,boolean has_queue_control,float min_rate_vph,float max_rate_vph) throws Exception {
-        super(id, Type.RampMetering, dt, algorithm);
+    public AbstractControllerRampMeter(Float dt, control.AbstractController.Algorithm  algorithm,boolean has_queue_control,float min_rate_vph,float max_rate_vph) throws Exception {
+        super(Type.RampMetering, dt, algorithm);
         this.has_queue_control = has_queue_control;
         this.min_rate_vph = min_rate_vph;
         this.max_rate_vph = max_rate_vph;

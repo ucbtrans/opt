@@ -16,7 +16,6 @@ public class TestControl extends AbstractTest{
 		try {
 			TestData X = new TestData("project2_rm.opt");
 			ControllerRampMeterAlinea cntrl = ControlFactory.create_controller_alinea(X.scenario,
-					null,
 					3f,
 					false,
 					100f,
@@ -35,7 +34,6 @@ public class TestControl extends AbstractTest{
 		try {
 			TestData X = new TestData("project2_rm.opt");
 			ControllerRampMeterFixedRate cntrl = ControlFactory.create_controller_fixed_rate(X.scenario,
-					null,
 					3f,
 					false,
 					100f,

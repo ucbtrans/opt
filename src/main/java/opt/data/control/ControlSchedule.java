@@ -192,6 +192,10 @@ public class ControlSchedule implements Comparable {
     // API
     ////////////////////////////////
 
+    public long getId(){
+        return id;
+    }
+
     public String get_name(){
         return name;
     }
@@ -228,10 +232,10 @@ public class ControlSchedule implements Comparable {
             try {
                 switch(controlType){
                     case RampMetering:
-                        entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_rmopen(fwyscn,null)));
+                        entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_rmopen(fwyscn)));
                         break;
                     case HOVHOT:
-                        entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null,null,null)));
+                        entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null,null)));
                         break;
                 }
             } catch (Exception e) {

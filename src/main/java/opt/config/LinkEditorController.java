@@ -2315,17 +2315,16 @@ public class LinkEditorController {
             AbstractControllerRampMeter newController;
             switch(ca) {
                 case rm_open:
-                    newController = ControlFactory.create_controller_rmopen(myLink.get_segment().get_scenario(), null);
+                    newController = ControlFactory.create_controller_rmopen(myLink.get_segment().get_scenario());
                     break;
 
                 case rm_closed:
-                    newController = ControlFactory.create_controller_rmclosed(myLink.get_segment().get_scenario(), null);
+                    newController = ControlFactory.create_controller_rmclosed(myLink.get_segment().get_scenario());
                     break;
 
                 case rm_alinea:
                     AbstractLink sensor_link = myLink.get_dn_link();
                     newController = ControlFactory.create_controller_alinea(myLink.get_segment().get_scenario(),
-                        null,
                         dt,
                         false,
                         min_rate_vphpl,
@@ -2337,7 +2336,6 @@ public class LinkEditorController {
 
                 case rm_fixed_rate:
                     newController = ControlFactory.create_controller_fixed_rate(myLink.get_segment().get_scenario(),
-                        null,
                         dt,
                         false,
                         min_rate_vphpl,
@@ -2544,7 +2542,7 @@ public class LinkEditorController {
         int aux_lanes = numLanesAuxSpinnerValueFactory.getValue();
         int total_lanes = gp_lanes + managed_lanes + aux_lanes;
         
-        
+
         if (managed_lanes > 0) {
             cbBarrier.setDisable(false);
             capacityManagedLane.setDisable(false);

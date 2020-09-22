@@ -397,14 +397,11 @@ public abstract class AbstractLink implements Comparable {
             return schedules.get(lgtype).get(cntrl_type);
     }
 
-    public final Set<Long> get_controller_ids(){
+    public final Set<Long> get_schedule_ids(){
         Set<Long> ids = new HashSet<>();
-        for(Map<AbstractController.Type,ControlSchedule> e1 : schedules.values())
-            for(ControlSchedule sch : e1.values())
-                ids.addAll( sch.get_entries().stream()
-                        .map(e->e.get_cntrl().getId())
-                        .collect(Collectors.toSet()));
-
+        for(Map<AbstractController.Type,ControlSchedule> x : schedules.values())
+            for(ControlSchedule sch : x.values())
+                ids.add(sch.getId());
         return ids;
     }
 

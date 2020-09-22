@@ -15,7 +15,7 @@ public class FreewayScenario {
     private Long max_link_id;
     private Long max_node_id;
     private Long max_seg_id;
-    private Long max_controller_id;
+    private Long max_schedule_id;
     private Long max_sensor_id;
     private Long max_rc_id;
 
@@ -321,11 +321,11 @@ public class FreewayScenario {
                     switch( algorithm ){
 
                         case rm_open:
-                            ctrl = ControlFactory.create_controller_rmopen(this,null);
+                            ctrl = ControlFactory.create_controller_rmopen(this);
                             break;
 
                         case rm_closed:
-                            ctrl = ControlFactory.create_controller_rmclosed(this,null);
+                            ctrl = ControlFactory.create_controller_rmclosed(this);
                             break;
 
                         case rm_alinea:
@@ -337,15 +337,15 @@ public class FreewayScenario {
                                 jsns = sensors.get(sensor_id);
                             }
 
-                            ctrl = ControlFactory.create_controller_alinea(this,jentry,jsns,null);
+                            ctrl = ControlFactory.create_controller_alinea(this,jentry,jsns);
                             break;
 
                         case rm_fixed_rate:
-                            ctrl = ControlFactory.create_controller_fixed_rate(this,jentry,null);
+                            ctrl = ControlFactory.create_controller_fixed_rate(this,jentry);
                             break;
 
                         case lg_restrict:
-                            ctrl = ControlFactory.create_controller_hovhot(this,jentry,null);
+                            ctrl = ControlFactory.create_controller_hovhot(this,jentry);
 
                     }
 
@@ -372,7 +372,7 @@ public class FreewayScenario {
         scn_cpy.max_link_id = max_link_id;
         scn_cpy.max_node_id = max_node_id;
         scn_cpy.max_seg_id = max_seg_id;
-        scn_cpy.max_controller_id = max_controller_id;
+        scn_cpy.max_schedule_id = max_schedule_id;
         scn_cpy.max_sensor_id = max_sensor_id;
         scn_cpy.max_rc_id = max_rc_id;
         scn_cpy.scenario = scenario.clone();
@@ -926,7 +926,7 @@ public class FreewayScenario {
             max_link_id = 0l;
             max_node_id = 0l;
             max_seg_id = 0l;
-            max_controller_id = 0l;
+            max_schedule_id = 0l;
             max_sensor_id = 0l;
             max_rc_id = 0l;
             return;
@@ -949,9 +949,9 @@ public class FreewayScenario {
 
         // controller
         Optional<Long> opt_max_cntrl_id = scenario.links.values().stream()
-                .flatMap(link->link.get_controller_ids().stream())
+                .flatMap(link->link.get_schedule_ids().stream())
                 .max(Comparator.comparing(Long::valueOf));
-        max_controller_id = opt_max_cntrl_id.isPresent() ? opt_max_cntrl_id.get() : 0l;
+        max_schedule_id = opt_max_cntrl_id.isPresent() ? opt_max_cntrl_id.get() : 0l;
 
         // sensor
         Optional<Long> opt_max_sens_id = scenario.links.values().stream()
@@ -975,8 +975,8 @@ public class FreewayScenario {
         return ++max_seg_id;
     }
 
-    public long new_controller_id(){
-        return ++max_controller_id;
+    public long new_schedule_id(){
+        return ++max_schedule_id;
     }
 
     public long new_sensor_id(){

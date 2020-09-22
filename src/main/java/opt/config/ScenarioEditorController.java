@@ -377,12 +377,8 @@ public class ScenarioEditorController {
     private void initLanePolicies() {
         policyPane.setVisible(false);
         deletePolicy.setDisable(true);
-        linksUnderPolicy.clear();
-        listLanePolicies = myScenario.get_schedules_for_controltype(AbstractController.Type.HOVHOT);
         
-        for (ControlSchedule p : listLanePolicies)
-            linksUnderPolicy.addAll(p.get_links());
-        
+        populateUnderPolicyLinkList();
         populatePolicyList();
         populateFreeForPolicyLinkList();
         
@@ -413,6 +409,14 @@ public class ScenarioEditorController {
         
         if (selectedPolicyIndex >= 0)
             cbPolicies.getSelectionModel().select(selectedPolicyIndex);
+    }
+    
+    private void populateUnderPolicyLinkList() {
+        linksUnderPolicy.clear();
+        listLanePolicies = myScenario.get_schedules_for_controltype(AbstractController.Type.HOVHOT);
+        
+        for (ControlSchedule p : listLanePolicies)
+            linksUnderPolicy.addAll(p.get_links());
     }
     
     private void populateFreeForPolicyLinkList() {
@@ -841,7 +845,7 @@ public class ScenarioEditorController {
         vphpl_to_cents_table[0][0] = 0;
         vphpl_to_cents_table[0][1] = 0;
         try {
-            ControllerPolicyHOVHOT ctrl = ControlFactory.create_controller_hovhot(myScenario, null, new HashSet<Long>(), free_comms, dt, a0, a1, a2, vphpl_to_cents_table, v_thres);
+            ControllerPolicyHOVHOT ctrl = ControlFactory.create_controller_hovhot(myScenario, null, free_comms, dt, a0, a1, a2, vphpl_to_cents_table, v_thres);
             ScheduleEntry entry = new ScheduleEntry(start_time, ctrl);
             launchLaneControlEditor(entry, true);
         } catch(Exception ex) {
