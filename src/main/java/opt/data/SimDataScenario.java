@@ -340,13 +340,15 @@ public class SimDataScenario {
                 X.add_timeseries(i++,lkdata.get_dty_array(lgtypes,commids));
             else {
                 double cell_length_miles = lkdata.cell_length();
-                int c = i;
-                for(SimDataLanegroup lgdata: lkdata.get_lgdatas(lgtypes)) {
-                    c = i;
+                for(LaneGroupType lgtype : lgtypes){
+                    int c = i;
+                    SimDataLanegroup lgdata = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
+                    if(lgdata==null)
+                        continue;
                     for (SimCellData cd : lgdata.celldata)
                         X.add_timeseries(c++, cd.get_cell_dty(commids, cell_length_miles));
                 }
-                i = c;
+                i += lkdata.numcells();
             }
 
         }
@@ -371,13 +373,15 @@ public class SimDataScenario {
             if(haslgdata)
                 X.add_timeseries(i++,lkdata.get_exit_flw_array(lgtypes,commids));
             else {
-                int c = i;
-                for(SimDataLanegroup lgdata: lkdata.get_lgdatas(lgtypes)) {
-                    c = i;
+                for(LaneGroupType lgtype : lgtypes){
+                    int c = i;
+                    SimDataLanegroup lgdata = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
+                    if(lgdata==null)
+                        continue;
                     for (SimCellData cd : lgdata.celldata)
                         X.add_timeseries(c++, cd.get_cell_flw(commids));
                 }
-                i = c;
+                i += lkdata.numcells();
             }
         }
         return X;
@@ -407,24 +411,19 @@ public class SimDataScenario {
             TimeMatrix.LinkLaneGroupCell e = X.space.get(i);
             SimDataLink lkdata = linkdata.get(e.linkid);
 
-//            // fill row with nans if lanegroup is not present in this link
-//            if(!lkdata.lgtype2id.containsKey(lgtype)) {
-//                X.fill_with_nans(i++);
-//                continue;
-//            }
-
             if(haslgdata)
                 X.add_timeseries(i++,lkdata.get_spd_array(lgtypes));
             else{
                 double cell_length_miles = lkdata.cell_length();
-                int c = i;
                 for(LaneGroupType lgtype : lgtypes){
-                    c = i;
+                    int c = i;
                     SimDataLanegroup lgdata = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
+                    if(lgdata==null)
+                        continue;
                     for(double[] z : lgdata.get_cell_speeds(lkdata.ffspeed_mph,cell_length_miles))
                         X.add_timeseries(c++, z);
                 }
-                i = c;
+                i += lkdata.numcells();
             }
 
         }

@@ -480,6 +480,7 @@ public class RoutePerformanceController {
         TimeMatrix tm_flow_mng = mySimData.get_flow_contour_for_route(myRoute.getId(), lgset_mng, null);
         TimeMatrix tm_density_gp = mySimData.get_density_contour_for_route(myRoute.getId(), lgset_gp, null);
         TimeMatrix tm_density_mng = mySimData.get_density_contour_for_route(myRoute.getId(), lgset_mng, null);
+        
         double[][] vmtrx_gp = tm_speed_gp.values;
         double[][] vmtrx_mng = tm_speed_mng.values;
         double[][] fmtrx_gp = tm_flow_gp.values;
