@@ -127,7 +127,10 @@ public class RoutePerformanceController {
     private double[][] densityDataGP = null;
     private double[][] densityDataManaged = null;
     
+    private double minCellLength = 0;
     private double maxCellLength = 0;
+    private double minCellLengthM = 0;
+    private double maxCellLengthM = 0;
     private double maxLinkLength = 0;
     private double routeLength = 0;
     
@@ -271,202 +274,25 @@ public class RoutePerformanceController {
     }
 
     
-    private void processLinkSequence() {
-//
-//        maxCellLength = 0;
-//        maxLinkLength = 0;
-//        routeLength = 0;
-//        minSpeed = Double.MAX_VALUE;
-//        maxSpeed = 0;
-//        minFlow = Double.MAX_VALUE;
-//        maxFlow = 0;
-//        minVeh = Double.MAX_VALUE;
-//        maxVeh = 0;
-//        hasManagedLanes = false;
-//        hasAuxLanes = false;
-//        List<AbstractLink> links = myRoute.get_link_sequence();
-//        int lSize = links.size();
-//        int xSize = 0;
-//        int ySize = 0;
-//        double lcc = UserSettings.lengthConversionMap.get("meters"+UserSettings.unitsLength);
-//        double scc = UserSettings.speedConversionMap.get("mph"+UserSettings.unitsSpeed);
-//        double fcc = UserSettings.flowConversionMap.get("vph"+UserSettings.unitsFlow);
-//        SimDataLink[] sdl = new SimDataLink[lSize];
-//        double[] cellLengths = new double[lSize];
-//        double[] ffspeed_gp_mph = new double[lSize];
-//        double[] ffspeed_mng_mph = new double[lSize];
-//        int[] begCellIdx = new int[lSize];
-//
-//        int prev_num_cells = 0;
-//        for (int i = 0; i < lSize; i++) {
-//            AbstractLink l = links.get(i);
-//            maxLinkLength = Math.max(maxLinkLength, lcc*l.get_length_meters());
-//            routeLength += lcc*l.get_length_meters();
-//            sdl[i] = mySimData.linkdata.get(l.id);
-//            List<SimCellData> scd = sdl[i].lgData.get(sdl[i].lgtype2id.get(LaneGroupType.gp)).celldata;
-//            int num_cells = scd.size();
-//            double cell_length = lcc * l.get_length_meters() / (double)num_cells;
-//            maxCellLength = Math.max(maxCellLength, cell_length);
-//            cellLengths[i] = cell_length;
-//            xSize += num_cells;
-//            if (i == 0)
-//                begCellIdx[i] = 0;
-//            else
-//                begCellIdx[i] = begCellIdx[i-1] + prev_num_cells;
-//            prev_num_cells = num_cells;
-//            ffspeed_gp_mph[i] = UserSettings.speedConversionMap.get("kphmph")*l.get_gp_freespeed_kph();
-//            ffspeed_mng_mph[i] = Double.NaN;
-//            if (l.get_mng_lanes() > 0)
-//                ffspeed_mng_mph[i] = UserSettings.speedConversionMap.get("kphmph")*l.get_mng_freespeed_kph();
-//            ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.gp).time.length);
-//
-//            if (l.get_mng_lanes() > 0) {
-//                hasManagedLanes = true;
-//                ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.mng).time.length);
-//            }
-//            if (l.get_aux_lanes() > 0) {
-//                hasAuxLanes = true;
-//                ySize = Math.max(ySize, sdl[i].get_speed(LaneGroupType.aux).time.length);
-//            }
-//        }
-//
-//        float dt = sdl[0].get_speed(LaneGroupType.gp).get_dt();
-//        myDt = dt / (float)timeDivider;
-//        speedDataGP = new double[3][xSize*ySize];
-//        speedDataManaged = new double[3][xSize*ySize];
-//        speedDataAux = new double[3][xSize*ySize];
-//        flowDataGP = new double[3][xSize*ySize];
-//        flowDataManaged = new double[3][xSize*ySize];
-//        flowDataAux = new double[3][xSize*ySize];
-//        vehDataGP = new double[3][xSize*ySize];
-//        vehDataManaged = new double[3][xSize*ySize];
-//        vehDataAux = new double[3][xSize*ySize];
-//
-//        for (int j = 0; j < ySize; j++) {
-//            double dd = 0.0;
-//            float hour = (start+j*dt) / (float)timeDivider;
-//            for (int i = 0; i < lSize; i++) {
-//                List<SimCellData> scd_gp = sdl[i].lgData.get(sdl[i].lgtype2id.get(LaneGroupType.gp)).celldata;
-//                List<SimCellData> scd_mng = null;
-//                List<SimCellData> scd_aux = null;
-//                if (links.get(i).get_mng_lanes() > 0)
-//                    scd_mng = sdl[i].lgData.get(sdl[i].lgtype2id.get(LaneGroupType.mng)).celldata;
-//                if (links.get(i).get_aux_lanes() > 0)
-//                    scd_aux = sdl[i].lgData.get(sdl[i].lgtype2id.get(LaneGroupType.aux)).celldata;
-//                int num_cells = scd_gp.size();
-//                for (int k = 0; k < num_cells; k++) {
-//                    double[] vv = scd_gp.get(k).get_speed((float)ffspeed_gp_mph[i], cellLengths[i]);
-//                    double v = Double.NaN;
-//                    if ((vv != null) && (j < vv.length))
-//                        v = scc*vv[j];
-//                    if (!Double.isNaN(v)) {
-//                        minSpeed = Math.min(minSpeed, v);
-//                        maxSpeed = Math.max(maxSpeed, v);
-//                    }
-//
-//                    double[] ff = scd_gp.get(k).get_total_flw();
-//                    double f = Double.NaN;
-//                    if ((ff != null) && (j < ff.length))
-//                        f = fcc*ff[j];
-//                    if ((scd_aux != null) && (k < scd_aux.size())) {
-//                        ff = scd_aux.get(k).get_total_flw();
-//                        if ((ff != null) && (j < ff.length))
-//                            if (!Double.isNaN(f)) {
-//                                if (!Double.isNaN(ff[j]))
-//                                    f += fcc*ff[j];
-//                            } else
-//                                f = fcc*ff[j];
-//                    }
-//                    if (!Double.isNaN(f)) {
-//                        minFlow = Math.min(minFlow, f);
-//                        maxFlow = Math.max(maxFlow, f);
-//                    }
-//
-//                    speedDataGP[0][j * xSize + begCellIdx[i] + k] = dd;
-//                    speedDataGP[1][j * xSize + begCellIdx[i] + k] = hour;
-//                    speedDataGP[2][j * xSize + begCellIdx[i] + k] = v;
-//                    flowDataGP[0][j * xSize + begCellIdx[i] + k] = dd;
-//                    flowDataGP[1][j * xSize + begCellIdx[i] + k] = hour;
-//                    flowDataGP[2][j * xSize + begCellIdx[i] + k] = f;
-//                    vehDataGP[0][j * xSize + begCellIdx[i] + k] = dd;
-//                    vehDataGP[1][j * xSize + begCellIdx[i] + k] = hour;
-//
-//                    if (hasManagedLanes) {
-//                        v = Double.NaN;
-//                        if (links.get(i).get_mng_lanes() > 0) {
-//                            vv = null;
-//                            if (scd_mng != null)
-//                                vv = scd_mng.get(k).get_speed((float)ffspeed_mng_mph[i], cellLengths[i]);
-//                            if ((vv != null) && (j < vv.length))
-//                                v = scc*vv[j];
-//                            if (!Double.isNaN(v)) {
-//                                minSpeed = Math.min(minSpeed, v);
-//                                maxSpeed = Math.max(maxSpeed, v);
-//                            }
-//                        }
-//
-//                        f = Double.NaN;
-//                        if (links.get(i).get_mng_lanes() > 0) {
-//                            ff = null;
-//                            if (scd_mng != null)
-//                                ff = scd_mng.get(k).get_total_flw();
-//                            if ((ff != null) && (j < ff.length))
-//                                f = fcc*ff[j];
-//                            if (!Double.isNaN(f)) {
-//                                minFlow = Math.min(minFlow, f);
-//                                maxFlow = Math.max(maxFlow, f);
-//                            }
-//                        }
-//
-//                        speedDataManaged[0][j * xSize + begCellIdx[i] + k] = dd;
-//                        speedDataManaged[1][j * xSize + begCellIdx[i] + k] = hour;
-//                        speedDataManaged[2][j * xSize + begCellIdx[i] + k] = v;
-//                        flowDataManaged[0][j * xSize + begCellIdx[i] + k] = dd;
-//                        flowDataManaged[1][j * xSize + begCellIdx[i] + k] = hour;
-//                        flowDataManaged[2][j * xSize + begCellIdx[i] + k] = f;
-//                        vehDataManaged[0][j * xSize + begCellIdx[i] + k] = dd;
-//                        vehDataManaged[1][j * xSize + begCellIdx[i] + k] = hour;
-//                    }
-//
-//                    if (hasAuxLanes) {
-//                        speedDataAux[0][j * xSize + i] = dd;
-//                        speedDataAux[1][j * xSize + i] = hour;
-//                        flowDataAux[0][j * xSize + i] = dd;
-//                        flowDataAux[1][j * xSize + i] = hour;
-//                        vehDataAux[0][j * xSize + i] = dd;
-//                        vehDataAux[1][j * xSize + i] = hour;
-//                    }
-//
-//                    dd += cellLengths[i];
-//                }
-//            }
-//	    }
-//
-//        // HACK
-//        minSpeed = 0d;
-        
-    }
-    
-    
-    
-    
     
     private void processRouteData() {
         double dt = mySimData.get_dt_sec();
         myDt = dt /(float)timeDivider;
+        minCellLength = Double.MAX_VALUE;
         maxCellLength = 0;
+        minCellLengthM = Double.MAX_VALUE;
+        maxCellLengthM = 0;
         maxLinkLength = 0;
         routeLength = 0;
-        minSpeed = Double.MAX_VALUE;
+        minSpeed = 0;
         maxSpeed = 0;
-        minFlow = Double.MAX_VALUE;
+        minFlow = 0;
         maxFlow = 0;
-        minDensity = Double.MAX_VALUE;
+        minDensity = 0;
         maxDensity = 0;
         hasManagedLanes = false;
         hasAuxLanes = false;
         List<AbstractLink> links = myRoute.get_link_sequence();
-        int lSize = links.size();
         
         double lcc = UserSettings.lengthConversionMap.get("meters"+UserSettings.unitsLength);
         double lcc2 = UserSettings.lengthConversionMap.get("miles"+UserSettings.unitsLength);
@@ -489,11 +315,12 @@ public class RoutePerformanceController {
         double[][] dmtrx_mng = tm_density_mng.values;
         int ySize = vmtrx_gp.length;
         int xSize = vmtrx_gp[0].length;
+        int ySizeM = 0;
+        if (vmtrx_mng != null)
+            ySizeM = vmtrx_mng.length;
         
-        for (int i = 0; i < lSize; i++) {
-            AbstractLink l = links.get(i);
+        for (AbstractLink l : links) {
             maxLinkLength = Math.max(maxLinkLength, lcc*l.get_length_meters());
-            routeLength += lcc*l.get_length_meters();
 
             if (l.get_mng_lanes() > 0)
                 hasManagedLanes = true;
@@ -501,27 +328,6 @@ public class RoutePerformanceController {
             if (l.get_aux_lanes() > 0)
                 hasAuxLanes = true;
         }
-        
-        minSpeed = Math.min(minSpeed, tm_speed_gp.min_value);
-        maxSpeed = Math.max(maxSpeed, tm_speed_gp.max_value);
-        minFlow = Math.min(minFlow, tm_flow_gp.min_value);
-        maxFlow = Math.max(maxFlow, tm_flow_gp.max_value);
-        minDensity = Math.min(minDensity, tm_density_gp.min_value);
-        maxDensity = Math.max(maxDensity, tm_density_gp.max_value);
-        if (hasManagedLanes) {
-            minSpeed = Math.min(minSpeed, tm_speed_mng.min_value);
-            maxSpeed = Math.max(maxSpeed, tm_speed_mng.max_value);
-            minFlow = Math.min(minFlow, tm_flow_mng.min_value);
-            maxFlow = Math.max(maxFlow, tm_flow_mng.max_value);
-            minDensity = Math.min(minDensity, tm_density_mng.min_value);
-            maxDensity = Math.max(maxDensity, tm_density_mng.max_value);
-        }
-        minSpeed = scc*minSpeed;
-        maxSpeed = scc*maxSpeed;
-        minFlow = fcc*minFlow;
-        maxFlow = fcc*maxFlow;
-        minDensity = dcc*minDensity;
-        maxDensity = dcc*maxDensity;
 
         speedDataGP = new double[3][xSize*ySize];
         speedDataManaged = new double[3][xSize*ySize];
@@ -530,65 +336,121 @@ public class RoutePerformanceController {
         densityDataGP = new double[3][xSize*ySize];
         densityDataManaged = new double[3][xSize*ySize];
         
-        double[] dist = new double[xSize];
+        double[] dist = new double[ySize];
+        double[] distM = new double[ySizeM];
         List<Double> cell_lengths = tm_speed_gp.cell_lengths_miles;
+        List<Double> cell_lengthsM = tm_speed_mng.cell_lengths_miles;
         
-        for (int i = 0; i < ySize; i++) {
+        for (int i = 0; i < xSize; i++) {
             double hour = (start + i*dt) / timeDivider;
             double dd = 0.0;
-            for (int j = 0; j < xSize; j++) {
+            double ddM = 0.0;
+            for (int j = 0; j < ySize; j++) {
                 if (i == 0) {
                     if (j > 0)
                         dd += lcc2 * cell_lengths.get(j-1);
                     dist[j] = dd;
+                    minCellLength = Math.min(minCellLength, cell_lengths.get(j));
                     maxCellLength = Math.max(maxCellLength, cell_lengths.get(j));
+                    routeLength += lcc2 * cell_lengths.get(j);
                 } else {
                     dd = dist[j];
                 }
                 
-                int idx = i * xSize + j;
-                speedDataGP[0][idx] = hour;
-                speedDataGP[1][idx] = dd;
-                speedDataGP[2][idx] = scc*vmtrx_gp[i][j];
-                flowDataGP[0][idx] = hour;
-                flowDataGP[1][idx] = dd;
-                flowDataGP[2][idx] = fcc*fmtrx_gp[i][j];
-                densityDataGP[0][idx] = hour;
-                densityDataGP[1][idx] = dd;
-                densityDataGP[2][idx] = dcc*dmtrx_gp[i][j];
-                if (hasManagedLanes) {
-                    speedDataManaged[0][idx] = hour;
-                    speedDataManaged[1][idx] = dd;
-                    speedDataManaged[2][idx] = scc*vmtrx_mng[i][j];
-                    flowDataManaged[0][idx] = hour;
-                    flowDataManaged[1][idx] = dd;
-                    flowDataManaged[2][idx] = fcc*fmtrx_mng[i][j];
-                    densityDataManaged[0][idx] = hour;
-                    densityDataManaged[1][idx] = dd;
-                    densityDataManaged[2][idx] = dcc*dmtrx_mng[i][j];
+                int idx = i * ySize + j;
+                speedDataGP[0][idx] = dd;
+                speedDataGP[1][idx] = hour;
+                speedDataGP[2][idx] = scc*vmtrx_gp[j][i];
+                flowDataGP[0][idx] = dd;
+                flowDataGP[1][idx] = hour;
+                flowDataGP[2][idx] = fcc*fmtrx_gp[j][i];
+                densityDataGP[0][idx] = dd;
+                densityDataGP[1][idx] = hour;
+                densityDataGP[2][idx] = dcc*dmtrx_gp[j][i];
+                
+                if (!Double.isNaN(speedDataGP[2][idx])) {
+                    minSpeed = Math.min(minSpeed, speedDataGP[2][idx]);
+                    maxSpeed = Math.max(maxSpeed, speedDataGP[2][idx]);
+                }
+                if (!Double.isNaN(flowDataGP[2][idx])) {
+                    minFlow = Math.min(minFlow, flowDataGP[2][idx]);
+                    maxFlow = Math.max(maxFlow, flowDataGP[2][idx]);
+                }
+                if (!Double.isNaN(densityDataGP[2][idx])) {
+                    minDensity = Math.min(minDensity, densityDataGP[2][idx]);
+                    maxDensity = Math.max(maxDensity, densityDataGP[2][idx]);
+                }
+            }
+            
+            if (hasManagedLanes) {
+                for (int j = 0; j < ySizeM; j++) {
+                    if (i == 0) {
+                        if (j > 0)
+                            ddM += lcc2 * cell_lengthsM.get(j-1);
+                        distM[j] = ddM;
+                        minCellLengthM = Math.min(minCellLengthM, cell_lengths.get(j));
+                        maxCellLengthM = Math.max(maxCellLengthM, cell_lengthsM.get(j));
+                    } else {
+                        ddM = distM[j];
+                    }
+
+                    int idx = i * ySizeM + j;
+                    speedDataManaged[0][idx] = ddM;
+                    speedDataManaged[1][idx] = hour;
+                    speedDataManaged[2][idx] = scc*vmtrx_mng[j][i];
+                    flowDataManaged[0][idx] = ddM;
+                    flowDataManaged[1][idx] = hour;
+                    flowDataManaged[2][idx] = fcc*fmtrx_mng[j][i];
+                    densityDataManaged[0][idx] = ddM;
+                    densityDataManaged[1][idx] = hour;
+                    densityDataManaged[2][idx] = dcc*dmtrx_mng[j][i];
+
+                    if (!Double.isNaN(speedDataManaged[2][idx])) {
+                        minSpeed = Math.min(minSpeed, speedDataManaged[2][idx]);
+                        maxSpeed = Math.max(maxSpeed, speedDataManaged[2][idx]);
+                    }
+                    if (!Double.isNaN(flowDataManaged[2][idx])) {
+                        minFlow = Math.min(minFlow, flowDataGP[2][idx]);
+                        maxFlow = Math.max(maxFlow, flowDataManaged[2][idx]);
+                    }
+                    if (!Double.isNaN(densityDataManaged[2][idx])) {
+                        minDensity = Math.min(minDensity, densityDataManaged[2][idx]);
+                        maxDensity = Math.max(maxDensity, densityDataManaged[2][idx]);
+                    }
                 }
             }
         }
-
-        // HACK
-        minSpeed = 0d;   
+        
+        minCellLength = lcc2 * minCellLength;
+        maxCellLength = lcc2 * maxCellLength;
+        minCellLengthM = lcc2 * minCellLengthM;
+        maxCellLengthM = lcc2 * maxCellLengthM; 
     }
     
     
-    
-    
     private void fillTabContours() {
+        int minWidthGP = 300;
+        int minHeightGP = 200;
+        int minWidthManaged = 300;
+        int minHeightManaged = 260;
+        
+        String lanes_buf = "in GP Lanes";
+        if (hasAuxLanes)
+            lanes_buf = "in GP and Aux Lanes";
+        
         vbContours.getChildren().clear();
         speedGPDS = new DefaultXYZDataset();
-        speedGPDS.addSeries("Speed in GP Lanes", speedDataGP);
+        speedGPDS.addSeries("Speed " + lanes_buf, speedDataGP);
         speedManagedDS = new DefaultXYZDataset();
         speedManagedDS.addSeries("Speed in Managed Lanes", speedDataManaged);
         flowGPDS = new DefaultXYZDataset();
-        flowGPDS.addSeries("Flow in GP Lanes", flowDataGP);
+        flowGPDS.addSeries("Flow " + lanes_buf, flowDataGP);
         flowManagedDS = new DefaultXYZDataset();
         flowManagedDS.addSeries("Flow in Managed Lanes", flowDataManaged);
         densityGPDS = new DefaultXYZDataset();
+        densityGPDS.addSeries("Density " + lanes_buf, densityDataGP);
         densityManagedDS = new DefaultXYZDataset();
+        densityManagedDS.addSeries("Density in Managed Lanes", flowDataManaged);
         
         XYPlot plot;
         XYBlockRenderer renderer;
@@ -614,7 +476,7 @@ public class RoutePerformanceController {
         renderer.setPaintScale(paintScale);
         plot = new XYPlot(speedGPDS, distAxis, timeAxis, renderer);
         plot.setAxisOffset(new RectangleInsets(5, 5, 5, 5));
-        speedGPChart = new JFreeChart("Speed in GP Lanes", plot);
+        speedGPChart = new JFreeChart("Speed " + lanes_buf, plot);
         speedGPChart.removeLegend();
         scaleAxis = new org.jfree.chart.axis.NumberAxis("Speed (" + UserSettings.unitsSpeed + ")");
         scaleAxis.setRange(minSpeed, maxSpeed);
@@ -623,13 +485,13 @@ public class RoutePerformanceController {
         psl.setPosition(RectangleEdge.BOTTOM);
         psl.setAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
         psl.setAxisOffset(5.0);
-        psl.setPosition(RectangleEdge.RIGHT);
+        psl.setPosition(RectangleEdge.BOTTOM);
         psl.setFrame(new BlockBorder(Color.GRAY));
-        speedGPChart.addSubtitle(psl);
+        if (!hasManagedLanes)
+            speedGPChart.addSubtitle(psl);
         viewer = new ChartViewer(speedGPChart);
-        //viewer.setEventDispatcher(null);
-        viewer.setMinWidth(300);
-        viewer.setMinHeight(200);
+        viewer.setMinWidth(minWidthGP);
+        viewer.setMinHeight(minHeightGP);
         double prefWidth = routePerformanceMainPane.getPrefWidth();
         double prefHeight = routePerformanceMainPane.getPrefHeight()/3;
         viewer.setPrefSize(prefWidth, prefHeight);
@@ -644,7 +506,7 @@ public class RoutePerformanceController {
             timeAxis.setUpperMargin(0.0);
             timeAxis.setRange(start/timeDivider, (start + mySimData.fwyscenario.get_sim_duration())/timeDivider);
             renderer = new XYBlockRenderer();
-            renderer.setBlockWidth(maxCellLength);
+            renderer.setBlockWidth(maxCellLengthM);
             renderer.setBlockHeight(myDt);
             renderer.setBlockAnchor(RectangleAnchor.BOTTOM_LEFT);
             paintScale = speedPaintScale();
@@ -660,20 +522,21 @@ public class RoutePerformanceController {
             psl.setPosition(RectangleEdge.BOTTOM);
             psl.setAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
             psl.setAxisOffset(5.0);
-            psl.setPosition(RectangleEdge.RIGHT);
+            psl.setPosition(RectangleEdge.BOTTOM);
             psl.setFrame(new BlockBorder(Color.GRAY));
             speedManagedChart.addSubtitle(psl);
             viewer = new ChartViewer(speedManagedChart);
-            //viewer.setEventDispatcher(null);
             vbContours.getWidth();
-            viewer.setMinWidth(300);
-            viewer.setMinHeight(200);
+            viewer.setMinWidth(minWidthManaged);
+            viewer.setMinHeight(minHeightManaged);
             prefWidth = routePerformanceMainPane.getPrefWidth();
             prefHeight = routePerformanceMainPane.getPrefHeight()/3;
             viewer.setPrefSize(prefWidth, prefHeight);
             vbContours.getChildren().add(viewer);
         }
         vbContours.getChildren().add(new Separator());
+
+
         
         distAxis = new org.jfree.chart.axis.NumberAxis("Distance (" + UserSettings.unitsLength + ")");
 	distAxis.setRange(0.0, routeLength);
@@ -702,13 +565,13 @@ public class RoutePerformanceController {
         psl.setPosition(RectangleEdge.BOTTOM);
         psl.setAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
         psl.setAxisOffset(5.0);
-        psl.setPosition(RectangleEdge.RIGHT);
+        psl.setPosition(RectangleEdge.BOTTOM);
         psl.setFrame(new BlockBorder(Color.GRAY));
-        flowGPChart.addSubtitle(psl);
+        if (!hasManagedLanes)
+            flowGPChart.addSubtitle(psl);
         viewer = new ChartViewer(flowGPChart);
-        //viewer.setEventDispatcher(null);
-        viewer.setMinWidth(300);
-        viewer.setMinHeight(200);
+        viewer.setMinWidth(minWidthGP);
+        viewer.setMinHeight(minHeightGP);
         prefWidth = routePerformanceMainPane.getPrefWidth();
         prefHeight = routePerformanceMainPane.getPrefHeight()/3;
         viewer.setPrefSize(prefWidth, prefHeight);
@@ -723,7 +586,7 @@ public class RoutePerformanceController {
             timeAxis.setUpperMargin(0.0);
             timeAxis.setRange(start/timeDivider, (start + mySimData.fwyscenario.get_sim_duration())/timeDivider);
             renderer = new XYBlockRenderer();
-            renderer.setBlockWidth(maxCellLength);
+            renderer.setBlockWidth(maxCellLengthM);
             renderer.setBlockHeight(myDt);
             renderer.setBlockAnchor(RectangleAnchor.BOTTOM_LEFT);
             paintScale = flowPaintScale();
@@ -739,14 +602,13 @@ public class RoutePerformanceController {
             psl.setPosition(RectangleEdge.BOTTOM);
             psl.setAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
             psl.setAxisOffset(5.0);
-            psl.setPosition(RectangleEdge.RIGHT);
+            psl.setPosition(RectangleEdge.BOTTOM);
             psl.setFrame(new BlockBorder(Color.GRAY));
             flowManagedChart.addSubtitle(psl);
             viewer = new ChartViewer(flowManagedChart);
-            //viewer.setEventDispatcher(null);
             vbContours.getWidth();
-            viewer.setMinWidth(300);
-            viewer.setMinHeight(200);
+            viewer.setMinWidth(minWidthManaged);
+            viewer.setMinHeight(minHeightManaged);
             prefWidth = routePerformanceMainPane.getPrefWidth();
             prefHeight = routePerformanceMainPane.getPrefHeight()/3;
             viewer.setPrefSize(prefWidth, prefHeight);
@@ -754,6 +616,83 @@ public class RoutePerformanceController {
         }
         vbContours.getChildren().add(new Separator());
         
+        
+        distAxis = new org.jfree.chart.axis.NumberAxis("Distance (" + UserSettings.unitsLength + ")");
+	distAxis.setRange(0.0, routeLength);
+        distAxis.setLowerMargin(0.0);
+        distAxis.setUpperMargin(0.0);
+        timeAxis = new org.jfree.chart.axis.NumberAxis(timeLabel);
+        timeAxis.setUpperMargin(0.0);
+        timeAxis.setRange(start/timeDivider, (start + mySimData.fwyscenario.get_sim_duration())/timeDivider);
+        renderer = new XYBlockRenderer();
+        renderer.setBlockWidth(maxCellLength);
+        renderer.setBlockHeight(myDt);
+        renderer.setBlockAnchor(RectangleAnchor.BOTTOM_LEFT);
+        paintScale = densityPaintScale();
+        renderer.setPaintScale(paintScale);
+        plot = new XYPlot(densityGPDS, distAxis, timeAxis, renderer);
+        plot.setAxisOffset(new RectangleInsets(5, 5, 5, 5));
+        chartTitle = "Density in GP Lanes";
+        if (hasAuxLanes)
+            chartTitle = "Density in GP and Aux Lanes";
+        densityGPChart = new JFreeChart(chartTitle, plot);
+        densityGPChart.removeLegend();
+        scaleAxis = new org.jfree.chart.axis.NumberAxis("Flow (" + UserSettings.unitsFlow + ")");
+        scaleAxis.setRange(minDensity, maxDensity);
+        psl = new PaintScaleLegend(paintScale, scaleAxis);
+        psl.setMargin(new RectangleInsets(3, 10, 3, 10));
+        psl.setPosition(RectangleEdge.BOTTOM);
+        psl.setAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+        psl.setAxisOffset(5.0);
+        psl.setPosition(RectangleEdge.BOTTOM);
+        psl.setFrame(new BlockBorder(Color.GRAY));
+        if (!hasManagedLanes)
+            densityGPChart.addSubtitle(psl);
+        viewer = new ChartViewer(densityGPChart);
+        viewer.setMinWidth(minWidthGP);
+        viewer.setMinHeight(minHeightGP);
+        prefWidth = routePerformanceMainPane.getPrefWidth();
+        prefHeight = routePerformanceMainPane.getPrefHeight()/3;
+        viewer.setPrefSize(prefWidth, prefHeight);
+        vbContours.getChildren().add(viewer);
+        
+        if (hasManagedLanes) {
+            distAxis = new org.jfree.chart.axis.NumberAxis("Distance (" + UserSettings.unitsLength + ")");
+            distAxis.setRange(0.0, routeLength);
+            distAxis.setLowerMargin(0.0);
+            distAxis.setUpperMargin(0.0);
+            timeAxis = new org.jfree.chart.axis.NumberAxis(timeLabel);
+            timeAxis.setUpperMargin(0.0);
+            timeAxis.setRange(start/timeDivider, (start + mySimData.fwyscenario.get_sim_duration())/timeDivider);
+            renderer = new XYBlockRenderer();
+            renderer.setBlockWidth(maxCellLengthM);
+            renderer.setBlockHeight(myDt);
+            renderer.setBlockAnchor(RectangleAnchor.BOTTOM_LEFT);
+            paintScale = densityPaintScale();
+            renderer.setPaintScale(paintScale);
+            plot = new XYPlot(densityManagedDS, distAxis, timeAxis, renderer);
+            plot.setAxisOffset(new RectangleInsets(5, 5, 5, 5));
+            densityManagedChart = new JFreeChart("Density in Managed Lanes", plot);
+            densityManagedChart.removeLegend();
+            scaleAxis = new org.jfree.chart.axis.NumberAxis("Density (" + UserSettings.unitsDensity + ")");
+            scaleAxis.setRange(minDensity, maxDensity);
+            psl = new PaintScaleLegend(paintScale, scaleAxis);
+            psl.setMargin(new RectangleInsets(3, 10, 3, 10));
+            psl.setPosition(RectangleEdge.BOTTOM);
+            psl.setAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+            psl.setAxisOffset(5.0);
+            psl.setPosition(RectangleEdge.BOTTOM);
+            psl.setFrame(new BlockBorder(Color.GRAY));
+            densityManagedChart.addSubtitle(psl);
+            viewer = new ChartViewer(densityManagedChart);
+            vbContours.getWidth();
+            viewer.setMinWidth(minWidthManaged);
+            viewer.setMinHeight(minHeightManaged);
+            prefWidth = routePerformanceMainPane.getPrefWidth();
+            prefHeight = routePerformanceMainPane.getPrefHeight()/3;
+            viewer.setPrefSize(prefWidth, prefHeight);
+            vbContours.getChildren().add(viewer);
+        }
     }
     
     

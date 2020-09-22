@@ -97,6 +97,7 @@ public class UserSettings {
     public static float defaultMaxCellLength = 100f;
 
     public static double defaultControlDtSeconds = 30;
+    public static double queueOverrideTriggerThreshold = 0.0;
     
     public static double defaultQosSpeedThresholdKph = 72.4205;
     
@@ -110,6 +111,8 @@ public class UserSettings {
     public static double maxManagedRampMeteringRatePerLaneVph = 1400;
     
     public static double reportingPeriodSeconds = 300; // 5 minutes
+    public static boolean contourDataPerCell = false;
+    
             
     
     

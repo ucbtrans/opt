@@ -121,7 +121,7 @@
             <Color blue="0.625" green="0.625" red="0.625" fx:id="x4" />
           </textFill>
         </Label>
-            <ProgressBar id="simProgressBar" fx:id="simProgressBar" minWidth="231.0" prefHeight="18.0" prefWidth="245.0" progress="0.0" GridPane.columnIndex="1" />
+            <ProgressBar id="simProgressBar" fx:id="simProgressBar" minWidth="231.0" progress="0.0" GridPane.columnIndex="1" />
          </children>
       </GridPane>
   </children>
