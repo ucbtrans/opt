@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.fail;
 
@@ -22,7 +23,7 @@ public class TestSimData extends AbstractTest {
     final long routeB = 2l;
     SimDataScenario simdata;
     SimDataLink simdatalink;
-    boolean celloutput = false;
+    boolean celloutput = true;
 
     @Before
     public void test_setup(){
@@ -30,7 +31,7 @@ public class TestSimData extends AbstractTest {
         // load
         OTMTask task = null;
 //        String project_file_name = get_test_fullpath("project.opt");
-        String project_file_name = "/home/gomes/Desktop/xxx/opt_line.opt";
+        String project_file_name = "/home/gomes/Downloads/issue_165.opt";
         boolean validate = true;
         try {
             Project project = ProjectFactory.load_project(project_file_name,validate);
@@ -185,6 +186,35 @@ public class TestSimData extends AbstractTest {
                 "speed [mph]",
                 String.format("temp/%s_routeA_speed_all.png",celloutput));
     }
+
+    @Test
+    public void route_contours(){
+
+        long routeid = 3l;
+
+        Set<LaneGroupType> gplgset = new HashSet<>();
+        gplgset.add(LaneGroupType.gp);
+        gplgset.add(LaneGroupType.aux);
+
+        Set<LaneGroupType> mnglgset = new HashSet<>();
+        mnglgset.add(LaneGroupType.mng);
+
+//        TimeMatrix DTYgp = simdata.get_density_contour_for_route(routeid, gplgset,null);
+//        TimeMatrix FLWgp = simdata.get_flow_contour_for_route(routeid,gplgset,null);
+//        TimeMatrix SPDgp = simdata.get_speed_contour_for_route(routeid, gplgset);
+        TimeMatrix DTYmng = simdata.get_density_contour_for_route(routeid, mnglgset,null);
+//        TimeMatrix FLWmng = simdata.get_flow_contour_for_route(routeid,mnglgset,null);
+//        TimeMatrix SPDmng = simdata.get_speed_contour_for_route(routeid, mnglgset);
+
+//        System.out.println(String.format("DTYgp\t%d\t%d",DTYgp.time.length,DTYgp.space.size()));
+//        System.out.println(String.format("FLWgp\t%d\t%d",FLWgp.time.length,FLWgp.space.size()));
+//        System.out.println(String.format("SPDgp\t%d\t%d",SPDgp.time.length,SPDgp.space.size()));
+//        System.out.println(String.format("DTYmng\t%d\t%d",DTYmng.time.length,DTYmng.space.size()));
+//        System.out.println(String.format("FLWmng\t%d\t%d",FLWmng.time.length,FLWmng.space.size()));
+//        System.out.println(String.format("SPDmng\t%d\t%d",SPDmng.time.length,SPDmng.space.size()));
+
+    }
+
 
     /////////////////////////////////
     // link level

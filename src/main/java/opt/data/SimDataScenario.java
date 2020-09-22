@@ -84,7 +84,9 @@ public class SimDataScenario {
                 if(!linkdata.containsKey(flg.link.getId()))
                     continue;
 
-                SimDataLanegroup lgdata = linkdata.get(flg.link.getId()).lgData.get(flg.id);
+                SimDataLink lkdata = linkdata.get(flg.link.getId());
+                LaneGroupType lgtype = lkdata.lgid2type.get(flg.id);
+                SimDataLanegroup lgdata = lkdata.lgData.get(lgtype);
                 lgdata.set_lg_data(commid,
                         flw.lgprofiles.get(alg.id).profile.values,
                         veh.lgprofiles.get(alg.id).profile.values,
@@ -122,7 +124,10 @@ public class SimDataScenario {
                 if(!linkdata.containsKey(flg.link.getId()))
                     continue;
 
-                SimDataLanegroup lgdata = linkdata.get(flg.link.getId()).lgData.get(flg.id);
+
+                SimDataLink lkdata = linkdata.get(flg.link.getId());
+                LaneGroupType lgtype = lkdata.lgid2type.get(flg.id);
+                SimDataLanegroup lgdata = lkdata.lgData.get(lgtype);
                 List<AbstractOutputTimedCell.CellProfile> flw_cellprofs = flw.lgprofiles.get(flg.id);
                 List<AbstractOutputTimedCell.CellProfile> veh_cellprofs = veh.lgprofiles.get(flg.id);
                 for(int i=0;i<flw_cellprofs.size();i++)
@@ -336,13 +341,19 @@ public class SimDataScenario {
             TimeMatrix.LinkLaneGroupCell e = X.space.get(i);
             SimDataLink lkdata = linkdata.get(e.linkid);
 
+            // special case I have no data for these lgtypes in this link
+            if(lgtypes.stream().noneMatch(lgtype-> lkdata.lgData.containsKey(lgtype))){
+                X.add_timeseries(i++,null);
+                continue;
+            }
+
             if(haslgdata)
                 X.add_timeseries(i++,lkdata.get_dty_array(lgtypes,commids));
             else {
                 double cell_length_miles = lkdata.cell_length();
                 for(LaneGroupType lgtype : lgtypes){
                     int c = i;
-                    SimDataLanegroup lgdata = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
+                    SimDataLanegroup lgdata = lkdata.lgData.get(lgtype);
                     if(lgdata==null)
                         continue;
                     for (SimCellData cd : lgdata.celldata)
@@ -370,12 +381,19 @@ public class SimDataScenario {
         while(i<X.space.size()){
             TimeMatrix.LinkLaneGroupCell e = X.space.get(i);
             SimDataLink lkdata = linkdata.get(e.linkid);
+
+            // special case I have no data for these lgtypes in this link
+            if(lgtypes.stream().noneMatch(lgtype-> lkdata.lgData.containsKey(lgtype))){
+                X.add_timeseries(i++,null);
+                continue;
+            }
+
             if(haslgdata)
                 X.add_timeseries(i++,lkdata.get_exit_flw_array(lgtypes,commids));
             else {
                 for(LaneGroupType lgtype : lgtypes){
                     int c = i;
-                    SimDataLanegroup lgdata = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
+                    SimDataLanegroup lgdata = lkdata.lgData.get(lgtype);
                     if(lgdata==null)
                         continue;
                     for (SimCellData cd : lgdata.celldata)
@@ -411,13 +429,19 @@ public class SimDataScenario {
             TimeMatrix.LinkLaneGroupCell e = X.space.get(i);
             SimDataLink lkdata = linkdata.get(e.linkid);
 
+            // special case I have no data for these lgtypes in this link
+            if(lgtypes.stream().noneMatch(lgtype-> lkdata.lgData.containsKey(lgtype))){
+                X.add_timeseries(i++,null);
+                continue;
+            }
+
             if(haslgdata)
                 X.add_timeseries(i++,lkdata.get_spd_array(lgtypes));
             else{
                 double cell_length_miles = lkdata.cell_length();
                 for(LaneGroupType lgtype : lgtypes){
                     int c = i;
-                    SimDataLanegroup lgdata = lkdata.lgData.get(lkdata.lgtype2id.get(lgtype));
+                    SimDataLanegroup lgdata = lkdata.lgData.get(lgtype);
                     if(lgdata==null)
                         continue;
                     for(double[] z : lgdata.get_cell_speeds(lkdata.ffspeed_mph,cell_length_miles))

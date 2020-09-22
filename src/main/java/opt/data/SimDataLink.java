@@ -10,8 +10,8 @@ public class SimDataLink {
     private SimDataScenario scndata;
     public long id;
 
-    public Map<LaneGroupType,Long> lgtype2id;
-    public Map<Long, SimDataLanegroup> lgData;
+    public Map<Long,LaneGroupType> lgid2type;
+    public Map<LaneGroupType, SimDataLanegroup> lgData;
 
     public double link_length_miles;
     public boolean is_source;
@@ -25,20 +25,20 @@ public class SimDataLink {
         this.link_length_miles = otmlink.length / 1609.344;
 
         lgData = new HashMap<>();
-        lgtype2id = new HashMap<>();
+        lgid2type = new HashMap<>();
 
         models.fluid.FluidLaneGroup lg;
 
         if(optlink.has_mng()){
             lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(1);
-            lgtype2id.put(LaneGroupType.mng,lg.id);
-            lgData.put(lg.id,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime));
+            lgid2type.put(lg.id,LaneGroupType.mng);
+            lgData.put(LaneGroupType.mng,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime));
         }
 
         lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(optlink.get_mng_lanes()+1);
         int numcells = lg.cells.size();
-        lgtype2id.put(LaneGroupType.gp,lg.id);
-        lgData.put(lg.id,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime));
+        lgid2type.put(lg.id,LaneGroupType.gp);
+        lgData.put(LaneGroupType.gp,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime));
 
         float simdt_hr = scndata.fwyscenario.get_sim_dt_sec() / 3600f;
         ffspeed_mph = (float) (lg.ffspeed_cell_per_dt * link_length_miles/numcells/simdt_hr);
@@ -46,8 +46,8 @@ public class SimDataLink {
         if(optlink.has_aux()){
             lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(
                     optlink.get_mng_lanes() + optlink.get_gp_lanes() + 1);
-            lgtype2id.put(LaneGroupType.aux,lg.id);
-            lgData.put(lg.id,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime));
+            lgid2type.put(lg.id,LaneGroupType.aux);
+            lgData.put(LaneGroupType.aux,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime));
         }
 
     }
@@ -70,8 +70,11 @@ public class SimDataLink {
 
     protected double[] get_veh_array(Set<LaneGroupType> lgtypes,Set<Long> commids){
         double [] X = new double[scndata.numtime()];
-        for(LaneGroupType lgtype : lgtypes)
-            Misc.add_in_place(X,lgData.get(lgtype2id.get(lgtype)).get_sum_veh(commids,scndata.haslgdata));
+        for(LaneGroupType lgtype : lgtypes) {
+            if(!lgData.containsKey(lgtype))
+                continue;
+            Misc.add_in_place(X, lgData.get(lgtype).get_sum_veh(commids, scndata.haslgdata));
+        }
         return X;
     }
 
@@ -83,8 +86,11 @@ public class SimDataLink {
 
     protected double [] get_exit_flw_array(Set<LaneGroupType> lgtypes,Set<Long> commids) {
         double [] X = new double[scndata.numtime()];
-        for(LaneGroupType lgtype : lgtypes)
-            Misc.add_in_place(X,lgData.get(lgtype2id.get(lgtype)).get_flw_exiting_lg(commids,numtime(), scndata.haslgdata));
+        for(LaneGroupType lgtype : lgtypes) {
+            if(!lgData.containsKey(lgtype))
+                continue;
+            Misc.add_in_place(X, lgData.get(lgtype).get_flw_exiting_lg(commids, numtime(), scndata.haslgdata));
+        }
         return X;
     }
 
@@ -231,17 +237,17 @@ public class SimDataLink {
 
 
     public Set<SimDataLanegroup> get_lgdatas(Set<LaneGroupType> lgtypes){
-        return extract_lgtypes(lgtypes).stream().map(x->  lgData.get(lgtype2id.get(x))).collect(Collectors.toSet());
+        return extract_lgtypes(lgtypes).stream().map(x->  lgData.get(x)).collect(Collectors.toSet());
     }
 
     public Set<LaneGroupType> extract_lgtypes(Set<LaneGroupType> lgtypes){
         Set<LaneGroupType> X = new HashSet<>();
         if(lgtypes==null) {
-            X.addAll(lgtype2id.keySet());
+            X.addAll(lgData.keySet());
             return X;
         } else {
             X.addAll(lgtypes);
-            X.retainAll(lgtype2id.keySet());
+            X.retainAll(lgData.keySet());
             return X;
         }
     }
@@ -249,7 +255,7 @@ public class SimDataLink {
     private LaneGroupsAndCommodities extract_lgdatas_and_comms(Set<LaneGroupType> lgtypes,Set<Long> commids){
         lgtypes = extract_lgtypes(lgtypes);
         Set<SimDataLanegroup> lgDatas = lgtypes.stream()
-                .map(x->lgData.get(lgtype2id.get(x)))
+                .map(x->lgData.get(x))
                 .collect(Collectors.toSet());
         return new LaneGroupsAndCommodities(lgDatas,commids==null? scndata.fwyscenario.get_commodities().keySet() : commids);
     }

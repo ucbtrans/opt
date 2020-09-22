@@ -30,7 +30,7 @@ public class TimeMatrix {
             // keep only the lanegroup types that this link actually has
             Set<LaneGroupType> mylgtypes = new HashSet<>();
             mylgtypes.addAll(lgtypes);
-            mylgtypes.retainAll(lkdata.lgtype2id.keySet());
+            mylgtypes.retainAll(lkdata.lgData.keySet());
 
             if(haslgdata) {
                 space.add(new LinkLaneGroupCell(link.id, mylgtypes, -1));
@@ -58,6 +58,13 @@ public class TimeMatrix {
     }
 
     public void add_timeseries(int i,double [] v){
+
+        // special case when I want to add a row of nans
+        if(v==null){
+            for(int k=0;k<time.length;k++)
+                values[i][k] = Double.NaN;
+            return;
+        }
 
         Misc.add_in_place(values[i],v);
 
