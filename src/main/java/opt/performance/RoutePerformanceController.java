@@ -672,6 +672,7 @@ public class RoutePerformanceController {
             viewer.setPrefSize(prefWidth, prefHeight);
             vbContours.getChildren().add(viewer);
         }
+        vbContours.getChildren().add(new Separator());
         
         distAxis = new org.jfree.chart.axis.NumberAxis("Distance (" + UserSettings.unitsLength + ")");
 	distAxis.setRange(0.0, routeLength);
@@ -750,6 +751,7 @@ public class RoutePerformanceController {
             viewer.setPrefSize(prefWidth, prefHeight);
             vbContours.getChildren().add(viewer);
         }
+        vbContours.getChildren().add(new Separator());
         
     }
     
@@ -794,6 +796,29 @@ public class RoutePerformanceController {
         Color[] clr = UtilGUI.byrColorScale();
         double delta = (maxFlow - minFlow)/(clr.length - 1);
         double value = minFlow;
+        pScale.add(value, clr[0]);
+        value += Double.MIN_VALUE;
+        for (int i = 1; i < clr.length; i++) {
+            pScale.add(value, clr[i]);
+            value += delta;
+        }
+        return pScale;
+    }
+    
+    
+    /**
+     * Generates paint scale for the density contour plot.
+     */
+    private LookupPaintScale densityPaintScale() {
+        if (minDensity >= maxDensity)
+            if (minDensity < 1.0)
+                maxDensity = minDensity + 1.0;
+            else
+                minDensity = maxDensity - 1.0;
+        LookupPaintScale pScale = new LookupPaintScale(minDensity, maxDensity, Color.white);
+        Color[] clr = UtilGUI.gyrkColorScale();
+        double delta = (maxDensity - minDensity)/(clr.length - 1);
+        double value = minDensity;
         pScale.add(value, clr[0]);
         value += Double.MIN_VALUE;
         for (int i = 1; i < clr.length; i++) {
