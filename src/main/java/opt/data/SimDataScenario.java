@@ -226,6 +226,30 @@ public class SimDataScenario {
         X.mult(X.get_dt()/3600.0f);
         return X;
     }
+    
+    public TimeSeries get_vht_for_network_sources(Set<Long> commids){
+        TimeSeries vht = new TimeSeries(time);
+        try {
+            for(SimDataLink lkdata : linkdata.values())
+                if(lkdata.is_source)
+                    vht.add(lkdata.get_vht(null, commids));   //public
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return vht;
+    }
+
+    public TimeSeries get_vht_for_network_nonsources(Set<Long> commids){
+        TimeSeries vht = new TimeSeries(time);
+        try {
+            for(SimDataLink lkdata : linkdata.values())
+                if(!lkdata.is_source)
+                    vht.add(lkdata.get_vht(null, commids));  // public
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return vht;
+    }
 
     // VMT ................................................
 
