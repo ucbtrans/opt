@@ -363,6 +363,28 @@ public class FreewayScenario {
         // max ids
         reset_max_ids();
 
+        if(!validate())
+            throw new Exception("Validation failure.");
+
+    }
+
+    private boolean validate(){
+
+        // link ids in the scenario and segments are identical
+        Set<Long> segment_link_ids = segments.values().stream()
+                .flatMap(sgmt->sgmt.get_links().stream())
+                .map(link->link.get_id())
+                .collect(toSet());
+
+        Set<Long> scenario_link_ids = scenario.links.keySet();
+
+        if (!segment_link_ids.containsAll(scenario_link_ids) || !scenario_link_ids.containsAll(segment_link_ids)) {
+            System.err.println("Scenario and segment link ids are not identical");
+            return false;
+        }
+
+        return true;
+
     }
 
     public FreewayScenario clone(){
@@ -1135,26 +1157,6 @@ public class FreewayScenario {
 
         reset_max_ids();
     }
-
-    /////////////////////////////////////
-    // override
-    /////////////////////////////////////
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        FreewayScenario that = (FreewayScenario) o;
-//        return name.equals(that.name) &&
-//                description.equals(that.description) &&
-//                scenario.equals(that.scenario) &&
-//                segments.equals(that.segments);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(name, description, scenario, segments);
-//    }
 
     /////////////////////////////////////
     // class

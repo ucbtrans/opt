@@ -19,11 +19,11 @@ public class TestSimData extends AbstractTest {
     final long car = 0l;
     final long truck = 1l;
     final long linkid = 3l;
-    final long routeA = 1l;
+    final long routeA = 3l;
     final long routeB = 2l;
     SimDataScenario simdata;
     SimDataLink simdatalink;
-    boolean celloutput = true;
+    boolean celloutput = false;
 
     @Before
     public void test_setup(){
@@ -241,7 +241,7 @@ public class TestSimData extends AbstractTest {
             Long linkid = e.getKey();
             SimDataLink data = e.getValue();
             XYSeriesCollection A = new XYSeriesCollection();
-            A.addSeries(data.get_vmt(null,null).get_XYSeries("all"));
+            A.addSeries(data.get_vmt(null,null,true,true).get_XYSeries("all"));
             TestPlot.plot(A,
                     String.format("Link %d",linkid),
                     "veh miles",
@@ -255,7 +255,7 @@ public class TestSimData extends AbstractTest {
             Long linkid = e.getKey();
             SimDataLink data = e.getValue();
             XYSeriesCollection A = new XYSeriesCollection();
-            A.addSeries(data.get_delay(null,null,30f).get_XYSeries("all"));
+            A.addSeries(data.get_delay(null,null,30f,true,true).get_XYSeries("all"));
             TestPlot.plot(A,
                     String.format("Link %d",linkid),
                     "veh hours",

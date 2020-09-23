@@ -32,7 +32,7 @@ public class OTMTask  extends Task {
 		this.celloutput = celloutput;
 		this.lgoutput = lgoutput;
 
-//		assert(outdt==300f);
+		assert(outdt==300f);
 
 		if(!celloutput && !lgoutput)
 			throw new Exception("No data requested");
@@ -117,7 +117,6 @@ public class OTMTask  extends Task {
 			float sim_dt = fwyscenario.get_sim_dt_sec();
 
 			Set<Long> linkids = fwyscenario.get_links().stream()
-					.filter(link->link.get_type()!= AbstractLink.Type.ghost)
 					.map(x->x.id).collect(Collectors.toSet());
 
 			if(celloutput) {
