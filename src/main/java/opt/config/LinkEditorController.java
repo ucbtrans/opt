@@ -1270,6 +1270,15 @@ public class LinkEditorController {
         if (ignoreChange)
             return;
         
+        String from = linkFromName.getText();
+        String to = linkToName.getText();
+        
+        if (from.equals("") && (myLink.get_type() != AbstractLink.Type.offramp))
+            return;
+        
+        if (to.equals("") && (myLink.get_type() != AbstractLink.Type.onramp))
+            return;
+        
         String link_name = linkFromName.getText() + " -> " + linkToName.getText();
         link_name = opt.utils.Misc.validateAndCorrectLinkName(link_name, myLink.get_segment().get_scenario());
         
