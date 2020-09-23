@@ -113,6 +113,16 @@ public class SimDataLink {
         return X;
     }
 
+    protected double [] get_avg_flw_array(Set<LaneGroupType> lgtypes,Set<Long> commids) {
+        double [] X = new double[scndata.numtime()];
+        for(LaneGroupType lgtype : lgtypes) {
+            if(!lgData.containsKey(lgtype))
+                continue;
+            Misc.add_in_place(X, lgData.get(lgtype).get_flw_avg_lg(commids, numtime(), scndata.haslgdata));
+        }
+        return X;
+    }
+
     protected double [] get_spd_array(Set<LaneGroupType> lgtypes) {
 
         LaneGroupsAndCommodities X =  extract_lgdatas_and_comms(lgtypes, null);
@@ -304,7 +314,7 @@ public class SimDataLink {
     }
 
     // Flow [vph] Speed [mph] ..............................
-    public TimeSeries get_flw(Set<LaneGroupType> lgtypes, Set<Long> commids){
+    public TimeSeries get_flw_exiting(Set<LaneGroupType> lgtypes, Set<Long> commids){
 
         // get lgtypes and comms
         if(commids==null)
@@ -316,6 +326,20 @@ public class SimDataLink {
             return new TimeSeries(scndata.time,scndata.nan());
 
         return new TimeSeries(scndata.time,get_exit_flw_array(lgtypes,commids));
+    }
+
+    public TimeSeries get_flw_space_average(Set<LaneGroupType> lgtypes, Set<Long> commids){
+
+        // get lgtypes and comms
+        if(commids==null)
+            commids = scndata.fwyscenario.get_commodities().keySet();
+        lgtypes = extract_lgtypes(lgtypes);
+
+        // degenerate case
+        if(lgtypes.isEmpty() || commids.isEmpty())
+            return new TimeSeries(scndata.time,scndata.nan());
+
+        return new TimeSeries(scndata.time,get_avg_flw_array(lgtypes,commids));
     }
 
     // Speed [mph] ..........................................
@@ -335,7 +359,9 @@ public class SimDataLink {
     }
 
 
-
+    //////////////////////////
+    // PROTECTED/PRIVATE
+    //////////////////////////
 
     protected Set<LaneGroupType> extract_lgtypes(Set<LaneGroupType> lgtypes){
         Set<LaneGroupType> X = new HashSet<>();

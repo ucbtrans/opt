@@ -70,16 +70,32 @@ public class SimDataLanegroup {
         Map<Long, double[]> myflws = uselgs ? flws : celldata.get(celldata.size()-1).flws;
         if(commids==null)
             for(double [] list : myflws.values())
-                for (int k = 0; k <numtime; k++)
-                    X[k] += list[k];
+                Misc.add_in_place(X,list);
         else
-            for(Long commid : commids) {
-                double [] x = myflws.get(commid);
-                for (int k = 0; k < numtime; k++)
-                    X[k] += x[k];
-            }
+            for(Long commid : commids)
+                Misc.add_in_place(X,myflws.get(commid));
         return X;
     }
+
+    protected double [] get_flw_avg_lg(Set<Long> commids, int numtime, boolean uselgs){
+
+        if(uselgs)
+            return get_flw_exiting_lg(commids,numtime,uselgs);
+
+        double [] X = new double[numtime];
+        if(commids==null)
+            for(SimCellData cd : celldata)
+                for (double[] list : cd.flws.values())
+                    Misc.add_in_place(X,list);
+        else
+            for(SimCellData cd : celldata)
+                for (Long commid : commids)
+                    Misc.add_in_place(X, cd.flws.get(commid));
+
+        Misc.mult_in_place(X,1/celldata.size());
+        return X;
+    }
+
 
     protected double get_sum_flw_for_time(Set<Long> commids, int k, boolean uselg) {
         if(commids==null)

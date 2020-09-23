@@ -50,9 +50,9 @@ public class OTMTask  extends Task {
 			final float nominal_simdt = fwyscenario.get_sim_dt_sec();
 
 			if(nominal_simdt<1f)
-				throw new Exception("out dt too small.");
+				throw new Exception("Simulation dt too small. This is likely caused by very short segments.");
 			if(nominal_simdt>300f)
-				throw new Exception("out dt too large.");
+				throw new Exception("Simulation dt too large.");
 
 			List<Float> factors_300 = List.of(1f, 2f, 3f, 4f, 5f, 6f, 9f, 10f, 12f, 15f, 20f, 25f, 30f, 50f, 60f, 75f, 100f, 150f, 300f);
 

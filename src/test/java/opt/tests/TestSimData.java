@@ -5,7 +5,6 @@ import opt.OTMTask;
 import opt.utils.Misc;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -292,8 +291,8 @@ public class TestSimData extends AbstractTest {
 
             SimDataLink data = e.getValue();
             XYSeriesCollection A = new XYSeriesCollection();
-            A.addSeries(data.get_flw(null,Misc.hashset(car)).get_XYSeries("cars"));
-            A.addSeries(data.get_flw(null,Misc.hashset(truck)).get_XYSeries("trucks"));
+            A.addSeries(data.get_flw_exiting(null,Misc.hashset(car)).get_XYSeries("cars"));
+            A.addSeries(data.get_flw_exiting(null,Misc.hashset(truck)).get_XYSeries("trucks"));
             TestPlot.plot(A,
                     String.format("Link %d",linkid),
                     "flw [vph]",
@@ -358,9 +357,9 @@ public class TestSimData extends AbstractTest {
 
         // get FLOWS on given lane group type and commodity
         XYSeriesCollection A = new XYSeriesCollection();
-        A.addSeries(simdatalink.get_flw(Misc.hashset(LaneGroupType.gp),Misc.hashset(car)).get_XYSeries("cars in gp lanes"));
-        A.addSeries(simdatalink.get_flw(Misc.hashset(LaneGroupType.mng),Misc.hashset(car)).get_XYSeries("cars in mng lanes"));
-        A.addSeries(simdatalink.get_flw(Misc.hashset(LaneGroupType.aux),Misc.hashset(car)).get_XYSeries("cars in aux lanes"));
+        A.addSeries(simdatalink.get_flw_exiting(Misc.hashset(LaneGroupType.gp),Misc.hashset(car)).get_XYSeries("cars in gp lanes"));
+        A.addSeries(simdatalink.get_flw_exiting(Misc.hashset(LaneGroupType.mng),Misc.hashset(car)).get_XYSeries("cars in mng lanes"));
+        A.addSeries(simdatalink.get_flw_exiting(Misc.hashset(LaneGroupType.aux),Misc.hashset(car)).get_XYSeries("cars in aux lanes"));
         TestPlot.plot(A,
                 "link 1 car flows",
                 "flw [vph]",
@@ -368,9 +367,9 @@ public class TestSimData extends AbstractTest {
 
         // get FLOWS on given lane group type and all commodities
         A = new XYSeriesCollection();
-        A.addSeries(simdatalink.get_flw(Misc.hashset(LaneGroupType.gp),null).get_XYSeries("gp lanes"));
-        A.addSeries(simdatalink.get_flw(Misc.hashset(LaneGroupType.mng),null).get_XYSeries("mng lanes"));
-        A.addSeries(simdatalink.get_flw(Misc.hashset(LaneGroupType.aux),null).get_XYSeries("aux lanes"));
+        A.addSeries(simdatalink.get_flw_exiting(Misc.hashset(LaneGroupType.gp),null).get_XYSeries("gp lanes"));
+        A.addSeries(simdatalink.get_flw_exiting(Misc.hashset(LaneGroupType.mng),null).get_XYSeries("mng lanes"));
+        A.addSeries(simdatalink.get_flw_exiting(Misc.hashset(LaneGroupType.aux),null).get_XYSeries("aux lanes"));
         TestPlot.plot(A,
                 "link 1 all flows",
                 "flw [vph]",
@@ -378,7 +377,7 @@ public class TestSimData extends AbstractTest {
 
         // get FLOWS on all lane groups and commodities
         A = new XYSeriesCollection();
-        A.addSeries(simdatalink.get_flw(null,null).get_XYSeries("all lanes"));
+        A.addSeries(simdatalink.get_flw_exiting(null,null).get_XYSeries("all lanes"));
         TestPlot.plot(A,
                 "link 1 all flows",
                 "flw [vph]",
