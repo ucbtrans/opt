@@ -284,9 +284,9 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_flw(lgset_gp, cset(c)).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_flw_exiting(lgset_gp, cset(c)).values.length);
             }
-            dt = mySimData.get_flw(lgset_gp, cset(listVT.get(0))).get_dt();
+            dt = mySimData.get_flw_exiting(lgset_gp, cset(listVT.get(0))).get_dt();
             double[] total = new double[max_sz];
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
@@ -346,16 +346,16 @@ public class LinkPerformanceController {
 
         max_sz = 0;
         for (Commodity c : listVT) {
-            max_sz = Math.max(max_sz, mySimData.get_flw(lgset_gp, cset(c)).values.length);
+            max_sz = Math.max(max_sz, mySimData.get_flw_exiting(lgset_gp, cset(c)).values.length);
         }
         double[] total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
             total[i] = 0;
         for (Commodity c : listVT) {
-            dt = mySimData.get_flw(lgset_gp, cset(c)).get_dt();
+            dt = mySimData.get_flw_exiting(lgset_gp, cset(c)).get_dt();
             dataSeries_gp = new XYChart.Series();
             dataSeries_gp.setName(c.get_name());
-            xydata_gp = mySimData.get_flw(lgset_gp, cset(c)).get_XYSeries(c.get_name()).getItems();
+            xydata_gp = mySimData.get_flw_exiting(lgset_gp, cset(c)).get_XYSeries(c.get_name()).getItems();
 
             sz_gp = xydata_gp.size();
 
@@ -400,14 +400,14 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_flw(lgset_mng, cset(c)).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_flw_exiting(lgset_mng, cset(c)).values.length);
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
             for (Commodity c : listVT) {
                 dataSeries_mng = new XYChart.Series();
                 dataSeries_mng.setName(c.get_name());
-                xydata_mng = mySimData.get_flw(lgset_mng, cset(c)).get_XYSeries(c.get_name()).getItems();
+                xydata_mng = mySimData.get_flw_exiting(lgset_mng, cset(c)).get_XYSeries(c.get_name()).getItems();
 
                 sz_mng = xydata_mng.size();
 
@@ -453,14 +453,14 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_flw(lgset_aux, cset(c)).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_flw_exiting(lgset_aux, cset(c)).values.length);
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
             for (Commodity c : listVT) {
                 dataSeries_aux = new XYChart.Series();
                 dataSeries_aux.setName(c.get_name());
-                xydata_aux = mySimData.get_flw(lgset_aux, cset(c)).get_XYSeries(c.get_name()).getItems();
+                xydata_aux = mySimData.get_flw_exiting(lgset_aux, cset(c)).get_XYSeries(c.get_name()).getItems();
 
                 sz_aux = xydata_aux.size();
 
