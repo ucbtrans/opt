@@ -69,7 +69,7 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
     
     
     T myNewValue;
-
+    
     public EditCell(final StringConverter<T> converter) {
 	super(converter);
         

@@ -95,7 +95,9 @@ public class STableHandler {
         minSelectedColumn = maxSelectedColumn = j0;
         selectBox();
         myTable.getFocusModel().focus(i0, myTable.getColumns().get(j0));
-        event.consume();
+        if (event.getClickCount() == 1)
+            myTable.edit(i0, myTable.getColumns().get(j0));
+        //event.consume();
         prevFocusedCell = focusedCell;
     }
     
@@ -481,10 +483,11 @@ public class STableHandler {
         myTable.getItems().clear();
         myTable.getItems().addAll(updatedItems);
         myTable.refresh();
-        myTable.getFocusModel().focus(i0+1, myTable.getColumns().get(j0)); 
+        myTable.getFocusModel().focus(i0+1, myTable.getColumns().get(j0));
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
-        //myTable.getSelectionModel().clearSelection();
-        //myTable.getSelectionModel().select(i0+1, myTable.getColumns().get(j0));
+        prevFocusedCell = null;
+        myTable.getSelectionModel().clearSelection();
+        myTable.getSelectionModel().select(focusedCell.getRow(), myTable.getColumns().get(j0));
         
         return true;
     }
@@ -627,10 +630,14 @@ public class STableHandler {
             col = numCols - 1;
         }
         
-        if (row >= 0)
+        if (row >= 0) {
             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
-        else
-            myTable.getSelectionModel().select(0, myTable.getColumns().get(1));
+            myTable.edit(row, myTable.getColumns().get(col));
+        }
+        else {
+            myTable.getSelectionModel().select(0, myTable.getColumns().get(0));
+            myTable.edit(0, myTable.getColumns().get(0));
+        }
             
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
         
@@ -644,7 +651,6 @@ public class STableHandler {
         
         int row = prevFocusedCell.getRow();
         int col = prevFocusedCell.getColumn() + 1;
-        myTable.getSelectionModel().clearSelection();
         
         boolean res = false;
         
@@ -659,8 +665,12 @@ public class STableHandler {
             addRow();
         }
         
+        myTable.getSelectionModel().clearSelection();
+        
         myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
         myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        if (!res)
+            myTable.edit(row, myTable.getColumns().get(col));
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
         
         return res;
@@ -693,6 +703,8 @@ public class STableHandler {
             maxSelectedColumn = col;
             selectBox();
             myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
+        } else {
+            myTable.edit(row, myTable.getColumns().get(col));
         }
         
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
@@ -707,7 +719,6 @@ public class STableHandler {
         
         int row = prevFocusedCell.getRow() + 1;
         int col = prevFocusedCell.getColumn();
-        myTable.getSelectionModel().clearSelection();
         
         boolean res = false;
         
@@ -717,6 +728,8 @@ public class STableHandler {
             res = true;
             addRow();
         }
+        
+        myTable.getSelectionModel().clearSelection();
         
         if (col < numCols) {
             myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
@@ -729,6 +742,8 @@ public class STableHandler {
             maxSelectedColumn = col;
             selectBox();
             myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
+        } else if (!res) {
+            myTable.edit(row, myTable.getColumns().get(col));
         }
         
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();

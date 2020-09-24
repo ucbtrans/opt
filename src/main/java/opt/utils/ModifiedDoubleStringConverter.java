@@ -74,6 +74,7 @@ public class ModifiedDoubleStringConverter extends DoubleStringConverter {
             }
 
             value = value.trim();
+            value = value.replace(",", "");
 
             if (value.length() < 1) {
                 return null;

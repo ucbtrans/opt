@@ -56,7 +56,7 @@ import javafx.util.converter.NumberStringConverter;
  * @author Alex Kurzhanskiy
  */
 public class TSTableHandler {
-    private DoubleStringConverter dsc = new DoubleStringConverter();
+    private DoubleStringConverter dsc = new ModifiedDoubleStringConverter();
     private TableView<ObservableList<Object>> myTable = null;
     private ObservableList<Object> defaultRow = null;
     TablePosition prevFocusedCell = null;
@@ -105,7 +105,9 @@ public class TSTableHandler {
             maxSelectedColumn = myTable.getColumns().size() - 1;
         selectBox();
         myTable.getFocusModel().focus(i0, myTable.getColumns().get(j0));
-        event.consume();
+        if ((j0 > 0) && (event.getClickCount() == 1))
+            myTable.edit(i0, myTable.getColumns().get(j0));
+        //event.consume();
         prevFocusedCell = focusedCell;
     }
     
@@ -357,7 +359,7 @@ public class TSTableHandler {
                 try {
                     String cs = textCols[jj-j0+offset];
                     cs = cs.replaceAll(",", "");
-                    Double val = dsc.fromString(cs);
+                    double val = dsc.fromString(cs);
                     row.add(val);
                 } catch(Exception e) {
                     row.add(myItems.get(ii).get(jj));
@@ -388,7 +390,7 @@ public class TSTableHandler {
             
             while ((jj < numCols) && (jj-j0+offset < numSubs)) {
                 try {
-                    Double val = dsc.fromString(textCols[jj-j0+offset]);
+                    double val = dsc.fromString(textCols[jj-j0+offset]);
                     row.add(val);
                 } catch(Exception e) {
                     row.add(lastRow.get(jj));
@@ -513,10 +515,11 @@ public class TSTableHandler {
         myTable.getItems().clear();
         myTable.getItems().addAll(updatedItems);
         myTable.refresh();
-        myTable.getFocusModel().focus(i0+1, myTable.getColumns().get(j0)); 
+        myTable.getFocusModel().focus(i0+1, myTable.getColumns().get(j0));
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
-        //myTable.getSelectionModel().clearSelection();
-        //myTable.getSelectionModel().select(i0+1, myTable.getColumns().get(j0));
+        prevFocusedCell = null;
+        myTable.getSelectionModel().clearSelection();
+        myTable.getSelectionModel().select(focusedCell.getRow(), myTable.getColumns().get(j0));
         
         return true;
     }
@@ -661,10 +664,14 @@ public class TSTableHandler {
             col = numCols - 1;
         }
         
-        if (row >= 0)
+        if (row >= 0) {
             myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
-        else
+            myTable.edit(row, myTable.getColumns().get(col));
+        }
+        else {
             myTable.getSelectionModel().select(0, myTable.getColumns().get(1));
+            myTable.edit(0, myTable.getColumns().get(1));
+        }
             
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
         
@@ -678,7 +685,6 @@ public class TSTableHandler {
         
         int row = prevFocusedCell.getRow();
         int col = prevFocusedCell.getColumn() + 1;
-        myTable.getSelectionModel().clearSelection();
         
         boolean res = false;
         
@@ -693,8 +699,11 @@ public class TSTableHandler {
             addRow();
         }
         
+        myTable.getSelectionModel().clearSelection();
         myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
         myTable.getSelectionModel().select(row, myTable.getColumns().get(col));
+        if (!res)
+            myTable.edit(row, myTable.getColumns().get(col));
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
         
         return res;
@@ -727,6 +736,8 @@ public class TSTableHandler {
             maxSelectedColumn = myTable.getColumns().size() - 1;
             selectBox();
             myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
+        } else {
+            myTable.edit(row, myTable.getColumns().get(col));
         }
         
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
@@ -741,7 +752,6 @@ public class TSTableHandler {
         
         int row = prevFocusedCell.getRow() + 1;
         int col = prevFocusedCell.getColumn();
-        myTable.getSelectionModel().clearSelection();
         
         boolean res = false;
         
@@ -751,6 +761,8 @@ public class TSTableHandler {
             res = true;
             addRow();
         }
+        
+        myTable.getSelectionModel().clearSelection();
         
         if (col < numCols) {
             myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
@@ -763,6 +775,8 @@ public class TSTableHandler {
             maxSelectedColumn = myTable.getColumns().size() - 1;
             selectBox();
             myTable.getFocusModel().focus(row, myTable.getColumns().get(col));
+        } else if (!res) {
+            myTable.edit(row, myTable.getColumns().get(col));
         }
         
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();

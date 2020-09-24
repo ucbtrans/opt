@@ -246,6 +246,7 @@ public class LaneControlEditorController {
         tableFlowPrice.setRowFactory(tv -> {
             TableRow<ObservableList<Object>> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
+                event.consume();
                 if ((event.getClickCount() == 2) && (row.isEmpty())) {
                     fpTableHandler.addRow();
                 }
@@ -258,7 +259,7 @@ public class LaneControlEditorController {
         
         double width_scale = 0.49;
         
-        colFlow.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter(), true));
+        colFlow.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter(), false));
         colFlow.setCellValueFactory(data -> new SimpleDoubleProperty((Double)data.getValue().get(0)));
         colFlow.prefWidthProperty().bind(tableFlowPrice.widthProperty().multiply(width_scale));
         colFlow.setEditable(true);
@@ -273,7 +274,7 @@ public class LaneControlEditorController {
         });
         colFlow.setReorderable(false);
         
-        colPrice.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter(), true));
+        colPrice.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter(), false));
         colPrice.setCellValueFactory(data -> new SimpleDoubleProperty((Double)data.getValue().get(1)));
         colPrice.prefWidthProperty().bind(tableFlowPrice.widthProperty().multiply(width_scale));
         colPrice.setEditable(true);

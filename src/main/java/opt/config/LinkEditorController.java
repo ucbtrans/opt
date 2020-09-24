@@ -809,6 +809,7 @@ public class LinkEditorController {
         tableDemand.setOnKeyPressed(event -> {
             if (ignoreChange)
                 return;
+            event.consume();
             demandTableHandler.setDt(dtDemandSpinnerValueFactory.getValue());
             if (demandTableHandler.onKeyPressed(event))
                 setDemand();
@@ -826,7 +827,7 @@ public class LinkEditorController {
 
             if (event.getCode().isDigitKey()) {              
                 tableDemand.edit(focusedCell.getRow(), focusedCell.getTableColumn());
-            } 
+            }
         });
         
         tableDemand.setOnMouseClicked(event -> {
@@ -838,6 +839,7 @@ public class LinkEditorController {
         tableDemand.setRowFactory(tv -> {
             TableRow<ObservableList<Object>> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
+                event.consume();
                 if ((event.getClickCount() == 2) && (row.isEmpty())) {
                     demandTableHandler.addRow();
                     setDemand();
