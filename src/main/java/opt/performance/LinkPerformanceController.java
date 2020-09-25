@@ -674,10 +674,16 @@ public class LinkPerformanceController {
         int sz_gp, sz_mng, sz_aux;
         XYDataItem xy;
         float dt = mySimData.get_speed(lgset_gp).get_dt();
+        int disp_dt = (int)Math.round(dt / 60.0);
+        String per_buf = " per " + disp_dt + " Minutes";
+        if (disp_dt == 60)
+            per_buf = " per Hour";
+        else if (disp_dt > 60) 
+            per_buf = " per " + (dt / 3600.0) + " Hours";
 
-        label_gp = "VMT in GP Lanes";
-        label_mng = "VMT in Managed Lanes";
-        label_aux = "VMT in Aux Lanes";
+        label_gp = "VMT in GP Lanes" + per_buf;
+        label_mng = "VMT in Managed Lanes" + per_buf;
+        label_aux = "VMT in Aux Lanes" + per_buf;
 
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel(timeLabel);
@@ -840,9 +846,9 @@ public class LinkPerformanceController {
         vbAggregates.getChildren().add(new Separator());
 
 
-        label_gp = "VHT in GP Lanes";
-        label_mng = "VHT in Managed Lanes";
-        label_aux = "VHT in Aux Lanes";
+        label_gp = "VHT in GP Lanes" + per_buf;
+        label_mng = "VHT in Managed Lanes" + per_buf;
+        label_aux = "VHT in Aux Lanes" + per_buf;
 
         xAxis = new NumberAxis();
         xAxis.setLabel(timeLabel);
@@ -1005,9 +1011,9 @@ public class LinkPerformanceController {
         vbAggregates.getChildren().add(new Separator());
         
         
-        label_gp = "Delay in GP Lanes ";
-        label_mng = "Delay in Managed Lanes ";
-        label_aux = "Delay in Aux Lanes ";
+        label_gp = "Delay in GP Lanes" + per_buf + " ";
+        label_mng = "Delay in Managed Lanes" + per_buf + " ";
+        label_aux = "Delay in Aux Lanes" + per_buf + " ";
         String label_units = UserSettings.unitsSpeed;
         double cc = UserSettings.speedConversionMap.get("mph"+label_units);
         double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;

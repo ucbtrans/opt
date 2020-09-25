@@ -378,8 +378,15 @@ public class ScenarioPerformanceController {
         int sz, sz_src;
         XYDataItem xy;
         double dt = mySimData.get_dt_sec();
+        int disp_dt = (int)Math.round(dt / 60.0);
+        String per_buf = " per " + disp_dt + " Minutes";
+        if (disp_dt == 60)
+            per_buf = " per Hour";
+        else if (disp_dt > 60) 
+            per_buf = " per " + (dt / 3600.0) + " Hours";
+            
 
-        label = "Network VMT";
+        label = "Network VMT" + per_buf;
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel(timeLabel);
         NumberAxis yAxis = new NumberAxis();
@@ -437,7 +444,7 @@ public class ScenarioPerformanceController {
 
 
 
-        label = "Network VHT";
+        label = "Network VHT" + per_buf;
         xAxis = new NumberAxis();
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
@@ -566,7 +573,7 @@ public class ScenarioPerformanceController {
         
         
         
-        label = "Network Delay ";
+        label = "Network Delay" + per_buf + " ";
         String label_units = UserSettings.unitsSpeed;
         double cc = UserSettings.speedConversionMap.get("mph"+label_units);
         double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;

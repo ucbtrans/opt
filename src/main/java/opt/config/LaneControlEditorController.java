@@ -315,6 +315,8 @@ public class LaneControlEditorController {
         origStartTime = entry.get_start_time();
         textStartTime.setText(Misc.seconds2timestring(origStartTime, ""));
         
+        fpTableHandler.resetFocus();
+        
         fillListPermsVT();
         if (countFree() == listVT.size()) {
             cbControlType.getSelectionModel().select(0);

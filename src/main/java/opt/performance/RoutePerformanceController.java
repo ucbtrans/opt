@@ -782,6 +782,12 @@ public class RoutePerformanceController {
         int sz_gp, sz_mng, sz_aux;
         XYDataItem xy;
         double dt = mySimData.get_dt_sec();
+        int disp_dt = (int)Math.round(dt / 60.0);
+        String per_buf = " per " + disp_dt + " Minutes";
+        if (disp_dt == 60)
+            per_buf = " per Hour";
+        else if (disp_dt > 60) 
+            per_buf = " per " + (dt / 3600.0) + " Hours";
         int num_comms = listVT.size();
         TimeSeries[] vmt_series_gp = new TimeSeries[num_comms];
         TimeSeries[] vmt_series_mng = new TimeSeries[num_comms];
@@ -894,6 +900,8 @@ public class RoutePerformanceController {
         if (hasAuxLanes)
             label_gp = "VMT in GP and Aux Lanes";
         label_mng = "VMT in Managed Lanes";
+        label_gp += per_buf;
+        label_mng += per_buf;
 
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel(timeLabel);
@@ -1007,6 +1015,8 @@ public class RoutePerformanceController {
         if (hasAuxLanes)
             label_gp = "VHT in GP and Aux Lanes";
         label_mng = "VHT in Managed Lanes";
+        label_gp += per_buf;
+        label_mng += per_buf;
 
         xAxis = new NumberAxis();
         xAxis.setLabel(timeLabel);
@@ -1116,10 +1126,12 @@ public class RoutePerformanceController {
         vbAggregates.getChildren().add(new Separator());
 
         
-        label_gp = "Delay in GP Lanes ";
+        label_gp = "Delay in GP Lanes";
         if (hasAuxLanes)
-            label_gp = "Delay in GP and Aux Lanes ";
-        label_mng = "Delay in Managed Lanes ";
+            label_gp = "Delay in GP and Aux Lanes";
+        label_mng = "Delay in Managed Lanes";
+        label_gp += per_buf + " ";
+        label_mng += per_buf + " ";
 
         xAxis = new NumberAxis();
         xAxis.setLabel(timeLabel);

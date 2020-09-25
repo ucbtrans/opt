@@ -56,7 +56,7 @@ import javafx.util.converter.NumberStringConverter;
  * @author Alex Kurzhanskiy
  */
 public class STableHandler {
-    private DoubleStringConverter dsc = new DoubleStringConverter();
+    private DoubleStringConverter dsc = new ModifiedDoubleStringConverter();
     private TableView<ObservableList<Object>> myTable = null;
     private ObservableList<Object> defaultRow = null;
     TablePosition prevFocusedCell = null;
@@ -218,6 +218,12 @@ public class STableHandler {
         
         //int row = focusedCell.getRow();
         //int col = focusedCell.getColumn();
+    }
+    
+    
+    public void resetFocus() {
+        prevFocusedCell = null;
+        focusedCell = null;
     }
     
     
