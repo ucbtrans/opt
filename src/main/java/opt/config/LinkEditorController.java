@@ -840,9 +840,14 @@ public class LinkEditorController {
             TableRow<ObservableList<Object>> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 event.consume();
+                demandTableHandler.resetFocus();
                 if ((event.getClickCount() == 2) && (row.isEmpty())) {
                     demandTableHandler.addRow();
                     setDemand();
+                } else if (event.getClickCount() == 2) {
+                    demandTableHandler.setEditOn();
+                } else {
+                    demandTableHandler.onMouseClicked2();
                 }
             });
             return row ;
@@ -910,9 +915,15 @@ public class LinkEditorController {
         tableSR.setRowFactory(tv -> {
             TableRow<ObservableList<Object>> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
+                event.consume();
+                srTableHandler.resetFocus();
                 if ((event.getClickCount() == 2) && (row.isEmpty())) {
                     srTableHandler.addRow();
                     setSR();
+                } else if (event.getClickCount() == 2) {
+                    srTableHandler.setEditOn();
+                } else {
+                    srTableHandler.onMouseClicked2();
                 }
             });
             return row ;
@@ -1845,6 +1856,7 @@ public class LinkEditorController {
         tableDemand.getItems().clear();
         tableDemand.getColumns().clear();
         listVT.clear();
+        demandTableHandler.resetFocus();
         
         TableColumn<ObservableList<Object>, String> colTime = new TableColumn("Time");
         colTime.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get(0).toString()));
@@ -2054,6 +2066,7 @@ public class LinkEditorController {
         tableSR.getItems().clear();
         tableSR.getColumns().clear();
         listVT.clear();
+        srTableHandler.resetFocus();
         
         TableColumn<ObservableList<Object>, String> colTime = new TableColumn("Time");
         colTime.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get(0).toString()));

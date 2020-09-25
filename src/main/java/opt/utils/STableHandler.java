@@ -95,10 +95,32 @@ public class STableHandler {
         minSelectedColumn = maxSelectedColumn = j0;
         selectBox();
         myTable.getFocusModel().focus(i0, myTable.getColumns().get(j0));
-        if (event.getClickCount() == 1)
+        if (event.getClickCount() == 2)
             myTable.edit(i0, myTable.getColumns().get(j0));
         //event.consume();
-        prevFocusedCell = focusedCell;
+        prevFocusedCell = null;
+    }
+    
+    public void onMouseClicked2() {
+        focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
+        
+        int i0 = focusedCell.getRow();
+        int j0 = focusedCell.getColumn();
+        
+        minSelectedRow = maxSelectedRow = i0;
+        minSelectedColumn = maxSelectedColumn = j0;
+        selectBox();
+        prevFocusedCell = null;
+    }
+    
+    
+    public void setEditOn() {
+        focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
+        
+        int i0 = focusedCell.getRow();
+        int j0 = focusedCell.getColumn();
+        
+        myTable.edit(i0, myTable.getColumns().get(j0));
     }
     
     

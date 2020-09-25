@@ -247,8 +247,13 @@ public class LaneControlEditorController {
             TableRow<ObservableList<Object>> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 event.consume();
+                fpTableHandler.resetFocus();
                 if ((event.getClickCount() == 2) && (row.isEmpty())) {
                     fpTableHandler.addRow();
+                } else if (event.getClickCount() == 2) {
+                    fpTableHandler.setEditOn();
+                } else {
+                    fpTableHandler.onMouseClicked2();
                 }
             });
             return row ;

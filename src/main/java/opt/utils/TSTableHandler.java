@@ -88,6 +88,11 @@ public class TSTableHandler {
             defaultRow = myRow;
     }
     
+    public void resetFocus() {
+        prevFocusedCell = null;
+        focusedCell = null;
+    }
+    
     
     
     public void onMouseClicked(MouseEvent event) {
@@ -105,10 +110,35 @@ public class TSTableHandler {
             maxSelectedColumn = myTable.getColumns().size() - 1;
         selectBox();
         myTable.getFocusModel().focus(i0, myTable.getColumns().get(j0));
-        if ((j0 > 0) && (event.getClickCount() == 1))
+        if ((j0 > 0) && (event.getClickCount() == 2))
             myTable.edit(i0, myTable.getColumns().get(j0));
         //event.consume();
-        prevFocusedCell = focusedCell;
+        prevFocusedCell = null;
+    }
+    
+    
+    public void onMouseClicked2() {
+        focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
+        
+        int i0 = focusedCell.getRow();
+        int j0 = focusedCell.getColumn();
+        
+        minSelectedRow = maxSelectedRow = i0;
+        minSelectedColumn = maxSelectedColumn = j0;
+        if (j0 == 0)
+            maxSelectedColumn = myTable.getColumns().size() - 1;
+        selectBox();
+        prevFocusedCell = null;
+    }
+    
+    
+    public void setEditOn() {
+        focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
+        
+        int i0 = focusedCell.getRow();
+        int j0 = focusedCell.getColumn();
+        
+        myTable.edit(i0, myTable.getColumns().get(j0));
     }
     
     
