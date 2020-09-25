@@ -8,6 +8,7 @@ public class ControllerRampMeterOpen extends AbstractControllerRampMeter {
         super(Float.POSITIVE_INFINITY,
                 control.AbstractController.Algorithm.rm_open,
                 false,
+                Float.NaN,
                 Float.POSITIVE_INFINITY,
                 Float.POSITIVE_INFINITY);
     }

@@ -13,10 +13,11 @@ public class ControllerRampMeterFixedRate extends AbstractControllerRampMeter {
     // construction
     ////////////////////////////////
 
-    public ControllerRampMeterFixedRate(FreewayScenario scn, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl,float rate_vphpl) throws Exception {
+    public ControllerRampMeterFixedRate(FreewayScenario scn, float dt, boolean has_queue_control,float override_threshold, float min_rate_vphpl, float max_rate_vphpl,float rate_vphpl) throws Exception {
         super(dt,
                 control.AbstractController.Algorithm.rm_fixed_rate,
                 has_queue_control,
+                override_threshold,
                 min_rate_vphpl,
                 max_rate_vphpl);
 

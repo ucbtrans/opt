@@ -2351,6 +2351,7 @@ public class LinkEditorController {
                     newController = ControlFactory.create_controller_alinea(myLink.get_segment().get_scenario(),
                         dt,
                         false,
+                        Float.NaN,
                         min_rate_vphpl,
                         max_rate_vphpl,
                         null,
@@ -2362,6 +2363,7 @@ public class LinkEditorController {
                     newController = ControlFactory.create_controller_fixed_rate(myLink.get_segment().get_scenario(),
                         dt,
                         false,
+                        Float.NaN,
                         min_rate_vphpl,
                         max_rate_vphpl,
                         max_rate_vphpl);

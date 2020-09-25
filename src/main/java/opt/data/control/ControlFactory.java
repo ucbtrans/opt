@@ -96,14 +96,14 @@ public class ControlFactory {
 		return new ControllerRampMeterClosed(fwyscn);
 	}
 
-	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl, float rate_vphpl) throws Exception {
+	public static ControllerRampMeterFixedRate create_controller_fixed_rate(FreewayScenario fwyscn, float dt, boolean has_queue_control,float override_threshold, float min_rate_vphpl, float max_rate_vphpl, float rate_vphpl) throws Exception {
 		parameters_check(dt);
-		return new ControllerRampMeterFixedRate(fwyscn,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,rate_vphpl);
+		return new ControllerRampMeterFixedRate(fwyscn,dt,has_queue_control,override_threshold,min_rate_vphpl,max_rate_vphpl,rate_vphpl);
 	}
 
-	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn, float dt, boolean has_queue_control, float min_rate_vphpl, float max_rate_vphpl,Long sensor_id, long sensor_link_id, float sensor_offset) throws Exception {
+	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn, float dt, boolean has_queue_control,float override_threshold, float min_rate_vphpl, float max_rate_vphpl,Long sensor_id, long sensor_link_id, float sensor_offset) throws Exception {
 		parameters_check(dt);
-		return new ControllerRampMeterAlinea(fwyscn,dt,has_queue_control,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
+		return new ControllerRampMeterAlinea(fwyscn,dt,has_queue_control,override_threshold,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
 	}
 
 	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn, Set<Long> disallowed_comms,Set<Long> free_comms,Float dt, Double a0,Double a1,Double a2,int [][] vplph_to_cents_table, Double qos_speed_threshold_kph) throws Exception {
@@ -126,6 +126,7 @@ public class ControlFactory {
 
 		// read parameters
 		boolean has_queue_control = false;
+		float override_threshold = Float.NaN;
 		float min_rate_vphpl = Float.NaN;
 		float max_rate_vphpl = Float.NaN;
 		if(jentry.getParameters()!=null)
@@ -133,6 +134,9 @@ public class ControlFactory {
 				switch(param.getName()){
 					case "queue_control":
 						has_queue_control = param.getValue().equals("true");
+						break;
+					case "override_threshold":
+						override_threshold = Float.parseFloat(param.getValue());
 						break;
 					case "min_rate_vphpl":
 						min_rate_vphpl = Float.parseFloat(param.getValue());
@@ -148,6 +152,7 @@ public class ControlFactory {
 		ControllerRampMeterAlinea cntrl = create_controller_alinea(fwyscn,
 				jentry.getDt(),
 				has_queue_control,
+				override_threshold,
 				min_rate_vphpl,
 				max_rate_vphpl,
 				jsn.getId(),
@@ -161,6 +166,7 @@ public class ControlFactory {
 
 		// read parameters
 		boolean has_queue_control = false;
+		float override_threshold = Float.NaN;
 		float min_rate_vphpl = Float.NaN;
 		float max_rate_vphpl = Float.NaN;
 		float rate_vphpl = Float.NaN;
@@ -169,6 +175,9 @@ public class ControlFactory {
 				switch(param.getName()){
 					case "queue_control":
 						has_queue_control = param.getValue().equals("true");
+						break;
+					case "override_threshold":
+						override_threshold = Float.parseFloat(param.getValue());
 						break;
 					case "min_rate_vphpl":
 						min_rate_vphpl = Float.parseFloat(param.getValue());
@@ -185,7 +194,7 @@ public class ControlFactory {
 			}
 
 		ControllerRampMeterFixedRate cntrl = create_controller_fixed_rate(fwyscn,
-				jentry.getDt(),has_queue_control,min_rate_vphpl,max_rate_vphpl,rate_vphpl);
+				jentry.getDt(),has_queue_control,override_threshold,min_rate_vphpl,max_rate_vphpl,rate_vphpl);
 
 		return cntrl;
 
