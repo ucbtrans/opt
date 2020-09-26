@@ -1,6 +1,7 @@
 package opt.data.control;
 
 import jaxb.Parameter;
+import opt.UserSettings;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -19,9 +20,9 @@ public abstract class AbstractControllerRampMeter extends AbstractController {
     public AbstractControllerRampMeter(Float dt, control.AbstractController.Algorithm  algorithm,boolean has_queue_control,float override_threshold,float min_rate_vph,float max_rate_vph) throws Exception {
         super(Type.RampMetering, dt, algorithm);
         this.has_queue_control = has_queue_control;
-        this.override_threshold = override_threshold;
-        this.min_rate_vph = min_rate_vph;
-        this.max_rate_vph = max_rate_vph;
+        this.override_threshold = Float.isNaN(override_threshold) ? (float) UserSettings.queueOverrideTriggerThreshold : override_threshold;
+        this.min_rate_vph = Float.isNaN(min_rate_vph) ? (float) UserSettings.minGPRampMeteringRatePerLaneVph : min_rate_vph;
+        this.max_rate_vph = Float.isNaN(max_rate_vph) ? (float) UserSettings.maxGPRampMeteringRatePerLaneVph : max_rate_vph;
     }
 
     ////////////////////////////////

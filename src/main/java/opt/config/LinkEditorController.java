@@ -2325,9 +2325,10 @@ public class LinkEditorController {
         float start_time = controlSchedule.num_entries()==0 ? 0 :
                 Math.round(controlSchedule.get_largest_start_time()) + 3600;
 
-        float min_rate_vphpl, max_rate_vphpl, dt;
+        float override_threshold,min_rate_vphpl, max_rate_vphpl, dt;
         dt = (float)opt.UserSettings.defaultControlDtSeconds;
-        
+
+        override_threshold = (float)opt.UserSettings.queueOverrideTriggerThreshold;
         min_rate_vphpl = (float)opt.UserSettings.minGPRampMeteringRatePerLaneVph;
         max_rate_vphpl = (float)opt.UserSettings.maxGPRampMeteringRatePerLaneVph;
         if (isml) {
@@ -2351,7 +2352,7 @@ public class LinkEditorController {
                     newController = ControlFactory.create_controller_alinea(myLink.get_segment().get_scenario(),
                         dt,
                         false,
-                        Float.NaN,
+                        override_threshold,
                         min_rate_vphpl,
                         max_rate_vphpl,
                         null,
@@ -2363,7 +2364,7 @@ public class LinkEditorController {
                     newController = ControlFactory.create_controller_fixed_rate(myLink.get_segment().get_scenario(),
                         dt,
                         false,
-                        Float.NaN,
+                        override_threshold,
                         min_rate_vphpl,
                         max_rate_vphpl,
                         max_rate_vphpl);
