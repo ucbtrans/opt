@@ -97,7 +97,7 @@ public class UserSettings {
     public static float defaultMaxCellLength = 100f;
 
     public static double defaultControlDtSeconds = 30;
-    public static double queueOverrideTriggerThreshold = 0.8;
+    public static double queueOverrideTriggerThreshold = 0.2;
     
     public static double defaultQosSpeedThresholdKph = 72.4205;
     
