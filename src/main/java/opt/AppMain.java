@@ -41,9 +41,11 @@ public class AppMain extends Application {
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
         primaryStage.setScene(scene);
         primaryStage.show();
+        UserSettings.load();
     }
     
     public void stop() throws IOException {
+        UserSettings.save();
         main_controller.toSaveProjectOrNot();
     }
     
