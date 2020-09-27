@@ -117,7 +117,7 @@ public class UserSettings {
     public static double maxManagedRampMeteringRatePerLaneVph = 1400;
     
     public static double reportingPeriodSeconds = 300; // 5 minutes
-    public static boolean contourDataPerCell = false;
+    public static boolean contourDataPerCell = true;
     
             
     
