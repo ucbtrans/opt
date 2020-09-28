@@ -245,6 +245,52 @@ public class FreewayScenario {
                 }
         }
 
+        // assign offramp flows
+        if (jaxb_scenario.getControllers()!=null){
+            for(jaxb.Controller cont : jaxb_scenario.getControllers().getController()){
+                if(cont.getType()=="frflow"){
+                    float ctrl_dt = cont.getDt();
+                    float ctrl_start_time = cont.getStartTime();
+                    long target_act_id = cont.getTargetActuators().getTargetActuator().get(0).getId();
+                    Float prof_dt = null;
+                    List<Double> prof_flow = null;
+                    for(jaxb.Parameter p : cont.getParameters().getParameter()){
+                        switch(p.getName()){
+                            case "dt":
+                                prof_dt = Float.parseFloat(p.getValue());
+                                break;
+                            case "flowvph":
+                                prof_flow = OTMUtils.csv2list(p.getValue());
+                                break;
+                        }
+                    }
+
+                    Profile1D profile = new Profile1D(ctrl_start_time,prof_dt,prof_flow);
+
+                    // get the actuator
+                    jaxb.Actuator jact = jaxb_scenario.getActuators().getActuator().stream().filter(a->a.getId()==target_act_id).findFirst().get();
+                    Long linkoutid = null;
+                    Long commid = null;
+                    for(jaxb.Parameter p : jact.getActuatorTarget().getParameters().getParameter()){
+                        switch(p.getName()){
+                            case "linkout":
+                                linkoutid = Long.parseLong(p.getValue());
+                                break;
+                            case "comm":
+                                commid = Long.parseLong(p.getValue());
+                                break;
+                        }
+                    }
+
+                    AbstractLink link = scenario.links.get(linkoutid);
+                    if (link instanceof LinkOfframp)
+                        ((LinkOfframp) link).set_frflow(ctrl_dt,commid,profile);
+
+                }
+            }
+        }
+
+
         // create actuator and sensor maps
         Map<Long,jaxb.Actuator> actuators = new HashMap<>();
         if(jaxb_scenario.getActuators()!=null)
@@ -738,8 +784,10 @@ public class FreewayScenario {
         // delete all links
         for(AbstractLink link : segment.get_links()) {
             link.demands = null;
-            if(link instanceof LinkOfframp)
-                ((LinkOfframp)link).delete_splits();
+            if(link instanceof LinkOfframp) {
+                ((LinkOfframp) link).delete_splits();
+                ((LinkOfframp) link).delete_frflows();
+            }
             scenario.links.remove(link.id);
         }
 
@@ -852,8 +900,10 @@ public class FreewayScenario {
         for(AbstractLink link : scenario.links.values()) {
             if (link.demands != null && link.demands.containsKey(comm_id))
                 link.demands.remove(comm_id);
-            if(link instanceof LinkOfframp)
+            if(link instanceof LinkOfframp) {
                 ((LinkOfframp) link).remove_split_for_commodity(comm_id);
+                ((LinkOfframp) link).remove_frlow_for_commodity(comm_id);
+            }
         }
 
     }

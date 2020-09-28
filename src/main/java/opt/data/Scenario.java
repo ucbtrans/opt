@@ -391,15 +391,6 @@ public class Scenario {
 
             Node node = this.nodes.get(up_ml.end_node_id);
 
-            // onramp -> offramp profiles
-            List<LinkOnramp> dn_ors = new ArrayList<>();
-            Map<Long, String> or_outlink2value = new HashMap<>();
-            if(dn_ml!=null) {
-                dn_ors = dn_ml.mysegment.get_ors();
-                frs.forEach(fr -> or_outlink2value.put(fr.id, "0")); // start_time, value
-                or_outlink2value.put(dn_ml.id, "1");
-            }
-
             for(Commodity comm : commodities.values()){
 
                 // collect the split profiles we have
@@ -491,6 +482,78 @@ public class Scenario {
         jScn.setSensors(jsnss);
         for(Sensor sensor : all_sensors)
             jsnss.getSensor().add(sensor.to_jaxb());
+
+        /////////////////////////////////////////////////////
+        // offramp flows
+        for(Segment segment : my_fwy_scenario.segments.values()) {
+
+            if (segment.fwy.get_type() != AbstractLink.Type.freeway)
+                continue;
+
+            LinkFreeway up_ml = (LinkFreeway) segment.fwy;
+
+            for(LinkOfframp fr : segment.get_frs()){
+                for(Map.Entry<Long, Profile1D> e : fr.frflows.entrySet()){
+                    long commid = e.getKey();
+                    Profile1D prof = e.getValue();
+
+                    long ctrlid = my_fwy_scenario.new_schedule_id();
+
+                    // actuator
+                    jaxb.Actuator act = new jaxb.Actuator();
+                    jacts.getActuator().add(act);
+                    act.setId(ctrlid);
+                    act.setType("split");
+                    jaxb.ActuatorTarget actar = new jaxb.ActuatorTarget();
+                    act.setActuatorTarget(actar);
+                    act.setType("split");
+
+
+                    jaxb.Parameters aps = new jaxb.Parameters();
+                    act.setParameters(aps);
+                    jaxb.Parameter ap1 = new jaxb.Parameter();
+                    aps.getParameter().add(ap1);
+                    ap1.setName("linkin");
+                    ap1.setValue(String.format("%d",up_ml.id));
+
+                    jaxb.Parameter ap2 = new jaxb.Parameter();
+                    aps.getParameter().add(ap2);
+                    ap2.setName("linkout");
+                    ap2.setValue(String.format("%d",fr.id));
+
+                    jaxb.Parameter ap3 = new jaxb.Parameter();
+                    aps.getParameter().add(ap3);
+                    ap3.setName("comm");
+                    ap3.setValue(String.format("%d",commid));
+
+                    // controller
+                    jaxb.Controller ctrl = new jaxb.Controller();
+                    jcntrls.getController().add(ctrl);
+                    ctrl.setId(my_fwy_scenario.new_schedule_id());
+                    ctrl.setType("frflow");
+                    ctrl.setDt(fr.frctrldt.get(commid));
+                    ctrl.setStartTime(prof.start_time);
+
+                    jaxb.TargetActuators ta = new jaxb.TargetActuators();
+                    ctrl.setTargetActuators(ta);
+                    ta.setIds(String.format("%d",ctrlid));
+
+                    jaxb.Parameters cps = new jaxb.Parameters();
+                    ctrl.setParameters(cps);
+                    jaxb.Parameter cp1 = new jaxb.Parameter();
+                    cps.getParameter().add(cp1);
+                    cp1.setName("dt");
+                    cp1.setValue(prof.dt.toString());
+                    jaxb.Parameter cp2 = new jaxb.Parameter();
+                    cps.getParameter().add(cp2);
+                    cp2.setName("flowvph");
+                    cp2.setValue(OTMUtils.comma_format(prof.values));
+
+                }
+            }
+
+        }
+
 
         return jScn;
     }

@@ -9,6 +9,8 @@ import java.util.*;
 public class LinkOfframp extends LinkRamp {
 
     private Map<Long, Profile1D> splits = new HashMap<>();     // commodity -> Profile1D
+    public Map<Long, Profile1D> frflows = new HashMap<>();     // commodity -> Profile1D
+    public Map<Long, Float> frctrldt = new HashMap<>();     // commodity -> Profile1D
 
     /////////////////////////////////////
     // construction
@@ -54,9 +56,29 @@ public class LinkOfframp extends LinkRamp {
         }
     }
 
+    public final Profile1D get_frflows(Long comm_id,float ctrl_dt,double default_dt){
+        if(frflows.containsKey(comm_id))
+            return frflows.get(comm_id);
+        else {
+            List<Double> list = new ArrayList<>();
+            list.add(0d);
+            Profile1D prof = new Profile1D(0f,(float)default_dt,list);
+            frflows.put(comm_id,prof);
+            frctrldt.put(comm_id,ctrl_dt);
+            return prof;
+        }
+    }
+
     public final void remove_split_for_commodity(long comm_id){
         if(splits.containsKey(comm_id))
             splits.remove(comm_id);
+    }
+
+    public final void remove_frlow_for_commodity(long comm_id){
+        if(frflows.containsKey(comm_id)) {
+            frflows.remove(comm_id);
+            frctrldt.remove(comm_id);
+        }
     }
 
     public final void set_split(Long comm_id,float dt, double[] values) throws Exception {
@@ -66,12 +88,30 @@ public class LinkOfframp extends LinkRamp {
         this.splits.put(comm_id, profile);
     }
 
+    public final void set_frflow(Long comm_id,float ctrldt,float dt, double[] values) throws Exception {
+        Profile1D profile = new Profile1D(0f,dt);
+        for(double v : values)
+            profile.add_entry(v);
+        this.frflows.put(comm_id, profile);
+        this.frctrldt.put(comm_id, ctrldt);
+    }
+
     public final void set_split(Long comm_id,Profile1D profile) throws Exception {
         this.splits.put(comm_id,profile);
     }
 
+    public final void set_frflow(float ctrl_dt,long comm_id,Profile1D profile) throws Exception {
+        this.frflows.put(comm_id,profile);
+        this.frctrldt.put(comm_id,ctrl_dt);
+    }
+
     public final void delete_splits(){
         splits = null;
+    }
+
+    public final void delete_frflows(){
+        frflows = null;
+        frctrldt = null;
     }
 
     /////////////////////////////////////
@@ -136,17 +176,11 @@ public class LinkOfframp extends LinkRamp {
         LinkOfframp clink = (LinkOfframp) super.clone();
         for(Map.Entry<Long, Profile1D> e : splits.entrySet())
             clink.splits.put(e.getKey(),e.getValue().clone());
+        for(Map.Entry<Long, Profile1D> e : frflows.entrySet())
+            clink.frflows.put(e.getKey(),e.getValue().clone());
+        for(Map.Entry<Long, Float> e : frctrldt.entrySet())
+            clink.frctrldt.put(e.getKey(),e.getValue());
         return clink;
     }
-
-//    @Override
-//    public boolean equals(Object o) {
-//        return super.equals(o) ? splits.equals(((LinkOfframp) o).splits) : false;
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(id, start_node_id, end_node_id, params, demands, splits);
-//    }
 
 }
