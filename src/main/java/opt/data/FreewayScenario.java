@@ -274,7 +274,7 @@ public class FreewayScenario {
 
                 List<AbstractLink> links = new ArrayList<>();
                 List<LaneGroupType> lgtypes = new ArrayList<>();
-                for(String e : jact.getActuatorTarget().getContent().split(",")){
+                for(String e : jact.getActuatorTarget().getLanegroups().split(",")){
 
                     String [] a1 = e.split("[(]");
                     Long linkid = Long.parseLong(a1[0]);

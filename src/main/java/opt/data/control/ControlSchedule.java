@@ -106,7 +106,7 @@ public class ControlSchedule implements Comparable {
                 jtgt.setType("lanegroups");
                 AbstractLink link = links_to_write.iterator().next();
                 int [] lanes = link.lgtype2lanes(lgtype);
-                jtgt.setContent(String.format("%d(%d#%d)",link.id,lanes[0],lanes[1]));
+                jtgt.setLanegroups(String.format("%d(%d#%d)",link.id,lanes[0],lanes[1]));
                 break;
 
             case HOVHOT:
@@ -123,7 +123,7 @@ public class ControlSchedule implements Comparable {
                 }
                 if(!str.isEmpty())
                     str = str.substring(0, str.length() - 1);
-                jtgt.setContent(str);
+                jtgt.setLanegroups(str);
                 break;
         }
 
