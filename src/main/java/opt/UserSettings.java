@@ -25,8 +25,14 @@
  **/
 package opt;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import opt.config.LinkEditorController;
 import opt.data.ParametersFreeway;
 import opt.data.ParametersRamp;
@@ -111,7 +117,7 @@ public class UserSettings {
     public static double maxManagedRampMeteringRatePerLaneVph = 1400;
     
     public static double reportingPeriodSeconds = 300; // 5 minutes
-    public static boolean contourDataPerCell = false;
+    public static boolean contourDataPerCell = true;
     
             
     
@@ -322,6 +328,245 @@ public class UserSettings {
         return res * value;
     }
     
+    
+    private static String userSettingsFileName = null;
+    
+    public static void load() {
+        String home = System.getProperty("user.home");
+        if (home == null)
+            home = System.getProperty("java.io.tmpdir");
+        if (home == null)
+            return;
+        userSettingsFileName = home + File.separator + ".opt.prf";
+        
+        File userSettingsFile = new File(userSettingsFileName);
+        if (!userSettingsFile.exists())
+            return;
+        
+        Properties props = new Properties();
+        try {
+            FileInputStream in = new FileInputStream(userSettingsFileName);
+            props.loadFromXML(in);
+        } catch(Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Error reading user preferences", e);
+        }
+        
+        
+        String pv = props.getProperty("rightSideRoads");
+        if (pv != null)
+            rightSideRoads = Boolean.parseBoolean(pv);
+        
+        pv = props.getProperty("unitsLength");
+        if ((pv != null) && (Arrays.stream(unitsLengthOptions).anyMatch(pv::equals)))
+            unitsLength = pv;
+        pv = props.getProperty("unitsSpeed", unitsSpeed);
+        if ((pv != null) && (Arrays.stream(unitsSpeedOptions).anyMatch(pv::equals)))
+            unitsSpeed = pv;
+        pv = props.getProperty("unitsFlow", unitsFlow);
+        if ((pv != null) && (Arrays.stream(unitsFlowOptions).anyMatch(pv::equals)))
+            unitsFlow = pv;
+        pv = props.getProperty("unitsDensity", unitsDensity);
+        if ((pv != null) && (Arrays.stream(unitsDensityOptions).anyMatch(pv::equals)))
+            unitsDensity = pv;
+        
+        pv = props.getProperty("defaultRampLengthMeters", Double.toString(defaultRampLengthMeters));
+        if (pv != null)
+            defaultRampLengthMeters = Double.parseDouble(pv);
+        
+        pv = props.getProperty("defaultOnrampGPLanes");
+        if (pv != null)
+            defaultOnrampGPLanes = Integer.parseInt(pv);
+        pv = props.getProperty("defaultOnrampManagedLanes");
+        if (pv != null)
+            defaultOnrampManagedLanes = Integer.parseInt(pv);
+        pv = props.getProperty("defaultOnrampAuxLanes");
+        if (pv != null)
+            defaultOnrampAuxLanes = Integer.parseInt(pv);
+        pv = props.getProperty("defaultOfframpGPLanes");
+        if (pv != null)
+            defaultOfframpGPLanes = Integer.parseInt(pv);
+        pv = props.getProperty("defaultOfframpManagedLanes");
+        if (pv != null)
+            defaultOfframpManagedLanes = Integer.parseInt(pv);
+        pv = props.getProperty("defaultOfframpAuxLanes");
+        if (pv != null)
+            defaultOfframpAuxLanes = Integer.parseInt(pv);
+        pv = props.getProperty("defaultFreewayGPLanes");
+        if (pv != null)
+            defaultFreewayGPLanes = Integer.parseInt(pv);
+        pv = props.getProperty("defaultFreewayManagedLanes");
+        if (pv != null)
+            defaultFreewayManagedLanes = Integer.parseInt(pv);
+        pv = props.getProperty("defaultFreewayAuxLanes");
+        if (pv != null)
+            defaultFreewayAuxLanes = Integer.parseInt(pv);
+        pv = props.getProperty("defaultConnectorGPLanes");
+        if (pv != null)
+            defaultConnectorGPLanes = Integer.parseInt(pv);
+        pv = props.getProperty("defaultConnectorManagedLanes");
+        if (pv != null)
+            defaultConnectorManagedLanes = Integer.parseInt(pv);
+        pv = props.getProperty("defaultConnectorAuxLanes");
+        if (pv != null)
+            defaultConnectorAuxLanes = Integer.parseInt(pv);
+        
+        pv = props.getProperty("defaultGPLaneCapacityVph");
+        if (pv != null)
+            defaultGPLaneCapacityVph = Double.parseDouble(pv);
+        pv = props.getProperty("defaultManagedLaneCapacityVph");
+        if (pv != null)
+            defaultManagedLaneCapacityVph = Double.parseDouble(pv);
+        pv = props.getProperty("defaultAuxLaneCapacityVph");       
+        if (pv != null)
+            defaultAuxLaneCapacityVph = Double.parseDouble(pv);
+        pv = props.getProperty("defaultGPLaneFreeFlowSpeedKph");
+        if (pv != null)
+            defaultGPLaneFreeFlowSpeedKph = Double.parseDouble(pv);
+        pv = props.getProperty("defaultManagedLaneFreeFlowSpeedKph");
+        if (pv != null)
+            defaultManagedLaneFreeFlowSpeedKph = Double.parseDouble(pv);
+        pv = props.getProperty("defaultAuxLaneFreeFlowSpeedKph");        
+        if (pv != null)
+            defaultAuxLaneFreeFlowSpeedKph = Double.parseDouble(pv);
+        pv = props.getProperty("defaultGPLaneJamDensityVpk");
+        if (pv != null)
+            defaultGPLaneJamDensityVpk = Double.parseDouble(pv);
+        pv = props.getProperty("defaultManagedLaneJamDensityVpk");
+        if (pv != null)
+            defaultManagedLaneJamDensityVpk = Double.parseDouble(pv);
+        pv = props.getProperty("defaultAuxLaneJamDensityVpk");
+        if (pv != null)
+            defaultAuxLaneJamDensityVpk = Double.parseDouble(pv);
+        
+        pv = props.getProperty("defaultFreeFlowSpeedThresholdForDelayMph");
+        if (pv != null)
+            defaultFreeFlowSpeedThresholdForDelayMph = Double.parseDouble(pv);
+        
+        pv = props.getProperty("defaultStartTime");
+        if (pv != null)
+            defaultStartTime = Double.parseDouble(pv);
+        pv = props.getProperty("defaultSimulationDuration");
+        if (pv != null)
+            defaultSimulationDuration = Double.parseDouble(pv);
+        pv = props.getProperty("defaultMaxCellLength");
+        if (pv != null)
+            defaultMaxCellLength = Float.parseFloat(pv);
+        pv = props.getProperty("defaultDemandDtMinutes");
+        if (pv != null)
+            defaultDemandDtMinutes = Integer.parseInt(pv);
+        pv = props.getProperty("defaultSRDtMinutes");
+        if (pv != null)
+            defaultSRDtMinutes = Integer.parseInt(pv);
+        pv = props.getProperty("reportingPeriodSeconds");
+        if (pv != null)
+            reportingPeriodSeconds = Double.parseDouble(pv);
+        pv = props.getProperty("contourDataPerCell");
+        if (pv != null)
+            contourDataPerCell = Boolean.parseBoolean(pv);
+        
+        pv = props.getProperty("defaultControlDtSeconds");
+        if (pv != null)
+            defaultControlDtSeconds = Double.parseDouble(pv);
+        pv = props.getProperty("queueOverrideTriggerThreshold");
+        if (pv != null)
+            queueOverrideTriggerThreshold = Double.parseDouble(pv);
+        pv = props.getProperty("defaultQosSpeedThresholdKph");
+        if (pv != null)
+            defaultQosSpeedThresholdKph = Double.parseDouble(pv);
+        pv = props.getProperty("defaultLaneChoice_A0");
+        if (pv != null)
+            defaultLaneChoice_A0 = Double.parseDouble(pv);
+        pv = props.getProperty("defaultLaneChoice_A1");
+        if (pv != null)
+            defaultLaneChoice_A1 = Double.parseDouble(pv);
+        pv = props.getProperty("defaultLaneChoice_A2");
+        if (pv != null)
+            defaultLaneChoice_A2 = Double.parseDouble(pv);
+        
+        pv = props.getProperty("minGPRampMeteringRatePerLaneVph");
+        if (pv != null)
+            minGPRampMeteringRatePerLaneVph = Double.parseDouble(pv);
+        pv = props.getProperty("minManagedRampMeteringRatePerLaneVph");
+        if (pv != null)
+            minManagedRampMeteringRatePerLaneVph = Double.parseDouble(pv);
+        pv = props.getProperty("maxGPRampMeteringRatePerLaneVph");
+        if (pv != null)
+            maxGPRampMeteringRatePerLaneVph = Double.parseDouble(pv);
+        pv = props.getProperty("maxManagedRampMeteringRatePerLaneVph");
+        if (pv != null)
+            maxManagedRampMeteringRatePerLaneVph = Double.parseDouble(pv);
+        
+    }
+    
+    
+    public static void save() {
+        if (userSettingsFileName == null)
+            return;
+        
+        Properties props = new Properties();
+        props.setProperty("rightSideRoads", Boolean.toString(rightSideRoads));
+        
+        props.setProperty("unitsLength", unitsLength);
+        props.setProperty("unitsSpeed", unitsSpeed);
+        props.setProperty("unitsFlow", unitsFlow);
+        props.setProperty("unitsDensity", unitsDensity);
+        
+        props.setProperty("defaultRampLengthMeters", Double.toString(defaultRampLengthMeters));
+        
+        props.setProperty("defaultOnrampGPLanes", Integer.toString(defaultOnrampGPLanes));
+        props.setProperty("defaultOnrampManagedLanes", Integer.toString(defaultOnrampManagedLanes));
+        props.setProperty("defaultOnrampAuxLanes", Integer.toString(defaultOnrampAuxLanes));
+        props.setProperty("defaultOfframpGPLanes", Integer.toString(defaultOfframpGPLanes));
+        props.setProperty("defaultOfframpManagedLanes", Integer.toString(defaultOfframpManagedLanes));
+        props.setProperty("defaultOfframpAuxLanes", Integer.toString(defaultOfframpAuxLanes));
+        props.setProperty("defaultFreewayGPLanes", Integer.toString(defaultFreewayGPLanes));
+        props.setProperty("defaultFreewayManagedLanes", Integer.toString(defaultFreewayManagedLanes));
+        props.setProperty("defaultFreewayAuxLanes", Integer.toString(defaultFreewayAuxLanes));        
+        props.setProperty("defaultConnectorGPLanes", Integer.toString(defaultConnectorGPLanes));
+        props.setProperty("defaultConnectorManagedLanes", Integer.toString(defaultConnectorManagedLanes));
+        props.setProperty("defaultConnectorAuxLanes", Integer.toString(defaultConnectorAuxLanes));
+        
+        props.setProperty("defaultGPLaneCapacityVph", Double.toString(defaultGPLaneCapacityVph));
+        props.setProperty("defaultManagedLaneCapacityVph", Double.toString(defaultManagedLaneCapacityVph));
+        props.setProperty("defaultAuxLaneCapacityVph", Double.toString(defaultAuxLaneCapacityVph));       
+        props.setProperty("defaultGPLaneFreeFlowSpeedKph", Double.toString(defaultGPLaneFreeFlowSpeedKph));
+        props.setProperty("defaultManagedLaneFreeFlowSpeedKph", Double.toString(defaultManagedLaneFreeFlowSpeedKph));
+        props.setProperty("defaultAuxLaneFreeFlowSpeedKph", Double.toString(defaultAuxLaneFreeFlowSpeedKph));        
+        props.setProperty("defaultGPLaneJamDensityVpk", Double.toString(defaultGPLaneJamDensityVpk));
+        props.setProperty("defaultManagedLaneJamDensityVpk", Double.toString(defaultManagedLaneJamDensityVpk));
+        props.setProperty("defaultAuxLaneJamDensityVpk", Double.toString(defaultAuxLaneJamDensityVpk));
+        
+        props.setProperty("defaultFreeFlowSpeedThresholdForDelayMph", Double.toString(defaultFreeFlowSpeedThresholdForDelayMph));
+        
+        props.setProperty("defaultStartTime", Double.toString(defaultStartTime));
+        props.setProperty("defaultSimulationDuration", Double.toString(defaultSimulationDuration));
+        props.setProperty("defaultMaxCellLength", Float.toString(defaultMaxCellLength));
+        props.setProperty("defaultDemandDtMinutes", Integer.toString(defaultDemandDtMinutes));
+        props.setProperty("defaultSRDtMinutes", Integer.toString(defaultSRDtMinutes));
+        props.setProperty("reportingPeriodSeconds", Double.toString(reportingPeriodSeconds));
+        props.setProperty("contourDataPerCell", Boolean.toString(contourDataPerCell));
+        
+        props.setProperty("defaultControlDtSeconds", Double.toString(defaultControlDtSeconds));
+        props.setProperty("queueOverrideTriggerThreshold", Double.toString(queueOverrideTriggerThreshold));
+        props.setProperty("defaultQosSpeedThresholdKph", Double.toString(defaultQosSpeedThresholdKph));
+        props.setProperty("defaultLaneChoice_A0", Double.toString(defaultLaneChoice_A0));
+        props.setProperty("defaultLaneChoice_A1", Double.toString(defaultLaneChoice_A1));
+        props.setProperty("defaultLaneChoice_A2", Double.toString(defaultLaneChoice_A2));
+        
+        props.setProperty("minGPRampMeteringRatePerLaneVph", Double.toString(minGPRampMeteringRatePerLaneVph));
+        props.setProperty("minManagedRampMeteringRatePerLaneVph", Double.toString(minManagedRampMeteringRatePerLaneVph));
+        props.setProperty("maxGPRampMeteringRatePerLaneVph", Double.toString(maxGPRampMeteringRatePerLaneVph));
+        props.setProperty("maxManagedRampMeteringRatePerLaneVph", Double.toString(maxManagedRampMeteringRatePerLaneVph));
+        
+        try {
+            File userSettingsFile = new File(userSettingsFileName);
+            FileOutputStream out = new FileOutputStream(userSettingsFile);
+            props.storeToXML(out, "Preferences");
+        } catch (Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Error saving user preferences", e);
+        }
+        
+    }
     
     
     
