@@ -637,7 +637,7 @@ public class RoutePerformanceController {
             chartTitle = "Density in GP and Aux Lanes";
         densityGPChart = new JFreeChart(chartTitle, plot);
         densityGPChart.removeLegend();
-        scaleAxis = new org.jfree.chart.axis.NumberAxis("Flow (" + UserSettings.unitsFlow + ")");
+        scaleAxis = new org.jfree.chart.axis.NumberAxis("Density (" + UserSettings.unitsDensity + ")");
         scaleAxis.setRange(minDensity, maxDensity);
         psl = new PaintScaleLegend(paintScale, scaleAxis);
         psl.setMargin(new RectangleInsets(3, 10, 3, 10));
