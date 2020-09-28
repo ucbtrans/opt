@@ -8,6 +8,7 @@ import java.util.*;
 
 public class LinkOfframp extends LinkRamp {
 
+    private boolean use_frflow = false;
     private Map<Long, Profile1D> splits = new HashMap<>();     // commodity -> Profile1D
     public Map<Long, Profile1D> frflows = new HashMap<>();     // commodity -> Profile1D
     public Map<Long, Float> frctrldt = new HashMap<>();     // commodity -> Profile1D
@@ -41,8 +42,12 @@ public class LinkOfframp extends LinkRamp {
     }
 
     /////////////////////////////////////
-    // splits
+    // splits and frflows
     /////////////////////////////////////
+
+    public final void set_use_fr_flows(boolean x){
+        this.use_frflow = x;
+    }
 
     public final Profile1D get_splits(Long comm_id,double default_dt){
         if(splits.containsKey(comm_id))
