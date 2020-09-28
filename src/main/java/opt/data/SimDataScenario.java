@@ -468,6 +468,7 @@ public class SimDataScenario {
             lgtypes = new HashSet<>(Arrays.asList(LaneGroupType.values()));
         List<AbstractLink> routelinks = fwyscenario.routes.get(routeid).get_link_sequence();
         TimeMatrix X = new TimeMatrix(time,routelinks,this,haslgdata,lgtypes);
+        int numtime = X.time.length;
 
         int i=0;
         while(i<X.space.size()){
@@ -484,15 +485,35 @@ public class SimDataScenario {
                 X.add_timeseries(i++,lkdata.get_spd_array(lgtypes));
             else{
                 double cell_length_miles = lkdata.cell_length();
-                for(LaneGroupType lgtype : lgtypes){
-                    int c = i;
-                    SimDataLanegroup lgdata = lkdata.lgData.get(lgtype);
-                    if(lgdata==null)
-                        continue;
-                    for(double[] z : lgdata.get_cell_speeds(lkdata.ffspeed_mph,cell_length_miles))
-                        X.add_timeseries(c++, z);
+
+                for(int cellindex=0;cellindex<lkdata.numcells();cellindex++){
+
+                    double [] sumflw = new double[numtime];
+                    double [] sumveh = new double[numtime];
+
+                    for(LaneGroupType lgtype : lgtypes){
+
+                        SimDataLanegroup lgdata = lkdata.lgData.get(lgtype);
+                        if(lgdata==null)
+                            continue;
+                        SimCellData cd = lgdata.celldata.get(cellindex);
+                        for (long commid : cd.vehs.keySet()) {
+                            Misc.add_in_place(sumflw,cd.flws.get(commid));
+                            Misc.add_in_place(sumveh,cd.vehs.get(commid));
+                        }
+                    }
+
+                    double [] speeds = new double[numtime];
+                    for(int k=0;k<numtime;k++) {
+                        speeds[k] = sumveh[k]<1 ? lkdata.ffspeed_mph : cell_length_miles*sumflw[k]/sumveh[k];
+                        if(speeds[k]>lkdata.ffspeed_mph)
+                            speeds[k] = lkdata.ffspeed_mph;
+                    }
+
+                    X.add_timeseries(i++,speeds);
+
                 }
-                i += lkdata.numcells();
+
             }
 
         }
