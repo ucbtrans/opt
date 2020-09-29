@@ -63,6 +63,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
@@ -147,13 +148,18 @@ public class LinkEditorController {
     
     private SpinnerValueFactory<Integer> dtDemandSpinnerValueFactory = null;
     private SpinnerValueFactory<Integer> dtSRSpinnerValueFactory = null;
+    private SpinnerValueFactory<Integer> dtFRFlowSpinnerValueFactory = null;
     
     
     private TSTableHandler demandTableHandler = new TSTableHandler();
     private TSTableHandler srTableHandler = new TSTableHandler();
+    private TSTableHandler frFlowTableHandler = new TSTableHandler();
     
     private ObservableList<Object> defaultDemandRow = null;
     private ObservableList<Object> defaultSRRow = null;
+    private ObservableList<Object> defaultFRFlowRow = null;
+    
+    private boolean useFRFlows = false;
     
     
     
@@ -314,14 +320,29 @@ public class LinkEditorController {
     @FXML // fx:id="trafficSplitDownstream"
     private TitledPane trafficSplitDownstream; // Value injected by FXMLLoader
     
-    @FXML // fx:id="labelSRUpdatePeriod"
-    private Label labelSRUpdatePeriod; // Value injected by FXMLLoader
+    @FXML // fx:id="gridSR"
+    private GridPane gridSR; // Value injected by FXMLLoader
 
     @FXML // fx:id="dtSR"
     private Spinner<Integer> dtSR; // Value injected by FXMLLoader
 
     @FXML // fx:id="tableSR"
     private TableView<ObservableList<Object>> tableSR; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="cbUseFRFlows"
+    private CheckBox cbUseFRFlows; // Value injected by FXMLLoader
+
+    @FXML // fx:id="gridFRFlow"
+    private GridPane gridFRFlow; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="dtFRFlow"
+    private Spinner<Integer> dtFRFlow; // Value injected by FXMLLoader
+
+    @FXML // fx:id="tableFRFlow"
+    private TableView<ObservableList<Object>> tableFRFlow; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="cbUseFRFlows2"
+    private CheckBox cbUseFRFlows2; // Value injected by FXMLLoader
     
     @FXML // fx:id="linkControllerPane"
     private TitledPane linkControllerPane; // Value injected by FXMLLoader
@@ -933,6 +954,78 @@ public class LinkEditorController {
         tableSR.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
        
         
+        /**
+         * Off-Ramp Flow pane
+         **/
+        dtFRFlowSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1440, UserSettings.defaultFRFlowDtMinutes, 1);
+        dtFRFlowSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter());
+        dtFRFlow.setValueFactory(dtFRFlowSpinnerValueFactory);
+        dtFRFlow.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (!ignoreChange && (oldValue != newValue))
+                onDtFRFlowChange();
+        });
+        dtFRFlow.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Integer dt = UserSettings.defaultFRFlowDtMinutes;
+            // TODO: obtain SR dt
+            opt.utils.WidgetFunctionality.commitEditorText(dtFRFlow, dt);
+        });
+        
+        frFlowTableHandler.setTable(tableFRFlow);
+        tableFRFlow.setOnKeyPressed(event -> {
+            if (ignoreChange)
+                return;
+            frFlowTableHandler.setDt(dtFRFlowSpinnerValueFactory.getValue());
+            if (frFlowTableHandler.onKeyPressed(event))
+                setFRFlow();
+            
+            TablePosition<ObservableList<Object>, ?> focusedCell = tableFRFlow.focusModelProperty().get().focusedCellProperty().get();
+            if ((event.getCode() == KeyCode.C) && event.isControlDown()) {
+                appMainController.setLeftStatus("Copied off-ramp flow data from '" + myLink.get_name() + "' to clipboard.");
+            }
+            
+            if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
+                int del_num = frFlowTableHandler.deleteRows();
+                setFRFlow();
+                appMainController.setLeftStatus("Deleted " + del_num + " off-ramp flow entries from '" + myLink.get_name() + "'.");
+            }
+
+            
+            if (event.getCode().isDigitKey()) {              
+                tableFRFlow.edit(focusedCell.getRow(), focusedCell.getTableColumn());
+            } 
+        });
+        
+        tableFRFlow.setOnMouseClicked(event -> {
+            if (ignoreChange)
+                return;
+            frFlowTableHandler.onMouseClicked(event);
+        });
+        
+        tableFRFlow.setRowFactory(tv -> {
+            TableRow<ObservableList<Object>> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                event.consume();
+                frFlowTableHandler.resetFocus();
+                if ((event.getClickCount() == 2) && (row.isEmpty())) {
+                    frFlowTableHandler.addRow();
+                    setFRFlow();
+                } else if (event.getClickCount() == 2) {
+                    frFlowTableHandler.setEditOn();
+                } else {
+                    frFlowTableHandler.onMouseClicked2();
+                }
+            });
+            return row ;
+        });
+        
+        tableFRFlow.getSelectionModel().setCellSelectionEnabled(true);
+        tableFRFlow.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        
+        
+        
+        
         linkEditorCanvas.widthProperty().bind(canvasParent.widthProperty());
         linkEditorCanvas.heightProperty().bind(canvasParent.heightProperty());
 
@@ -966,15 +1059,21 @@ public class LinkEditorController {
         
         ignoreChange = true;        
         myLink = lnk;
+        useFRFlows = false;
         
         UserSettings.linkEditorController = this;
         appMainController.setLeftStatus("");
     
+        listVT.clear();
+        Map<Long, Commodity> mapVT = myLink.get_segment().get_scenario().get_commodities();
+        mapVT.forEach((k, v) -> {listVT.add(v);});
+        
         initHeader();
         initLaneProperties();
         initOnOffRamps();
         initDemand();
         initSR();
+        initFRFlow();
         initControllers();
             
         drawRoadSection();
@@ -1855,7 +1954,6 @@ public class LinkEditorController {
         
         tableDemand.getItems().clear();
         tableDemand.getColumns().clear();
-        listVT.clear();
         demandTableHandler.resetFocus();
         
         TableColumn<ObservableList<Object>, String> colTime = new TableColumn("Time");
@@ -1867,8 +1965,6 @@ public class LinkEditorController {
         colTime.prefWidthProperty().bind(tableDemand.widthProperty().multiply(0.09));
         colTime.setReorderable(false);
         
-        Map<Long, Commodity> mapVT = myLink.get_segment().get_scenario().get_commodities();
-        mapVT.forEach((k, v) -> {listVT.add(v);});
         int num_vt = listVT.size();
         
         TableColumn<ObservableList<Object>, Number> colDemand = new TableColumn("Demand (" + UserSettings.unitsFlow + ")");
@@ -2065,7 +2161,6 @@ public class LinkEditorController {
         
         tableSR.getItems().clear();
         tableSR.getColumns().clear();
-        listVT.clear();
         srTableHandler.resetFocus();
         
         TableColumn<ObservableList<Object>, String> colTime = new TableColumn("Time");
@@ -2077,8 +2172,6 @@ public class LinkEditorController {
         colTime.prefWidthProperty().bind(tableSR.widthProperty().multiply(0.09));
         colTime.setReorderable(false);
         
-        Map<Long, Commodity> mapVT = myLink.get_segment().get_scenario().get_commodities();
-        mapVT.forEach((k, v) -> {listVT.add(v);});
         int num_vt = listVT.size();
         
         List<List<Double>> profiles = new ArrayList<>();
@@ -2204,6 +2297,234 @@ public class LinkEditorController {
         
         appMainController.setProjectModified(true);
     }
+    
+    
+    @FXML
+    void onToggleUseFRFlows(ActionEvent event) {
+        CheckBox cb = (CheckBox)event.getSource();
+        useFRFlows = cb.isSelected();
+        gridFRFlow.setVisible(useFRFlows);         
+        gridSR.setVisible(!useFRFlows); 
+        cbUseFRFlows.setSelected(useFRFlows);
+        cbUseFRFlows2.setSelected(useFRFlows);
+        ((LinkOfframp)myLink).set_use_fr_flows(useFRFlows);
+        appMainController.setProjectModified(true);
+    }
+    
+    
+    
+    
+    /***************************************************************************
+     * Off-Ramp flow pane: initialization and callbacks
+     ***************************************************************************/
+    
+    private void initFRFlow() {
+        if (myLink.get_type() == AbstractLink.Type.offramp) {
+            trafficSplitDownstream.setDisable(false);
+        } else {
+             if (trafficSplitDownstream.isExpanded())
+                laneProperties.setExpanded(true);
+            trafficSplitDownstream.setDisable(true);
+            return;
+        }
+        
+        useFRFlows = ((LinkOfframp)myLink).get_use_fr_flows();
+        gridFRFlow.setVisible(useFRFlows);         
+        gridSR.setVisible(!useFRFlows); 
+        cbUseFRFlows.setSelected(useFRFlows);
+        cbUseFRFlows2.setSelected(useFRFlows);
+        
+        tableFRFlow.getItems().clear();
+        tableFRFlow.getColumns().clear();
+        frFlowTableHandler.resetFocus();
+        
+        TableColumn<ObservableList<Object>, String> colTime = new TableColumn("Time");
+        colTime.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get(0).toString()));
+        colTime.setStyle( "-fx-alignment: CENTER;");
+        colTime.setEditable(false);
+        colTime.setSortable(false);
+        tableFRFlow.getColumns().add(colTime);
+        colTime.prefWidthProperty().bind(tableFRFlow.widthProperty().multiply(0.09));
+        colTime.setReorderable(false);
+        
+        int num_vt = listVT.size();
+        
+        TableColumn<ObservableList<Object>, Number> colDemand = new TableColumn("Flow (" + UserSettings.unitsFlow + ")");
+        colDemand.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter(), true));
+        colDemand.setCellValueFactory(data -> new SimpleDoubleProperty((Double)data.getValue().get(1)));
+        colDemand.setStyle( "-fx-alignment: CENTER-RIGHT;");
+        colDemand.setEditable(true);
+        colDemand.setSortable(false);
+        tableFRFlow.getColumns().add(colDemand);
+        colDemand.prefWidthProperty().bind(tableFRFlow.widthProperty().multiply(0.89/(num_vt+1)));
+        colDemand.setOnEditCommit(event -> {
+            if (ignoreChange)
+                return;
+            TablePosition<ObservableList<Object>, ?> focusedCell = event.getTablePosition();
+            if ((event.getNewValue() != null) && (!event.getNewValue().equals("")))
+                tableFRFlow.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), event.getNewValue().doubleValue());
+            tableFRFlow.refresh();
+            setFRFlow();
+        });
+        colDemand.setReorderable(false);
+        
+        List<List<Double>> profiles = new ArrayList<>();
+        double pdt = Integer.MAX_VALUE;
+        int numSteps = 0;
+        for (int i = 0; i < num_vt; i++) {
+            final int idx = i;
+            TableColumn<ObservableList<Object>, Number> col = new TableColumn(listVT.get(i).get_name() + " (%)");
+            col.setCellFactory(EditCell.<ObservableList<Object>, Number>forTableColumn(new ModifiedNumberStringConverter(), true));
+            col.setCellValueFactory(data -> new SimpleDoubleProperty((Double)data.getValue().get(idx+2)));
+            col.setStyle( "-fx-alignment: CENTER-RIGHT;");
+            col.setEditable(true);
+            col.setSortable(false);
+            tableFRFlow.getColumns().add(col);
+            col.prefWidthProperty().bind(tableFRFlow.widthProperty().multiply(0.89/(num_vt+1)));
+            col.setOnEditCommit(event -> {
+                if (ignoreChange)
+                    return;
+                TablePosition<ObservableList<Object>, ?> focusedCell = event.getTablePosition();
+                if ((event.getNewValue() != null) && (!event.getNewValue().equals(""))) {
+                    double val = event.getNewValue().doubleValue();
+                    val = Math.min(Math.max(val, 0), 100);
+                    tableFRFlow.getItems().get(focusedCell.getRow()).set(focusedCell.getColumn(), val);
+                }
+                tableFRFlow.refresh();
+                setFRFlow();
+            });
+            col.setReorderable(false);
+            double dt = Math.min(pdt, UserSettings.defaultFRFlowDtMinutes * 60);
+            float ctrldt = 0.5f * (float)dt;
+            Profile1D cdp = ((LinkOfframp)myLink).get_frflows(listVT.get(i).getId(), ctrldt, dt);
+            if (cdp != null) {
+                pdt = Math.min(pdt, cdp.get_dt());
+                List<Double> lst = cdp.get_values();
+                if (lst == null) {
+                    lst = new ArrayList<>();
+                }
+                if (lst.size() < 1) {
+                    lst.add(0.0);
+                }
+                numSteps = Math.max(numSteps, lst.size());
+                profiles.add(lst);
+            } else {
+                pdt = Math.min(pdt, UserSettings.defaultFRFlowDtMinutes * 60);
+                List<Double> lst = new ArrayList<>();
+                lst.add(0.0);
+                profiles.add(lst);
+                numSteps = Math.max(numSteps, lst.size());
+            }
+        }
+        
+        int dtF = (int)Math.round(pdt / 60);
+        
+        double fcc = UserSettings.flowConversionMap.get("vph" + UserSettings.unitsFlow);
+        
+        ObservableList<Object> row;
+        for (int i = 0; i < numSteps; i++) {
+            row = FXCollections.observableArrayList();
+            row.add(opt.utils.Misc.minutes2timeString(i*dtF));
+            
+            row.add(0.0);
+            
+            double total = 0;
+            for (int j = 0; j < num_vt; j++) {
+                double val = profiles.get(j).get(profiles.get(j).size()-1);
+                if (i < profiles.get(j).size()) {
+                    val = profiles.get(j).get(i);
+                }
+                total += val;
+                row.add(val);
+            }
+            
+            for (int j = 0; j < num_vt; j++) {
+                double val = (Double)row.get(j+2);
+                val = Math.round(100 * val / total);
+                row.set(j+2, val);
+                if ((total < 0.0000000001) && (j == 0))
+                    row.set(j+2, 100.0);
+            }
+            
+            row.set(1, fcc*total);
+            tableFRFlow.getItems().add(row);
+        }
+        
+        row = FXCollections.observableArrayList();
+        row.add("");
+        row.add(0.0);
+        row.add(100.0);
+        for (int i = 1; i < num_vt + 1; i++)
+            row.add(0.0);
+        frFlowTableHandler.setDefaultRow(row);
+        frFlowTableHandler.setDt(dtF);
+        
+        if (num_vt == 1) {
+            frFlowTableHandler.setColumnValue(2, 100.0);
+        }
+        
+        tableFRFlow.refresh();
+
+        dtFRFlowSpinnerValueFactory.setValue(dtF);
+    }
+    
+    
+    /*
+     * Off-ramp flow dt and matrix callbacks 
+     */
+    
+    private void onDtFRFlowChange() { 
+        if (ignoreChange)
+            return;
+        
+        int dt = dtFRFlowSpinnerValueFactory.getValue();
+        frFlowTableHandler.setDt(dt);
+        frFlowTableHandler.timeColumnUpdate();
+        setFRFlow();
+    }
+    
+    
+    private void setFRFlow() {
+        if (ignoreChange)
+            return;
+        
+        float dt = 60 * dtFRFlowSpinnerValueFactory.getValue();
+        float ctrldt = 0.5f*dt;
+        ObservableList<ObservableList<Object>> myItems = tableFRFlow.getItems();
+        int numSteps = myItems.size();
+        int num_vt = listVT.size();
+        
+        if (num_vt == 1) {
+            frFlowTableHandler.setColumnValue(2, 100.0);
+        }
+        
+        double fcc = UserSettings.flowConversionMap.get(UserSettings.unitsFlow + "vph");
+        
+        for (int j = 0; j < num_vt; j++) {
+            double[] values = new double[numSteps];
+            
+            for (int i = 0; i < numSteps; i++) {
+                double total_prct = 0;
+                for (int jj = 0; jj < num_vt; jj++) {
+                    total_prct += (Double)myItems.get(i).get(jj+2);
+                }
+                if (total_prct < 0.0000000001) {
+                    myItems.get(i).set(2, 100.0);
+                    total_prct = 100.0;
+                }
+                values[i] = fcc * (Double)myItems.get(i).get(1) * (Double)myItems.get(i).get(j+2) / total_prct;
+            }
+            
+            try {
+                ((LinkOfframp)myLink).set_frflow(listVT.get(j).getId(), ctrldt, dt, values);
+            } catch(Exception e) {
+                opt.utils.Dialogs.ExceptionDialog("Cannot set off-amp flow for vehicle type '" + listVT.get(j).get_name() + "'...", e);
+            }
+        }
+        
+        appMainController.setProjectModified(true);
+    }
+
     
     
     

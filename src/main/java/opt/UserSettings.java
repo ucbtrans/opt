@@ -95,6 +95,7 @@ public class UserSettings {
     
     public static int defaultDemandDtMinutes = 5;
     public static int defaultSRDtMinutes = 5;
+    public static int defaultFRFlowDtMinutes = 5;
     
 //    public static int defaultSimulationDtSeconds = 5;
     public static double defaultStartTime = 0.0;
@@ -457,6 +458,9 @@ public class UserSettings {
         pv = props.getProperty("defaultSRDtMinutes");
         if (pv != null)
             defaultSRDtMinutes = Integer.parseInt(pv);
+        pv = props.getProperty("defaultFRFlowDtMinutes");
+        if (pv != null)
+            defaultFRFlowDtMinutes = Integer.parseInt(pv);
         pv = props.getProperty("reportingPeriodSeconds");
         if (pv != null)
             reportingPeriodSeconds = Double.parseDouble(pv);
@@ -543,6 +547,7 @@ public class UserSettings {
         props.setProperty("defaultMaxCellLength", Float.toString(defaultMaxCellLength));
         props.setProperty("defaultDemandDtMinutes", Integer.toString(defaultDemandDtMinutes));
         props.setProperty("defaultSRDtMinutes", Integer.toString(defaultSRDtMinutes));
+        props.setProperty("defaultFRFlowDtMinutes", Integer.toString(defaultFRFlowDtMinutes));
         props.setProperty("reportingPeriodSeconds", Double.toString(reportingPeriodSeconds));
         props.setProperty("contourDataPerCell", Boolean.toString(contourDataPerCell));
         
