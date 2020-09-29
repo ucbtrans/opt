@@ -407,8 +407,13 @@ public class ScenarioEditorController {
             }
         }
         
-        if (selectedPolicyIndex >= 0)
+        if ((listLanePolicies.size() > 0) && (selectedPolicyIndex < 0))
+            selectedPolicyIndex = 0;
+        
+        if (selectedPolicyIndex >= 0) {
             cbPolicies.getSelectionModel().select(selectedPolicyIndex);
+            selectedPolicy = listLanePolicies.get(selectedPolicyIndex);
+        }
     }
     
     private void populateUnderPolicyLinkList() {
@@ -705,17 +710,27 @@ public class ScenarioEditorController {
     }
     
     private void onPolicyNameChange(String old_nm, String nm) {
+        if (ignoreChange)
+            return;
+        
         if (selectedPolicyIndex != cbPolicies.getSelectionModel().getSelectedIndex()) {
             selectedPolicyIndex = cbPolicies.getSelectionModel().getSelectedIndex();
-            //selectedPolicy = listLanePolicies.get(selectedPolicyIndex);
             return;
         }
         
-        if (ignoreChange || (selectedPolicy == null) || (selectedPolicyIndex < 0) || (selectedPolicyIndex >= listLanePolicies.size()))
+        if (selectedPolicy == null)
             return;
         
+        if ((selectedPolicyIndex < 0) || (selectedPolicyIndex >= listLanePolicies.size())) {
+            selectedPolicyIndex = cbPolicies.getSelectionModel().getSelectedIndex();
+            if (listLanePolicies.size() == 1) {
+                selectedPolicyIndex = 0;
+                selectedPolicy = listLanePolicies.get(selectedPolicyIndex);
+            } else
+                return;
+        }
+        
         if (!nm.equals("")) {
-            //System.err.println("Name = " + nm + "\t Index = " + selectedPolicyIndex + "\t Policy = " + selectedPolicy);
             selectedPolicy.set_name(nm);
             cbPolicies.getItems().set(selectedPolicyIndex, nm);
             appMainController.setProjectModified(true);
