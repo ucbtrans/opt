@@ -551,7 +551,7 @@ public class STableHandler {
         while (updatedItems.size() < 1) {
             ObservableList<Object> row = FXCollections.observableArrayList();
             for (int j = 0; j < numCols; j++) {
-                row.add(0);
+                row.add(new Double(0));
             }
             updatedItems.add(row);
         }
