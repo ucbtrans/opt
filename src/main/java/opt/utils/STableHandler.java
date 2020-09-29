@@ -88,6 +88,9 @@ public class STableHandler {
         if (event.isShiftDown())
             return;
         
+        if (myTable.getSelectionModel().getSelectedCells().size() > 0)
+            return;
+        
         int i0 = focusedCell.getRow();
         int j0 = focusedCell.getColumn();
         
@@ -103,6 +106,9 @@ public class STableHandler {
     
     public void onMouseClicked2() {
         focusedCell = myTable.focusModelProperty().get().focusedCellProperty().get();
+        
+        if (myTable.getSelectionModel().getSelectedCells().size() > 0)
+            return;
         
         int i0 = focusedCell.getRow();
         int j0 = focusedCell.getColumn();
