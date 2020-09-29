@@ -45,6 +45,10 @@ public class LinkOfframp extends LinkRamp {
     // splits and frflows
     /////////////////////////////////////
 
+    public final boolean get_use_fr_flows() {
+        return use_frflow;
+    }
+    
     public final void set_use_fr_flows(boolean x){
         this.use_frflow = x;
     }
