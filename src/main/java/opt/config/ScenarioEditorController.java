@@ -410,9 +410,9 @@ public class ScenarioEditorController {
         if ((listLanePolicies.size() > 0) && (selectedPolicyIndex < 0))
             selectedPolicyIndex = 0;
         
-        if (selectedPolicyIndex >= 0) {
-            cbPolicies.getSelectionModel().select(selectedPolicyIndex);
+        if ((selectedPolicyIndex >= 0) && (selectedPolicyIndex < listLanePolicies.size())) {
             selectedPolicy = listLanePolicies.get(selectedPolicyIndex);
+            cbPolicies.getSelectionModel().select(selectedPolicyIndex);
         }
     }
     
@@ -697,6 +697,8 @@ public class ScenarioEditorController {
     @FXML
     void onPolicySelection(ActionEvent event) {
         selectedPolicyIndex = cbPolicies.getSelectionModel().getSelectedIndex();
+        //if (listLanePolicies.size() > 0)
+          //  selectedPolicyIndex = Math.max(0, selectedPolicyIndex);
         if (ignoreChange || (selectedPolicyIndex < 0) || (selectedPolicyIndex >= listLanePolicies.size())) {
             policyPane.setVisible(false);
             deletePolicy.setDisable(true);
@@ -745,7 +747,7 @@ public class ScenarioEditorController {
         
         if (linksFreeForPolicy.size() < 1) {
             opt.utils.Dialogs.ErrorDialog("Cannot add new lane policy...",
-                                          "All road sections are already assigned to other policies!");
+                                          "No road sections with managed lanes are available!");
             return;
         }
         
