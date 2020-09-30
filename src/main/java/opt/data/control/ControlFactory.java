@@ -72,7 +72,7 @@ public class ControlFactory {
 					break;
 
 				case LgPolicy:
-					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null,null));
+					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null,null,null));
 					break;
 
 			}
@@ -106,8 +106,8 @@ public class ControlFactory {
 		return new ControllerRampMeterAlinea(fwyscn,dt,has_queue_control,override_threshold,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
 	}
 
-	public static ControllerLgPolicy create_controller_hovhot(FreewayScenario fwyscn, Set<Long> disallowed_comms, Set<Long> free_comms, Float dt, Double a0, Double a1, Double a2, int [][] vplph_to_cents_table, Double qos_speed_threshold_kph) throws Exception {
-		return new ControllerLgPolicy(fwyscn,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
+	public static ControllerLgPolicy create_controller_hovhot(FreewayScenario fwyscn, Set<Long> tolled_comms,Set<Long> disallowed_comms, Set<Long> free_comms, Float dt, Double a0, Double a1, Double a2, int [][] vplph_to_cents_table, Double qos_speed_threshold_kph) throws Exception {
+		return new ControllerLgPolicy(fwyscn,tolled_comms,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
 	}
 
 	/////////////////////
@@ -203,6 +203,7 @@ public class ControlFactory {
 	public static ControllerLgPolicy create_controller_hovhot(FreewayScenario fwyscn, jaxb.Entry jentry) throws Exception {
 
 		// read parameters
+		Set<Long> tolled_comms = new HashSet<>();
 		Set<Long> disallowed_comms = new HashSet<>();
 		Set<Long> free_comms = new HashSet<>();
 		Double a0 = null;
@@ -213,6 +214,9 @@ public class ControlFactory {
 		if(jentry.getParameters()!=null) {
 			for (jaxb.Parameter param : jentry.getParameters().getParameter()) {
 				switch (param.getName()) {
+					case "tolled_comms":
+						tolled_comms.addAll(OTMUtils.csv2longlist(param.getValue()));
+						break;
 					case "disallowed_comms":
 						disallowed_comms.addAll(OTMUtils.csv2longlist(param.getValue()));
 						break;
@@ -242,7 +246,7 @@ public class ControlFactory {
 
 		Float dt = jentry.getDt()==null ? (float) UserSettings.defaultControlDtSeconds : jentry.getDt();
 
-		ControllerLgPolicy cntrl = create_controller_hovhot(fwyscn,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
+		ControllerLgPolicy cntrl = create_controller_hovhot(fwyscn,tolled_comms,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
 		return cntrl;
 	}
 

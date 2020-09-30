@@ -6,6 +6,7 @@ import opt.data.FreewayScenario;
 import utils.OTMUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ControllerLgPolicy extends AbstractController {
 
@@ -29,18 +30,29 @@ public class ControllerLgPolicy extends AbstractController {
 	// construction
 	////////////////////////////////
 
-	public ControllerLgPolicy(FreewayScenario scn, Set<Long> disallowed_comms, Set<Long> free_comms, Float dt, Double a0, Double a1, Double a2, int [][] vphpl_to_cents_table, Double qos_speed_threshold_kph) {
+	public ControllerLgPolicy(FreewayScenario scn, Set<Long> tolled_comms, Set<Long> disallowed_comms, Set<Long> free_comms, Float dt, Double a0, Double a1, Double a2, int [][] vphpl_to_cents_table, Double qos_speed_threshold_kph) {
 		super(Type.LgPolicy,dt, control.AbstractController.Algorithm.lg_restrict);
 
 		this.comm2permission = new HashMap<>();
 
+		if(tolled_comms==null)
+			tolled_comms = new HashSet<>();
 		if(disallowed_comms==null)
 			disallowed_comms = new HashSet<>();
 		if(free_comms==null)
 			free_comms = new HashSet<>();
 
-		// all are tolled by default
-		for(Long cid : scn.get_commodities().keySet())
+		// check that together they are a partition of the commodities
+		assert(Collections.disjoint(tolled_comms,disallowed_comms));
+		assert(Collections.disjoint(tolled_comms,free_comms));
+		assert(Collections.disjoint(disallowed_comms,free_comms));
+		Set<Long> all_comms = new HashSet<>();
+		all_comms.addAll(tolled_comms);
+		all_comms.addAll(disallowed_comms);
+		all_comms.addAll(free_comms);
+		assert(all_comms.containsAll(scn.get_commodities().keySet()));
+
+		for(Long cid : tolled_comms)
 			comm2permission.put(cid,Permission.Tolled);
 		for(Long cid : disallowed_comms)
 			comm2permission.put(cid,Permission.Banned);
@@ -97,6 +109,13 @@ public class ControllerLgPolicy extends AbstractController {
 
 	public Permission get_comm_permission(Long commid){
 		return comm2permission.get(commid);
+	}
+
+	public Set<Long> get_restricted_comm_ids(){
+		return comm2permission.entrySet().stream()
+				.filter(x->x.getValue()!=Permission.Free)
+				.map(x->x.getKey())
+				.collect(Collectors.toSet());
 	}
 
 	////////////////////////////////
