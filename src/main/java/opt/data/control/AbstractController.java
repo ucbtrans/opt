@@ -10,24 +10,18 @@ public abstract class AbstractController {
 	protected Type type;
 	protected Float dt;
 	protected control.AbstractController.Algorithm algorithm;
-	protected Map<Long,Sensor> sensors;
 
 	abstract public Collection<jaxb.Parameter> jaxb_parameters();
+	abstract public Set<Sensor> get_sensors();
 
 	////////////////////////////////
 	// construction
 	////////////////////////////////
 
 	public AbstractController(Type type, Float dt, control.AbstractController.Algorithm algorithm) {
-//		this.id = id;
 		this.type = type;
 		this.dt = dt;
 		this.algorithm = algorithm;
-		this.sensors = new HashMap<>();
-	}
-
-	protected void add_sensor(Sensor sensor){
-		sensors.put(sensor.id,sensor);
 	}
 
 	////////////////////////////////
@@ -61,10 +55,6 @@ public abstract class AbstractController {
 	// API
 	////////////////////////////////
 
-	public Set<Long>get_sensor_ids(){
-		return sensors.keySet();
-	}
-
 	public long getId() {
 		return id;
 	}
@@ -77,9 +67,9 @@ public abstract class AbstractController {
 		this.dt = dt;
 	}
 
-	public Map<Long,Sensor> get_sensors(){
-		return sensors;
-	}
+//	public Map<Long,Sensor> get_sensors(){
+//		return sensors;
+//	}
 
 	public void setId(long id){
 		this.id = id;

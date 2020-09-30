@@ -4,6 +4,8 @@ import jaxb.Parameter;
 import opt.data.FreewayScenario;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ControllerRampMeterFixedRate extends AbstractControllerRampMeter {
 
@@ -22,6 +24,11 @@ public class ControllerRampMeterFixedRate extends AbstractControllerRampMeter {
                 max_rate_vphpl);
 
         this.rate_vphpl = rate_vphpl;
+    }
+
+    @Override
+    public Set<Sensor> get_sensors() {
+        return new HashSet<>();
     }
 
     public float get_rate_vphpl(){

@@ -1,11 +1,10 @@
 package opt.data;
 
 import geometry.Side;
-import jaxb.ModelParams;
-import jaxb.Roadgeom;
-import jaxb.Roadparam;
+import jaxb.*;
 import opt.UserSettings;
 import opt.data.control.*;
+import opt.data.control.Sensor;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
@@ -446,43 +445,92 @@ public class Scenario {
 
         /////////////////////////////////////////////////////
         // controllers, actuators, sensors
-        jaxb.Controllers jcntrls = new jaxb.Controllers();
-        jScn.setControllers(jcntrls);
 
-        jaxb.Actuators jacts = new jaxb.Actuators();
-        jScn.setActuators(jacts);
-
-        Set<Sensor> all_sensors = new HashSet<>();
 
         // collect controllers and filter out invalid ones
         Set<ControlSchedule> schedules = links.values().stream()
                 .flatMap(link->link.get_all_schedules().stream())
                 .collect(Collectors.toSet());
 
+        jaxb.Controllers jcntrls = new jaxb.Controllers();
+        jScn.setControllers(jcntrls);
+
+        jaxb.Actuators jacts = new jaxb.Actuators();
+        jScn.setActuators(jacts);
+
+        Map<AbstractController,Set<Sensor>> sensors = generate_sensors(schedules);
+
         for(ControlSchedule schedule : schedules){
 
-            if(schedule.ignore())
+            Set<AbstractLink> links_to_write = schedule.links_to_write();
+
+            if(schedule.ignore(links_to_write))
                 continue;
 
-            // actuator
-            jaxb.Actuator jact = schedule.to_jaxb_actuator();
+            // schedule controller
+            jaxb.Controller jschcntrl = new jaxb.Controller();
+            jcntrls.getController().add(jschcntrl);
+            jschcntrl.setType("schedule");
+            jschcntrl.setId(schedule.getId());
 
-            if(jact==null)
-                continue;
-
+            // target actuator
+            jaxb.Actuator jact = schedule.get_jaxb_actuator(links_to_write);
             jacts.getActuator().add(jact);
+            long actuator_id = jact.getId();
 
+            jaxb.TargetActuators tacts = new jaxb.TargetActuators();
+            tacts.setIds(String.format("%d",actuator_id));
+            jschcntrl.setTargetActuators(tacts);
 
-            jcntrls.getController().add(schedule.to_jaxb_controller());
+            // entries
+            jaxb.Schedule jsch = new jaxb.Schedule();
+            jschcntrl.setSchedule(jsch);
+            for(ScheduleEntry entry : schedule.get_entries()){
+                float start_time = entry.get_start_time();
+                float end_time = entry.get_end_time();
 
-            // sensors
-            all_sensors.addAll(schedule.get_sensors());
+                jaxb.Entry jentry = new jaxb.Entry();
+                jsch.getEntry().add(jentry);
+
+                // dt
+                if(entry.get_cntrl().getDt()!=null && !entry.get_cntrl().getDt().isInfinite())
+                    jentry.setDt(entry.get_cntrl().getDt());
+
+                // start time and end time
+                jentry.setStartTime(start_time);
+                if(Float.isFinite(end_time))
+                    jentry.setEndTime(end_time);
+
+                // controller
+                AbstractController cntrl = entry.get_cntrl();
+                jentry.setType(cntrl.getAlgorithm().toString());
+
+                // sensors
+                Set<Sensor> mysensors = sensors.get(cntrl);
+
+                if(!mysensors.isEmpty()){
+                    jaxb.FeedbackSensors jsns = new jaxb.FeedbackSensors();
+                    jentry.setFeedbackSensors(jsns);
+                    Set<Long> sensor_ids = mysensors.stream().map(s->s.id).collect(Collectors.toSet());
+                    jsns.setIds(OTMUtils.comma_format(sensor_ids));
+                }
+
+                // controller parameters
+                Collection<Parameter> jparamslist = cntrl.jaxb_parameters();
+                if(!jparamslist.isEmpty()){
+                    jaxb.Parameters jparams = new jaxb.Parameters();
+                    jentry.setParameters(jparams);
+                    jparams.getParameter().addAll(jparamslist);
+                }
+
+            }
         }
 
         jaxb.Sensors jsnss = new jaxb.Sensors();
         jScn.setSensors(jsnss);
-        for(Sensor sensor : all_sensors)
-            jsnss.getSensor().add(sensor.to_jaxb());
+        for(Set<Sensor> ss : sensors.values())
+            for(Sensor s : ss)
+                jsnss.getSensor().add(s.to_jaxb());
 
         /////////////////////////////////////////////////////
         // offramp flows
@@ -562,6 +610,22 @@ public class Scenario {
     /////////////////////////////////////
     // private
     /////////////////////////////////////
+
+    private Map<AbstractController,Set<Sensor>> generate_sensors(Set<ControlSchedule> schs){
+        Map<AbstractController,Set<Sensor>> X = new HashMap<>();
+        long sensor_id = 0;
+        for(ControlSchedule sch : schs){
+            for(ScheduleEntry entry : sch.get_entries()){
+                Set<Sensor> cntr_sensors = entry.get_cntrl().get_sensors();
+                for(Sensor sensor : cntr_sensors)
+                    sensor.id =sensor_id++;
+                X.put(entry.get_cntrl(),cntr_sensors);
+            }
+
+        }
+        return X;
+
+    }
 
     private jaxb.Roadconnection make_road_connection(FreewayScenario scn, AbstractLink in_link, LaneGroupType in_lg, AbstractLink out_link, LaneGroupType out_lg){
         jaxb.Roadconnection rc = new jaxb.Roadconnection();

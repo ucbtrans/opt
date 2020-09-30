@@ -114,9 +114,9 @@ public class ControlFactory {
 	// sensor
 	/////////////////////
 
-	protected static Sensor create_sensor(FreewayScenario fwyscn,Long sensor_id, long link_id, float offset, AbstractController myController){
-		return new Sensor(sensor_id!=null?sensor_id:fwyscn.new_sensor_id(),link_id,offset,myController);
-	}
+//	protected static Sensor create_sensor(FreewayScenario fwyscn,Long sensor_id, long link_id, float offset, AbstractController myController){
+//		return new Sensor(sensor_id!=null?sensor_id:fwyscn.new_sensor_id(),link_id,offset,myController);
+//	}
 
 	/////////////////////////
 	// jaxb

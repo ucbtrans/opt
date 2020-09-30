@@ -16,7 +16,7 @@ public class FreewayScenario {
     private Long max_node_id;
     private Long max_seg_id;
     private Long max_schedule_id;
-    private Long max_sensor_id;
+//    private Long max_sensor_id;
     private Long max_rc_id;
 
     public String name;
@@ -441,7 +441,7 @@ public class FreewayScenario {
         scn_cpy.max_node_id = max_node_id;
         scn_cpy.max_seg_id = max_seg_id;
         scn_cpy.max_schedule_id = max_schedule_id;
-        scn_cpy.max_sensor_id = max_sensor_id;
+//        scn_cpy.max_sensor_id = max_sensor_id;
         scn_cpy.max_rc_id = max_rc_id;
         scn_cpy.scenario = scenario.clone();
         for(Map.Entry<Long,Segment> e : segments.entrySet()) {
@@ -952,7 +952,7 @@ public class FreewayScenario {
         scn.setSchds(schds);
         for(ControlSchedule sch : get_all_schedules()) {
             Set<AbstractLink> links_to_write = sch.links_to_write();
-            if(sch.ignore() || links_to_write.isEmpty())
+            if(sch.ignore(links_to_write))
                 continue;
             schds.getSchd().add(sch.to_jaxb());
         }
@@ -999,7 +999,7 @@ public class FreewayScenario {
             max_node_id = 0l;
             max_seg_id = 0l;
             max_schedule_id = 0l;
-            max_sensor_id = 0l;
+//            max_sensor_id = 0l;
             max_rc_id = 0l;
             return;
         }
@@ -1025,11 +1025,12 @@ public class FreewayScenario {
                 .max(Comparator.comparing(Long::valueOf));
         max_schedule_id = opt_max_cntrl_id.isPresent() ? opt_max_cntrl_id.get() : 0l;
 
-        // sensor
-        Optional<Long> opt_max_sens_id = scenario.links.values().stream()
-                .flatMap(link->link.get_sensor_ids().stream())
-                .max(Comparator.comparing(Long::valueOf));
-        max_sensor_id = opt_max_sens_id.isPresent() ? opt_max_sens_id.get() : 0l;
+//        // sensor
+//        Optional<Long> opt_max_sens_id =
+//                scenario.links.values().stream()
+//                .flatMap(link->link.get_sensor_ids().stream())
+//                .max(Comparator.comparing(Long::valueOf));
+//        max_sensor_id = opt_max_sens_id.isPresent() ? opt_max_sens_id.get() : 0l;
 
         // rc
         max_rc_id = 0l;
@@ -1051,9 +1052,9 @@ public class FreewayScenario {
         return ++max_schedule_id;
     }
 
-    public long new_sensor_id(){
-        return ++max_sensor_id;
-    }
+//    public long new_sensor_id(){
+//        return ++max_sensor_id;
+//    }
 
     public long new_rc_id(){
         return ++max_rc_id;

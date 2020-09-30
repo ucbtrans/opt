@@ -9,7 +9,6 @@ import java.util.*;
 
 public class ControllerLgPolicy extends AbstractController {
 
-
 	public enum Permission { Free, Banned, Tolled }
 	protected Permission permission;
 	protected Map<Long,Permission> comm2permission;
@@ -62,7 +61,12 @@ public class ControllerLgPolicy extends AbstractController {
 			this.vphpl_to_cents_table = vphpl_to_cents_table;
 		this.qos_speed_threshold_kph = qos_speed_threshold_kph==null ? UserSettings.defaultQosSpeedThresholdKph : qos_speed_threshold_kph;
 	}
-        
+
+	@Override
+	public Set<Sensor> get_sensors() {
+		return new HashSet<>();
+	}
+
 	////////////////////////////////
 	// Getters
 	////////////////////////////////
@@ -94,7 +98,6 @@ public class ControllerLgPolicy extends AbstractController {
 	public Permission get_comm_permission(Long commid){
 		return comm2permission.get(commid);
 	}
-
 
 	////////////////////////////////
 	// Setters
@@ -137,16 +140,19 @@ public class ControllerLgPolicy extends AbstractController {
 	public Collection<Parameter> jaxb_parameters() {
 
 		Set<Parameter> params = new HashSet<>();
-
 		Set<Long> banned_comms = new HashSet<>();
+		Set<Long> tolled_comms = new HashSet<>();
 		Set<Long> free_comms = new HashSet<>();
 		for(Map.Entry<Long,Permission> e : comm2permission.entrySet()){
 			switch(e.getValue()){
-				case Free:
-					free_comms.add(e.getKey());
+				case Tolled:
+					tolled_comms.add(e.getKey());
 					break;
 				case Banned:
 					banned_comms.add(e.getKey());
+					break;
+				case Free:
+					free_comms.add(e.getKey());
 					break;
 				default:
 					break;
@@ -168,43 +174,53 @@ public class ControllerLgPolicy extends AbstractController {
 		}
 
 		// tolling parameters ............
+		if(!tolled_comms.isEmpty()) {
 
-		if(a0!=null){
-			Parameter n = new Parameter();
-			n.setName("a0");
-			n.setValue(a0.toString());
-			params.add(n);
-		}
+			Parameter n0 = new Parameter();
+			n0.setName("tolled_comms");
+			n0.setValue(OTMUtils.comma_format(free_comms));
+			params.add(n0);
 
-		if(a1!=null){
-			Parameter n = new Parameter();
-			n.setName("a1");
-			n.setValue(a1.toString());
-			params.add(n);
-		}
 
-		if(a2!=null){
-			Parameter n = new Parameter();
-			n.setName("a2");
-			n.setValue(a2.toString());
-			params.add(n);
-		}
+			if (a0 != null) {
+				Parameter n = new Parameter();
+				n.setName("a0");
+				n.setValue(a0.toString());
+				params.add(n);
+			}
 
-		if(vphpl_to_cents_table!=null){
-			Parameter n = new Parameter();
-			n.setName("vplph_to_cents_table");
-			n.setValue(OTMUtils.write_int_table(vphpl_to_cents_table));
-			params.add(n);
-		}
-                
-		if(qos_speed_threshold_kph!=null){
-			Parameter n = new Parameter();
-			n.setName("qos_speed_threshold_kph");
-			n.setValue(qos_speed_threshold_kph.toString());
-			params.add(n);
+			if (a1 != null) {
+				Parameter n = new Parameter();
+				n.setName("a1");
+				n.setValue(a1.toString());
+				params.add(n);
+			}
+
+			if (a2 != null) {
+				Parameter n = new Parameter();
+				n.setName("a2");
+				n.setValue(a2.toString());
+				params.add(n);
+			}
+
+			if (vphpl_to_cents_table != null) {
+				Parameter n = new Parameter();
+				n.setName("vplph_to_cents_table");
+				n.setValue(OTMUtils.write_int_table(vphpl_to_cents_table));
+				params.add(n);
+			}
+
+			if (qos_speed_threshold_kph != null) {
+				Parameter n = new Parameter();
+				n.setName("qos_speed_threshold_kph");
+				n.setValue(qos_speed_threshold_kph.toString());
+				params.add(n);
+			}
+
 		}
 
 		return params;
 	}
+
 
 }

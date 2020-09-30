@@ -17,7 +17,6 @@ public class ControlSchedule implements Comparable {
     protected AbstractController.Type controlType;
     protected List<ScheduleEntry> entries;
 
-    protected long actuator_id;
     protected Set<AbstractLink> links;
     protected LaneGroupType lgtype;
 
@@ -27,7 +26,6 @@ public class ControlSchedule implements Comparable {
 
     public ControlSchedule(long id,String name,Collection<AbstractLink> links, LaneGroupType lgtype, AbstractController.Type controlType) throws Exception {
         this.id = id;
-        this.actuator_id = id;
         this.name = name;
         this.controlType = controlType;
         this.entries = new ArrayList<>();
@@ -41,7 +39,6 @@ public class ControlSchedule implements Comparable {
         assert(!links.isEmpty());
         assert(links.stream().map(x->x.get_segment().get_scenario()).distinct().count()==1);
         this.fwyscn = links.iterator().next().get_segment().get_scenario();
-
     }
 
     public jaxb.Schd to_jaxb(){
@@ -68,30 +65,21 @@ public class ControlSchedule implements Comparable {
         return X;
     }
 
-    public boolean ignore(){
+    public boolean ignore(Set<AbstractLink> links_to_write){
 
-        if(links.isEmpty())
+        if(links_to_write.isEmpty())
             return true;
 
-        if( controlType== AbstractController.Type.RampMetering
-                && lgtype==LaneGroupType.mng
-                && links.iterator().next().get_mng_lanes() == 0)
+        if(entries.isEmpty())
             return true;
 
         return false;
     }
 
-    public jaxb.Actuator to_jaxb_actuator(){
-
-        // determine which links to write to the actuator.
-        // This is usually all of the links in the cotnroller. But in the case of HOVHOT controller
-        // we ignore links without managed lanes
-        Set<AbstractLink> links_to_write = links_to_write();
-
-        if(links_to_write.isEmpty())
-            return null;
+    public jaxb.Actuator get_jaxb_actuator(Set<AbstractLink>  links_to_write){
 
         jaxb.Actuator jact = new jaxb.Actuator();
+        long actuator_id = this.id;
         jact.setId(actuator_id);
 
         // set type, target
@@ -129,7 +117,7 @@ public class ControlSchedule implements Comparable {
         return jact;
     }
 
-    public jaxb.Controller to_jaxb_controller(){
+    public jaxb.Controller to_jaxb_controller(long actuator_id){
         jaxb.Controller jcntrl = new jaxb.Controller();
 
         if(entries.isEmpty())
@@ -168,11 +156,11 @@ public class ControlSchedule implements Comparable {
             jentry.setType(cntrl.algorithm.toString());
 
             // sensors
-            if(!cntrl.get_sensors().isEmpty()){
-                jaxb.FeedbackSensors jsns = new jaxb.FeedbackSensors();
-                jentry.setFeedbackSensors(jsns);
-                jsns.setIds(OTMUtils.comma_format(cntrl.get_sensors().keySet()));
-            }
+//            if(cntrl.get_num_sensors()>0){
+//                jaxb.FeedbackSensors jsns = new jaxb.FeedbackSensors();
+//                jentry.setFeedbackSensors(jsns);
+//                jsns.setIds(OTMUtils.comma_format(cntrl.get_sensor_ids()));
+//            }
 
             // controller parameters
             Collection<Parameter> jparamslist = cntrl.jaxb_parameters();
@@ -262,10 +250,6 @@ public class ControlSchedule implements Comparable {
 
     public float get_largest_start_time(){
         return entries.get(entries.size()-1).start_time;
-    }
-
-    public Set<Sensor> get_sensors(){
-        return entries.stream().flatMap(e->e.get_cntrl().get_sensors().values().stream()).collect(Collectors.toSet());
     }
 
     public Set<AbstractLink> get_links(){

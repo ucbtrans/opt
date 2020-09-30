@@ -2,6 +2,9 @@ package opt.data.control;
 
 import opt.data.FreewayScenario;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class ControllerRampMeterOpen extends AbstractControllerRampMeter {
 
     public ControllerRampMeterOpen(FreewayScenario scn) throws Exception {
@@ -11,6 +14,11 @@ public class ControllerRampMeterOpen extends AbstractControllerRampMeter {
                 Float.NaN,
                 Float.POSITIVE_INFINITY,
                 Float.POSITIVE_INFINITY);
+    }
+
+    @Override
+    public Set<Sensor> get_sensors() {
+        return new HashSet<>();
     }
 
 }

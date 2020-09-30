@@ -405,17 +405,6 @@ public abstract class AbstractLink implements Comparable {
         return ids;
     }
 
-    public final Set<Long> get_sensor_ids(){
-        Set<Long> ids = new HashSet<>();
-        for(Map<AbstractController.Type,ControlSchedule> e1 : schedules.values())
-            for(ControlSchedule sch : e1.values())
-                ids.addAll( sch.get_entries().stream()
-                        .flatMap(e->e.get_cntrl().get_sensor_ids().stream())
-                        .collect(Collectors.toSet()));
-
-        return ids;
-    }
-
     public final Set<ControlSchedule> get_all_schedules(){
         Set<ControlSchedule> X = new HashSet<>();
         for(Map<AbstractController.Type, ControlSchedule> e1 : schedules.values())

@@ -17,7 +17,7 @@ public class TestProject extends AbstractTest {
     @Ignore
     public void test_load(){
         try {
-            String optfile = "/home/gomes/Desktop/hovhot/hov1.opt";
+            String optfile = "/home/gomes/Dropbox/gabriel/_transfer/hov/A.opt";
             Project project = ProjectFactory.load_project(optfile,true);
 //            FreewayScenario scenario = project.get_scenario_with_name("scenarioA");
         } catch (Exception e) {
@@ -28,8 +28,8 @@ public class TestProject extends AbstractTest {
     @Test
     public void test_save() {
         try {
-            String infile = "/home/gomes/Desktop/hovhot/hov1.opt";
-            String outfile = "/home/gomes/Desktop/hovhot/saved.opt";
+            String infile = "/home/gomes/Dropbox/gabriel/_transfer/hov/A.opt";
+            String outfile = "/home/gomes/Dropbox/gabriel/_transfer/hov/B.opt";
             Project project = ProjectFactory.load_project(infile,true);
             ProjectFactory.save_project(project,outfile);
         } catch (Exception e) {
