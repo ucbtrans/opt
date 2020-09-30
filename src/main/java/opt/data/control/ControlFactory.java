@@ -71,7 +71,7 @@ public class ControlFactory {
 					schedule.update(0f,ControlFactory.create_controller_rmopen(fwyscn));
 					break;
 
-				case HOVHOT:
+				case LgPolicy:
 					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null,null));
 					break;
 
@@ -106,8 +106,8 @@ public class ControlFactory {
 		return new ControllerRampMeterAlinea(fwyscn,dt,has_queue_control,override_threshold,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
 	}
 
-	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn, Set<Long> disallowed_comms,Set<Long> free_comms,Float dt, Double a0,Double a1,Double a2,int [][] vplph_to_cents_table, Double qos_speed_threshold_kph) throws Exception {
-		return new ControllerPolicyHOVHOT(fwyscn,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
+	public static ControllerLgPolicy create_controller_hovhot(FreewayScenario fwyscn, Set<Long> disallowed_comms, Set<Long> free_comms, Float dt, Double a0, Double a1, Double a2, int [][] vplph_to_cents_table, Double qos_speed_threshold_kph) throws Exception {
+		return new ControllerLgPolicy(fwyscn,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
 	}
 
 	/////////////////////
@@ -200,7 +200,7 @@ public class ControlFactory {
 
 	}
 
-	public static ControllerPolicyHOVHOT create_controller_hovhot(FreewayScenario fwyscn,jaxb.Entry jentry) throws Exception {
+	public static ControllerLgPolicy create_controller_hovhot(FreewayScenario fwyscn, jaxb.Entry jentry) throws Exception {
 
 		// read parameters
 		Set<Long> disallowed_comms = new HashSet<>();
@@ -242,7 +242,7 @@ public class ControlFactory {
 
 		Float dt = jentry.getDt()==null ? (float) UserSettings.defaultControlDtSeconds : jentry.getDt();
 
-		ControllerPolicyHOVHOT cntrl = create_controller_hovhot(fwyscn,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
+		ControllerLgPolicy cntrl = create_controller_hovhot(fwyscn,disallowed_comms,free_comms,dt,a0,a1,a2,vplph_to_cents_table,qos_speed_threshold_kph);
 		return cntrl;
 	}
 

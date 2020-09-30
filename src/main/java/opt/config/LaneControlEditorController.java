@@ -39,7 +39,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -54,7 +53,6 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -62,7 +60,7 @@ import opt.UserSettings;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
 import opt.data.control.ControlSchedule;
-import opt.data.control.ControllerPolicyHOVHOT;
+import opt.data.control.ControllerLgPolicy;
 import opt.data.control.ScheduleEntry;
 import opt.utils.EditCell;
 import opt.utils.Misc;
@@ -76,13 +74,13 @@ public class LaneControlEditorController {
     
     private ScenarioEditorController scenarioEditorController = null;
     private List<Commodity> listVT = new ArrayList<>();
-    private List<ControllerPolicyHOVHOT.Permission> listPermsVT = new ArrayList<>();
+    private List<ControllerLgPolicy.Permission> listPermsVT = new ArrayList<>();
     
     
     private FreewayScenario myScenario = null;
     private boolean ignoreChange = true;
     private ControlSchedule mySchedule;
-    private ControllerPolicyHOVHOT myController = null;
+    private ControllerLgPolicy myController = null;
     private float origStartTime;
     private boolean isnew;
     
@@ -117,7 +115,7 @@ public class LaneControlEditorController {
     private TableColumn<PermsVT, String> colVT; // Value injected by FXMLLoader
     
     @FXML // fx:id="colPermission"
-    private TableColumn<PermsVT, ControllerPolicyHOVHOT.Permission> colPermission; // Value injected by FXMLLoader
+    private TableColumn<PermsVT, ControllerLgPolicy.Permission> colPermission; // Value injected by FXMLLoader
     
     @FXML // fx:id="controlDt"
     private Spinner<Integer> controlDt; // Value injected by FXMLLoader
@@ -179,15 +177,15 @@ public class LaneControlEditorController {
         colPermission.setReorderable(false);
         colPermission.setSortable(false);
         colPermission.setEditable(true);
-        colPermission.setCellFactory((TableColumn<PermsVT, ControllerPolicyHOVHOT.Permission> param) -> {
-            return new RadioButtonCell<>(EnumSet.allOf(ControllerPolicyHOVHOT.Permission.class));
+        colPermission.setCellFactory((TableColumn<PermsVT, ControllerLgPolicy.Permission> param) -> {
+            return new RadioButtonCell<>(EnumSet.allOf(ControllerLgPolicy.Permission.class));
         });
         colPermission.setCellValueFactory(data -> new SimpleObjectProperty(data.getValue().permission.getValue()));
-        colPermission.setOnEditCommit(new EventHandler<CellEditEvent<PermsVT, ControllerPolicyHOVHOT.Permission>>() {
+        colPermission.setOnEditCommit(new EventHandler<CellEditEvent<PermsVT, ControllerLgPolicy.Permission>>() {
             @Override
-            public void handle(CellEditEvent<PermsVT, ControllerPolicyHOVHOT.Permission> t) {
+            public void handle(CellEditEvent<PermsVT, ControllerLgPolicy.Permission> t) {
                 int row = t.getTablePosition().getRow();
-                ControllerPolicyHOVHOT.Permission p = t.getNewValue();
+                ControllerLgPolicy.Permission p = t.getNewValue();
                 ((PermsVT) t.getTableView().getItems().get(row)).setPermission(p);
                 if ((row >= 0) && (row < listPermsVT.size()))
                     listPermsVT.set(row, p);
@@ -315,7 +313,7 @@ public class LaneControlEditorController {
         listVT.clear();
         mapVT.forEach((k, v) -> {listVT.add(v);});
         mySchedule = schedule;
-        myController = (ControllerPolicyHOVHOT) entry.get_cntrl();
+        myController = (ControllerLgPolicy) entry.get_cntrl();
         this.isnew = isnew;
         origStartTime = entry.get_start_time();
         textStartTime.setText(Misc.seconds2timestring(origStartTime, ""));
@@ -424,30 +422,30 @@ public class LaneControlEditorController {
     
     private int countFree() {
         int count = 0;
-        return listPermsVT.stream().filter((p) -> (p == ControllerPolicyHOVHOT.Permission.Free)).map((_item) -> 1).reduce(count, Integer::sum);
+        return listPermsVT.stream().filter((p) -> (p == ControllerLgPolicy.Permission.Free)).map((_item) -> 1).reduce(count, Integer::sum);
     }
     
     private int countBanned() {
         int count = 0;
-        return listPermsVT.stream().filter((p) -> (p == ControllerPolicyHOVHOT.Permission.Banned)).map((_item) -> 1).reduce(count, Integer::sum);
+        return listPermsVT.stream().filter((p) -> (p == ControllerLgPolicy.Permission.Banned)).map((_item) -> 1).reduce(count, Integer::sum);
     }
     
     private int countTolled() {
         int count = 0;
-        return listPermsVT.stream().filter((p) -> (p == ControllerPolicyHOVHOT.Permission.Tolled)).map((_item) -> 1).reduce(count, Integer::sum);
+        return listPermsVT.stream().filter((p) -> (p == ControllerLgPolicy.Permission.Tolled)).map((_item) -> 1).reduce(count, Integer::sum);
     }
     
     private void setAllPersToFree() {
         int sz = listVT.size();
         for (int i = 0; i < sz; i++)
-            listPermsVT.set(i, ControllerPolicyHOVHOT.Permission.Free);
+            listPermsVT.set(i, ControllerLgPolicy.Permission.Free);
         restrictedPane.setVisible(false);
     }
     
     private void setAllPersToBanned() {
         int sz = listVT.size();
         for (int i = 0; i < sz; i++)
-            listPermsVT.set(i, ControllerPolicyHOVHOT.Permission.Banned);
+            listPermsVT.set(i, ControllerLgPolicy.Permission.Banned);
         restrictedPane.setVisible(false);
     }
     
@@ -577,14 +575,14 @@ public class LaneControlEditorController {
     
     public static class PermsVT {
         private final SimpleStringProperty vt_name = new SimpleStringProperty();
-        private final SimpleObjectProperty<ControllerPolicyHOVHOT.Permission> permission = new SimpleObjectProperty<>();
+        private final SimpleObjectProperty<ControllerLgPolicy.Permission> permission = new SimpleObjectProperty<>();
 
-        PermsVT(String nm, ControllerPolicyHOVHOT.Permission p) {
+        PermsVT(String nm, ControllerLgPolicy.Permission p) {
             vt_name.set(nm);
             permission.set(p);
         }
 
-        public void setPermission(ControllerPolicyHOVHOT.Permission p) {
+        public void setPermission(ControllerLgPolicy.Permission p) {
             permission.set(p);
         }
     }

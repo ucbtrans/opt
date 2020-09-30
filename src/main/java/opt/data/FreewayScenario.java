@@ -345,7 +345,7 @@ public class FreewayScenario {
                     lg_type = lgtypes.get(0);
                 }
                 else if ( entry_types.stream().allMatch(e->AbstractController.is_lg_restrict(e) ) ) {
-                    cntr_type = AbstractController.Type.HOVHOT;
+                    cntr_type = AbstractController.Type.LgPolicy;
 
                     // all lane groups should be mng
                     assert(lgtypes.stream().allMatch(t->t==LaneGroupType.mng));

@@ -4,7 +4,7 @@ import java.util.*;
 
 public abstract class AbstractController {
 
-	public enum Type { RampMetering , HOVHOT }
+	public enum Type { RampMetering , LgPolicy}
 
 	protected long id;
 	protected Type type;

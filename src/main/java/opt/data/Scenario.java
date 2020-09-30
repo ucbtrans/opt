@@ -455,27 +455,28 @@ public class Scenario {
         Set<Sensor> all_sensors = new HashSet<>();
 
         // collect controllers and filter out invalid ones
-        Set<ControlSchedule> controllers = links.values().stream()
+        Set<ControlSchedule> schedules = links.values().stream()
                 .flatMap(link->link.get_all_schedules().stream())
                 .collect(Collectors.toSet());
 
-        for(ControlSchedule controller : controllers){
+        for(ControlSchedule schedule : schedules){
 
-            // determine which links to write to the actuator.
-            // This is usually all of the links in the cotnroller. But in the case of HOVHOT controller
-            // we ignore links without managed lanes
-            Set<AbstractLink> links_to_write = controller.links_to_write();
-
-            if(controller.ignore() || links_to_write.isEmpty())
+            if(schedule.ignore())
                 continue;
 
-            jcntrls.getController().add(controller.to_jaxb_controller());
-
             // actuator
-            jacts.getActuator().add(controller.to_jaxb_actuator(links_to_write));
+            jaxb.Actuator jact = schedule.to_jaxb_actuator();
+
+            if(jact==null)
+                continue;
+
+            jacts.getActuator().add(jact);
+
+
+            jcntrls.getController().add(schedule.to_jaxb_controller());
 
             // sensors
-            all_sensors.addAll(controller.get_sensors());
+            all_sensors.addAll(schedule.get_sensors());
         }
 
         jaxb.Sensors jsnss = new jaxb.Sensors();

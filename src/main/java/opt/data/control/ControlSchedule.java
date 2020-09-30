@@ -35,7 +35,7 @@ public class ControlSchedule implements Comparable {
         this.lgtype = lgtype;
 
         // controlType=HOVHOT -> lgtype=managed
-        assert( controlType!=AbstractController.Type.HOVHOT || lgtype==LaneGroupType.mng );
+        assert( controlType!=AbstractController.Type.LgPolicy || lgtype==LaneGroupType.mng );
 
         // all links should belong to the same scenario
         assert(!links.isEmpty());
@@ -59,7 +59,7 @@ public class ControlSchedule implements Comparable {
                 X.addAll(links);
                 break;
 
-            case HOVHOT:
+            case LgPolicy:
                 X = links.stream()
                         .filter(lk->lk.get_mng_lanes()>0)
                         .collect(Collectors.toSet());
@@ -81,19 +81,18 @@ public class ControlSchedule implements Comparable {
         return false;
     }
 
-    public jaxb.Actuator to_jaxb_actuator(Set<AbstractLink> links_to_write){
+    public jaxb.Actuator to_jaxb_actuator(){
 
-        if(links_to_write==null)
-            links_to_write=links;
+        // determine which links to write to the actuator.
+        // This is usually all of the links in the cotnroller. But in the case of HOVHOT controller
+        // we ignore links without managed lanes
+        Set<AbstractLink> links_to_write = links_to_write();
+
+        if(links_to_write.isEmpty())
+            return null;
 
         jaxb.Actuator jact = new jaxb.Actuator();
         jact.setId(actuator_id);
-
-//        jact.setDt();
-//        jact.setLanegroups();
-//        jact.setMaxValue();
-//        jact.setMinValue();
-//        jact.setSignal();
 
         // set type, target
         jaxb.ActuatorTarget jtgt;
@@ -109,7 +108,7 @@ public class ControlSchedule implements Comparable {
                 jtgt.setLanegroups(String.format("%d(%d#%d)",link.id,lanes[0],lanes[1]));
                 break;
 
-            case HOVHOT:
+            case LgPolicy:
                 jact.setType("lg_restrict");
                 jtgt = new jaxb.ActuatorTarget();
                 jact.setActuatorTarget(jtgt);
@@ -234,7 +233,7 @@ public class ControlSchedule implements Comparable {
                     case RampMetering:
                         entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_rmopen(fwyscn)));
                         break;
-                    case HOVHOT:
+                    case LgPolicy:
                         entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null,null)));
                         break;
                 }
