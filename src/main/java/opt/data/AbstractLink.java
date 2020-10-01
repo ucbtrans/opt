@@ -6,7 +6,6 @@ import profiles.Profile1D;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class AbstractLink implements Comparable {
 

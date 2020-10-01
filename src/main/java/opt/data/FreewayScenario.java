@@ -904,6 +904,15 @@ public class FreewayScenario {
                 ((LinkOfframp) link).remove_split_for_commodity(comm_id);
                 ((LinkOfframp) link).remove_frlow_for_commodity(comm_id);
             }
+
+
+            // remove commodity from mng lane policies
+            if(link.schedules!=null && link.schedules.containsKey(LaneGroupType.mng)){
+                Map<AbstractController.Type, ControlSchedule> schmap = link.schedules.get(LaneGroupType.mng);
+                if(schmap.containsKey(AbstractController.Type.LgPolicy))
+                    for(ScheduleEntry entry : (schmap.get(AbstractController.Type.LgPolicy)).get_entries())
+                        ((ControllerLgPolicy)entry.get_cntrl()).remove_commodity(comm_id);
+            }
         }
 
     }

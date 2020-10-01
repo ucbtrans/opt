@@ -72,7 +72,7 @@ public class ControlFactory {
 					break;
 
 				case LgPolicy:
-					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null,null,null));
+					schedule.update(0f,ControlFactory.create_controller_hovhot(fwyscn,fwyscn.get_commodities().keySet(),null,null,null,null,null,null,null,null));
 					break;
 
 			}

@@ -1,7 +1,5 @@
 package opt.data;
 
-import java.util.Objects;
-
 public class Commodity {
 
     protected final long id;

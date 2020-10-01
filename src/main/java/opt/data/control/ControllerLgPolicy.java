@@ -79,6 +79,12 @@ public class ControllerLgPolicy extends AbstractController {
 		return new HashSet<>();
 	}
 
+	public void remove_commodity(long comm_id){
+		if(comm2permission.containsKey(comm_id))
+			comm2permission.remove(comm_id);
+		refresh_type();
+	}
+
 	////////////////////////////////
 	// Getters
 	////////////////////////////////
@@ -109,13 +115,6 @@ public class ControllerLgPolicy extends AbstractController {
 
 	public Permission get_comm_permission(Long commid){
 		return comm2permission.get(commid);
-	}
-
-	public Set<Long> get_restricted_comm_ids(){
-		return comm2permission.entrySet().stream()
-				.filter(x->x.getValue()!=Permission.Free)
-				.map(x->x.getKey())
-				.collect(Collectors.toSet());
 	}
 
 	////////////////////////////////
@@ -197,7 +196,7 @@ public class ControllerLgPolicy extends AbstractController {
 
 			Parameter n0 = new Parameter();
 			n0.setName("tolled_comms");
-			n0.setValue(OTMUtils.comma_format(free_comms));
+			n0.setValue(OTMUtils.comma_format(tolled_comms));
 			params.add(n0);
 
 
@@ -240,6 +239,5 @@ public class ControllerLgPolicy extends AbstractController {
 
 		return params;
 	}
-
 
 }
