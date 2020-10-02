@@ -553,13 +553,10 @@ public class Scenario {
                     jacts.getActuator().add(act);
                     act.setId(ctrlid);
                     act.setType("split");
-                    jaxb.ActuatorTarget actar = new jaxb.ActuatorTarget();
-                    act.setActuatorTarget(actar);
-                    act.setType("split");
-
 
                     jaxb.Parameters aps = new jaxb.Parameters();
                     act.setParameters(aps);
+
                     jaxb.Parameter ap1 = new jaxb.Parameter();
                     aps.getParameter().add(ap1);
                     ap1.setName("linkin");

@@ -245,52 +245,6 @@ public class FreewayScenario {
                 }
         }
 
-        // assign offramp flows
-        if (jaxb_scenario.getControllers()!=null){
-            for(jaxb.Controller cont : jaxb_scenario.getControllers().getController()){
-                if(cont.getType()=="frflow"){
-                    float ctrl_dt = cont.getDt();
-                    float ctrl_start_time = cont.getStartTime();
-                    long target_act_id = cont.getTargetActuators().getTargetActuator().get(0).getId();
-                    Float prof_dt = null;
-                    List<Double> prof_flow = null;
-                    for(jaxb.Parameter p : cont.getParameters().getParameter()){
-                        switch(p.getName()){
-                            case "dt":
-                                prof_dt = Float.parseFloat(p.getValue());
-                                break;
-                            case "flowvph":
-                                prof_flow = OTMUtils.csv2list(p.getValue());
-                                break;
-                        }
-                    }
-
-                    Profile1D profile = new Profile1D(ctrl_start_time,prof_dt,prof_flow);
-
-                    // get the actuator
-                    jaxb.Actuator jact = jaxb_scenario.getActuators().getActuator().stream().filter(a->a.getId()==target_act_id).findFirst().get();
-                    Long linkoutid = null;
-                    Long commid = null;
-                    for(jaxb.Parameter p : jact.getActuatorTarget().getParameters().getParameter()){
-                        switch(p.getName()){
-                            case "linkout":
-                                linkoutid = Long.parseLong(p.getValue());
-                                break;
-                            case "comm":
-                                commid = Long.parseLong(p.getValue());
-                                break;
-                        }
-                    }
-
-                    AbstractLink link = scenario.links.get(linkoutid);
-                    if (link instanceof LinkOfframp)
-                        ((LinkOfframp) link).set_frflow(ctrl_dt,commid,profile);
-
-                }
-            }
-        }
-
-
         // create actuator and sensor maps
         Map<Long,jaxb.Actuator> actuators = new HashMap<>();
         if(jaxb_scenario.getActuators()!=null)
@@ -309,100 +263,18 @@ public class FreewayScenario {
                 sch_names.put(jschd.getId(), jschd.getName());
 
         if(jaxb_scenario.getControllers()!=null){
-            for(jaxb.Controller jcnt : jaxb_scenario.getControllers().getController()){
+            for(jaxb.Controller jcnt : jaxb_scenario.getControllers().getController()) {
 
-                if(jcnt.getType().compareTo("schedule")!=0)
-                    throw new Exception("Uknown controller type: " + jcnt.getType());
-
-                // actuator
-                long act_id = Long.parseLong(jcnt.getTargetActuators().getIds());
-                jaxb.Actuator jact = actuators.get(act_id);
-
-                List<AbstractLink> links = new ArrayList<>();
-                List<LaneGroupType> lgtypes = new ArrayList<>();
-                for(String e : jact.getActuatorTarget().getLanegroups().split(",")){
-
-                    String [] a1 = e.split("[(]");
-                    Long linkid = Long.parseLong(a1[0]);
-                    AbstractLink link = scenario.links.get(linkid);
-                    links.add(link);
-
-                    String [] a2 = a1[1].split("[)]");
-                    int [] lanes = OTMUtils.read_lanes(a2[0],link.get_lanes());
-                    lgtypes.add( link.lane2lgtype().get(lanes[0]-1) );
+                switch (jcnt.getType()) {
+                    case "schedule":
+                        read_schedule(jcnt,actuators,sensors,sch_names);
+                        break;
+                    case "frflow":
+                        read_frflow(jcnt,actuators);
+                        break;
+                    default:
+                        throw new Exception("Unknown controller type.");
                 }
-
-                // determine the controller type from the entry types
-                Set<control.AbstractController.Algorithm> entry_types = jcnt.getSchedule().getEntry().stream()
-                        .map(e->control.AbstractController.Algorithm.valueOf(e.getType()))
-                        .collect(toSet());
-
-                AbstractController.Type cntr_type = null;
-                LaneGroupType lg_type = null;
-                if( entry_types.stream().allMatch(e->AbstractController.is_ramp_metering(e) ) ) {
-                    cntr_type = AbstractController.Type.RampMetering;
-                    assert(links.size()==1);
-                    lg_type = lgtypes.get(0);
-                }
-                else if ( entry_types.stream().allMatch(e->AbstractController.is_lg_restrict(e) ) ) {
-                    cntr_type = AbstractController.Type.LgPolicy;
-
-                    // all lane groups should be mng
-                    assert(lgtypes.stream().allMatch(t->t==LaneGroupType.mng));
-                    lg_type = LaneGroupType.mng;
-                }
-                else
-                    throw new Exception("Incompatible control algorithms in schedule.");
-
-                // create the schedule
-                long sch_id = jcnt.getId();
-                String sch_name = sch_names.containsKey(sch_id) ? sch_names.get(sch_id) : "";
-                ControlSchedule sch = new ControlSchedule(sch_id,sch_name,links,lg_type,cntr_type);
-
-                for(jaxb.Entry jentry : jcnt.getSchedule().getEntry()){
-
-                    control.AbstractController.Algorithm  algorithm = control.AbstractController.Algorithm.valueOf(jentry.getType());
-
-                    AbstractController ctrl = null;
-                    switch( algorithm ){
-
-                        case rm_open:
-                            ctrl = ControlFactory.create_controller_rmopen(this);
-                            break;
-
-                        case rm_closed:
-                            ctrl = ControlFactory.create_controller_rmclosed(this);
-                            break;
-
-                        case rm_alinea:
-
-                            // feedback sensors
-                            jaxb.Sensor jsns = null;
-                            if(jentry.getFeedbackSensors()!=null){
-                                long sensor_id = OTMUtils.csv2longlist(jentry.getFeedbackSensors().getIds()).get(0);
-                                jsns = sensors.get(sensor_id);
-                            }
-
-                            ctrl = ControlFactory.create_controller_alinea(this,jentry,jsns);
-                            break;
-
-                        case rm_fixed_rate:
-                            ctrl = ControlFactory.create_controller_fixed_rate(this,jentry);
-                            break;
-
-                        case lg_restrict:
-                            ctrl = ControlFactory.create_controller_hovhot(this,jentry);
-
-                    }
-
-                    sch.update(jentry.getStartTime(),ctrl);
-
-                }
-
-                // add the schedule to all of its links
-                for(AbstractLink link : links)
-                    link.add_schedule(sch);
-
             }
         }
 
@@ -465,6 +337,139 @@ public class FreewayScenario {
 //            scn_cpy.controller_schedule.items.add(ctrl);
 
         return scn_cpy;
+    }
+
+    private void read_schedule(jaxb.Controller jcnt,Map<Long,jaxb.Actuator> actuators,Map<Long,jaxb.Sensor> sensors,Map<Long,String> sch_names) throws Exception {
+
+        // actuator
+        long act_id = Long.parseLong(jcnt.getTargetActuators().getIds());
+        jaxb.Actuator jact = actuators.get(act_id);
+
+        List<AbstractLink> links = new ArrayList<>();
+        List<LaneGroupType> lgtypes = new ArrayList<>();
+        for(String e : jact.getActuatorTarget().getLanegroups().split(",")){
+
+            String [] a1 = e.split("[(]");
+            Long linkid = Long.parseLong(a1[0]);
+            AbstractLink link = scenario.links.get(linkid);
+            links.add(link);
+
+            String [] a2 = a1[1].split("[)]");
+            int [] lanes = OTMUtils.read_lanes(a2[0],link.get_lanes());
+            lgtypes.add( link.lane2lgtype().get(lanes[0]-1) );
+        }
+
+        // determine the controller type from the entry types
+        Set<control.AbstractController.Algorithm> entry_types = jcnt.getSchedule().getEntry().stream()
+                .map(e->control.AbstractController.Algorithm.valueOf(e.getType()))
+                .collect(toSet());
+
+        AbstractController.Type cntr_type = null;
+        LaneGroupType lg_type = null;
+        if( entry_types.stream().allMatch(e->AbstractController.is_ramp_metering(e) ) ) {
+            cntr_type = AbstractController.Type.RampMetering;
+            assert(links.size()==1);
+            lg_type = lgtypes.get(0);
+        }
+        else if ( entry_types.stream().allMatch(e->AbstractController.is_lg_restrict(e) ) ) {
+            cntr_type = AbstractController.Type.LgPolicy;
+
+            // all lane groups should be mng
+            assert(lgtypes.stream().allMatch(t->t==LaneGroupType.mng));
+            lg_type = LaneGroupType.mng;
+        }
+        else
+            throw new Exception("Incompatible control algorithms in schedule.");
+
+        // create the schedule
+        long sch_id = jcnt.getId();
+        String sch_name = sch_names.containsKey(sch_id) ? sch_names.get(sch_id) : "";
+        ControlSchedule sch = new ControlSchedule(sch_id,sch_name,links,lg_type,cntr_type);
+
+        for(jaxb.Entry jentry : jcnt.getSchedule().getEntry()){
+
+            control.AbstractController.Algorithm  algorithm = control.AbstractController.Algorithm.valueOf(jentry.getType());
+
+            AbstractController ctrl = null;
+            switch( algorithm ){
+
+                case rm_open:
+                    ctrl = ControlFactory.create_controller_rmopen(this);
+                    break;
+
+                case rm_closed:
+                    ctrl = ControlFactory.create_controller_rmclosed(this);
+                    break;
+
+                case rm_alinea:
+
+                    // feedback sensors
+                    jaxb.Sensor jsns = null;
+                    if(jentry.getFeedbackSensors()!=null){
+                        long sensor_id = OTMUtils.csv2longlist(jentry.getFeedbackSensors().getIds()).get(0);
+                        jsns = sensors.get(sensor_id);
+                    }
+
+                    ctrl = ControlFactory.create_controller_alinea(this,jentry,jsns);
+                    break;
+
+                case rm_fixed_rate:
+                    ctrl = ControlFactory.create_controller_fixed_rate(this,jentry);
+                    break;
+
+                case lg_restrict:
+                    ctrl = ControlFactory.create_controller_hovhot(this,jentry);
+
+            }
+
+            sch.update(jentry.getStartTime(),ctrl);
+
+        }
+
+        // add the schedule to all of its links
+        for(AbstractLink link : links)
+            link.add_schedule(sch);
+
+    }
+
+    private void read_frflow(jaxb.Controller jcnt,Map<Long,jaxb.Actuator> actuators) throws Exception {
+        float ctrl_dt = jcnt.getDt();
+        float ctrl_start_time = jcnt.getStartTime();
+        long target_act_id = Long.parseLong(jcnt.getTargetActuators().getIds());
+        Float prof_dt = null;
+        List<Double> prof_flow = null;
+        for(jaxb.Parameter p : jcnt.getParameters().getParameter()){
+            switch(p.getName()){
+                case "dt":
+                    prof_dt = Float.parseFloat(p.getValue());
+                    break;
+                case "flowvph":
+                    prof_flow = OTMUtils.csv2list(p.getValue());
+                    break;
+            }
+        }
+
+        Profile1D profile = new Profile1D(ctrl_start_time,prof_dt,prof_flow);
+
+        // get the actuator
+        jaxb.Actuator jact = actuators.get(target_act_id);
+        Long linkoutid = null;
+        Long commid = null;
+        for(jaxb.Parameter p : jact.getParameters().getParameter()){
+            switch(p.getName()){
+                case "linkout":
+                    linkoutid = Long.parseLong(p.getValue());
+                    break;
+                case "comm":
+                    commid = Long.parseLong(p.getValue());
+                    break;
+            }
+        }
+
+        AbstractLink link = scenario.links.get(linkoutid);
+        if (link instanceof LinkOfframp)
+            ((LinkOfframp) link).set_frflow(ctrl_dt,commid,profile);
+
     }
 
     /////////////////////////////////////
