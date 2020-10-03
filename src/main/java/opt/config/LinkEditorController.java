@@ -2491,7 +2491,7 @@ public class LinkEditorController {
             return;
         
         float dt = 60 * dtFRFlowSpinnerValueFactory.getValue();
-        float ctrldt = 0.5f*dt;
+        float ctrldt = 100f; //0.5f*dt;
         ObservableList<ObservableList<Object>> myItems = tableFRFlow.getItems();
         int numSteps = myItems.size();
         int num_vt = listVT.size();
