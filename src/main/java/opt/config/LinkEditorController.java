@@ -2395,7 +2395,8 @@ public class LinkEditorController {
             });
             col.setReorderable(false);
             double dt = Math.min(pdt, UserSettings.defaultFRFlowDtMinutes * 60);
-            float ctrldt = 0.5f * (float)dt;
+//            float ctrldt = 0.5f * (float)dt;
+            float ctrldt = 100f;
             Profile1D cdp = ((LinkOfframp)myLink).get_frflows(listVT.get(i).getId(), ctrldt, dt);
             if (cdp != null) {
                 pdt = Math.min(pdt, cdp.get_dt());
