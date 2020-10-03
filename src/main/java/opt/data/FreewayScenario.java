@@ -436,10 +436,14 @@ public class FreewayScenario {
         float ctrl_dt = jcnt.getDt();
         float ctrl_start_time = jcnt.getStartTime();
         long target_act_id = Long.parseLong(jcnt.getTargetActuators().getIds());
+        Float prof_start_time = null;
         Float prof_dt = null;
         List<Double> prof_flow = null;
         for(jaxb.Parameter p : jcnt.getParameters().getParameter()){
             switch(p.getName()){
+                case "start_time":
+                    prof_start_time = Float.parseFloat(p.getValue());
+                    break;
                 case "dt":
                     prof_dt = Float.parseFloat(p.getValue());
                     break;
@@ -449,7 +453,7 @@ public class FreewayScenario {
             }
         }
 
-        Profile1D profile = new Profile1D(ctrl_start_time,prof_dt,prof_flow);
+        Profile1D profile = new Profile1D(prof_start_time,prof_dt,prof_flow);
 
         // get the actuator
         jaxb.Actuator jact = actuators.get(target_act_id);
@@ -466,9 +470,11 @@ public class FreewayScenario {
             }
         }
 
+        boolean usefrflows = ctrl_start_time!=100000;
+
         AbstractLink link = scenario.links.get(linkoutid);
         if (link instanceof LinkOfframp)
-            ((LinkOfframp) link).set_frflow(ctrl_dt,commid,profile);
+            ((LinkOfframp) link).set_frflow(ctrl_dt,commid,profile,usefrflows);
 
     }
 

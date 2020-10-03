@@ -2303,6 +2303,7 @@ public class LinkEditorController {
     void onToggleUseFRFlows(ActionEvent event) {
         CheckBox cb = (CheckBox)event.getSource();
         useFRFlows = cb.isSelected();
+        ((LinkOfframp)this.myLink).set_use_frflows(useFRFlows);
         gridFRFlow.setVisible(useFRFlows);         
         gridSR.setVisible(!useFRFlows); 
         cbUseFRFlows.setSelected(useFRFlows);
@@ -2500,7 +2501,7 @@ public class LinkEditorController {
         }
         
         double fcc = UserSettings.flowConversionMap.get(UserSettings.unitsFlow + "vph");
-        
+
         for (int j = 0; j < num_vt; j++) {
             double[] values = new double[numSteps];
             
@@ -2517,7 +2518,7 @@ public class LinkEditorController {
             }
             
             try {
-                ((LinkOfframp)myLink).set_frflow(listVT.get(j).getId(), ctrldt, dt, values);
+                ((LinkOfframp)myLink).set_frflow(listVT.get(j).getId(), ctrldt, dt, values,useFRFlows);
             } catch(Exception e) {
                 opt.utils.Dialogs.ExceptionDialog("Cannot set off-amp flow for vehicle type '" + listVT.get(j).get_name() + "'...", e);
             }

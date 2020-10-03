@@ -578,7 +578,8 @@ public class Scenario {
                     ctrl.setId(my_fwy_scenario.new_schedule_id());
                     ctrl.setType("frflow");
                     ctrl.setDt(fr.frctrldt.get(commid));
-                    ctrl.setStartTime(prof.start_time);
+
+                    ctrl.setStartTime(fr.get_use_fr_flows()?prof.start_time:100000);
 
                     jaxb.TargetActuators ta = new jaxb.TargetActuators();
                     ctrl.setTargetActuators(ta);
@@ -586,6 +587,12 @@ public class Scenario {
 
                     jaxb.Parameters cps = new jaxb.Parameters();
                     ctrl.setParameters(cps);
+
+                    jaxb.Parameter cp0 = new jaxb.Parameter();
+                    cps.getParameter().add(cp0);
+                    cp0.setName("start_time");
+                    cp0.setValue(String.format("%.1f",prof.start_time));
+
                     jaxb.Parameter cp1 = new jaxb.Parameter();
                     cps.getParameter().add(cp1);
                     cp1.setName("dt");

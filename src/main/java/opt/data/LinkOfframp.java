@@ -97,10 +97,11 @@ public class LinkOfframp extends LinkRamp {
         this.splits.put(comm_id, profile);
     }
 
-    public final void set_frflow(Long comm_id,float ctrldt,float dt, double[] values) throws Exception {
-        Profile1D profile = new Profile1D(0f,dt);
+    public final void set_frflow(Long comm_id,float ctrldt,float profdt, double[] values,boolean usefrflows) throws Exception {
+        Profile1D profile = new Profile1D(0f,profdt);
         for(double v : values)
             profile.add_entry(v);
+        this.use_frflow = usefrflows;
         this.frflows.put(comm_id, profile);
         this.frctrldt.put(comm_id, ctrldt);
     }
@@ -109,9 +110,10 @@ public class LinkOfframp extends LinkRamp {
         this.splits.put(comm_id,profile);
     }
 
-    public final void set_frflow(float ctrl_dt,long comm_id,Profile1D profile) throws Exception {
+    public final void set_frflow(float ctrl_dt,long comm_id,Profile1D profile,boolean usefrflow) throws Exception {
         this.frflows.put(comm_id,profile);
         this.frctrldt.put(comm_id,ctrl_dt);
+        this.use_frflow = usefrflow;
     }
 
     public final void delete_splits(){
@@ -121,6 +123,11 @@ public class LinkOfframp extends LinkRamp {
     public final void delete_frflows(){
         frflows = null;
         frctrldt = null;
+        use_frflow=false;
+    }
+
+    public final void set_use_frflows(boolean x){
+        this.use_frflow = x;
     }
 
     /////////////////////////////////////
