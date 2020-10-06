@@ -579,7 +579,7 @@ public class Scenario {
                     ctrl.setType("frflow");
                     ctrl.setDt(fr.frctrldt.get(commid));
 
-                    ctrl.setStartTime(fr.get_use_fr_flows()?prof.start_time:100000);
+                    ctrl.setStartTime(fr.get_use_fr_flows()?prof.start_time+100:100000);
 
                     jaxb.TargetActuators ta = new jaxb.TargetActuators();
                     ctrl.setTargetActuators(ta);

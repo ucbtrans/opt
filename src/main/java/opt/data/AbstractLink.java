@@ -317,6 +317,8 @@ public abstract class AbstractLink implements Comparable {
     public final void set_mng_lanes(int x) throws Exception {
         if(x<0)
             throw new Exception("Negative lanes");
+        if(x==0 && schedules.containsKey(LaneGroupType.mng))
+            schedules.remove(LaneGroupType.mng);
         params.mng_lanes = x;
     }
 

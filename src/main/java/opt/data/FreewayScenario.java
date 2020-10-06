@@ -1,5 +1,6 @@
 package opt.data;
 
+import jaxb.Schedule;
 import opt.UserSettings;
 import opt.data.control.*;
 import profiles.Profile1D;
@@ -758,6 +759,15 @@ public class FreewayScenario {
 
         if(segments.size()==1)
             throw new Exception("Removing the sole segment is not allowed.");
+
+        // modify schedules that refer to this segment
+        List<ControlSchedule> schedules = segment.get_links().stream()
+                .flatMap(link->link.get_all_schedules().stream())
+                .collect(Collectors.toList());
+
+        for(ControlSchedule schedule : schedules)
+            for(AbstractLink link : segment.get_links())
+                schedule.remove_link(link);
 
         // disconnect ramps from connectors, or delete nodes
         // delete links
