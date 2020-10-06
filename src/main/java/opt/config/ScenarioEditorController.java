@@ -851,9 +851,9 @@ public class ScenarioEditorController {
         float start_time = selectedPolicy.num_entries() == 0 ? 0 :
                 Math.round(selectedPolicy.get_largest_start_time()) + 3600;
         
-        double a0 = UserSettings.defaultLaneChoice_A0;
-        double a1 = UserSettings.defaultLaneChoice_A1;
-        double a2 = UserSettings.defaultLaneChoice_A2;
+        double a0 = UserSettings.defaultLaneChoice_keep;
+        double a1 = UserSettings.defaultLaneChoice_rhovpmplane;
+        double a2 = UserSettings.defaultLaneChoice_tollcents;
         float dt = (float) UserSettings.defaultControlDtSeconds;
         double v_thres = UserSettings.defaultQosSpeedThresholdKph;
         Set<Long> free_comms = new HashSet<Long>();

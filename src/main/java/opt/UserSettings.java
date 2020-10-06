@@ -28,7 +28,6 @@ package opt;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -108,9 +107,9 @@ public class UserSettings {
     
     public static double defaultQosSpeedThresholdKph = 72.4205;
     
-    public static double defaultLaneChoice_A0 = -0.6931;
-    public static double defaultLaneChoice_A1 = 0.0115;
-    public static double defaultLaneChoice_A2 = -0.0053;
+    public static double defaultLaneChoice_keep = 0.6931;   // positive utility of not changing lanes
+    public static double defaultLaneChoice_rhovpmplane = 0.0115; // positive utility of choosing a lane with density in vpm
+    public static double defaultLaneChoice_tollcents = 0.0053;     // positive utility of not paying a toll in cents
     
     public static double minGPRampMeteringRatePerLaneVph = 160;
     public static double minManagedRampMeteringRatePerLaneVph = 320;
@@ -479,13 +478,13 @@ public class UserSettings {
             defaultQosSpeedThresholdKph = Double.parseDouble(pv);
         pv = props.getProperty("defaultLaneChoice_A0");
         if (pv != null)
-            defaultLaneChoice_A0 = Double.parseDouble(pv);
+            defaultLaneChoice_keep = Double.parseDouble(pv);
         pv = props.getProperty("defaultLaneChoice_A1");
         if (pv != null)
-            defaultLaneChoice_A1 = Double.parseDouble(pv);
+            defaultLaneChoice_rhovpmplane = Double.parseDouble(pv);
         pv = props.getProperty("defaultLaneChoice_A2");
         if (pv != null)
-            defaultLaneChoice_A2 = Double.parseDouble(pv);
+            defaultLaneChoice_tollcents = Double.parseDouble(pv);
         
         pv = props.getProperty("minGPRampMeteringRatePerLaneVph");
         if (pv != null)
@@ -554,9 +553,9 @@ public class UserSettings {
         props.setProperty("defaultControlDtSeconds", Double.toString(defaultControlDtSeconds));
         props.setProperty("queueOverrideTriggerThreshold", Double.toString(queueOverrideTriggerThreshold));
         props.setProperty("defaultQosSpeedThresholdKph", Double.toString(defaultQosSpeedThresholdKph));
-        props.setProperty("defaultLaneChoice_A0", Double.toString(defaultLaneChoice_A0));
-        props.setProperty("defaultLaneChoice_A1", Double.toString(defaultLaneChoice_A1));
-        props.setProperty("defaultLaneChoice_A2", Double.toString(defaultLaneChoice_A2));
+        props.setProperty("defaultLaneChoice_A0", Double.toString(defaultLaneChoice_keep));
+        props.setProperty("defaultLaneChoice_A1", Double.toString(defaultLaneChoice_rhovpmplane));
+        props.setProperty("defaultLaneChoice_A2", Double.toString(defaultLaneChoice_tollcents));
         
         props.setProperty("minGPRampMeteringRatePerLaneVph", Double.toString(minGPRampMeteringRatePerLaneVph));
         props.setProperty("minManagedRampMeteringRatePerLaneVph", Double.toString(minManagedRampMeteringRatePerLaneVph));

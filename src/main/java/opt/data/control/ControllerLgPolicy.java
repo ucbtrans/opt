@@ -6,7 +6,6 @@ import opt.data.FreewayScenario;
 import utils.OTMUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ControllerLgPolicy extends AbstractController {
 
@@ -61,9 +60,9 @@ public class ControllerLgPolicy extends AbstractController {
 
 		refresh_type();
 
-		this.a0 = a0==null ? UserSettings.defaultLaneChoice_A0 : a0;
-		this.a1 = a1==null ? UserSettings.defaultLaneChoice_A1 : a1;
-		this.a2 = a2==null ? UserSettings.defaultLaneChoice_A2 : a2;
+		this.a0 = a0==null ? UserSettings.defaultLaneChoice_keep : a0;
+		this.a1 = a1==null ? UserSettings.defaultLaneChoice_rhovpmplane : a1;
+		this.a2 = a2==null ? UserSettings.defaultLaneChoice_tollcents : a2;
 
 		if(vphpl_to_cents_table==null){
 			this.vphpl_to_cents_table = new int[1][2];

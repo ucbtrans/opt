@@ -396,17 +396,17 @@ public class LaneControlEditorController {
         
         Double a0 = myController.get_a0();
         if (a0 == null)
-            a0 = UserSettings.defaultLaneChoice_A0;
+            a0 = UserSettings.defaultLaneChoice_keep;
         spA0.getValueFactory().setValue(a0);
         
         Double a1 = myController.get_a1();
         if (a1 == null)
-            a1 = UserSettings.defaultLaneChoice_A1;
+            a1 = UserSettings.defaultLaneChoice_rhovpmplane;
         spA1.getValueFactory().setValue(a1);
         
         Double a2 = myController.get_a2();
         if (a2 == null)
-            a2 = UserSettings.defaultLaneChoice_A2;
+            a2 = UserSettings.defaultLaneChoice_tollcents;
         spA2.getValueFactory().setValue(a2);
         
         String unitsSpeed = UserSettings.unitsSpeed;
