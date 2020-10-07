@@ -732,7 +732,7 @@ public class ScenarioEditorController {
                 return;
         }
         
-        if (!nm.equals("")) {
+        if ((!nm.equals("")) && (!nm.equals(selectedPolicy.get_name()))) {
             selectedPolicy.set_name(nm);
             cbPolicies.getItems().set(selectedPolicyIndex, nm);
             appMainController.setProjectModified(true);
