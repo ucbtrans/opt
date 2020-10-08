@@ -32,7 +32,7 @@ public class LaneChangeModel {
         jaxb.Parameter p2 = new jaxb.Parameter();
         prams.getParameter().add(p2);
         p2.setName("rho_vpkmplane");
-        p2.setValue(String.format("%f",density_vpmileplane*1.609));
+        p2.setValue(String.format("%f",density_vpmileplane/1.609));
         return jlcs;
     }
 

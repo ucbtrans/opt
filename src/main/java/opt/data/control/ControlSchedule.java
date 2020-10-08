@@ -73,6 +73,10 @@ public class ControlSchedule implements Comparable {
         if(entries.isEmpty())
             return true;
 
+        for(AbstractLink link : links_to_write)
+            if(link.lgtype2lanes(lgtype)==null)
+                return true;
+
         return false;
     }
 
