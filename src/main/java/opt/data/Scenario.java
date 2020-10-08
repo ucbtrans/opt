@@ -446,7 +446,6 @@ public class Scenario {
         /////////////////////////////////////////////////////
         // controllers, actuators, sensors
 
-
         // collect controllers and filter out invalid ones
         Set<ControlSchedule> schedules = links.values().stream()
                 .flatMap(link->link.get_all_schedules().stream())
@@ -609,23 +608,7 @@ public class Scenario {
 
         /////////////////////////////////////////////////////
         // lane change model
-        jaxb.Lanechanges jlcs = new jaxb.Lanechanges();
-        jScn.setLanechanges(jlcs);
-        jaxb.Lanechange jlc = new jaxb.Lanechange();
-        jlcs.getLanechange().add(jlc);
-        jlc.setIsDefault(true);
-        jlc.setDt(100f);
-        jlc.setType("logit");
-        jaxb.Parameters prams = new jaxb.Parameters();
-        jlc.setParameters(prams);
-        jaxb.Parameter p1 = new jaxb.Parameter();
-        prams.getParameter().add(p1);
-        p1.setName("keep");
-        p1.setValue(String.format("%f",UserSettings.defaultLaneChoice_keep));
-        jaxb.Parameter p2 = new jaxb.Parameter();
-        prams.getParameter().add(p2);
-        p2.setName("rho_vpkmplane");
-        p2.setValue(String.format("%f",UserSettings.defaultLaneChoice_rhovpmplane *1.609));
+        jScn.setLanechanges(this.my_fwy_scenario.lcmodel.to_jaxb());
 
         return jScn;
     }

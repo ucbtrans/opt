@@ -13,7 +13,7 @@ public class ControllerLgPolicy extends AbstractController {
 	protected Permission permission;
 	protected Map<Long,Permission> comm2permission;
 
-	protected Double a0,a1,a2;
+	protected Double a2;
 	protected int [][] vphpl_to_cents_table;
 	// vphpl_to_cents_table[i][1] is the price for all flows
 	// between vphpl_to_cents_table[i][0] and vplph_to_cents_table[i+1][0]
@@ -29,7 +29,7 @@ public class ControllerLgPolicy extends AbstractController {
 	// construction
 	////////////////////////////////
 
-	public ControllerLgPolicy(FreewayScenario scn, Set<Long> tolled_comms, Set<Long> disallowed_comms, Set<Long> free_comms, Float dt, Double a0, Double a1, Double a2, int [][] vphpl_to_cents_table, Double qos_speed_threshold_kph) {
+	public ControllerLgPolicy(FreewayScenario scn, Set<Long> tolled_comms, Set<Long> disallowed_comms, Set<Long> free_comms, Float dt, Double a2, int [][] vphpl_to_cents_table, Double qos_speed_threshold_kph) {
 		super(Type.LgPolicy,dt, control.AbstractController.Algorithm.lg_restrict);
 
 		this.comm2permission = new HashMap<>();
@@ -60,8 +60,8 @@ public class ControllerLgPolicy extends AbstractController {
 
 		refresh_type();
 
-		this.a0 = a0==null ? UserSettings.defaultLaneChoice_keep : a0;
-		this.a1 = a1==null ? UserSettings.defaultLaneChoice_rhovpmplane : a1;
+//		this.a0 = a0==null ? UserSettings.defaultLaneChoice_keep : a0;
+//		this.a1 = a1==null ? UserSettings.defaultLaneChoice_rhovpmplane : a1;
 		this.a2 = a2==null ? UserSettings.defaultLaneChoice_tollcents : a2;
 
 		if(vphpl_to_cents_table==null){
@@ -88,13 +88,13 @@ public class ControllerLgPolicy extends AbstractController {
 	// Getters
 	////////////////////////////////
 
-	public Double get_a0() {
-		return a0;
-	}
-
-	public Double get_a1() {
-		return a1;
-	}
+//	public Double get_a0() {
+//		return a0;
+//	}
+//
+//	public Double get_a1() {
+//		return a1;
+//	}
 
 	public Double get_a2() {
 		return a2;
@@ -120,13 +120,13 @@ public class ControllerLgPolicy extends AbstractController {
 	// Setters
 	////////////////////////////////
 
-	public void set_a0(Double x) {
-		a0 = x;
-	}
-
-	public void set_a1(Double x) {
-		a1 = x;
-	}
+//	public void set_a0(Double x) {
+//		a0 = x;
+//	}
+//
+//	public void set_a1(Double x) {
+//		a1 = x;
+//	}
 
 	public void set_a2(Double x) {
 		a2 = x;
@@ -199,19 +199,19 @@ public class ControllerLgPolicy extends AbstractController {
 			params.add(n0);
 
 
-			if (a0 != null) {
-				Parameter n = new Parameter();
-				n.setName("keep");
-				n.setValue(a0.toString());
-				params.add(n);
-			}
-
-			if (a1 != null) {
-				Parameter n = new Parameter();
-				n.setName("rho_vpkmplane");
-				n.setValue(a1.toString());
-				params.add(n);
-			}
+//			if (a0 != null) {
+//				Parameter n = new Parameter();
+//				n.setName("keep");
+//				n.setValue(a0.toString());
+//				params.add(n);
+//			}
+//
+//			if (a1 != null) {
+//				Parameter n = new Parameter();
+//				n.setName("rho_vpkmplane");
+//				n.setValue(a1.toString());
+//				params.add(n);
+//			}
 
 			if (a2 != null) {
 				Parameter n = new Parameter();

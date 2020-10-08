@@ -1,6 +1,5 @@
 package opt.data;
 
-import jaxb.Schedule;
 import opt.UserSettings;
 import opt.data.control.*;
 import profiles.Profile1D;
@@ -17,7 +16,6 @@ public class FreewayScenario {
     private Long max_node_id;
     private Long max_seg_id;
     private Long max_schedule_id;
-//    private Long max_sensor_id;
     private Long max_rc_id;
 
     public String name;
@@ -25,6 +23,7 @@ public class FreewayScenario {
     protected Scenario scenario;
     protected Map<Long,Segment> segments = new HashMap<>();
     protected Map<Long, Route> routes = new HashMap<>();
+    protected LaneChangeModel lcmodel;
 
     // simulation parameters
     protected float sim_start_time = 0f;
@@ -48,6 +47,7 @@ public class FreewayScenario {
         scenario = new Scenario(this);
         create_isolated_segment(segmentname,params, AbstractLink.Type.freeway);
         scenario.commodities.put(0l,new Commodity(0l,"Car",1f));
+        this.lcmodel = new LaneChangeModel(UserSettings.defaultLaneChoice_keep, UserSettings.defaultLaneChoice_rhovpmplane);
         reset_max_ids();
     }
 
@@ -58,113 +58,113 @@ public class FreewayScenario {
         this.name = name;
         this.description = description;
 
-        if(sim!=null){
+        if (sim != null) {
             this.sim_start_time = sim.getStarttime();
             this.sim_duration = sim.getDuration();
         }
 
         // model
-        if (jaxb_scenario.getModels()!=null){
+        if (jaxb_scenario.getModels() != null) {
             jaxb.Model model = jaxb_scenario.getModels().getModel().get(0);
             set_max_celllength_meters(model.getModelParams().getMaxCellLength());
         }
 
         // create Scenario object
-        this.scenario = new Scenario(this,jaxb_scenario);
+        this.scenario = new Scenario(this, jaxb_scenario);
 
         // attach link names
-        if (jaxb_lnks!=null)
-            for(jaxb.Lnk lnk : jaxb_lnks.getLnk())
+        if (jaxb_lnks != null)
+            for (jaxb.Lnk lnk : jaxb_lnks.getLnk())
                 if (scenario.links.containsKey(lnk.getId())) {
                     AbstractLink link = scenario.links.get(lnk.getId());
                     link.set_name(lnk.getName());
 
                     // TODO REMOVE THESE AFTER UPDATING EXISTING FILES.
-                    if(!link.has_mng()){
-                        link.set_mng_lanes(lnk.getManagedLanes()==null ? 0 : lnk.getManagedLanes().intValue());
-                        link.set_mng_barrier(lnk.isManagedLanesBarrier()==null ? false : lnk.isManagedLanesBarrier());
-                        link.set_mng_separated(lnk.isManagedLanesSeparated()==null ? false : lnk.isManagedLanesSeparated());
+                    if (!link.has_mng()) {
+                        link.set_mng_lanes(lnk.getManagedLanes() == null ? 0 : lnk.getManagedLanes().intValue());
+                        link.set_mng_barrier(lnk.isManagedLanesBarrier() == null ? false : lnk.isManagedLanesBarrier());
+                        link.set_mng_separated(lnk.isManagedLanesSeparated() == null ? false : lnk.isManagedLanesSeparated());
                     }
-                    if(!link.has_aux()){
-                        link.set_aux_lanes(lnk.getAuxLanes()==null ? 0 : lnk.getAuxLanes().intValue());
+                    if (!link.has_aux()) {
+                        link.set_aux_lanes(lnk.getAuxLanes() == null ? 0 : lnk.getAuxLanes().intValue());
                     }
-                    link.set_is_inner(lnk.isIsInner()==null ? false : lnk.isIsInner());
+                    link.set_is_inner(lnk.isIsInner() == null ? false : lnk.isIsInner());
 
                     // TODO REMOVE THIS
                     // HACK SET MNG AND AUX LANE PARAMETERS IF THEY ARE NOT SET
                     // ---------------------------------------------------------------------------
-                    if(link.has_mng()){
-                        if(link.params.mng_fd==null)
+                    if (link.has_mng()) {
+                        if (link.params.mng_fd == null)
                             link.params.mng_fd = new FDparams(
-                                    (float)UserSettings.defaultManagedLaneCapacityVph,
-                                    (float)UserSettings.defaultManagedLaneJamDensityVpk,
-                                    (float)UserSettings.defaultManagedLaneFreeFlowSpeedKph);
-                        if(Float.isNaN(link.params.mng_fd.capacity_vphpl))
-                            link.params.mng_fd.capacity_vphpl = (float)UserSettings.defaultManagedLaneCapacityVph;
-                        if(Float.isNaN(link.params.mng_fd.jam_density_vpkpl))
-                            link.params.mng_fd.jam_density_vpkpl = (float)UserSettings.defaultManagedLaneJamDensityVpk;
-                        if(Float.isNaN(link.params.mng_fd.ff_speed_kph))
-                            link.params.mng_fd.ff_speed_kph = (float)UserSettings.defaultManagedLaneFreeFlowSpeedKph;
+                                    (float) UserSettings.defaultManagedLaneCapacityVph,
+                                    (float) UserSettings.defaultManagedLaneJamDensityVpk,
+                                    (float) UserSettings.defaultManagedLaneFreeFlowSpeedKph);
+                        if (Float.isNaN(link.params.mng_fd.capacity_vphpl))
+                            link.params.mng_fd.capacity_vphpl = (float) UserSettings.defaultManagedLaneCapacityVph;
+                        if (Float.isNaN(link.params.mng_fd.jam_density_vpkpl))
+                            link.params.mng_fd.jam_density_vpkpl = (float) UserSettings.defaultManagedLaneJamDensityVpk;
+                        if (Float.isNaN(link.params.mng_fd.ff_speed_kph))
+                            link.params.mng_fd.ff_speed_kph = (float) UserSettings.defaultManagedLaneFreeFlowSpeedKph;
                     }
-                    if(link.has_aux()){
+                    if (link.has_aux()) {
                         FDparams aux_fd = ((ParametersFreeway) link.params).aux_fd;
-                        if(aux_fd==null)
+                        if (aux_fd == null)
                             aux_fd = new FDparams(
-                                    (float)UserSettings.defaultAuxLaneCapacityVph,
-                                    (float)UserSettings.defaultAuxLaneJamDensityVpk,
-                                    (float)UserSettings.defaultAuxLaneFreeFlowSpeedKph);
-                        if(Float.isNaN(aux_fd.capacity_vphpl))
-                            aux_fd.capacity_vphpl = (float)UserSettings.defaultManagedLaneCapacityVph;
-                        if(Float.isNaN(aux_fd.jam_density_vpkpl))
-                            aux_fd.jam_density_vpkpl = (float)UserSettings.defaultManagedLaneJamDensityVpk;
-                        if(Float.isNaN(aux_fd.ff_speed_kph))
-                            aux_fd.ff_speed_kph = (float)UserSettings.defaultManagedLaneFreeFlowSpeedKph;
+                                    (float) UserSettings.defaultAuxLaneCapacityVph,
+                                    (float) UserSettings.defaultAuxLaneJamDensityVpk,
+                                    (float) UserSettings.defaultAuxLaneFreeFlowSpeedKph);
+                        if (Float.isNaN(aux_fd.capacity_vphpl))
+                            aux_fd.capacity_vphpl = (float) UserSettings.defaultManagedLaneCapacityVph;
+                        if (Float.isNaN(aux_fd.jam_density_vpkpl))
+                            aux_fd.jam_density_vpkpl = (float) UserSettings.defaultManagedLaneJamDensityVpk;
+                        if (Float.isNaN(aux_fd.ff_speed_kph))
+                            aux_fd.ff_speed_kph = (float) UserSettings.defaultManagedLaneFreeFlowSpeedKph;
                     }
                     // ------------------------------------------------------------------
 
                 }
 
         // create segments
-        if(jaxb_segments!=null)
+        if (jaxb_segments != null)
             for (jaxb.Sgmt sgmt : jaxb_segments.getSgmt()) {
                 Segment segment = new Segment(this, sgmt);
-                segments.put(segment.id,segment);
+                segments.put(segment.id, segment);
             }
 
         // create routes
-        if(jaxb_routes!=null)
+        if (jaxb_routes != null)
             for (jaxb.Route jroute : jaxb_routes.getRoute()) {
                 Route route = new Route(this, jroute);
-                routes.put(route.id,route);
+                routes.put(route.id, route);
             }
 
         // make link connections
-        for(AbstractLink abslink : scenario.links.values()){
+        for (AbstractLink abslink : scenario.links.values()) {
 
             Set<AbstractLink> up_links = scenario.nodes.get(abslink.start_node_id).in_links.stream()
                     .map(link_id -> scenario.links.get(link_id))
-                    .filter(link -> link.mysegment!=null )
+                    .filter(link -> link.mysegment != null)
                     .collect(Collectors.toSet());
 
             Set<AbstractLink> dn_links = scenario.nodes.get(abslink.end_node_id).out_links.stream()
                     .map(link_id -> scenario.links.get(link_id))
-                    .filter(link -> link.mysegment!=null )
+                    .filter(link -> link.mysegment != null)
                     .collect(Collectors.toSet());
 
             Set<AbstractLink> up_links_f = null;
             Set<AbstractLink> dn_links_f = null;
-            switch(abslink.get_type()){
+            switch (abslink.get_type()) {
 
                 case freeway:
 
                     up_links_f = up_links.stream()
                             .filter(link -> link instanceof LinkFreeway)
-                            .map(link -> (LinkFreeway)link)
+                            .map(link -> (LinkFreeway) link)
                             .collect(Collectors.toSet());
 
                     dn_links_f = dn_links.stream()
                             .filter(link -> link instanceof LinkFreeway)
-                            .map(link -> (LinkFreeway)link)
+                            .map(link -> (LinkFreeway) link)
                             .collect(Collectors.toSet());
 
                     break;
@@ -173,12 +173,12 @@ public class FreewayScenario {
 
                     up_links_f = up_links.stream()
                             .filter(link -> link instanceof LinkOfframp)
-                            .map(link -> (LinkOfframp)link)
+                            .map(link -> (LinkOfframp) link)
                             .collect(Collectors.toSet());
 
                     dn_links_f = dn_links.stream()
                             .filter(link -> link instanceof LinkOnramp)
-                            .map(link -> (LinkOnramp)link)
+                            .map(link -> (LinkOnramp) link)
                             .collect(Collectors.toSet());
 
                     break;
@@ -187,12 +187,12 @@ public class FreewayScenario {
 
                     up_links_f = up_links.stream()
                             .filter(link -> link instanceof LinkConnector)
-                            .map(link -> (LinkConnector)link)
+                            .map(link -> (LinkConnector) link)
                             .collect(Collectors.toSet());
 
                     dn_links_f = dn_links.stream()
                             .filter(link -> link instanceof LinkFreeway)
-                            .map(link -> (LinkFreeway)link)
+                            .map(link -> (LinkFreeway) link)
                             .collect(Collectors.toSet());
 
                     break;
@@ -201,27 +201,27 @@ public class FreewayScenario {
 
                     up_links_f = up_links.stream()
                             .filter(link -> link instanceof LinkFreeway)
-                            .map(link -> (LinkFreeway)link)
+                            .map(link -> (LinkFreeway) link)
                             .collect(Collectors.toSet());
 
                     dn_links_f = dn_links.stream()
                             .filter(link -> link instanceof LinkConnector)
-                            .map(link -> (LinkConnector)link)
+                            .map(link -> (LinkConnector) link)
                             .collect(Collectors.toSet());
 
                     break;
             }
 
-            if(up_links_f!=null && !up_links_f.isEmpty())
+            if (up_links_f != null && !up_links_f.isEmpty())
                 abslink.up_link = up_links_f.iterator().next();
 
-            if(dn_links_f!=null && !dn_links_f.isEmpty())
+            if (dn_links_f != null && !dn_links_f.isEmpty())
                 abslink.dn_link = dn_links_f.iterator().next();
 
         }
 
         // assign demands
-        if (jaxb_scenario.getDemands()!=null) {
+        if (jaxb_scenario.getDemands() != null) {
             for (jaxb.Demand dem : jaxb_scenario.getDemands().getDemand())
                 scenario.links.get(dem.getLinkId()).set_demand_vph(
                         dem.getCommodityId(),
@@ -232,7 +232,7 @@ public class FreewayScenario {
         }
 
         // assign splits
-        if (jaxb_scenario.getSplits()!=null) {
+        if (jaxb_scenario.getSplits() != null) {
             for (jaxb.SplitNode jsplitnode : jaxb_scenario.getSplits().getSplitNode())
                 for (jaxb.Split split : jsplitnode.getSplit()) {
                     AbstractLink link = scenario.links.get(split.getLinkOut());
@@ -247,36 +247,59 @@ public class FreewayScenario {
         }
 
         // create actuator and sensor maps
-        Map<Long,jaxb.Actuator> actuators = new HashMap<>();
-        if(jaxb_scenario.getActuators()!=null)
-            for(jaxb.Actuator x : jaxb_scenario.getActuators().getActuator())
-                actuators.put(x.getId(),x);
+        Map<Long, jaxb.Actuator> actuators = new HashMap<>();
+        if (jaxb_scenario.getActuators() != null)
+            for (jaxb.Actuator x : jaxb_scenario.getActuators().getActuator())
+                actuators.put(x.getId(), x);
 
-        Map<Long,jaxb.Sensor> sensors = new HashMap<>();
-        if(jaxb_scenario.getSensors()!=null)
-            for(jaxb.Sensor x : jaxb_scenario.getSensors().getSensor())
-                sensors.put(x.getId(),x);
+        Map<Long, jaxb.Sensor> sensors = new HashMap<>();
+        if (jaxb_scenario.getSensors() != null)
+            for (jaxb.Sensor x : jaxb_scenario.getSensors().getSensor())
+                sensors.put(x.getId(), x);
 
         // put schedule names into a HashMap
-        Map<Long,String> sch_names = new HashMap<>();
-        if(jaxb_schds!=null)
-            for(jaxb.Schd jschd : jaxb_schds.getSchd())
+        Map<Long, String> sch_names = new HashMap<>();
+        if (jaxb_schds != null)
+            for (jaxb.Schd jschd : jaxb_schds.getSchd())
                 sch_names.put(jschd.getId(), jschd.getName());
 
-        if(jaxb_scenario.getControllers()!=null){
-            for(jaxb.Controller jcnt : jaxb_scenario.getControllers().getController()) {
+        if (jaxb_scenario.getControllers() != null) {
+            for (jaxb.Controller jcnt : jaxb_scenario.getControllers().getController()) {
 
                 switch (jcnt.getType()) {
                     case "schedule":
-                        read_schedule(jcnt,actuators,sensors,sch_names);
+                        read_schedule(jcnt, actuators, sensors, sch_names);
                         break;
                     case "frflow":
-                        read_frflow(jcnt,actuators);
+                        read_frflow(jcnt, actuators);
                         break;
                     default:
                         throw new Exception("Unknown controller type.");
                 }
             }
+        }
+
+        // lane change model
+        if (jaxb_scenario.getLanechanges()!=null && !jaxb_scenario.getLanechanges().getLanechange().isEmpty()) {
+            assert (jaxb_scenario.getLanechanges().getLanechange().size() == 1);
+            jaxb.Lanechange lc = jaxb_scenario.getLanechanges().getLanechange().get(0);
+            float dt = lc.getDt();
+            double keep = UserSettings.defaultLaneChoice_keep;
+            double rho_vpkmplane = UserSettings.defaultLaneChoice_rhovpmplane / 1.609;
+            for (jaxb.Parameter p : lc.getParameters().getParameter()) {
+                switch (p.getName()) {
+                    case "keep":
+                        keep = Double.parseDouble(p.getValue());
+                        break;
+                    case "rho_vpkmplane":
+                        rho_vpkmplane = Double.parseDouble(p.getValue());
+                        break;
+                }
+            }
+            this.lcmodel = new LaneChangeModel(dt, keep, rho_vpkmplane * 1.609);
+
+        } else {
+            this.lcmodel = new LaneChangeModel(UserSettings.defaultLaneChoice_keep, UserSettings.defaultLaneChoice_rhovpmplane);
         }
 
         // max ids
@@ -530,6 +553,26 @@ public class FreewayScenario {
                 sim_dt;
         sim_dt = Math.min(max_sim_dt,new_sim_dt);
         return sim_dt;
+    }
+
+    /////////////////////////////////////
+    // API lane change model
+    /////////////////////////////////////
+
+    public double get_lc_keep(){
+        return lcmodel.keep;
+    }
+
+    public double get_lc_density_vpkpl(){
+        return lcmodel.density_vpmileplane;
+    }
+
+    public void set_lc_density_vpkpl(double x){
+        lcmodel.keep = x;
+    }
+
+    public void set_lc_keep(double x){
+        lcmodel.density_vpmileplane = x;
     }
 
     /////////////////////////////////////
@@ -1081,10 +1124,6 @@ public class FreewayScenario {
     public long new_schedule_id(){
         return ++max_schedule_id;
     }
-
-//    public long new_sensor_id(){
-//        return ++max_sensor_id;
-//    }
 
     public long new_rc_id(){
         return ++max_rc_id;

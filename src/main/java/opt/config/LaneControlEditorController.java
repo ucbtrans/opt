@@ -394,12 +394,12 @@ public class LaneControlEditorController {
             dt = (float)UserSettings.defaultControlDtSeconds;
         controlDt.getValueFactory().setValue(Math.round(dt));
         
-        Double a0 = myController.get_a0();
+        Double a0 = Double.NaN; // removed by GG: myController.get_a0();
         if (a0 == null)
             a0 = UserSettings.defaultLaneChoice_keep;
         spA0.getValueFactory().setValue(a0);
         
-        Double a1 = myController.get_a1();
+        Double a1 = Double.NaN; // removed by GG: myController.get_a1();
         if (a1 == null)
             a1 = UserSettings.defaultLaneChoice_rhovpmplane;
         spA1.getValueFactory().setValue(a1);
@@ -541,8 +541,8 @@ public class LaneControlEditorController {
         myController.set_vphpl_to_cents_table(fpm);
 
         myController.setDt((float)controlDt.getValue());
-        myController.set_a0(spA0.getValue());
-        myController.set_a1(spA1.getValue());
+//        myController.set_a0(spA0.getValue());  // removed by GG
+//        myController.set_a1(spA1.getValue());  // removed by GG
         myController.set_a2(spA2.getValue());
         
         double cc = UserSettings.speedConversionMap.get(UserSettings.unitsSpeed + "kph");

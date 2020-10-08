@@ -831,8 +831,8 @@ public class ScenarioEditorController {
         float start_time = selectedPolicy.num_entries() == 0 ? 0 :
                 Math.round(selectedPolicy.get_largest_start_time()) + 3600;
         
-        double a0 = UserSettings.defaultLaneChoice_keep;
-        double a1 = UserSettings.defaultLaneChoice_rhovpmplane;
+//        double a0 = UserSettings.defaultLaneChoice_keep;      // removed by GG
+//        double a1 = UserSettings.defaultLaneChoice_rhovpmplane;      // removed by GG
         double a2 = UserSettings.defaultLaneChoice_tollcents;
         float dt = (float) UserSettings.defaultControlDtSeconds;
         double v_thres = UserSettings.defaultQosSpeedThresholdKph;
@@ -842,7 +842,7 @@ public class ScenarioEditorController {
         vphpl_to_cents_table[0][0] = 0;
         vphpl_to_cents_table[0][1] = 0;
         try {
-            ControllerLgPolicy ctrl = ControlFactory.create_controller_hovhot(myScenario, null,null, free_comms, dt, a0, a1, a2, vphpl_to_cents_table, v_thres);
+            ControllerLgPolicy ctrl = ControlFactory.create_controller_hovhot(myScenario, null,null, free_comms, dt, a2, vphpl_to_cents_table, v_thres);
             ScheduleEntry entry = new ScheduleEntry(start_time, ctrl);
             launchLaneControlEditor(entry, true);
         } catch(Exception ex) {
