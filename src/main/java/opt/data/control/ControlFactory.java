@@ -223,10 +223,10 @@ public class ControlFactory {
 					case "free_comms":
 						free_comms.addAll(OTMUtils.csv2longlist(param.getValue()));
 						break;
-					case "a0":
+					case "keep":
 						a0 = Double.parseDouble(param.getValue());
 						break;
-					case "a1":
+					case "rho_vpkmplane":
 						a1 = Double.parseDouble(param.getValue());
 						break;
 					case "a2":

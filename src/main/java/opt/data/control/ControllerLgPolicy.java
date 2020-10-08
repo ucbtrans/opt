@@ -201,14 +201,14 @@ public class ControllerLgPolicy extends AbstractController {
 
 			if (a0 != null) {
 				Parameter n = new Parameter();
-				n.setName("a0");
+				n.setName("keep");
 				n.setValue(a0.toString());
 				params.add(n);
 			}
 
 			if (a1 != null) {
 				Parameter n = new Parameter();
-				n.setName("a1");
+				n.setName("rho_vpkmplane");
 				n.setValue(a1.toString());
 				params.add(n);
 			}
