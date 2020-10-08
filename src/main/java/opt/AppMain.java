@@ -16,7 +16,9 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
+import javafx.stage.Screen;
 
 /**
  *
@@ -28,12 +30,22 @@ public class AppMain extends Application {
     
     @Override
     public void start(Stage primaryStage) throws IOException {
+        int W = 1250;
+        int sW = W;
+        int H = 920;
+        int sH = H;
+        
+        Rectangle2D bounds = Screen.getPrimary().getBounds();
+        if (bounds.getHeight() < H)
+            sH = (int)Math.round(0.9 * bounds.getHeight());
+        if (bounds.getWidth() < W)
+            sW = (int)Math.round(0.9 * bounds.getWidth());
         
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/opt_main.fxml"));
         VBox root = (VBox)loader.load();
         main_controller = loader.getController();
         main_controller.setPrimaryStage(primaryStage);
-        Scene scene = new Scene(root, 1250, 920);
+        Scene scene = new Scene(root, sW, sH);
         //setUserAgentStylesheet(STYLESHEET_CASPIAN);
         setUserAgentStylesheet(STYLESHEET_MODENA);
         scene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());

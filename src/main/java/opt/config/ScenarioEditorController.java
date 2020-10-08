@@ -113,9 +113,6 @@ public class ScenarioEditorController {
 
     @FXML // fx:id="scenarioName"
     private TextField scenarioName; // Value injected by FXMLLoader
-    
-    @FXML // fx:id="runSimulationButton"
-    private Button runSimulationButton; // Value injected by FXMLLoader
 
     @FXML // fx:id="scenarioEditorAccordionParent"
     private AnchorPane scenarioEditorAccordionParent; // Value injected by FXMLLoader
@@ -195,11 +192,6 @@ public class ScenarioEditorController {
 
    
     
-    public Button getRunSimulationButton() {
-        return runSimulationButton;
-    }
-
-
     public void setPrimaryStage(Stage s) {
         primaryStage = s;
     }
@@ -276,18 +268,6 @@ public class ScenarioEditorController {
         inputStage.showAndWait();
         fillLanePolicySchedule();
     }
-    
-    
-    
-    /**
-     * Start simulation of the current scenario.
-     * @param event 
-     */
-    @FXML
-    void runSimulation(ActionEvent event) {
-        appMainController.runSimulation();
-    }
-
     
     
     
