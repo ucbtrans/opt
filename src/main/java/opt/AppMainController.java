@@ -174,6 +174,15 @@ public class AppMainController {
 
     @FXML // fx:id="menuFileExit"
     private MenuItem menuFileExit; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="menuSimulationRun"
+    private MenuItem menuSimulationRun; // Value injected by FXMLLoader
+
+    @FXML // fx:id="menuSimulationExportResultsToExcel"
+    private MenuItem menuSimulationExportResultsToExcel; // Value injected by FXMLLoader
+
+    @FXML // fx:id="menuSimulationFullExcelReport"
+    private MenuItem menuSimulationFullExcelReport; // Value injected by FXMLLoader
 
     @FXML // fx:id="menuHelpAbout"
     private MenuItem menuHelpAbout; // Value injected by FXMLLoader
@@ -277,13 +286,18 @@ public class AppMainController {
     
     private void setSelectedScenario(TreeItem<String> treeItem) {
         selectedScenario = null;
+        menuSimulationRun.setDisable(true);
+        menuSimulationExportResultsToExcel.setDisable(true);
+        menuSimulationFullExcelReport.setDisable(true);
         TreeItem<String> p = treeItem;
         while (!p.equals(projectTree.getRoot())) {
             Object obj = tree2object.get(p);
             if (obj instanceof FreewayScenario) {
                 selectedScenario = (FreewayScenario)obj;
+                menuSimulationRun.setDisable(false);
                 if (Misc.myMapGet(scenario2simData, selectedScenario) != null) {
                     reportTabPane.setDisable(false);
+                    menuSimulationFullExcelReport.setDisable(false);
                 }
                 return;
             }
@@ -324,7 +338,8 @@ public class AppMainController {
     /**
      * Start simulation of the selected scenario.
      */
-    public void runSimulation() {
+    @FXML
+    public void runSimulation(ActionEvent event) {
         if (selectedScenario == null)
             return;
 
@@ -340,7 +355,9 @@ public class AppMainController {
             th.setDaemon(true);
             th.start();
             leftStatus.setText("Simulating scenario \"" + selectedScenario.name + "\"...");
-            scenarioEditorController.getRunSimulationButton().setDisable(true);
+            menuSimulationRun.setDisable(true);
+            menuSimulationExportResultsToExcel.setDisable(true);
+            menuSimulationFullExcelReport.setDisable(true);
         }
         catch(Exception e){
             opt.utils.Dialogs.ExceptionDialog("Error running OPT project", e);
@@ -361,7 +378,7 @@ public class AppMainController {
     
     public void completeSimulation() {
         unbindProgressBar();
-        scenarioEditorController.getRunSimulationButton().setDisable(false);
+        menuSimulationRun.setDisable(false);
         reportTabPane.setDisable(false);
         leftStatus.setText("Simulation completed!");
         if ((selectedScenario != null) &&
@@ -808,6 +825,18 @@ public class AppMainController {
     }
     
     
+    @FXML
+    private void onExportResultsToExcel(ActionEvent event) {
+        
+    }
+    
+    
+    @FXML
+    private void onFullExcelReport(ActionEvent event) {
+        
+    }
+    
+    
     
     @FXML
     void onClickMenuHelpAbout(ActionEvent event) {
@@ -897,6 +926,7 @@ public class AppMainController {
             linkEditorController.initWithLinkData(lnk);
             linkInfoController.initWithLinkData(lnk);
             if (Misc.myMapGet(scenario2simData, selectedScenario) != null) { 
+                menuSimulationExportResultsToExcel.setDisable(false);
                 linkPerformanceController.initWithLinkData(lnk, (SimDataScenario)Misc.myMapGet(scenario2simData, selectedScenario));
                 if (actionPane.getSelectionModel().getSelectedItem().equals(reportTabPane)) {
                     String ln = "(" + lnk.get_gp_lanes() + " GP";
@@ -907,6 +937,8 @@ public class AppMainController {
                     ln += " lanes)";
                     leftStatus.setText("Report for section\"" + lnk.get_name() + "\" " + ln);
                 }
+            } else {
+                menuSimulationExportResultsToExcel.setDisable(true);
             }
         }
 
@@ -927,10 +959,13 @@ public class AppMainController {
             if (fws != null)
                 scenarioEditorController.initWithScenarioData(fws);
             if (Misc.myMapGet(scenario2simData, selectedScenario) != null) {
+                menuSimulationExportResultsToExcel.setDisable(false);
                 scenarioPerformanceController.initWithScenarioData((SimDataScenario)Misc.myMapGet(scenario2simData, selectedScenario));
                 if (actionPane.getSelectionModel().getSelectedItem().equals(reportTabPane)) {
                     leftStatus.setText("Report for scenario \"" + selectedScenario.name + "\"");
                 }
+            } else {
+                menuSimulationExportResultsToExcel.setDisable(true);
             }
         }
         
@@ -951,10 +986,13 @@ public class AppMainController {
             if (route != null)
                 routeController.initWithRouteData(route);
             if (Misc.myMapGet(scenario2simData, selectedScenario) != null) {
+                menuSimulationExportResultsToExcel.setDisable(false);
                 routePerformanceController.initWithRouteData(route, (SimDataScenario)Misc.myMapGet(scenario2simData, selectedScenario));
                 if (actionPane.getSelectionModel().getSelectedItem().equals(reportTabPane)) {
                     leftStatus.setText("Report for route \"" + route.getName() + "\"");
                 }
+            } else {
+                menuSimulationExportResultsToExcel.setDisable(true);
             }
         }
         
@@ -1086,6 +1124,10 @@ public class AppMainController {
         projectFilePath = null;
         
         scenario2simData.clear();
+        
+        menuSimulationRun.setDisable(true);
+        menuSimulationExportResultsToExcel.setDisable(true);
+        menuSimulationFullExcelReport.setDisable(true);
         
         if (projectTree.getRoot() != null)
             projectTree.getRoot().getChildren().clear();

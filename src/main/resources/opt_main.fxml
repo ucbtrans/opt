@@ -11,7 +11,6 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -51,18 +50,21 @@
                      </accelerator></MenuItem>
           </items>
         </Menu>
-        <Menu disable="true" mnemonicParsing="false" text="Edit">
+        <Menu mnemonicParsing="false" text="Simulation">
           <items>
-            <MenuItem mnemonicParsing="false" text="Undo" />
-            <MenuItem mnemonicParsing="false" text="Redo" />
-            <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Cut" />
-            <MenuItem mnemonicParsing="false" text="Copy" />
-            <MenuItem mnemonicParsing="false" text="Paste" />
-            <MenuItem mnemonicParsing="false" text="Delete" />
-            <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Select All" />
-            <MenuItem mnemonicParsing="false" text="Unselect All" />
+            <MenuItem id="menuSimulationRun" fx:id="menuSimulationRun" disable="true" mnemonicParsing="false" onAction="#runSimulation" text="Run Simulatioon">
+                     <accelerator>
+                        <KeyCodeCombination alt="ANY" code="F5" control="UP" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
+            <SeparatorMenuItem disable="true" mnemonicParsing="false" />
+            <MenuItem id="menuSimulationExportResultsToExcel" fx:id="menuSimulationExportResultsToExcel" disable="true" mnemonicParsing="false" onAction="#onExportResultsToExcel" text="Export Results to Excel">
+                     <accelerator>
+                        <KeyCodeCombination alt="ANY" code="F6" control="UP" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
+            <MenuItem id="menuSimulationFullExcelReport" fx:id="menuSimulationFullExcelReport" disable="true" mnemonicParsing="false" onAction="#onFullExcelReport" text="Full Excel Report" visible="false">
+                     <accelerator>
+                        <KeyCodeCombination alt="ANY" code="F10" control="UP" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
@@ -72,7 +74,6 @@
         </Menu>
       </menus>
     </MenuBar>
-      <ToolBar prefHeight="40.0" prefWidth="200.0" visible="false" />
     <SplitPane dividerPositions="0.2287145242070117, 0.7979966611018364" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
             <AnchorPane minHeight="200.0" minWidth="200.0">
@@ -109,11 +110,8 @@
         <rowConstraints>
           <RowConstraints />
         </rowConstraints>
-         <padding>
-            <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
-         </padding>
          <children>
-        <Label id="leftStatus" fx:id="leftStatus" maxWidth="-1.0" minWidth="950.0" prefHeight="16.0" prefWidth="950.0">
+        <Label id="leftStatus" fx:id="leftStatus" maxWidth="-1.0" minWidth="950.0" prefHeight="16.0">
           <font>
             <Font size="11.0" fx:id="x3" />
           </font>
@@ -121,8 +119,11 @@
             <Color blue="0.625" green="0.625" red="0.625" fx:id="x4" />
           </textFill>
         </Label>
-            <ProgressBar id="simProgressBar" fx:id="simProgressBar" minWidth="231.0" progress="0.0" GridPane.columnIndex="1" />
+            <ProgressBar id="simProgressBar" fx:id="simProgressBar" minWidth="231.0" prefHeight="18.0" prefWidth="244.0" progress="0.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" />
          </children>
+         <VBox.margin>
+            <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
+         </VBox.margin>
       </GridPane>
   </children>
 </VBox>
