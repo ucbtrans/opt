@@ -101,6 +101,12 @@ public class TimeMatrix {
         return str;
     }
 
+    public void shift_time(){
+        for(double [] v : values)
+            for(int k=0;k<v.length-1;k++)
+                v[k] = v[k+1];
+    }
+
     public class LinkLaneGroupCell{
         final long linkid;
         final Set<LaneGroupType> lgtypes;
