@@ -308,6 +308,8 @@ public class RoutePerformanceController {
         TimeMatrix tm_density_mng = mySimData.get_density_contour_for_route(myRoute.getId(), lgset_mng, null);
 
         // GG inserted to make first time step look better
+        tm_speed_gp.shift_time();
+        tm_speed_mng.shift_time();
         tm_flow_gp.shift_time();
         tm_flow_mng.shift_time();
         tm_density_gp.shift_time();
