@@ -457,48 +457,46 @@ public class FreewayScenario {
     }
 
     private void read_frflow(jaxb.Controller jcnt,Map<Long,jaxb.Actuator> actuators) throws Exception {
-        float ctrl_dt = jcnt.getDt();
-        float ctrl_start_time = jcnt.getStartTime();
+
+        // actuator ..........................
         long target_act_id = Long.parseLong(jcnt.getTargetActuators().getIds());
-        Float prof_start_time = null;
-        Float prof_dt = null;
-        List<Double> prof_flow = null;
-        for(jaxb.Parameter p : jcnt.getParameters().getParameter()){
-            switch(p.getName()){
-                case "start_time":
-                    prof_start_time = Float.parseFloat(p.getValue());
-                    break;
-                case "dt":
-                    prof_dt = Float.parseFloat(p.getValue());
-                    break;
-                case "flowvph":
-                    prof_flow = OTMUtils.csv2list(p.getValue());
-                    break;
-            }
-        }
-
-        Profile1D profile = new Profile1D(prof_start_time,prof_dt,prof_flow);
-
-        // get the actuator
         jaxb.Actuator jact = actuators.get(target_act_id);
-        Long linkoutid = null;
+//        List<Long> linksout = null;
+//        Long linkin;
         Long commid = null;
         for(jaxb.Parameter p : jact.getParameters().getParameter()){
             switch(p.getName()){
-                case "linkout":
-                    linkoutid = Long.parseLong(p.getValue());
-                    break;
+//                case "linksout":
+//                    linksout = OTMUtils.csv2longlist(p.getValue());
+//                    break;
+//                case "linkin":
+//                    linkin = Long.parseLong(p.getValue());
+//                    break;
                 case "comm":
                     commid = Long.parseLong(p.getValue());
                     break;
             }
         }
 
+        // controller ................................
+        float ctrl_start_time = jcnt.getStartTime();
         boolean usefrflows = ctrl_start_time!=100000;
 
-        AbstractLink link = scenario.links.get(linkoutid);
-        if (link instanceof LinkOfframp)
-            ((LinkOfframp) link).set_frflow(ctrl_dt,commid,profile,usefrflows);
+        if(jcnt.getProfiles()!=null) {
+            for (jaxb.Profile p : jcnt.getProfiles().getProfile()) {
+
+                long frid = p.getId();
+                float prof_start_time = p.getStartTime();
+                float prof_dt = p.getDt();
+                List<Double> prof_flow = OTMUtils.csv2list(p.getContent());
+
+                Profile1D profile = new Profile1D(prof_start_time, prof_dt, prof_flow);
+                LinkOfframp fr = (LinkOfframp) scenario.links.get(frid);
+                fr.set_use_fr_flows(usefrflows);
+                fr.set_frflow(commid,profile);
+
+            }
+        }
 
     }
 

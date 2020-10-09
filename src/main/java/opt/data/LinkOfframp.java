@@ -8,10 +8,10 @@ import java.util.*;
 
 public class LinkOfframp extends LinkRamp {
 
-    private boolean use_frflow = false;
     private Map<Long, Profile1D> splits = new HashMap<>();     // commodity -> Profile1D
     public Map<Long, Profile1D> frflows = new HashMap<>();     // commodity -> Profile1D
-    public Map<Long, Float> frctrldt = new HashMap<>();     // commodity -> Profile1D
+    public boolean usefrflows;
+    public float ctrldt;
 
     /////////////////////////////////////
     // construction
@@ -31,7 +31,6 @@ public class LinkOfframp extends LinkRamp {
         this.set_is_inner(((ParametersRamp)params).is_inner);
     }
 
-
     /////////////////////////////////////
     // up and dn segment
     /////////////////////////////////////
@@ -46,11 +45,11 @@ public class LinkOfframp extends LinkRamp {
     /////////////////////////////////////
 
     public final boolean get_use_fr_flows() {
-        return use_frflow;
+        return usefrflows;
     }
-    
+
     public final void set_use_fr_flows(boolean x){
-        this.use_frflow = x;
+        this.usefrflows=x;
     }
 
     public final Profile1D get_splits(Long comm_id,double default_dt){
@@ -65,7 +64,7 @@ public class LinkOfframp extends LinkRamp {
         }
     }
 
-    public final Profile1D get_frflows(Long comm_id,float ctrl_dt,double default_dt){
+    public final Profile1D get_frflows(Long comm_id,double default_dt){
         if(frflows.containsKey(comm_id))
             return frflows.get(comm_id);
         else {
@@ -73,7 +72,7 @@ public class LinkOfframp extends LinkRamp {
             list.add(0d);
             Profile1D prof = new Profile1D(0f,(float)default_dt,list);
             frflows.put(comm_id,prof);
-            frctrldt.put(comm_id,ctrl_dt);
+            usefrflows = true;
             return prof;
         }
     }
@@ -84,10 +83,8 @@ public class LinkOfframp extends LinkRamp {
     }
 
     public final void remove_frlow_for_commodity(long comm_id){
-        if(frflows.containsKey(comm_id)) {
+        if(frflows.containsKey(comm_id))
             frflows.remove(comm_id);
-            frctrldt.remove(comm_id);
-        }
     }
 
     public final void set_split(Long comm_id,float dt, double[] values) throws Exception {
@@ -101,19 +98,17 @@ public class LinkOfframp extends LinkRamp {
         Profile1D profile = new Profile1D(0f,profdt);
         for(double v : values)
             profile.add_entry(v);
-        this.use_frflow = usefrflows;
+        this.usefrflows = usefrflows;
         this.frflows.put(comm_id, profile);
-        this.frctrldt.put(comm_id, ctrldt);
+
     }
 
     public final void set_split(Long comm_id,Profile1D profile) throws Exception {
         this.splits.put(comm_id,profile);
     }
 
-    public final void set_frflow(float ctrl_dt,long comm_id,Profile1D profile,boolean usefrflow) throws Exception {
+    public final void set_frflow(long comm_id,Profile1D profile) throws Exception {
         this.frflows.put(comm_id,profile);
-        this.frctrldt.put(comm_id,ctrl_dt);
-        this.use_frflow = usefrflow;
     }
 
     public final void delete_splits(){
@@ -122,12 +117,7 @@ public class LinkOfframp extends LinkRamp {
 
     public final void delete_frflows(){
         frflows = null;
-        frctrldt = null;
-        use_frflow=false;
-    }
-
-    public final void set_use_frflows(boolean x){
-        this.use_frflow = x;
+        usefrflows=false;
     }
 
     /////////////////////////////////////
@@ -194,8 +184,8 @@ public class LinkOfframp extends LinkRamp {
             clink.splits.put(e.getKey(),e.getValue().clone());
         for(Map.Entry<Long, Profile1D> e : frflows.entrySet())
             clink.frflows.put(e.getKey(),e.getValue().clone());
-        for(Map.Entry<Long, Float> e : frctrldt.entrySet())
-            clink.frctrldt.put(e.getKey(),e.getValue());
+//        for(Map.Entry<Long, Float> e : frctrldt.entrySet())
+//            clink.frctrldt.put(e.getKey(),e.getValue());
         return clink;
     }
 

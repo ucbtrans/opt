@@ -156,6 +156,9 @@ public class Scenario {
     }
 
     public jaxb.Scenario to_jaxb() throws Exception {
+
+        float simdt = my_fwy_scenario.get_sim_dt_sec();
+
         jaxb.Scenario jScn = new jaxb.Scenario();
 
         /////////////////////////////////////////////////////
@@ -170,7 +173,7 @@ public class Scenario {
         model.setType("ctm");
         ModelParams params = new ModelParams();
         params.setMaxCellLength(my_fwy_scenario.get_max_celllength_meters());
-        params.setSimDt(my_fwy_scenario.get_sim_dt_sec());
+        params.setSimDt(simdt);
         model.setModelParams(params);
 
         /////////////////////////////////////////////////////
@@ -540,70 +543,68 @@ public class Scenario {
 
             LinkFreeway up_ml = (LinkFreeway) segment.fwy;
 
-            for(LinkOfframp fr : segment.get_frs()){
-                for(Map.Entry<Long, Profile1D> e : fr.frflows.entrySet()){
-                    long commid = e.getKey();
-                    Profile1D prof = e.getValue();
+            List<LinkOfframp> all_frs = segment.get_frs();
+            Set<Long> commids = all_frs.stream().flatMap(f->f.frflows.keySet().stream()).collect(Collectors.toSet());
 
-                    long ctrlid = my_fwy_scenario.new_schedule_id();
+            if(commids.isEmpty())
+                continue;
 
-                    // actuator
-                    jaxb.Actuator act = new jaxb.Actuator();
-                    jacts.getActuator().add(act);
-                    act.setId(ctrlid);
-                    act.setType("split");
+            for(Long commid : commids){
 
-                    jaxb.Parameters aps = new jaxb.Parameters();
-                    act.setParameters(aps);
+                long ctrlid = my_fwy_scenario.new_schedule_id();
 
-                    jaxb.Parameter ap1 = new jaxb.Parameter();
-                    aps.getParameter().add(ap1);
-                    ap1.setName("linkin");
-                    ap1.setValue(String.format("%d",up_ml.id));
+                Set<LinkOfframp> frs = all_frs.stream().filter(f->f.frflows.containsKey(commid)).collect(Collectors.toSet());
 
-                    jaxb.Parameter ap2 = new jaxb.Parameter();
-                    aps.getParameter().add(ap2);
-                    ap2.setName("linkout");
-                    ap2.setValue(String.format("%d",fr.id));
+                // actuator ............................
+                jaxb.Actuator act = new jaxb.Actuator();
+                jacts.getActuator().add(act);
+                act.setId(ctrlid);
+                act.setType("split");
 
-                    jaxb.Parameter ap3 = new jaxb.Parameter();
-                    aps.getParameter().add(ap3);
-                    ap3.setName("comm");
-                    ap3.setValue(String.format("%d",commid));
+                jaxb.Parameters aps = new jaxb.Parameters();
+                act.setParameters(aps);
 
-                    // controller
-                    jaxb.Controller ctrl = new jaxb.Controller();
-                    jcntrls.getController().add(ctrl);
-                    ctrl.setId(my_fwy_scenario.new_schedule_id());
-                    ctrl.setType("frflow");
-                    ctrl.setDt(fr.frctrldt.get(commid));
+                jaxb.Parameter ap1 = new jaxb.Parameter();
+                aps.getParameter().add(ap1);
+                ap1.setName("linkin");
+                ap1.setValue(String.format("%d",up_ml.id));
 
-                    ctrl.setStartTime(fr.get_use_fr_flows()?prof.start_time+100:100000);
+                jaxb.Parameter ap2 = new jaxb.Parameter();
+                aps.getParameter().add(ap2);
+                ap2.setName("linksout");
+                ap2.setValue(OTMUtils.comma_format(frs.stream().map(f->f.id).collect(Collectors.toSet())));
 
-                    jaxb.TargetActuators ta = new jaxb.TargetActuators();
-                    ctrl.setTargetActuators(ta);
-                    ta.setIds(String.format("%d",ctrlid));
+                jaxb.Parameter ap3 = new jaxb.Parameter();
+                aps.getParameter().add(ap3);
+                ap3.setName("comm");
+                ap3.setValue(String.format("%d",commid));
 
-                    jaxb.Parameters cps = new jaxb.Parameters();
-                    ctrl.setParameters(cps);
+                // controller ..............................
+                jaxb.Controller ctrl = new jaxb.Controller();
+                jcntrls.getController().add(ctrl);
+                ctrl.setId(ctrlid);
+                ctrl.setType("frflow");
+                ctrl.setDt(simdt);
+                ctrl.setStartTime(0f);
 
-                    jaxb.Parameter cp0 = new jaxb.Parameter();
-                    cps.getParameter().add(cp0);
-                    cp0.setName("start_time");
-                    cp0.setValue(String.format("%.1f",prof.start_time));
+                jaxb.TargetActuators ta = new jaxb.TargetActuators();
+                ctrl.setTargetActuators(ta);
+                ta.setIds(String.format("%d",ctrlid));
 
-                    jaxb.Parameter cp1 = new jaxb.Parameter();
-                    cps.getParameter().add(cp1);
-                    cp1.setName("dt");
-                    cp1.setValue(prof.dt.toString());
-                    jaxb.Parameter cp2 = new jaxb.Parameter();
-                    cps.getParameter().add(cp2);
-                    cp2.setName("flowvph");
-                    cp2.setValue(OTMUtils.comma_format(prof.values));
+                jaxb.Profiles profs = new jaxb.Profiles();
+                ctrl.setProfiles(profs);
 
+                for(LinkOfframp fr : frs){
+                    if(!fr.frflows.containsKey(commid))
+                        continue;
+                    jaxb.Profile prof = new jaxb.Profile();
+                    profs.getProfile().add(prof);
+                    prof.setStartTime(fr.get_use_fr_flows()?30f:100000f);
+                    prof.setDt(300f);
+                    prof.setId(fr.id);
+                    prof.setContent(OTMUtils.comma_format(fr.frflows.get(commid).values));
                 }
             }
-
         }
 
         /////////////////////////////////////////////////////

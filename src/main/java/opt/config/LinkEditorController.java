@@ -2303,7 +2303,7 @@ public class LinkEditorController {
     void onToggleUseFRFlows(ActionEvent event) {
         CheckBox cb = (CheckBox)event.getSource();
         useFRFlows = cb.isSelected();
-        ((LinkOfframp)this.myLink).set_use_frflows(useFRFlows);
+        ((LinkOfframp)this.myLink).set_use_fr_flows(useFRFlows);
         gridFRFlow.setVisible(useFRFlows);         
         gridSR.setVisible(!useFRFlows); 
         cbUseFRFlows.setSelected(useFRFlows);
@@ -2396,9 +2396,7 @@ public class LinkEditorController {
             });
             col.setReorderable(false);
             double dt = Math.min(pdt, UserSettings.defaultFRFlowDtMinutes * 60);
-//            float ctrldt = 0.5f * (float)dt;
-            float ctrldt = 0f;
-            Profile1D cdp = ((LinkOfframp)myLink).get_frflows(listVT.get(i).getId(), ctrldt, dt);
+            Profile1D cdp = ((LinkOfframp)myLink).get_frflows(listVT.get(i).getId(), dt);
             if (cdp != null) {
                 pdt = Math.min(pdt, cdp.get_dt());
                 List<Double> lst = cdp.get_values();
