@@ -40,6 +40,7 @@ import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
@@ -185,7 +186,6 @@ public class ScenarioEditorController {
 
     @FXML // fx:id="removeFromPolicy"
     private Button removeFromPolicy; // Value injected by FXMLLoader
-
 
     @FXML // fx:id="eventPane"
     private TitledPane eventPane; // Value injected by FXMLLoader

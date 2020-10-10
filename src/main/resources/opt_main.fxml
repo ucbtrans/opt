@@ -83,7 +83,7 @@
             </AnchorPane>
             <ScrollPane fitToHeight="true" fitToWidth="true">
                <content>
-                  <TabPane id="actionPane" fx:id="actionPane" tabClosingPolicy="UNAVAILABLE">
+                  <TabPane id="actionPane" fx:id="actionPane" minHeight="-Infinity" minWidth="650.0" prefHeight="800.0" prefWidth="898.0" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
                       <Tab id="configTabPane" fx:id="configTabPane" text="Configuration">
                            <content>

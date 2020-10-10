@@ -5,7 +5,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.VBox?>
 
-<TabPane id="linkPerformanceMainPane" fx:id="linkPerformanceMainPane" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.performance.LinkPerformanceController">
+<TabPane id="linkPerformanceMainPane" fx:id="linkPerformanceMainPane" minWidth="650.0" prefHeight="820.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.performance.LinkPerformanceController">
   <tabs>
     <Tab id="tabTimeSeries" fx:id="tabTimeSeries" text="Time Series">
          <content>

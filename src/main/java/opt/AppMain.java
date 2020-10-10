@@ -40,6 +40,7 @@ public class AppMain extends Application {
             sH = (int)Math.round(0.9 * bounds.getHeight());
         if (bounds.getWidth() < W)
             sW = (int)Math.round(0.9 * bounds.getWidth());
+        //sH = (int)Math.round(0.9 * 613); //just for testing...
         
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/opt_main.fxml"));
         VBox root = (VBox)loader.load();

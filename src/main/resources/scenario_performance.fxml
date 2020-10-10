@@ -5,21 +5,21 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.VBox?>
 
-<TabPane id="scenarioPerformanceMainPane" fx:id="scenarioPerformanceMainPane" prefHeight="820.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.performance.ScenarioPerformanceController">
+<TabPane id="scenarioPerformanceMainPane" fx:id="scenarioPerformanceMainPane" minWidth="650.0" prefHeight="820.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.performance.ScenarioPerformanceController">
   <tabs>
     <Tab id="tabSummary" fx:id="tabSummary" text="Summary">
          <content>
-            <ScrollPane id="spSummary" fx:id="spSummary" fitToHeight="true" fitToWidth="true" vbarPolicy="ALWAYS">
+            <ScrollPane id="spSummary" fx:id="spSummary" fitToHeight="true" fitToWidth="true">
                <content>
-                  <VBox id="vbSummary" fx:id="vbSummary" prefHeight="820.0" prefWidth="900.0" />
+                  <VBox id="vbSummary" fx:id="vbSummary" minWidth="650.0" prefHeight="820.0" prefWidth="900.0" />
                </content></ScrollPane>
          </content>
     </Tab>
     <Tab id="tabAggregates" fx:id="tabAggregates" text="Aggregates">
          <content>
-            <ScrollPane id="spAggregates" fx:id="spAggregates" fitToHeight="true" fitToWidth="true" vbarPolicy="ALWAYS">
+            <ScrollPane id="spAggregates" fx:id="spAggregates" fitToHeight="true" fitToWidth="true">
                <content>
-                  <VBox id="vbAggregates" fx:id="vbAggregates" prefHeight="820.0" prefWidth="900.0" />
+                  <VBox id="vbAggregates" fx:id="vbAggregates" minWidth="650.0" prefHeight="820.0" prefWidth="900.0" />
                </content></ScrollPane>
          </content>
     </Tab>

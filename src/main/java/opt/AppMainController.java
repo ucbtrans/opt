@@ -663,8 +663,8 @@ public class AppMainController {
                 routes_node.getChildren().add(route_node); 
             }
             
-            TreeItem<String> events_node = new TreeItem<String>(eventsTreeItem, new ImageView(imageFolder));    
-            scenario_node.getChildren().add(events_node);
+            //TreeItem<String> events_node = new TreeItem<String>(eventsTreeItem, new ImageView(imageFolder));    
+            //scenario_node.getChildren().add(events_node);
             
             root.getChildren().add(scenario_node);
         }

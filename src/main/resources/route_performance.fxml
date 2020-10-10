@@ -5,7 +5,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.VBox?>
 
-<TabPane id="routePerformanceMainPane" fx:id="routePerformanceMainPane" prefHeight="820.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.performance.RoutePerformanceController">
+<TabPane id="routePerformanceMainPane" fx:id="routePerformanceMainPane" minWidth="650.0" prefHeight="820.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.performance.RoutePerformanceController">
   <tabs>
     <Tab id="tabContours" fx:id="tabContours" text="Contours">
          <content>

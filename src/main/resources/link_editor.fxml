@@ -8,6 +8,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.SplitPane?>
@@ -26,538 +27,547 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane id="linkEditorMainPane" fx:id="linkEditorMainPane" dividerPositions="0.2040133779264214" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="600.0" orientation="VERTICAL" prefHeight="820.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.config.LinkEditorController">
+<SplitPane id="linkEditorMainPane" fx:id="linkEditorMainPane" dividerPositions="0.2040133779264214" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="650.0" orientation="VERTICAL" prefHeight="820.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.config.LinkEditorController">
   <items>
-      <AnchorPane id="canvasParent" fx:id="canvasParent" minHeight="170.0" minWidth="600.0" prefHeight="170.0" prefWidth="850.0">
+      <AnchorPane id="canvasParent" fx:id="canvasParent" minHeight="170.0" minWidth="650.0" prefHeight="170.0" prefWidth="898.0">
          <children>
             <Canvas id="linkEditorCanvas" fx:id="linkEditorCanvas" height="180.0" width="898.0" />
          </children>
       </AnchorPane>
-      <AnchorPane prefHeight="151.0" prefWidth="800.0">
+      <AnchorPane prefHeight="650.0" prefWidth="898.0">
          <children>
-            <VBox prefHeight="471.0" prefWidth="498.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <children>
-                  <AnchorPane prefHeight="30.0" prefWidth="498.0">
+            <ScrollPane fitToHeight="true" fitToWidth="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <content>
+                  <VBox minHeight="-Infinity" minWidth="650.0" prefHeight="650.0" prefWidth="898.0">
                      <children>
-                        <BorderPane prefHeight="200.0" prefWidth="498.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <left>
-                              <HBox prefHeight="30.0" prefWidth="257.0" BorderPane.alignment="CENTER">
-                                 <children>
-                                    <Button id="addSeectionUpstream" fx:id="addSectionUpstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionUpstreamAction" prefWidth="130.0" text="&lt;&lt; Add Section">
-                                       <HBox.margin>
-                                          <Insets left="10.0" />
-                                       </HBox.margin>
+                        <AnchorPane prefHeight="30.0" prefWidth="498.0">
+                           <children>
+                              <BorderPane minHeight="20.0" prefHeight="200.0" prefWidth="498.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <left>
+                                    <HBox prefHeight="30.0" prefWidth="257.0" BorderPane.alignment="CENTER">
+                                       <children>
+                                          <Button id="addSeectionUpstream" fx:id="addSectionUpstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionUpstreamAction" prefWidth="130.0" text="&lt;&lt; Add Section">
+                                             <HBox.margin>
+                                                <Insets left="10.0" />
+                                             </HBox.margin>
+                                             <tooltip>
+                                                <Tooltip id="ttAddSectionUpstream" fx:id="ttAddSectionUpstream" text="Attach new freeway section upstream" />
+                                             </tooltip>
+                                          </Button>
+                                          <Button id="connectSectionUpstream" fx:id="connectSectionUpstream" defaultButton="true" mnemonicParsing="false" onAction="#onConnectSectionUpstreamAction" prefWidth="130.0" text="&lt;&lt; Connect Section" visible="false">
+                                             <tooltip>
+                                                <Tooltip id="ttConnectUpstream" fx:id="ttConnectUpstream" text="Empty Tooltip" />
+                                             </tooltip>
+                                          </Button>
+                                       </children>
+                                    </HBox>
+                                 </left>
+                                 <right>
+                                    <HBox alignment="TOP_RIGHT" prefHeight="30.0" prefWidth="257.0" BorderPane.alignment="CENTER">
+                                       <children>
+                                          <Button id="connectSectionDownstream" fx:id="connectSectionDownstream" defaultButton="true" mnemonicParsing="false" onAction="#onConnectSectionDownstreamAction" prefWidth="130.0" text="Connect Section &gt;&gt;" visible="false">
+                                             <tooltip>
+                                                <Tooltip id="ttConnectDownstream" fx:id="ttConnectDownstream" text="Empty Tooltip" />
+                                             </tooltip>
+                                          </Button>
+                                          <Button id="addSectionDownstream" fx:id="addSectionDownstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionDownstreamAction" prefWidth="130.0" text="Add Section &gt;&gt;">
+                                             <HBox.margin>
+                                                <Insets right="10.0" />
+                                             </HBox.margin>
+                                             <tooltip>
+                                                <Tooltip id="ttAddSectionDownstream" fx:id="ttAddSectionDownstream" text="Attach new freeway section downstream" />
+                                             </tooltip>
+                                          </Button>
+                                       </children>
+                                    </HBox>
+                                 </right>
+                                 <center>
+                                    <Button id="deleteSection" fx:id="deleteSection" mnemonicParsing="false" onAction="#onDeleteSection" prefWidth="130.0" text="Delete Section" BorderPane.alignment="TOP_CENTER">
                                        <tooltip>
-                                          <Tooltip id="ttAddSectionUpstream" fx:id="ttAddSectionUpstream" text="Attach new freeway section upstream" />
-                                       </tooltip></Button>
-                                    <Button id="connectSectionUpstream" fx:id="connectSectionUpstream" defaultButton="true" mnemonicParsing="false" onAction="#onConnectSectionUpstreamAction" prefWidth="130.0" text="&lt;&lt; Connect Section" visible="false">
-                                       <tooltip>
-                                          <Tooltip id="ttConnectUpstream" fx:id="ttConnectUpstream" text="Empty Tooltip" />
+                                          <Tooltip id="ttDeleteSection" fx:id="ttDeleteSection" text="Empty Tooltip" />
                                        </tooltip>
                                     </Button>
-                                 </children>
-                              </HBox>
-                           </left>
-                           <right>
-                              <HBox alignment="TOP_RIGHT" prefHeight="30.0" prefWidth="257.0" BorderPane.alignment="CENTER">
-                                 <children>
-                                    <Button id="connectSectionDownstream" fx:id="connectSectionDownstream" defaultButton="true" mnemonicParsing="false" onAction="#onConnectSectionDownstreamAction" prefWidth="130.0" text="Connect Section &gt;&gt;" visible="false">
-                                       <tooltip>
-                                          <Tooltip id="ttConnectDownstream" fx:id="ttConnectDownstream" text="Empty Tooltip" />
-                                       </tooltip></Button>
-                                    <Button id="addSectionDownstream" fx:id="addSectionDownstream" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddSectionDownstreamAction" prefWidth="130.0" text="Add Section &gt;&gt;">
-                                       <HBox.margin>
-                                          <Insets right="10.0" />
-                                       </HBox.margin>
-                                       <tooltip>
-                                          <Tooltip id="ttAddSectionDownstream" fx:id="ttAddSectionDownstream" text="Attach new freeway section downstream" />
-                                       </tooltip></Button>
-                                 </children>
-                              </HBox>
-                           </right>
-                           <center>
-                              <Button id="deleteSection" fx:id="deleteSection" mnemonicParsing="false" onAction="#onDeleteSection" prefWidth="130.0" text="Delete Section" BorderPane.alignment="TOP_CENTER">
-                                 <tooltip>
-                                    <Tooltip id="ttDeleteSection" fx:id="ttDeleteSection" text="Empty Tooltip" />
-                                 </tooltip></Button>
-                           </center>
-                        </BorderPane>
-                     </children>
-                  </AnchorPane>
-                  <AnchorPane prefHeight="77.0" prefWidth="898.0">
-                     <children>
-                        <GridPane alignment="CENTER" hgap="10.0" prefHeight="64.0" prefWidth="898.0" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                          <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="220.0" minWidth="10.0" prefWidth="182.66668701171875" />
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="208.33331298828125" minWidth="10.0" prefWidth="208.33331298828125" />
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="133.66668701171875" minWidth="10.0" prefWidth="123.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints maxHeight="25.0" minHeight="10.0" prefHeight="18.666656494140625" vgrow="SOMETIMES" />
-                            <RowConstraints maxHeight="43.333343505859375" minHeight="10.0" prefHeight="22.333343505859375" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Label id="labelFromName" fx:id="labelFromName" text="FROM Name:" GridPane.valignment="BOTTOM" />
-                              <TextField id="linkFromName" fx:id="linkFromName" GridPane.rowIndex="1" />
-                              <Label id="labelToName" fx:id="labelToName" text="TO Name:" GridPane.columnIndex="1" GridPane.valignment="BOTTOM" />
-                              <TextField id="linkToName" fx:id="linkToName" prefHeight="12.0" prefWidth="209.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Label id="labelLength" fx:id="labelLength" text="Length (miles):" GridPane.columnIndex="2" GridPane.valignment="BOTTOM" />
-                              <Spinner id="linkLength" fx:id="linkLength" editable="true" prefHeight="25.0" prefWidth="134.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                 </center>
+                              </BorderPane>
                            </children>
-                           <padding>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                           </padding>
-                        </GridPane>
-                     </children>
-                  </AnchorPane>
-                  <AnchorPane id="linkEditorAccordionParent" fx:id="linkEditorAccordionParent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="542.0" prefWidth="898.0">
-                     <children>
-                        <Accordion id="linkEditorAccordion" fx:id="linkEditorAccordion" prefHeight="621.0" prefWidth="898.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                          <panes>
-                              <TitledPane id="laneProperties" fx:id="laneProperties" animated="false" prefHeight="351.0" prefWidth="898.0" text="Lane Properties">
-                                <content>
-                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                       <children>
-                                          <GridPane layoutX="92.0" layoutY="137.0" prefHeight="454.0" prefWidth="846.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <columnConstraints>
-                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
-                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
-                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                            </columnConstraints>
-                                            <rowConstraints>
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                            </rowConstraints>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="77.0" prefWidth="898.0">
+                           <children>
+                              <GridPane alignment="CENTER" hgap="10.0" minHeight="-Infinity" prefHeight="64.0" prefWidth="898.0" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="220.0" minWidth="10.0" prefWidth="182.66668701171875" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="208.33331298828125" minWidth="10.0" prefWidth="208.33331298828125" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="133.66668701171875" minWidth="10.0" prefWidth="123.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints maxHeight="25.0" minHeight="10.0" prefHeight="18.666656494140625" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="43.333343505859375" minHeight="10.0" prefHeight="22.333343505859375" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label id="labelFromName" fx:id="labelFromName" text="FROM Name:" GridPane.valignment="BOTTOM" />
+                                    <TextField id="linkFromName" fx:id="linkFromName" GridPane.rowIndex="1" />
+                                    <Label id="labelToName" fx:id="labelToName" text="TO Name:" GridPane.columnIndex="1" GridPane.valignment="BOTTOM" />
+                                    <TextField id="linkToName" fx:id="linkToName" prefHeight="12.0" prefWidth="209.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Label id="labelLength" fx:id="labelLength" text="Length (miles):" GridPane.columnIndex="2" GridPane.valignment="BOTTOM" />
+                                    <Spinner id="linkLength" fx:id="linkLength" editable="true" prefHeight="25.0" prefWidth="134.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane id="linkEditorAccordionParent" fx:id="linkEditorAccordionParent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="542.0" prefWidth="898.0">
+                           <children>
+                              <Accordion id="linkEditorAccordion" fx:id="linkEditorAccordion" prefHeight="621.0" prefWidth="898.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <panes>
+                                    <TitledPane id="laneProperties" fx:id="laneProperties" animated="false" prefHeight="351.0" prefWidth="898.0" text="Lane Properties">
+                                      <content>
+                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                              <children>
-                                                <Label text="Managed Lanes" GridPane.halignment="CENTER">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                </Label>
-                                                <Label text="General Purpose Lanes" GridPane.columnIndex="2" GridPane.halignment="CENTER">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                </Label>
-                                                <Label text="Auxiliary Lanes" GridPane.columnIndex="4" GridPane.halignment="CENTER">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                </Label>
-                                                <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowSpan="14" />
-                                                <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowSpan="14" />
-                                                <Spinner id="numManagedLanes" fx:id="numManagedLanes" editable="true" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-                                                <Spinner id="numGPLanes" fx:id="numGPLanes" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-                                                <Spinner id="numAuxLanes" fx:id="numAuxLanes" editable="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-                                                <Spinner id="capacityManagedLane" fx:id="capacityManagedLane" editable="true" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
-                                                <Spinner id="capacityGPLane" fx:id="capacityGPLane" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
-                                                <Spinner id="capacityAuxLane" fx:id="capacityAuxLane" editable="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
-                                                <Spinner id="ffSpeedManaged" fx:id="ffSpeedManaged" editable="true" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
-                                                <Spinner id="ffSpeedGP" fx:id="ffSpeedGP" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
-                                                <Spinner id="ffSpeedAux" fx:id="ffSpeedAux" editable="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
-                                                <Spinner id="jamDensityManagedLane" fx:id="jamDensityManagedLane" editable="true" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
-                                                <Spinner id="jamDensityGPLane" fx:id="jamDensityGPLane" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
-                                                <Spinner id="jamDensityAuxLane" fx:id="jamDensityAuxLane" editable="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
-                                                <CheckBox id="cbBarrier" fx:id="cbBarrier" disable="true" mnemonicParsing="false" onAction="#drawRoadSection" text="Barrier" GridPane.halignment="CENTER" GridPane.rowIndex="12" GridPane.valignment="BASELINE">
-                                                   <GridPane.margin>
-                                                      <Insets />
-                                                   </GridPane.margin>
-                                                   <tooltip>
-                                                      <Tooltip text="Set a barrier between managed and general purpose lanes" />
-                                                   </tooltip>
-                                                </CheckBox>
-                                                <CheckBox id="cbSeparated" fx:id="cbSeparated" disable="true" mnemonicParsing="false" onAction="#drawRoadSection" text="Separated" GridPane.halignment="CENTER" GridPane.rowIndex="13" GridPane.valignment="BASELINE">
-                                                   <GridPane.margin>
-                                                      <Insets left="18.0" />
-                                                   </GridPane.margin>
-                                                   <tooltip>
-                                                      <Tooltip text="Set barrier between managed lanes if there are more than one" />
-                                                   </tooltip>
-                                                </CheckBox>
-                                                <Separator prefWidth="200.0" GridPane.rowIndex="1" />
-                                                <Separator prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                                <Separator prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-                                                <Label text="Number of Managed Lanes:" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
-                                                   <GridPane.margin>
-                                                      <Insets left="20.0" />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Label text="Number of General Purpose Lanes:" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
-                                                   <GridPane.margin>
-                                                      <Insets left="20.0" />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Label text="Number of Auxiliary Lanes:" GridPane.columnIndex="4" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
-                                                   <GridPane.margin>
-                                                      <Insets left="20.0" />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Label id="labelManagedLaneCapacity" fx:id="labelManagedLaneCapacity" text="Managed Lane Capacity (vph):" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
-                                                   <GridPane.margin>
-                                                      <Insets left="20.0" />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Label id="labelGPLaneCapacity" fx:id="labelGPLaneCapacity" text="General Purpose Lane Capacity (vph):" GridPane.columnIndex="2" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
-                                                   <GridPane.margin>
-                                                      <Insets left="20.0" />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Label id="labelAuxLaneCapacity" fx:id="labelAuxLaneCapacity" text="Auxiliary Lane Capacity (vph):" GridPane.columnIndex="4" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
-                                                   <GridPane.margin>
-                                                      <Insets left="20.0" />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Label id="labelFreeFlowSpeedManaged" fx:id="labelFreeFlowSpeedManaged" text="Free Flow Speed (mph):" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
-                                                   <GridPane.margin>
-                                                      <Insets left="20.0" />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Label id="labelFreeFlowSpeedGP" fx:id="labelFreeFlowSpeedGP" text="Free Flow Speed (mph):" GridPane.columnIndex="2" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
-                                                   <GridPane.margin>
-                                                      <Insets left="20.0" />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Label id="labelFreeFlowSpeedAux" fx:id="labelFreeFlowSpeedAux" text="Free Flow Speed (mph):" GridPane.columnIndex="4" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
-                                                   <GridPane.margin>
-                                                      <Insets left="20.0" />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Label id="labelJamDensityManaged" fx:id="labelJamDensityManaged" text="Managed Lane Jam Density (vpm):" GridPane.rowIndex="9" GridPane.valignment="BOTTOM">
-                                                   <GridPane.margin>
-                                                      <Insets left="20.0" />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Label id="labelJamDensityGP" fx:id="labelJamDensityGP" text="General Purpose Lane Jam Density (vpm):" GridPane.columnIndex="2" GridPane.rowIndex="9" GridPane.valignment="BOTTOM">
-                                                   <GridPane.margin>
-                                                      <Insets left="20.0" />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Label id="labelJamDensityAux" fx:id="labelJamDensityAux" text="Auxiliary Lane Jam Density (vpm):" GridPane.columnIndex="4" GridPane.rowIndex="9" GridPane.valignment="BOTTOM">
-                                                   <GridPane.margin>
-                                                      <Insets left="20.0" />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Separator prefWidth="200.0" GridPane.rowIndex="4" />
-                                                <Separator prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                                                <Separator prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="4" />
-                                             </children>
-                                             <padding>
-                                                <Insets bottom="10.0" left="5.0" right="5.0" />
-                                             </padding>
-                                          </GridPane>
-                                       </children>
-                                    </AnchorPane>
-                                </content>
-                              </TitledPane>
-                            <TitledPane id="rampsPane" fx:id="rampsPane" animated="false" expanded="false" prefHeight="198.0" prefWidth="514.0" text="On-Ramp and Off-Ramp Configuration">
-                              <content>
-                                <AnchorPane prefHeight="300.0" prefWidth="512.0">
-                                       <children>
-                                          <GridPane alignment="CENTER" hgap="10.0" layoutX="107.0" layoutY="104.0" prefHeight="298.0" prefWidth="536.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <columnConstraints>
-                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                            </columnConstraints>
-                                            <rowConstraints>
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                            </rowConstraints>
-                                             <children>
-                                                <Label text="On-Ramps:" GridPane.rowIndex="1">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Label text="Off-Ramps:" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                </Label>
-                                                <ListView id="listOnramps" fx:id="listOnramps" onKeyPressed="#onrampsKeyPressed" onMouseClicked="#onrampsOnClick" prefHeight="136.0" prefWidth="123.0" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
-                                                <Button id="addOnRamp" fx:id="addOnRamp" alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddOnRamp" prefWidth="130.0" text="Add On-Ramp" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                                                <Button id="deleteOnRamps" fx:id="deleteOnRamps" alignment="CENTER" mnemonicParsing="false" onAction="#onDeleteOnRamp" prefWidth="130.0" text="Delete On-Ramp" textAlignment="CENTER" GridPane.rowIndex="5" />
-                                                <ListView id="listOfframps" fx:id="listOfframps" onKeyPressed="#offrampsKeyPressed" onMouseClicked="#offrampsOnClick" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
-                                                <Button id="addOffRamp" fx:id="addOffRamp" alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddOffRamp" prefWidth="130.0" text="Add Off-Ramp" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                                                <Button id="deleteOffRamps" fx:id="deleteOffRamps" alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onDeleteOffRamp" prefWidth="130.0" text="Delete Off-Ramp" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                                             </children>
-                                             <padding>
-                                                <Insets left="10.0" right="10.0" />
-                                             </padding>
-                                          </GridPane>
-                                       </children>
-                                    </AnchorPane>
-                              </content>
-                            </TitledPane>
-                              <TitledPane id="trafficDemand" fx:id="trafficDemand" animated="false" expanded="false" layoutX="10.0" layoutY="35.0" prefHeight="476.0" prefWidth="898.0" text="Traffic Demand">
-                                 <content>
-                                    <AnchorPane prefHeight="300.0" prefWidth="512.0">
-                                       <children>
-                                          <Group layoutX="155.0" layoutY="68.0" />
-                                          <GridPane layoutX="14.0" prefHeight="389.0" prefWidth="896.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <columnConstraints>
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="286.33331298828125" minWidth="10.0" prefWidth="286.33331298828125" />
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="323.33331298828125" minWidth="10.0" prefWidth="140.66668701171875" />
-                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="323.33331298828125" minWidth="10.0" prefWidth="300.66668701171875" />
-                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="284.0" minWidth="10.0" prefWidth="280.33331298828125" />
-                                            </columnConstraints>
-                                            <rowConstraints>
-                                                <RowConstraints maxHeight="27.0" minHeight="10.0" prefHeight="14.33331298828125" vgrow="SOMETIMES" />
-                                                <RowConstraints maxHeight="44.0" minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
-                                                <RowConstraints maxHeight="30.33331298828125" minHeight="10.0" prefHeight="18.33331298828125" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                            </rowConstraints>
-                                             <padding>
-                                                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-                                             </padding>
-                                             <children>
-                                                <Label id="labelDemandUpdatePeriod" fx:id="labelDemandUpdatePeriod" text="Demand Update Period (min):">
-                                                   <GridPane.margin>
-                                                      <Insets />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Spinner id="dtDemand" fx:id="dtDemand" editable="true" prefHeight="25.0" prefWidth="174.0" GridPane.rowIndex="1">
-                                                   <GridPane.margin>
-                                                      <Insets />
-                                                   </GridPane.margin>
-                                                   <tooltip>
-                                                      <Tooltip id="ttDtDemand" fx:id="ttDtDemand" text="Frequency of demand update given in minutes" wrapText="true" />
-                                                   </tooltip>
-                                                </Spinner>
-                                                <TableView id="tableDemand" fx:id="tableDemand" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="4" GridPane.rowIndex="2" GridPane.rowSpan="10">
-                                                   <tooltip>
-                                                      <Tooltip id="ttTableDemand" fx:id="ttTableDemand" text="Ctrl+C - copy selected table cells to clipboard&#10;Ctrl+V - paste items into table from clipboard&#10;Ctrl+D - duplicate table row&#10;DEL - delete selected rows&#10;Shift+Mouse Click - select table cells&#10;Ctrl+A - select all table entries" />
-                                                   </tooltip></TableView>
-                                             </children>
-                                          </GridPane>
-                                       </children>
-                                    </AnchorPane>
-                                 </content>
-                              </TitledPane>
-                              <TitledPane id="trafficSplitDownstream" fx:id="trafficSplitDownstream" animated="false" expanded="false" layoutX="10.0" layoutY="60.0" prefHeight="476.0" prefWidth="898.0" text="Off-Ramp Traffic Split or Flows">
-                                 <content>
-                                    <AnchorPane prefHeight="300.0" prefWidth="512.0">
-                                       <children>
-                                          <Group layoutX="155.0" layoutY="68.0" />
-                                          <GridPane id="gridSR" fx:id="gridSR" layoutX="14.0" prefHeight="389.0" prefWidth="896.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                             <columnConstraints>
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="286.33331298828125" minWidth="10.0" prefWidth="286.33331298828125" />
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="323.33331298828125" minWidth="10.0" prefWidth="140.66668701171875" />
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="323.33331298828125" minWidth="10.0" prefWidth="300.66668701171875" />
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="284.0" minWidth="10.0" prefWidth="280.33331298828125" />
-                                             </columnConstraints>
-                                             <rowConstraints>
-                                                <RowConstraints maxHeight="27.0" minHeight="10.0" prefHeight="14.33331298828125" vgrow="SOMETIMES" />
-                                                <RowConstraints maxHeight="44.0" minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
-                                                <RowConstraints maxHeight="30.33331298828125" minHeight="10.0" prefHeight="18.33331298828125" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                             </rowConstraints>
-                                             <padding>
-                                                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-                                             </padding>
-                                             <children>
-                                                <Label text="Split Ratio Update Period (min):">
-                                                   <GridPane.margin>
-                                                      <Insets />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Spinner id="dtSR" fx:id="dtSR" editable="true" prefHeight="25.0" prefWidth="174.0" GridPane.rowIndex="1">
-                                                   <GridPane.margin>
-                                                      <Insets />
-                                                   </GridPane.margin>
-                                                   <tooltip>
-                                                      <Tooltip id="ttDtSR" fx:id="ttDtSR" text="Frequency of split ratio update given in minutes" wrapText="true" />
-                                                   </tooltip>
-                                                </Spinner>
-                                                <TableView id="tableSR" fx:id="tableSR" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="4" GridPane.rowIndex="2" GridPane.rowSpan="10">
-                                                   <tooltip>
-                                                      <Tooltip id="ttTableSR" fx:id="ttTableSR" text="Ctrl+C - copy selected table cells to clipboard&#10;Ctrl+V - paste items into table from clipboard&#10;Ctrl+D - duplicate table row&#10;DEL - delete selected rows&#10;Shift+Mouse Click - select table cells&#10;Ctrl+A - select all table entries" />
-                                                   </tooltip>
-                                                </TableView>
-                                                <CheckBox id="cbUseFRFlows" fx:id="cbUseFRFlows" mnemonicParsing="false" onAction="#onToggleUseFRFlows" text="Use Off-Ramp Flows" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                             </children>
-                                          </GridPane>
-                                          <GridPane id="gridFRFlow" fx:id="gridFRFlow" layoutX="20.0" layoutY="20.0" prefHeight="389.0" prefWidth="896.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                             <columnConstraints>
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="286.33331298828125" minWidth="10.0" prefWidth="286.33331298828125" />
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="323.33331298828125" minWidth="10.0" prefWidth="140.66668701171875" />
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="323.33331298828125" minWidth="10.0" prefWidth="300.66668701171875" />
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="284.0" minWidth="10.0" prefWidth="280.33331298828125" />
-                                             </columnConstraints>
-                                             <rowConstraints>
-                                                <RowConstraints maxHeight="27.0" minHeight="10.0" prefHeight="14.33331298828125" vgrow="SOMETIMES" />
-                                                <RowConstraints maxHeight="44.0" minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
-                                                <RowConstraints maxHeight="30.33331298828125" minHeight="10.0" prefHeight="18.33331298828125" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                             </rowConstraints>
-                                             <padding>
-                                                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-                                             </padding>
-                                             <children>
-                                                <Label text="Flow Update Period (min):">
-                                                   <GridPane.margin>
-                                                      <Insets />
-                                                   </GridPane.margin>
-                                                </Label>
-                                                <Spinner id="dtFRFlow" fx:id="dtFRFlow" editable="true" prefHeight="25.0" prefWidth="174.0" GridPane.rowIndex="1">
-                                                   <GridPane.margin>
-                                                      <Insets />
-                                                   </GridPane.margin>
-                                                   <tooltip>
-                                                      <Tooltip id="ttDtSR" fx:id="ttDtSR1" text="Frequency of flow update given in minutes" wrapText="true" />
-                                                   </tooltip>
-                                                </Spinner>
-                                                <TableView id="tableFRFlow" fx:id="tableFRFlow" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="4" GridPane.rowIndex="2" GridPane.rowSpan="10">
-                                                   <tooltip>
-                                                      <Tooltip id="ttTableSR" fx:id="ttTableSR1" text="Ctrl+C - copy selected table cells to clipboard&#10;Ctrl+V - paste items into table from clipboard&#10;Ctrl+D - duplicate table row&#10;DEL - delete selected rows&#10;Shift+Mouse Click - select table cells&#10;Ctrl+A - select all table entries" />
-                                                   </tooltip>
-                                                </TableView>
-                                                <CheckBox id="cbUseFRFlows2" fx:id="cbUseFRFlows2" mnemonicParsing="false" onAction="#onToggleUseFRFlows" text="Use Off-Ramp Flows" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                             </children>
-                                          </GridPane>
-                                       </children>
-                                    </AnchorPane>
-                                 </content>
-                              </TitledPane>
-                              <TitledPane id="linkControllerPane" fx:id="linkControllerPane" animated="false" expanded="false" layoutX="10.0" layoutY="606.0" prefHeight="198.0" prefWidth="514.0" text="Control">
-                                 <content>
-                                    <TabPane id="controlTabPane" fx:id="controlTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
-                                      <tabs>
-                                        <Tab id="tabGPLanesControl" fx:id="tabGPLanesControl" text="GP Lanes">
-                                          <content>
-                                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                <GridPane layoutX="92.0" layoutY="137.0" prefHeight="454.0" prefWidth="846.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                  <columnConstraints>
+                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                  </rowConstraints>
                                                    <children>
-                                                      <GridPane prefHeight="389.0" prefWidth="896.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                        <columnConstraints>
-                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="540.6666870117188" minWidth="10.0" prefWidth="436.6666564941406" />
-                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="439.3333435058594" minWidth="10.0" prefWidth="439.3333435058594" />
-                                                        </columnConstraints>
-                                                        <rowConstraints>
-                                                          <RowConstraints maxHeight="37.0" minHeight="7.0" prefHeight="16.3333740234375" vgrow="SOMETIMES" />
-                                                          <RowConstraints maxHeight="62.0" minHeight="10.0" prefHeight="44.6666259765625" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints maxHeight="43.33331298828125" minHeight="0.33331298828125" prefHeight="33.66668701171875" vgrow="SOMETIMES" />
-                                                          <RowConstraints maxHeight="87.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints maxHeight="65.66668701171875" minHeight="0.0" prefHeight="11.0" vgrow="SOMETIMES" />
-                                                        </rowConstraints>
-                                                         <padding>
-                                                            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-                                                         </padding>
-                                                         <children>
-                                                            <ListView id="listControllersGP" fx:id="listControllersGP" onKeyPressed="#controllersOnKeyPressedGP" onMouseClicked="#controllersOnClickGP" prefHeight="262.0" prefWidth="876.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="9" />
-                                                            <Button id="deleteControllerGP" fx:id="deleteControllerGP" mnemonicParsing="false" onAction="#onDeleteControllerGP" prefWidth="130.0" text="Delete Controller" GridPane.rowIndex="10" />
-                                                            <Button id="addControllerGP" fx:id="addControllerGP" defaultButton="true" mnemonicParsing="false" onAction="#onAddControllerGP" prefWidth="130.0" text="Add Controller" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
-                                                         </children>
-                                                      </GridPane>
+                                                      <Label text="Managed Lanes" GridPane.halignment="CENTER">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <Label text="General Purpose Lanes" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <Label text="Auxiliary Lanes" GridPane.columnIndex="4" GridPane.halignment="CENTER">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowSpan="14" />
+                                                      <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowSpan="14" />
+                                                      <Spinner id="numManagedLanes" fx:id="numManagedLanes" editable="true" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                                                      <Spinner id="numGPLanes" fx:id="numGPLanes" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                                                      <Spinner id="numAuxLanes" fx:id="numAuxLanes" editable="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                                                      <Spinner id="capacityManagedLane" fx:id="capacityManagedLane" editable="true" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+                                                      <Spinner id="capacityGPLane" fx:id="capacityGPLane" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+                                                      <Spinner id="capacityAuxLane" fx:id="capacityAuxLane" editable="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+                                                      <Spinner id="ffSpeedManaged" fx:id="ffSpeedManaged" editable="true" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
+                                                      <Spinner id="ffSpeedGP" fx:id="ffSpeedGP" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
+                                                      <Spinner id="ffSpeedAux" fx:id="ffSpeedAux" editable="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
+                                                      <Spinner id="jamDensityManagedLane" fx:id="jamDensityManagedLane" editable="true" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
+                                                      <Spinner id="jamDensityGPLane" fx:id="jamDensityGPLane" editable="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
+                                                      <Spinner id="jamDensityAuxLane" fx:id="jamDensityAuxLane" editable="true" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
+                                                      <CheckBox id="cbBarrier" fx:id="cbBarrier" disable="true" mnemonicParsing="false" onAction="#drawRoadSection" text="Barrier" GridPane.halignment="CENTER" GridPane.rowIndex="12" GridPane.valignment="BASELINE">
+                                                         <GridPane.margin>
+                                                            <Insets />
+                                                         </GridPane.margin>
+                                                         <tooltip>
+                                                            <Tooltip text="Set a barrier between managed and general purpose lanes" />
+                                                         </tooltip>
+                                                      </CheckBox>
+                                                      <CheckBox id="cbSeparated" fx:id="cbSeparated" disable="true" mnemonicParsing="false" onAction="#drawRoadSection" text="Separated" GridPane.halignment="CENTER" GridPane.rowIndex="13" GridPane.valignment="BASELINE">
+                                                         <GridPane.margin>
+                                                            <Insets left="18.0" />
+                                                         </GridPane.margin>
+                                                         <tooltip>
+                                                            <Tooltip text="Set barrier between managed lanes if there are more than one" />
+                                                         </tooltip>
+                                                      </CheckBox>
+                                                      <Separator prefWidth="200.0" GridPane.rowIndex="1" />
+                                                      <Separator prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                      <Separator prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                                                      <Label text="Number of Managed Lanes:" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+                                                         <GridPane.margin>
+                                                            <Insets left="20.0" />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Label text="Number of General Purpose Lanes:" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+                                                         <GridPane.margin>
+                                                            <Insets left="20.0" />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Label text="Number of Auxiliary Lanes:" GridPane.columnIndex="4" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+                                                         <GridPane.margin>
+                                                            <Insets left="20.0" />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Label id="labelManagedLaneCapacity" fx:id="labelManagedLaneCapacity" text="Managed Lane Capacity (vph):" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
+                                                         <GridPane.margin>
+                                                            <Insets left="20.0" />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Label id="labelGPLaneCapacity" fx:id="labelGPLaneCapacity" text="General Purpose Lane Capacity (vph):" GridPane.columnIndex="2" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
+                                                         <GridPane.margin>
+                                                            <Insets left="20.0" />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Label id="labelAuxLaneCapacity" fx:id="labelAuxLaneCapacity" text="Auxiliary Lane Capacity (vph):" GridPane.columnIndex="4" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
+                                                         <GridPane.margin>
+                                                            <Insets left="20.0" />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Label id="labelFreeFlowSpeedManaged" fx:id="labelFreeFlowSpeedManaged" text="Free Flow Speed (mph):" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
+                                                         <GridPane.margin>
+                                                            <Insets left="20.0" />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Label id="labelFreeFlowSpeedGP" fx:id="labelFreeFlowSpeedGP" text="Free Flow Speed (mph):" GridPane.columnIndex="2" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
+                                                         <GridPane.margin>
+                                                            <Insets left="20.0" />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Label id="labelFreeFlowSpeedAux" fx:id="labelFreeFlowSpeedAux" text="Free Flow Speed (mph):" GridPane.columnIndex="4" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
+                                                         <GridPane.margin>
+                                                            <Insets left="20.0" />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Label id="labelJamDensityManaged" fx:id="labelJamDensityManaged" text="Managed Lane Jam Density (vpm):" GridPane.rowIndex="9" GridPane.valignment="BOTTOM">
+                                                         <GridPane.margin>
+                                                            <Insets left="20.0" />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Label id="labelJamDensityGP" fx:id="labelJamDensityGP" text="General Purpose Lane Jam Density (vpm):" GridPane.columnIndex="2" GridPane.rowIndex="9" GridPane.valignment="BOTTOM">
+                                                         <GridPane.margin>
+                                                            <Insets left="20.0" />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Label id="labelJamDensityAux" fx:id="labelJamDensityAux" text="Auxiliary Lane Jam Density (vpm):" GridPane.columnIndex="4" GridPane.rowIndex="9" GridPane.valignment="BOTTOM">
+                                                         <GridPane.margin>
+                                                            <Insets left="20.0" />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Separator prefWidth="200.0" GridPane.rowIndex="4" />
+                                                      <Separator prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                      <Separator prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                                                    </children>
-                                                </AnchorPane>
-                                          </content>
-                                        </Tab>
-                                          <Tab id="tabManagedLanesControl" fx:id="tabManagedLanesControl" text="Managed Lanes">
-                                             <content>
-                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                   <padding>
+                                                      <Insets bottom="10.0" left="5.0" right="5.0" />
+                                                   </padding>
+                                                </GridPane>
+                                             </children>
+                                          </AnchorPane>
+                                      </content>
+                                    </TitledPane>
+                                  <TitledPane id="rampsPane" fx:id="rampsPane" animated="false" expanded="false" prefHeight="198.0" prefWidth="514.0" text="On-Ramp and Off-Ramp Configuration">
+                                    <content>
+                                      <AnchorPane prefHeight="300.0" prefWidth="512.0">
+                                             <children>
+                                                <GridPane alignment="CENTER" hgap="10.0" layoutX="107.0" layoutY="104.0" prefHeight="298.0" prefWidth="536.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                  <columnConstraints>
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                  </rowConstraints>
                                                    <children>
-                                                      <GridPane prefHeight="389.0" prefWidth="896.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                         <columnConstraints>
-                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="540.6666870117188" minWidth="10.0" prefWidth="436.6666564941406" />
-                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="439.3333435058594" minWidth="10.0" prefWidth="439.3333435058594" />
-                                                         </columnConstraints>
-                                                         <rowConstraints>
-                                                            <RowConstraints maxHeight="37.0" minHeight="7.0" prefHeight="16.3333740234375" vgrow="SOMETIMES" />
-                                                            <RowConstraints maxHeight="62.0" minHeight="10.0" prefHeight="44.6666259765625" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints maxHeight="43.33331298828125" minHeight="0.33331298828125" prefHeight="33.66668701171875" vgrow="SOMETIMES" />
-                                                            <RowConstraints maxHeight="87.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints maxHeight="65.66668701171875" minHeight="0.0" prefHeight="11.0" vgrow="SOMETIMES" />
-                                                         </rowConstraints>
-                                                         <padding>
-                                                            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-                                                         </padding>
-                                                         <children>
-                                                            <ListView id="listControllersManaged" fx:id="listControllersManaged" onKeyPressed="#controllersOnKeyPressedManaged" onMouseClicked="#controllersOnClickManaged" prefHeight="262.0" prefWidth="876.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="9" />
-                                                            <Button id="deleteControllerManaged" fx:id="deleteControllerManaged" mnemonicParsing="false" onAction="#onDeleteControllerManaged" prefWidth="130.0" text="Delete Controller" GridPane.rowIndex="10" />
-                                                            <Button id="addControllerManaged" fx:id="addControllerManaged" defaultButton="true" mnemonicParsing="false" onAction="#onAddControllerManaged" prefWidth="130.0" text="Add Controller" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
-                                                         </children>
-                                                      </GridPane>
+                                                      <Label text="On-Ramps:" GridPane.rowIndex="1">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font>
+                                                         <GridPane.margin>
+                                                            <Insets />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Label text="Off-Ramps:" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <ListView id="listOnramps" fx:id="listOnramps" onKeyPressed="#onrampsKeyPressed" onMouseClicked="#onrampsOnClick" prefHeight="136.0" prefWidth="123.0" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
+                                                      <Button id="addOnRamp" fx:id="addOnRamp" alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddOnRamp" prefWidth="130.0" text="Add On-Ramp" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                                                      <Button id="deleteOnRamps" fx:id="deleteOnRamps" alignment="CENTER" mnemonicParsing="false" onAction="#onDeleteOnRamp" prefWidth="130.0" text="Delete On-Ramp" textAlignment="CENTER" GridPane.rowIndex="5" />
+                                                      <ListView id="listOfframps" fx:id="listOfframps" onKeyPressed="#offrampsKeyPressed" onMouseClicked="#offrampsOnClick" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
+                                                      <Button id="addOffRamp" fx:id="addOffRamp" alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onAddOffRamp" prefWidth="130.0" text="Add Off-Ramp" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                                                      <Button id="deleteOffRamps" fx:id="deleteOffRamps" alignment="CENTER" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#onDeleteOffRamp" prefWidth="130.0" text="Delete Off-Ramp" GridPane.columnIndex="2" GridPane.rowIndex="5" />
                                                    </children>
-                                                </AnchorPane>
-                                             </content>
-                                          </Tab>
-                                      </tabs>
-                                    </TabPane>
-                                 </content>
-                              </TitledPane>
-                              <TitledPane id="linkEventPane" fx:id="linkEventPane1" animated="false" disable="true" expanded="false" layoutX="10.0" layoutY="135.0" prefHeight="198.0" prefWidth="514.0" text="Events">
-                                 <content>
-                                    <AnchorPane prefHeight="300.0" prefWidth="512.0" />
-                                 </content>
-                              </TitledPane>
-                          </panes>
-                        </Accordion>
+                                                   <padding>
+                                                      <Insets left="10.0" right="10.0" />
+                                                   </padding>
+                                                </GridPane>
+                                             </children>
+                                          </AnchorPane>
+                                    </content>
+                                  </TitledPane>
+                                    <TitledPane id="trafficDemand" fx:id="trafficDemand" animated="false" expanded="false" layoutX="10.0" layoutY="35.0" prefHeight="476.0" prefWidth="898.0" text="Traffic Demand">
+                                       <content>
+                                          <AnchorPane prefHeight="300.0" prefWidth="512.0">
+                                             <children>
+                                                <Group layoutX="155.0" layoutY="68.0" />
+                                                <GridPane layoutX="14.0" prefHeight="389.0" prefWidth="896.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                  <columnConstraints>
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="286.33331298828125" minWidth="10.0" prefWidth="286.33331298828125" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="323.33331298828125" minWidth="10.0" prefWidth="140.66668701171875" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="323.33331298828125" minWidth="10.0" prefWidth="300.66668701171875" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="284.0" minWidth="10.0" prefWidth="280.33331298828125" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                      <RowConstraints maxHeight="27.0" minHeight="10.0" prefHeight="14.33331298828125" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="44.0" minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="30.33331298828125" minHeight="10.0" prefHeight="18.33331298828125" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                  </rowConstraints>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                                   </padding>
+                                                   <children>
+                                                      <Label id="labelDemandUpdatePeriod" fx:id="labelDemandUpdatePeriod" text="Demand Update Period (min):">
+                                                         <GridPane.margin>
+                                                            <Insets />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Spinner id="dtDemand" fx:id="dtDemand" editable="true" prefHeight="25.0" prefWidth="174.0" GridPane.rowIndex="1">
+                                                         <GridPane.margin>
+                                                            <Insets />
+                                                         </GridPane.margin>
+                                                         <tooltip>
+                                                            <Tooltip id="ttDtDemand" fx:id="ttDtDemand" text="Frequency of demand update given in minutes" wrapText="true" />
+                                                         </tooltip>
+                                                      </Spinner>
+                                                      <TableView id="tableDemand" fx:id="tableDemand" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="4" GridPane.rowIndex="2" GridPane.rowSpan="10">
+                                                         <tooltip>
+                                                            <Tooltip id="ttTableDemand" fx:id="ttTableDemand" text="Ctrl+C - copy selected table cells to clipboard&#10;Ctrl+V - paste items into table from clipboard&#10;Ctrl+D - duplicate table row&#10;DEL - delete selected rows&#10;Shift+Mouse Click - select table cells&#10;Ctrl+A - select all table entries" />
+                                                         </tooltip>
+                                                      </TableView>
+                                                   </children>
+                                                </GridPane>
+                                             </children>
+                                          </AnchorPane>
+                                       </content>
+                                    </TitledPane>
+                                    <TitledPane id="trafficSplitDownstream" fx:id="trafficSplitDownstream" animated="false" expanded="false" layoutX="10.0" layoutY="60.0" prefHeight="476.0" prefWidth="898.0" text="Off-Ramp Traffic Split or Flows">
+                                       <content>
+                                          <AnchorPane prefHeight="300.0" prefWidth="512.0">
+                                             <children>
+                                                <Group layoutX="155.0" layoutY="68.0" />
+                                                <GridPane id="gridSR" fx:id="gridSR" layoutX="14.0" prefHeight="389.0" prefWidth="896.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <columnConstraints>
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="286.33331298828125" minWidth="10.0" prefWidth="286.33331298828125" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="323.33331298828125" minWidth="10.0" prefWidth="140.66668701171875" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="323.33331298828125" minWidth="10.0" prefWidth="300.66668701171875" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="284.0" minWidth="10.0" prefWidth="280.33331298828125" />
+                                                   </columnConstraints>
+                                                   <rowConstraints>
+                                                      <RowConstraints maxHeight="27.0" minHeight="10.0" prefHeight="14.33331298828125" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="44.0" minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="30.33331298828125" minHeight="10.0" prefHeight="18.33331298828125" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   </rowConstraints>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                                   </padding>
+                                                   <children>
+                                                      <Label text="Split Ratio Update Period (min):">
+                                                         <GridPane.margin>
+                                                            <Insets />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Spinner id="dtSR" fx:id="dtSR" editable="true" prefHeight="25.0" prefWidth="174.0" GridPane.rowIndex="1">
+                                                         <GridPane.margin>
+                                                            <Insets />
+                                                         </GridPane.margin>
+                                                         <tooltip>
+                                                            <Tooltip id="ttDtSR" fx:id="ttDtSR" text="Frequency of split ratio update given in minutes" wrapText="true" />
+                                                         </tooltip>
+                                                      </Spinner>
+                                                      <TableView id="tableSR" fx:id="tableSR" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="4" GridPane.rowIndex="2" GridPane.rowSpan="10">
+                                                         <tooltip>
+                                                            <Tooltip id="ttTableSR" fx:id="ttTableSR" text="Ctrl+C - copy selected table cells to clipboard&#10;Ctrl+V - paste items into table from clipboard&#10;Ctrl+D - duplicate table row&#10;DEL - delete selected rows&#10;Shift+Mouse Click - select table cells&#10;Ctrl+A - select all table entries" />
+                                                         </tooltip>
+                                                      </TableView>
+                                                      <CheckBox id="cbUseFRFlows" fx:id="cbUseFRFlows" mnemonicParsing="false" onAction="#onToggleUseFRFlows" text="Use Off-Ramp Flows" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                   </children>
+                                                </GridPane>
+                                                <GridPane id="gridFRFlow" fx:id="gridFRFlow" layoutX="20.0" layoutY="20.0" prefHeight="389.0" prefWidth="896.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <columnConstraints>
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="286.33331298828125" minWidth="10.0" prefWidth="286.33331298828125" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="323.33331298828125" minWidth="10.0" prefWidth="140.66668701171875" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="323.33331298828125" minWidth="10.0" prefWidth="300.66668701171875" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="284.0" minWidth="10.0" prefWidth="280.33331298828125" />
+                                                   </columnConstraints>
+                                                   <rowConstraints>
+                                                      <RowConstraints maxHeight="27.0" minHeight="10.0" prefHeight="14.33331298828125" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="44.0" minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="30.33331298828125" minHeight="10.0" prefHeight="18.33331298828125" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   </rowConstraints>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                                   </padding>
+                                                   <children>
+                                                      <Label text="Flow Update Period (min):">
+                                                         <GridPane.margin>
+                                                            <Insets />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <Spinner id="dtFRFlow" fx:id="dtFRFlow" editable="true" prefHeight="25.0" prefWidth="174.0" GridPane.rowIndex="1">
+                                                         <GridPane.margin>
+                                                            <Insets />
+                                                         </GridPane.margin>
+                                                         <tooltip>
+                                                            <Tooltip id="ttDtSR" fx:id="ttDtSR1" text="Frequency of flow update given in minutes" wrapText="true" />
+                                                         </tooltip>
+                                                      </Spinner>
+                                                      <TableView id="tableFRFlow" fx:id="tableFRFlow" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="4" GridPane.rowIndex="2" GridPane.rowSpan="10">
+                                                         <tooltip>
+                                                            <Tooltip id="ttTableSR" fx:id="ttTableSR1" text="Ctrl+C - copy selected table cells to clipboard&#10;Ctrl+V - paste items into table from clipboard&#10;Ctrl+D - duplicate table row&#10;DEL - delete selected rows&#10;Shift+Mouse Click - select table cells&#10;Ctrl+A - select all table entries" />
+                                                         </tooltip>
+                                                      </TableView>
+                                                      <CheckBox id="cbUseFRFlows2" fx:id="cbUseFRFlows2" mnemonicParsing="false" onAction="#onToggleUseFRFlows" text="Use Off-Ramp Flows" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                   </children>
+                                                </GridPane>
+                                             </children>
+                                          </AnchorPane>
+                                       </content>
+                                    </TitledPane>
+                                    <TitledPane id="linkControllerPane" fx:id="linkControllerPane" animated="false" expanded="false" layoutX="10.0" layoutY="606.0" prefHeight="198.0" prefWidth="514.0" text="Control">
+                                       <content>
+                                          <TabPane id="controlTabPane" fx:id="controlTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+                                            <tabs>
+                                              <Tab id="tabGPLanesControl" fx:id="tabGPLanesControl" text="GP Lanes">
+                                                <content>
+                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <GridPane prefHeight="389.0" prefWidth="896.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                              <columnConstraints>
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="540.6666870117188" minWidth="10.0" prefWidth="436.6666564941406" />
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="439.3333435058594" minWidth="10.0" prefWidth="439.3333435058594" />
+                                                              </columnConstraints>
+                                                              <rowConstraints>
+                                                                <RowConstraints maxHeight="37.0" minHeight="7.0" prefHeight="16.3333740234375" vgrow="SOMETIMES" />
+                                                                <RowConstraints maxHeight="62.0" minHeight="10.0" prefHeight="44.6666259765625" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints maxHeight="43.33331298828125" minHeight="0.33331298828125" prefHeight="33.66668701171875" vgrow="SOMETIMES" />
+                                                                <RowConstraints maxHeight="87.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints maxHeight="65.66668701171875" minHeight="0.0" prefHeight="11.0" vgrow="SOMETIMES" />
+                                                              </rowConstraints>
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                                               </padding>
+                                                               <children>
+                                                                  <ListView id="listControllersGP" fx:id="listControllersGP" onKeyPressed="#controllersOnKeyPressedGP" onMouseClicked="#controllersOnClickGP" prefHeight="262.0" prefWidth="876.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="9" />
+                                                                  <Button id="deleteControllerGP" fx:id="deleteControllerGP" mnemonicParsing="false" onAction="#onDeleteControllerGP" prefWidth="130.0" text="Delete Controller" GridPane.rowIndex="10" />
+                                                                  <Button id="addControllerGP" fx:id="addControllerGP" defaultButton="true" mnemonicParsing="false" onAction="#onAddControllerGP" prefWidth="130.0" text="Add Controller" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
+                                                               </children>
+                                                            </GridPane>
+                                                         </children>
+                                                      </AnchorPane>
+                                                </content>
+                                              </Tab>
+                                                <Tab id="tabManagedLanesControl" fx:id="tabManagedLanesControl" text="Managed Lanes">
+                                                   <content>
+                                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <GridPane prefHeight="389.0" prefWidth="896.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                               <columnConstraints>
+                                                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="540.6666870117188" minWidth="10.0" prefWidth="436.6666564941406" />
+                                                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="439.3333435058594" minWidth="10.0" prefWidth="439.3333435058594" />
+                                                               </columnConstraints>
+                                                               <rowConstraints>
+                                                                  <RowConstraints maxHeight="37.0" minHeight="7.0" prefHeight="16.3333740234375" vgrow="SOMETIMES" />
+                                                                  <RowConstraints maxHeight="62.0" minHeight="10.0" prefHeight="44.6666259765625" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints maxHeight="43.33331298828125" minHeight="0.33331298828125" prefHeight="33.66668701171875" vgrow="SOMETIMES" />
+                                                                  <RowConstraints maxHeight="87.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints maxHeight="65.66668701171875" minHeight="0.0" prefHeight="11.0" vgrow="SOMETIMES" />
+                                                               </rowConstraints>
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                                               </padding>
+                                                               <children>
+                                                                  <ListView id="listControllersManaged" fx:id="listControllersManaged" onKeyPressed="#controllersOnKeyPressedManaged" onMouseClicked="#controllersOnClickManaged" prefHeight="262.0" prefWidth="876.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="9" />
+                                                                  <Button id="deleteControllerManaged" fx:id="deleteControllerManaged" mnemonicParsing="false" onAction="#onDeleteControllerManaged" prefWidth="130.0" text="Delete Controller" GridPane.rowIndex="10" />
+                                                                  <Button id="addControllerManaged" fx:id="addControllerManaged" defaultButton="true" mnemonicParsing="false" onAction="#onAddControllerManaged" prefWidth="130.0" text="Add Controller" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
+                                                               </children>
+                                                            </GridPane>
+                                                         </children>
+                                                      </AnchorPane>
+                                                   </content>
+                                                </Tab>
+                                            </tabs>
+                                          </TabPane>
+                                       </content>
+                                    </TitledPane>
+                                    <TitledPane id="linkEventPane" fx:id="linkEventPane1" animated="false" disable="true" expanded="false" layoutX="10.0" layoutY="135.0" prefHeight="198.0" prefWidth="514.0" text="Events">
+                                       <content>
+                                          <AnchorPane prefHeight="300.0" prefWidth="512.0" />
+                                       </content>
+                                    </TitledPane>
+                                </panes>
+                              </Accordion>
+                           </children>
+                        </AnchorPane>
                      </children>
-                  </AnchorPane>
-               </children>
-            </VBox>
+                  </VBox>
+               </content>
+            </ScrollPane>
          </children>
       </AnchorPane>
   </items>
