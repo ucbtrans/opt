@@ -48,6 +48,8 @@ import opt.data.*;
 import opt.utils.Misc;
 import opt.UserSettings;
 import opt.utils.jfxutils.chart.JFXChartUtil;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jfree.data.xy.XYDataItem;
 import profiles.Profile1D;
 
@@ -72,6 +74,8 @@ public class LinkPerformanceController {
     private Set<LaneGroupType> lgset_gp = new HashSet<LaneGroupType>();
     private Set<LaneGroupType> lgset_mng = new HashSet<LaneGroupType>();
     private Set<LaneGroupType> lgset_aux = new HashSet<LaneGroupType>();
+    
+    private Workbook workbook = null;
     
     @FXML // fx:id="linkPerformanceMainPane"
     private TabPane linkPerformanceMainPane; // Value injected by FXMLLoader
@@ -119,6 +123,14 @@ public class LinkPerformanceController {
         appMainController = ctrl;
     }
     
+    public Workbook getWorkbook() {
+        return workbook;
+    }
+    
+    public AbstractLink getLink() {
+        return myLink;
+    }
+    
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -141,6 +153,8 @@ public class LinkPerformanceController {
         
         myLink = lnk;
         mySimData = sdata.linkdata.get(myLink.id);
+        
+        workbook = new XSSFWorkbook();
         
         listVT = Misc.makeListVT(myLink.get_segment().get_scenario().get_commodities());
         start = myLink.get_segment().get_scenario().get_start_time();

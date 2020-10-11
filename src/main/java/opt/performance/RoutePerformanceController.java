@@ -105,6 +105,8 @@ import org.jfree.ui.RectangleInsets;
 import java.util.concurrent.TimeUnit;
 import javafx.scene.control.Separator;
 import opt.data.TimeMatrix;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * This class serves to display plots of simulation data for a given route.
@@ -166,6 +168,8 @@ public class RoutePerformanceController {
     private JFreeChart densityManagedChart;
     
     private List<Commodity> listVT = null;
+    
+    private Workbook workbook = null;
             
     
     @FXML // fx:id="routePerformanceMainPane"
@@ -214,6 +218,14 @@ public class RoutePerformanceController {
         appMainController = ctrl;
     }
     
+    public Workbook getWorkbook() {
+        return workbook;
+    }
+    
+    public Route getRoute() {
+        return myRoute;
+    }
+    
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -241,6 +253,8 @@ public class RoutePerformanceController {
         
         myRoute = rt;
         mySimData = sdata;
+        
+        workbook = new XSSFWorkbook();
         
         listVT = Misc.makeListVT(mySimData.fwyscenario.get_commodities());
         start = mySimData.fwyscenario.get_start_time();

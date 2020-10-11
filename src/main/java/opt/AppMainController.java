@@ -26,6 +26,7 @@
 package opt;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -70,6 +71,7 @@ import opt.performance.LinkPerformanceController;
 import opt.performance.RoutePerformanceController;
 import opt.performance.ScenarioPerformanceController;
 import opt.utils.Misc;
+import org.apache.poi.ss.usermodel.Workbook;
 
 
 /**
@@ -788,7 +790,7 @@ public class AppMainController {
                 fileChooser.setInitialDirectory(projectFileDir);
         }
         File file = fileChooser.showSaveDialog(null);
-        if (file==null)
+        if (file == null)
             return;
         try {
 
@@ -827,6 +829,69 @@ public class AppMainController {
     
     @FXML
     private void onExportResultsToExcel(ActionEvent event) {
+        Object o = tree2object.get(selectedTreeItem);
+        if (o == null)
+            return;
+        
+        Workbook workbook = null;
+        String wbFileName = "";
+        
+        if (o instanceof AbstractLink) {
+            workbook = linkPerformanceController.getWorkbook();
+            AbstractLink l = linkPerformanceController.getLink();
+            if (l != null)
+                wbFileName = l.get_name().replaceAll("->", "-to-");
+        } else if (o instanceof Route) {
+            workbook = routePerformanceController.getWorkbook();
+            Route r = routePerformanceController.getRoute();
+            if (r != null)
+                wbFileName = r.getName();
+        } else if (o instanceof FreewayScenario) {
+            workbook = scenarioPerformanceController.getWorkbook();
+            FreewayScenario s = scenarioPerformanceController.getScenario();
+            if (s != null)
+                wbFileName = s.name;
+        }
+        
+        if (workbook == null)
+            return;
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Simulation Results");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel", "*.xlsx"));
+
+        String optProjectFileDir_String = prefs.get(this.optProjectFileDir_String, null);
+        if (optProjectFileDir_String != null) {
+            projectFileDir = new File(optProjectFileDir_String);
+            if ((projectFileDir != null) && (projectFileDir.isDirectory())) {
+                fileChooser.setInitialDirectory(projectFileDir);
+                fileChooser.setInitialFileName(wbFileName);
+            }
+        }
+        File file = fileChooser.showSaveDialog(null);
+        if (file == null)
+            return;
+        try {
+            String filetype = fileChooser.getSelectedExtensionFilter().getDescription();
+            projectFilePath = file.getAbsolutePath();
+            projectFileDir = file.getParentFile();
+            prefs.put(this.optProjectFileDir_String, projectFileDir.getAbsolutePath());
+
+            // save Excel file
+            if( filetype.equalsIgnoreCase("Excel") ) {
+                FileOutputStream fileOut = new FileOutputStream(file);
+                workbook.write(fileOut);
+                fileOut.close();
+            }
+        } catch (Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot export simulation results", e);
+        }
+        
+        try {
+            workbook.close();
+        } catch (Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot close Workbook...", e);
+        }
         
     }
     

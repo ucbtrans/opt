@@ -61,6 +61,8 @@ import opt.data.Commodity;
 import opt.data.FreewayScenario;
 import opt.data.Route;
 import opt.utils.jfxutils.chart.JFXChartUtil;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -90,6 +92,8 @@ public class ScenarioPerformanceController {
     private float start = 0;
     private String timeLabel;
     private double timeDivider;
+    
+    Workbook workbook = null;
             
     
     @FXML // fx:id="scenarioPerformanceMainPane"
@@ -138,6 +142,14 @@ public class ScenarioPerformanceController {
         appMainController = ctrl;
     }
     
+    public Workbook getWorkbook() {
+        return workbook;
+    }
+    
+    public FreewayScenario getScenario() {
+        return myScenario;
+    }
+    
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -157,6 +169,8 @@ public class ScenarioPerformanceController {
         
         mySimData = sdata;
         myScenario = mySimData.fwyscenario;
+        
+        workbook = new XSSFWorkbook();
         
         start = myScenario.get_start_time();
         
