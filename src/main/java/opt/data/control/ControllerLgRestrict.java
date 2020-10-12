@@ -7,13 +7,13 @@ import utils.OTMUtils;
 
 import java.util.*;
 
-public class ControllerLgPolicy extends AbstractController {
+public class ControllerLgRestrict extends AbstractController {
 
 	public enum Permission { Free, Banned, Tolled }
 	protected Permission permission;
 	protected Map<Long,Permission> comm2permission;
 
-	protected Double a2;
+	protected Double toll_coef;
 	protected int [][] vphpl_to_cents_table;
 	// vphpl_to_cents_table[i][1] is the price for all flows
 	// between vphpl_to_cents_table[i][0] and vplph_to_cents_table[i+1][0]
@@ -29,8 +29,8 @@ public class ControllerLgPolicy extends AbstractController {
 	// construction
 	////////////////////////////////
 
-	public ControllerLgPolicy(FreewayScenario scn, Set<Long> tolled_comms, Set<Long> disallowed_comms, Set<Long> free_comms, Float dt, Double a2, int [][] vphpl_to_cents_table, Double qos_speed_threshold_kph) {
-		super(Type.LgPolicy,dt, control.AbstractController.Algorithm.lg_restrict);
+	public ControllerLgRestrict(FreewayScenario scn, Set<Long> tolled_comms, Set<Long> disallowed_comms, Set<Long> free_comms, Float dt, Double toll_coef, int [][] vphpl_to_cents_table, Double qos_speed_threshold_kph) {
+		super(Type.LgRestrict,dt, control.AbstractController.Algorithm.lg_restrict);
 
 		this.comm2permission = new HashMap<>();
 
@@ -62,7 +62,7 @@ public class ControllerLgPolicy extends AbstractController {
 
 //		this.a0 = a0==null ? UserSettings.defaultLaneChoice_keep : a0;
 //		this.a1 = a1==null ? UserSettings.defaultLaneChoice_rhovpmplane : a1;
-		this.a2 = a2==null ? UserSettings.defaultLaneChoice_tollcents : a2;
+		this.toll_coef = toll_coef ==null ? UserSettings.defaultLaneChoice_tollcents : toll_coef;
 
 		if(vphpl_to_cents_table==null){
 			this.vphpl_to_cents_table = new int[1][2];
@@ -84,20 +84,8 @@ public class ControllerLgPolicy extends AbstractController {
 		refresh_type();
 	}
 
-	////////////////////////////////
-	// Getters
-	////////////////////////////////
-
-//	public Double get_a0() {
-//		return a0;
-//	}
-//
-//	public Double get_a1() {
-//		return a1;
-//	}
-
-	public Double get_a2() {
-		return a2;
+	public Double get_toll_coef() {
+		return toll_coef;
 	}
 
 	public int[][] get_vphpl_to_cents_table() {
@@ -116,20 +104,8 @@ public class ControllerLgPolicy extends AbstractController {
 		return comm2permission.get(commid);
 	}
 
-	////////////////////////////////
-	// Setters
-	////////////////////////////////
-
-//	public void set_a0(Double x) {
-//		a0 = x;
-//	}
-//
-//	public void set_a1(Double x) {
-//		a1 = x;
-//	}
-
-	public void set_a2(Double x) {
-		a2 = x;
+	public void set_toll_coef(Double x) {
+		toll_coef = x;
 	}
 
 	public void set_vphpl_to_cents_table(int[][] x) {
@@ -149,7 +125,15 @@ public class ControllerLgPolicy extends AbstractController {
 		permission = unique_types.size()>1 ? Permission.Tolled :  unique_types.iterator().next();
 	}
 
-	////////////////////////////////
+	@Override
+	public control.AbstractController.Algorithm getAlgorithm() {
+		if(comm2permission.values().stream().anyMatch(x->x==Permission.Tolled))
+			return control.AbstractController.Algorithm.lg_toll;
+		else
+			return control.AbstractController.Algorithm.lg_restrict;
+	}
+
+////////////////////////////////
 	// AbstractController
 	////////////////////////////////
 
@@ -198,25 +182,10 @@ public class ControllerLgPolicy extends AbstractController {
 			n0.setValue(OTMUtils.comma_format(tolled_comms));
 			params.add(n0);
 
-
-//			if (a0 != null) {
-//				Parameter n = new Parameter();
-//				n.setName("keep");
-//				n.setValue(a0.toString());
-//				params.add(n);
-//			}
-//
-//			if (a1 != null) {
-//				Parameter n = new Parameter();
-//				n.setName("rho_vpkmplane");
-//				n.setValue(a1.toString());
-//				params.add(n);
-//			}
-
-			if (a2 != null) {
+			if (toll_coef != null) {
 				Parameter n = new Parameter();
-				n.setName("a2");
-				n.setValue(a2.toString());
+				n.setName("toll_coef");
+				n.setValue(toll_coef.toString());
 				params.add(n);
 			}
 

@@ -4,12 +4,12 @@ import java.util.*;
 
 public abstract class AbstractController {
 
-	public enum Type { RampMetering , LgPolicy}
+	public enum Type { RampMetering , LgRestrict, LgToll }
 
 	protected long id;
 	protected Type type;
 	protected Float dt;
-	protected control.AbstractController.Algorithm algorithm;
+	private control.AbstractController.Algorithm algorithm;
 
 	abstract public Collection<jaxb.Parameter> jaxb_parameters();
 	abstract public Set<Sensor> get_sensors();
@@ -29,14 +29,14 @@ public abstract class AbstractController {
 	////////////////////////////////
 
 	public final String getName(){
-		return ControlFactory.cntrl_alg_name.AtoB(algorithm);
+		return ControlFactory.cntrl_alg_name.AtoB(getAlgorithm());
 	}
         
-        public final Type getType() {
+	public final Type getType() {
             return type;
         }
 
-	public final control.AbstractController.Algorithm getAlgorithm(){
+	public control.AbstractController.Algorithm getAlgorithm(){
 		return algorithm;
 	}
 
@@ -48,7 +48,8 @@ public abstract class AbstractController {
 	}
 
 	public final static boolean is_lg_restrict(control.AbstractController.Algorithm a){
-		return a==control.AbstractController.Algorithm.lg_restrict;
+		return a==control.AbstractController.Algorithm.lg_restrict ||
+				a==control.AbstractController.Algorithm.lg_toll;
 	}
 
 	////////////////////////////////

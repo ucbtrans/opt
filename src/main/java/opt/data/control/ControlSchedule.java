@@ -33,7 +33,7 @@ public class ControlSchedule implements Comparable {
         this.lgtype = lgtype;
 
         // controlType=HOVHOT -> lgtype=managed
-        assert( controlType!=AbstractController.Type.LgPolicy || lgtype==LaneGroupType.mng );
+        assert( controlType!=AbstractController.Type.LgRestrict || lgtype==LaneGroupType.mng );
 
         // all links should belong to the same scenario
         assert(!links.isEmpty());
@@ -56,7 +56,7 @@ public class ControlSchedule implements Comparable {
                 X.addAll(links);
                 break;
 
-            case LgPolicy:
+            case LgRestrict:
                 X = links.stream()
                         .filter(lk->lk.get_mng_lanes()>0)
                         .collect(Collectors.toSet());
@@ -100,7 +100,7 @@ public class ControlSchedule implements Comparable {
                 jtgt.setLanegroups(String.format("%d(%d#%d)",link.id,lanes[0],lanes[1]));
                 break;
 
-            case LgPolicy:
+            case LgRestrict:
                 jact.setType("lg_restrict");
                 jtgt = new jaxb.ActuatorTarget();
                 jact.setActuatorTarget(jtgt);
@@ -160,7 +160,7 @@ public class ControlSchedule implements Comparable {
 
             // controller
             AbstractController cntrl = entry.get_cntrl();
-            jentry.setType(cntrl.algorithm.toString());
+            jentry.setType(cntrl.getAlgorithm().toString());
 
             // sensors
 //            if(cntrl.get_num_sensors()>0){
@@ -228,7 +228,7 @@ public class ControlSchedule implements Comparable {
                     case RampMetering:
                         entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_rmopen(fwyscn)));
                         break;
-                    case LgPolicy:
+                    case LgRestrict:
                         entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null)));
                         break;
                 }

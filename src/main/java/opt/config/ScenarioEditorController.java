@@ -40,7 +40,6 @@ import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
@@ -66,7 +65,7 @@ import opt.data.LinkConnector;
 import opt.data.Segment;
 import opt.data.control.AbstractController;
 import opt.data.control.ControlSchedule;
-import opt.data.control.ControllerLgPolicy;
+import opt.data.control.ControllerLgRestrict;
 import opt.data.control.ScheduleEntry;
 import opt.utils.Misc;
 
@@ -398,7 +397,7 @@ public class ScenarioEditorController {
     
     private void populateUnderPolicyLinkList() {
         linksUnderPolicy.clear();
-        listLanePolicies = myScenario.get_schedules_for_controltype(AbstractController.Type.LgPolicy);
+        listLanePolicies = myScenario.get_schedules_for_controltype(AbstractController.Type.LgRestrict);
         
         for (ControlSchedule p : listLanePolicies)
             linksUnderPolicy.addAll(p.get_links());
@@ -421,7 +420,7 @@ public class ScenarioEditorController {
     }
     
     
-    private String generateRestrictedEntryDesc(ControllerLgPolicy ctrl) {
+    private String generateRestrictedEntryDesc(ControllerLgRestrict ctrl) {
         String buf = "";
         List<Commodity> t_free = new ArrayList<Commodity>();
         List<Commodity> t_banned = new ArrayList<Commodity>();
@@ -485,7 +484,7 @@ public class ScenarioEditorController {
         for (ScheduleEntry se : policyEntries) {
             float start = se.get_start_time();
             float end = se.get_end_time();
-            ControllerLgPolicy ctrl = (ControllerLgPolicy)se.get_cntrl();
+            ControllerLgRestrict ctrl = (ControllerLgRestrict)se.get_cntrl();
             if (ctrl == null)
                 continue;
             
@@ -748,7 +747,7 @@ public class ScenarioEditorController {
         Set<AbstractLink> links = new HashSet<AbstractLink>();
         links.addAll(linksFreeForPolicy);
         try {
-            selectedPolicy = ControlFactory.create_empty_controller_schedule(null, name, links, LaneGroupType.mng, AbstractController.Type.LgPolicy);
+            selectedPolicy = ControlFactory.create_empty_controller_schedule(null, name, links, LaneGroupType.mng, AbstractController.Type.LgRestrict);
 
             // add all links
             if(!selectedPolicy.add_links(links))
@@ -842,7 +841,7 @@ public class ScenarioEditorController {
         vphpl_to_cents_table[0][0] = 0;
         vphpl_to_cents_table[0][1] = 0;
         try {
-            ControllerLgPolicy ctrl = ControlFactory.create_controller_hovhot(myScenario, null,null, free_comms, dt, a2, vphpl_to_cents_table, v_thres);
+            ControllerLgRestrict ctrl = ControlFactory.create_controller_hovhot(myScenario, null,null, free_comms, dt, a2, vphpl_to_cents_table, v_thres);
             ScheduleEntry entry = new ScheduleEntry(start_time, ctrl);
             launchLaneControlEditor(entry, true);
         } catch(Exception ex) {

@@ -396,7 +396,7 @@ public class FreewayScenario {
             lg_type = lgtypes.get(0);
         }
         else if ( entry_types.stream().allMatch(e->AbstractController.is_lg_restrict(e) ) ) {
-            cntr_type = AbstractController.Type.LgPolicy;
+            cntr_type = AbstractController.Type.LgRestrict;
 
             // all lane groups should be mng
             assert(lgtypes.stream().allMatch(t->t==LaneGroupType.mng));
@@ -441,8 +441,10 @@ public class FreewayScenario {
                     ctrl = ControlFactory.create_controller_fixed_rate(this,jentry);
                     break;
 
+                case lg_toll:
                 case lg_restrict:
                     ctrl = ControlFactory.create_controller_hovhot(this,jentry);
+                    break;
 
             }
 
@@ -971,9 +973,9 @@ public class FreewayScenario {
             // remove commodity from mng lane policies
             if(link.schedules!=null && link.schedules.containsKey(LaneGroupType.mng)){
                 Map<AbstractController.Type, ControlSchedule> schmap = link.schedules.get(LaneGroupType.mng);
-                if(schmap.containsKey(AbstractController.Type.LgPolicy))
-                    for(ScheduleEntry entry : (schmap.get(AbstractController.Type.LgPolicy)).get_entries())
-                        ((ControllerLgPolicy)entry.get_cntrl()).remove_commodity(comm_id);
+                if(schmap.containsKey(AbstractController.Type.LgRestrict))
+                    for(ScheduleEntry entry : (schmap.get(AbstractController.Type.LgRestrict)).get_entries())
+                        ((ControllerLgRestrict)entry.get_cntrl()).remove_commodity(comm_id);
             }
         }
 

@@ -60,7 +60,7 @@ import opt.UserSettings;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
 import opt.data.control.ControlSchedule;
-import opt.data.control.ControllerLgPolicy;
+import opt.data.control.ControllerLgRestrict;
 import opt.data.control.ScheduleEntry;
 import opt.utils.EditCell;
 import opt.utils.Misc;
@@ -74,13 +74,13 @@ public class LaneControlEditorController {
     
     private ScenarioEditorController scenarioEditorController = null;
     private List<Commodity> listVT = new ArrayList<>();
-    private List<ControllerLgPolicy.Permission> listPermsVT = new ArrayList<>();
+    private List<ControllerLgRestrict.Permission> listPermsVT = new ArrayList<>();
     
     
     private FreewayScenario myScenario = null;
     private boolean ignoreChange = true;
     private ControlSchedule mySchedule;
-    private ControllerLgPolicy myController = null;
+    private ControllerLgRestrict myController = null;
     private float origStartTime;
     private boolean isnew;
     
@@ -115,7 +115,7 @@ public class LaneControlEditorController {
     private TableColumn<PermsVT, String> colVT; // Value injected by FXMLLoader
     
     @FXML // fx:id="colPermission"
-    private TableColumn<PermsVT, ControllerLgPolicy.Permission> colPermission; // Value injected by FXMLLoader
+    private TableColumn<PermsVT, ControllerLgRestrict.Permission> colPermission; // Value injected by FXMLLoader
     
     @FXML // fx:id="controlDt"
     private Spinner<Integer> controlDt; // Value injected by FXMLLoader
@@ -177,15 +177,15 @@ public class LaneControlEditorController {
         colPermission.setReorderable(false);
         colPermission.setSortable(false);
         colPermission.setEditable(true);
-        colPermission.setCellFactory((TableColumn<PermsVT, ControllerLgPolicy.Permission> param) -> {
-            return new RadioButtonCell<>(EnumSet.allOf(ControllerLgPolicy.Permission.class));
+        colPermission.setCellFactory((TableColumn<PermsVT, ControllerLgRestrict.Permission> param) -> {
+            return new RadioButtonCell<>(EnumSet.allOf(ControllerLgRestrict.Permission.class));
         });
         colPermission.setCellValueFactory(data -> new SimpleObjectProperty(data.getValue().permission.getValue()));
-        colPermission.setOnEditCommit(new EventHandler<CellEditEvent<PermsVT, ControllerLgPolicy.Permission>>() {
+        colPermission.setOnEditCommit(new EventHandler<CellEditEvent<PermsVT, ControllerLgRestrict.Permission>>() {
             @Override
-            public void handle(CellEditEvent<PermsVT, ControllerLgPolicy.Permission> t) {
+            public void handle(CellEditEvent<PermsVT, ControllerLgRestrict.Permission> t) {
                 int row = t.getTablePosition().getRow();
-                ControllerLgPolicy.Permission p = t.getNewValue();
+                ControllerLgRestrict.Permission p = t.getNewValue();
                 ((PermsVT) t.getTableView().getItems().get(row)).setPermission(p);
                 if ((row >= 0) && (row < listPermsVT.size()))
                     listPermsVT.set(row, p);
@@ -313,7 +313,7 @@ public class LaneControlEditorController {
         listVT.clear();
         mapVT.forEach((k, v) -> {listVT.add(v);});
         mySchedule = schedule;
-        myController = (ControllerLgPolicy) entry.get_cntrl();
+        myController = (ControllerLgRestrict) entry.get_cntrl();
         this.isnew = isnew;
         origStartTime = entry.get_start_time();
         textStartTime.setText(Misc.seconds2timestring(origStartTime, ""));
@@ -404,7 +404,7 @@ public class LaneControlEditorController {
             a1 = UserSettings.defaultLaneChoice_rhovpmplane;
         spA1.getValueFactory().setValue(a1);
         
-        Double a2 = myController.get_a2();
+        Double a2 = myController.get_toll_coef();
         if (a2 == null)
             a2 = UserSettings.defaultLaneChoice_tollcents;
         spA2.getValueFactory().setValue(a2);
@@ -422,30 +422,30 @@ public class LaneControlEditorController {
     
     private int countFree() {
         int count = 0;
-        return listPermsVT.stream().filter((p) -> (p == ControllerLgPolicy.Permission.Free)).map((_item) -> 1).reduce(count, Integer::sum);
+        return listPermsVT.stream().filter((p) -> (p == ControllerLgRestrict.Permission.Free)).map((_item) -> 1).reduce(count, Integer::sum);
     }
     
     private int countBanned() {
         int count = 0;
-        return listPermsVT.stream().filter((p) -> (p == ControllerLgPolicy.Permission.Banned)).map((_item) -> 1).reduce(count, Integer::sum);
+        return listPermsVT.stream().filter((p) -> (p == ControllerLgRestrict.Permission.Banned)).map((_item) -> 1).reduce(count, Integer::sum);
     }
     
     private int countTolled() {
         int count = 0;
-        return listPermsVT.stream().filter((p) -> (p == ControllerLgPolicy.Permission.Tolled)).map((_item) -> 1).reduce(count, Integer::sum);
+        return listPermsVT.stream().filter((p) -> (p == ControllerLgRestrict.Permission.Tolled)).map((_item) -> 1).reduce(count, Integer::sum);
     }
     
     private void setAllPersToFree() {
         int sz = listVT.size();
         for (int i = 0; i < sz; i++)
-            listPermsVT.set(i, ControllerLgPolicy.Permission.Free);
+            listPermsVT.set(i, ControllerLgRestrict.Permission.Free);
         restrictedPane.setVisible(false);
     }
     
     private void setAllPersToBanned() {
         int sz = listVT.size();
         for (int i = 0; i < sz; i++)
-            listPermsVT.set(i, ControllerLgPolicy.Permission.Banned);
+            listPermsVT.set(i, ControllerLgRestrict.Permission.Banned);
         restrictedPane.setVisible(false);
     }
     
@@ -543,7 +543,7 @@ public class LaneControlEditorController {
         myController.setDt((float)controlDt.getValue());
 //        myController.set_a0(spA0.getValue());  // removed by GG
 //        myController.set_a1(spA1.getValue());  // removed by GG
-        myController.set_a2(spA2.getValue());
+        myController.set_toll_coef(spA2.getValue());
         
         double cc = UserSettings.speedConversionMap.get(UserSettings.unitsSpeed + "kph");
         myController.set_qos_speed_threshold_kph(cc*spSpeedThreshold.getValue());
@@ -575,14 +575,14 @@ public class LaneControlEditorController {
     
     public static class PermsVT {
         private final SimpleStringProperty vt_name = new SimpleStringProperty();
-        private final SimpleObjectProperty<ControllerLgPolicy.Permission> permission = new SimpleObjectProperty<>();
+        private final SimpleObjectProperty<ControllerLgRestrict.Permission> permission = new SimpleObjectProperty<>();
 
-        PermsVT(String nm, ControllerLgPolicy.Permission p) {
+        PermsVT(String nm, ControllerLgRestrict.Permission p) {
             vt_name.set(nm);
             permission.set(p);
         }
 
-        public void setPermission(ControllerLgPolicy.Permission p) {
+        public void setPermission(ControllerLgRestrict.Permission p) {
             permission.set(p);
         }
     }
