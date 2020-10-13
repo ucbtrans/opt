@@ -302,11 +302,11 @@
         
         <!-- Used to work with the older excel file format - `.xls` -->
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
-        <dependency>
+        <!--dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>4.1.2</version>
-        </dependency>
+        </dependency-->
 
         <!-- Used to work with the newer excel file format - `.xlsx` -->
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
