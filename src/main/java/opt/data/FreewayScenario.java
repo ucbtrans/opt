@@ -563,15 +563,15 @@ public class FreewayScenario {
         return lcmodel.keep;
     }
 
-    public double get_lc_density_vpkpl(){
+    public double get_lc_density_vpmilepl(){
         return lcmodel.density_vpmileplane;
     }
 
-    public void set_lc_density_vpkpl(double x){
+    public void set_lc_keep(double x){
         lcmodel.keep = x;
     }
 
-    public void set_lc_keep(double x){
+    public void set_lc_density_vpmilepl(double x){
         lcmodel.density_vpmileplane = x;
     }
 
