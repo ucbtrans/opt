@@ -132,12 +132,6 @@ public class LaneControlEditorController {
     @FXML // fx:id="colPrice"
     private TableColumn<ObservableList<Object>, Number> colPrice; // Value injected by FXMLLoader
 
-    @FXML // fx:id="spA0"
-    private Spinner<Double> spA0; // Value injected by FXMLLoader
-
-    @FXML // fx:id="spA1"
-    private Spinner<Double> spA1; // Value injected by FXMLLoader
-
     @FXML // fx:id="spA2"
     private Spinner<Double> spA2; // Value injected by FXMLLoader
 
@@ -200,14 +194,6 @@ public class LaneControlEditorController {
         SpinnerValueFactory<Integer> controlDtSpinnerValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 3600, 1, 1);
         controlDtSpinnerValueFactory.setConverter(new ModifiedIntegerStringConverter());
         controlDt.setValueFactory(controlDtSpinnerValueFactory);
-        
-        SpinnerValueFactory<Double> a0 = new SpinnerValueFactory.DoubleSpinnerValueFactory(-1000.0, 1000.0, 1.0, 1);
-        a0.setConverter(new ModifiedDoubleStringConverter("#.####", 1.0));
-        spA0.setValueFactory(a0);
-        
-        SpinnerValueFactory<Double> a1 = new SpinnerValueFactory.DoubleSpinnerValueFactory(-1000.0, 1000.0, 1.0, 1);
-        a1.setConverter(new ModifiedDoubleStringConverter("#.####", 1.0));
-        spA1.setValueFactory(a1);
         
         SpinnerValueFactory<Double> a2 = new SpinnerValueFactory.DoubleSpinnerValueFactory(-1000.0, 1000.0, 1.0, 1);
         a2.setConverter(new ModifiedDoubleStringConverter("#.####", 1.0));
@@ -394,16 +380,6 @@ public class LaneControlEditorController {
             dt = (float)UserSettings.defaultControlDtSeconds;
         controlDt.getValueFactory().setValue(Math.round(dt));
         
-        Double a0 = Double.NaN; // removed by GG: myController.get_a0();
-        if (a0 == null)
-            a0 = UserSettings.defaultLaneChoice_keep;
-        spA0.getValueFactory().setValue(a0);
-        
-        Double a1 = Double.NaN; // removed by GG: myController.get_a1();
-        if (a1 == null)
-            a1 = UserSettings.defaultLaneChoice_rhovpmplane;
-        spA1.getValueFactory().setValue(a1);
-        
         Double a2 = myController.get_toll_coef();
         if (a2 == null)
             a2 = UserSettings.defaultLaneChoice_tollcents;
@@ -541,8 +517,6 @@ public class LaneControlEditorController {
         myController.set_vphpl_to_cents_table(fpm);
 
         myController.setDt((float)controlDt.getValue());
-//        myController.set_a0(spA0.getValue());  // removed by GG
-//        myController.set_a1(spA1.getValue());  // removed by GG
         myController.set_toll_coef(spA2.getValue());
         
         double cc = UserSettings.speedConversionMap.get(UserSettings.unitsSpeed + "kph");

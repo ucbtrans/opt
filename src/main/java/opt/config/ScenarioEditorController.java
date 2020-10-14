@@ -39,8 +39,11 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tab;
@@ -68,6 +71,7 @@ import opt.data.control.ControlSchedule;
 import opt.data.control.ControllerLgRestrict;
 import opt.data.control.ScheduleEntry;
 import opt.utils.Misc;
+import opt.utils.ModifiedDoubleStringConverter;
 
 
 /**
@@ -100,6 +104,9 @@ public class ScenarioEditorController {
     
     private LaneControlEditorController laneControlEditorController = null;
     private Scene laneControlEditorScene = null;
+    
+    private SpinnerValueFactory<Double> a0SpinnerValueFactory = null;
+    private SpinnerValueFactory<Double> a1SpinnerValueFactory = null;
     
     
     @FXML // fx:id="scenarioEditorMainPane"
@@ -143,6 +150,15 @@ public class ScenarioEditorController {
     
     @FXML // fx:id="sDescription"
     private TextArea sDescription; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="spA0"
+    private Spinner<Double> spA0; // Value injected by FXMLLoader
+
+    @FXML // fx:id="labelA1"
+    private Label labelA1; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="spA1"
+    private Spinner<Double> spA1; // Value injected by FXMLLoader
     
     @FXML // fx:id="controllerPane"
     private TitledPane controllerPane; // Value injected by FXMLLoader
@@ -308,6 +324,39 @@ public class ScenarioEditorController {
             onDurationChange(null);
         });
         
+        a0SpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(-1000.0, 1000.0, 1.0, 1);
+        a0SpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter("#.####", 1.0));
+        spA0.setValueFactory(a0SpinnerValueFactory);
+        spA0.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (!ignoreChange && (oldValue != newValue))
+                onLCParamChange();
+        });
+        spA0.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            Double a0 = myScenario.get_lc_keep();
+            if (a0 == null)
+                a0 = UserSettings.defaultLaneChoice_keep;
+            opt.utils.WidgetFunctionality.commitEditorText(spA0, a0);
+        });
+        
+        a1SpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(-1000.0, 1000.0, 1.0, 1);
+        a1SpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter("#.####", 1.0));
+        spA1.setValueFactory(a1SpinnerValueFactory);
+        spA1.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (!ignoreChange && (oldValue != newValue))
+                onLCParamChange();
+        });
+        spA1.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+                return;
+            double cc = 1.0 / UserSettings.densityConversionMap.get("vpm"+UserSettings.unitsDensity);
+            Double a1 = myScenario.get_lc_density_vpmilepl();
+            if (a1 == null)
+                a1 = UserSettings.defaultLaneChoice_rhovpmplane;
+            opt.utils.WidgetFunctionality.commitEditorText(spA1, cc * a1);
+        });
+        
         cbPolicies.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
             onPolicyNameChange(oldValue, newValue);
         });
@@ -351,6 +400,20 @@ public class ScenarioEditorController {
         
         origScenarioDescription = myScenario.description;
         sDescription.setText(myScenario.description);
+        
+        Double a0 = myScenario.get_lc_keep();
+        if (a0 == null)
+            a0 = UserSettings.defaultLaneChoice_keep;
+        spA0.getValueFactory().setValue(a0);
+        
+        String units = UserSettings.unitsDensity;
+        labelA1.setText("Lane Choice Model Traffic Density Influencer: (1/" + units + "):");
+        
+        double cc = 1.0 / UserSettings.densityConversionMap.get("vpm"+UserSettings.unitsDensity);
+        Double a1 = myScenario.get_lc_density_vpmilepl();
+        if (a1 == null)
+            a1 = UserSettings.defaultLaneChoice_rhovpmplane;
+        spA1.getValueFactory().setValue(cc * a1);
     }
     
     private void initLanePolicies() {
@@ -669,6 +732,22 @@ public class ScenarioEditorController {
 
         int seconds = Misc.timeString2Seconds(buf);
         myScenario.set_sim_duration(seconds);
+        appMainController.setProjectModified(true);
+    }
+    
+    
+    private void onLCParamChange() {  
+        if (ignoreChange)
+            return;
+        
+        double cc = 1.0 / UserSettings.densityConversionMap.get(UserSettings.unitsDensity+"vpm");
+        
+        double a0 = a0SpinnerValueFactory.getValue();
+        double a1 = cc * a1SpinnerValueFactory.getValue();
+        
+        myScenario.set_lc_keep(a0);
+        myScenario.set_lc_density_vpmilepl(a1);
+         
         appMainController.setProjectModified(true);
     }
     

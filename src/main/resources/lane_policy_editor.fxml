@@ -133,52 +133,34 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <Spinner id="controlDt" fx:id="controlDt" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">
-                                 <tooltip>
-                                    <Tooltip text="How  often the metering rate is updated" wrapText="true" />
-                                 </tooltip>
-                              </Spinner>
-                              <Label text="Lane Choice Model a0:" GridPane.columnIndex="2" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
-                                 <GridPane.margin>
-                                    <Insets left="20.0" />
-                                 </GridPane.margin>
-                              </Label>
-                              <Spinner id="spA0" fx:id="spA0" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6">
-                                 <tooltip>
-                                    <Tooltip text="Lane Choice Model intercept" wrapText="true" />
-                                 </tooltip></Spinner>
-                              <Label text="Lane Choice Model a1:" GridPane.columnIndex="2" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
-                                 <GridPane.margin>
-                                    <Insets left="20.0" />
-                                 </GridPane.margin>
-                              </Label>
-                              <Spinner id="spA1" fx:id="spA1" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8">
-                                 <tooltip>
-                                    <Tooltip text="Lane Choice Model - coefficient for vehicle density difference between GP and Managed lanes" wrapText="true" />
-                                 </tooltip></Spinner>
-                              <Label text="Lane Choice Model a2:" GridPane.columnIndex="2" GridPane.rowIndex="9" GridPane.valignment="BOTTOM">
-                                 <GridPane.margin>
-                                    <Insets left="20.0" />
-                                 </GridPane.margin>
-                              </Label>
-                              <Spinner id="spA2" fx:id="spA2" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="10">
-                                 <tooltip>
-                                    <Tooltip text="Lane Choice Model - coefficient for per-mile pricing" wrapText="true" />
-                                 </tooltip></Spinner>
-                              <Label id="labelSpeedThreshold" fx:id="labelSpeedThreshold" text="QoS Speed Threshold:" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="12" GridPane.valignment="BOTTOM">
-                                 <GridPane.margin>
-                                    <Insets left="20.0" />
-                                 </GridPane.margin>
-                              </Label>
-                              <Spinner id="spSpeedThreshold" fx:id="spSpeedThreshold" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="13">
-                                 <tooltip>
-                                    <Tooltip text="Quality of Service speed threshold:&#10;When speed falls below this threshold,&#10;tolled vehicles are no longer allowed&#10;into managed lanes" wrapText="true" />
-                                 </tooltip></Spinner>
                               <Label text="Invocation Period (seconds):" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.valignment="BOTTOM">
                                  <GridPane.margin>
                                     <Insets left="20.0" />
                                  </GridPane.margin>
                               </Label>
+                              <Spinner id="controlDt" fx:id="controlDt" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                                 <tooltip>
+                                    <Tooltip text="How  often the metering rate is updated" wrapText="true" />
+                                 </tooltip>
+                              </Spinner>
+                              <Label text="Lane Choice Model Price Influencer:" GridPane.columnIndex="2" GridPane.rowIndex="6" GridPane.valignment="BOTTOM">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Spinner id="spA2" fx:id="spA2" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="7">
+                                 <tooltip>
+                                    <Tooltip text="Lane Choice Model - coefficient for per-mile pricing" wrapText="true" />
+                                 </tooltip></Spinner>
+                              <Label id="labelSpeedThreshold" fx:id="labelSpeedThreshold" text="QoS Speed Threshold:" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="9" GridPane.valignment="BOTTOM">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Spinner id="spSpeedThreshold" fx:id="spSpeedThreshold" editable="true" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="10">
+                                 <tooltip>
+                                    <Tooltip text="Quality of Service speed threshold:&#10;When speed falls below this threshold,&#10;tolled vehicles are no longer allowed&#10;into managed lanes" wrapText="true" />
+                                 </tooltip></Spinner>
                            </children>
                         </GridPane>
                      </children>

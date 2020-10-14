@@ -187,7 +187,7 @@
                                                             <Tooltip text="Set a barrier between managed and general purpose lanes" />
                                                          </tooltip>
                                                       </CheckBox>
-                                                      <CheckBox id="cbSeparated" fx:id="cbSeparated" disable="true" mnemonicParsing="false" onAction="#drawRoadSection" text="Separated" GridPane.halignment="CENTER" GridPane.rowIndex="13" GridPane.valignment="BASELINE">
+                                                      <CheckBox id="cbSeparated" fx:id="cbSeparated" disable="true" mnemonicParsing="false" onAction="#drawRoadSection" text="Separated" visible="false" GridPane.halignment="CENTER" GridPane.rowIndex="13" GridPane.valignment="BASELINE">
                                                          <GridPane.margin>
                                                             <Insets left="18.0" />
                                                          </GridPane.margin>
