@@ -284,6 +284,8 @@ public class Scenario {
         jNet.setRoadconnections(jRCs);
         List<jaxb.Roadconnection> rcs =jRCs. getRoadconnection();
 
+        Set<LinkGhost> ghostlinks = my_fwy_scenario.ghost_pieces.links;
+
         // for each link, generate road connections leaving
         for(AbstractLink up_link : links.values()){
 
@@ -301,7 +303,10 @@ public class Scenario {
                     rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.mng,dn_link,LaneGroupType.mng) );
 
                 // II) add gp-> gp
-                rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,dn_link,LaneGroupType.gp) );
+                if(ghostlinks.contains(up_link) || ghostlinks.contains(dn_link))
+                    rcs.add( make_road_connection(my_fwy_scenario,up_link,null,dn_link,null) );
+                else
+                    rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,dn_link,LaneGroupType.gp) );
 
             }
 
