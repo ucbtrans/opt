@@ -85,7 +85,6 @@ public class LinkPerformanceController {
     private Sheet sheet = null;
     private Row headerRow = null;
     private CellStyle headerCellStyle = null;
-    private int wbRow = 0;
     private int wbCol = 0;
     private int mngD = 0;
     private int auxD = 0;
@@ -1512,6 +1511,7 @@ public class LinkPerformanceController {
             if (v_thres < 0)
                 v_thres = UserSettings.speedConversionMap.get("kphmph") * myLink.get_mng_freespeed_kph();
             label_thres = String.format("(Speed Threshold: %.0f %s)", cc*v_thres, label_units);
+            label_thres2 = String.format("(veh.-hr.; Speed Threshold: %.0f %s)", cc*v_thres, label_units);
 
             delayChart = new LineChart(xAxis, yAxis);
             delayChart.setTitle(label_mng+ label_thres);
@@ -1594,6 +1594,7 @@ public class LinkPerformanceController {
             if (v_thres < 0)
                 v_thres = UserSettings.speedConversionMap.get("kphmph") * myLink.get_aux_ff_speed_kph();
             label_thres = String.format("(Speed Threshold: %.0f %s)", cc*v_thres, label_units);
+            label_thres2 = String.format("(veh.-hr.; Speed Threshold: %.0f %s)", cc*v_thres, label_units);
 
             delayChart = new LineChart(xAxis, yAxis);
             delayChart.setTitle(label_aux + label_thres);

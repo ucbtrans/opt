@@ -61,6 +61,11 @@ import opt.data.Commodity;
 import opt.data.FreewayScenario;
 import opt.data.Route;
 import opt.utils.jfxutils.chart.JFXChartUtil;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jfree.chart.ChartFactory;
@@ -88,13 +93,21 @@ public class ScenarioPerformanceController {
     private SimDataScenario mySimData = null;
     
     private List<Commodity> listVT = null;
+    private int numVT;
     
     private float start = 0;
     private String timeLabel;
     private double timeDivider;
     
     Workbook workbook = null;
-            
+    private Sheet shS1 = null;
+    private Sheet shS2 = null;
+    private Sheet shA = null;
+    private Row hrS1 = null;
+    private Row hrS2 = null;
+    private Row hrA = null;
+    private CellStyle headerCellStyle = null;
+    private int wbCol = 0;
     
     @FXML // fx:id="scenarioPerformanceMainPane"
     private TabPane scenarioPerformanceMainPane; // Value injected by FXMLLoader
@@ -171,6 +184,19 @@ public class ScenarioPerformanceController {
         myScenario = mySimData.fwyscenario;
         
         workbook = new XSSFWorkbook();
+        shS1 = workbook.createSheet("Summary 1");
+        shS2 = workbook.createSheet("Summary 2");
+        shA = workbook.createSheet("Aggregates");
+        hrS1 = shS1.createRow(0);
+        hrS2 = shS2.createRow(0);
+        hrA = shA.createRow(0);
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerFont.setFontHeightInPoints((short)10);
+        headerFont.setColor(IndexedColors.BLUE.getIndex());
+        headerCellStyle = workbook.createCellStyle();
+        headerCellStyle.setFont(headerFont);
+        wbCol = 1;
         
         start = myScenario.get_start_time();
         
@@ -182,9 +208,10 @@ public class ScenarioPerformanceController {
         }
         
         listVT = Misc.makeListVT(myScenario.get_commodities());
+        numVT = listVT.size();
+        
         fillTabSummary();
-        fillTabAggregates();
-             
+        fillTabAggregates();     
     }
     
     
@@ -215,18 +242,27 @@ public class ScenarioPerformanceController {
         double prefWidth = 0.75*scenarioPerformanceMainPane.getPrefWidth();
         double prefHeight = scenarioPerformanceMainPane.getPrefHeight()/3;
 
-        int sz = listVT.size();
         double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;
-        String[] labels = new String[sz];
-        double[] c_vmt = new double[sz];
-        double[] c_vht = new double[sz];
-        double[] c_delay = new double[sz];
-        int[] prcts = new int[sz];
+        String[] labels = new String[numVT];
+        double[] c_vmt = new double[numVT];
+        double[] c_vht = new double[numVT];
+        double[] c_delay = new double[numVT];
+        int[] prcts = new int[numVT];
         double total_vmt = 0;
         double total_vht = 0;
         double total_delay = 0;
 
-        for (int i = 0; i < sz; i++) {
+        shS1.createRow(0);
+        shS1.getRow(0).createCell(1);
+        shS1.getRow(0).createCell(2);
+        shS1.getRow(0).createCell(3);
+        shS1.getRow(0).getCell(1).setCellValue("VMT");
+        shS1.getRow(0).getCell(2).setCellValue("VHT");
+        shS1.getRow(0).getCell(3).setCellValue("Delay");
+        shS1.getRow(0).getCell(1).setCellStyle(headerCellStyle);
+        shS1.getRow(0).getCell(2).setCellStyle(headerCellStyle);
+        shS1.getRow(0).getCell(3).setCellStyle(headerCellStyle);
+        for (int i = 0; i < numVT; i++) {
             double t_vmt = 0;
             double t_vht = 0;
             double t_delay = 0;
@@ -247,16 +283,39 @@ public class ScenarioPerformanceController {
             c_vmt[i] = t_vmt;
             c_vht[i] = t_vht;
             c_delay[i] = t_delay;
+            
+            shS1.createRow(i + 1);
+            shS1.getRow(i + 1).createCell(0);
+            shS1.getRow(i + 1).getCell(0).setCellValue(listVT.get(i).get_name());
+            shS1.getRow(i + 1).getCell(0).setCellStyle(headerCellStyle);
+            
+            shS1.getRow(i + 1).createCell(1);
+            shS1.getRow(i + 1).createCell(2);
+            shS1.getRow(i + 1).createCell(3);
+            shS1.getRow(i + 1).getCell(1).setCellValue(t_vmt);
+            shS1.getRow(i + 1).getCell(2).setCellValue(t_vht);
+            shS1.getRow(i + 1).getCell(3).setCellValue(t_delay);
         }
+        shS1.createRow(numVT + 1);
+        shS1.getRow(numVT + 1).createCell(0);
+        shS1.getRow(numVT + 1).getCell(0).setCellValue("Total");
+        shS1.getRow(numVT + 1).getCell(0).setCellStyle(headerCellStyle);
+        
+        shS1.getRow(numVT + 1).createCell(1);
+        shS1.getRow(numVT + 1).createCell(2);
+        shS1.getRow(numVT + 1).createCell(3);
+        shS1.getRow(numVT + 1).getCell(1).setCellValue(total_vmt);
+        shS1.getRow(numVT + 1).getCell(2).setCellValue(total_vht);
+        shS1.getRow(numVT + 1).getCell(3).setCellValue(total_delay);
 
         int vmt_prct = 0;
         int vht_prct = 0;
         int delay_prct = 0;
-        for (int i = 0; i < sz; i++) {
+        for (int i = 0; i < numVT; i++) {
             int p_vmt = (int) Math.round(100 * c_vmt[i] / total_vmt);
             int p_vht = (int) Math.round(100 * c_vht[i] / total_vht);
             int p_delay = (int) Math.round(100 * c_delay[i] / total_delay);
-            if (i == sz - 1) {
+            if (i == numVT - 1) {
                 p_vmt = Math.max(0, 100 - vmt_prct);
                 p_vht = Math.max(0, 100 - vht_prct);
                 p_delay = Math.max(0, 100 - delay_prct);
@@ -296,6 +355,27 @@ public class ScenarioPerformanceController {
         vbSummary.getChildren().add(chart);
         
         
+        
+        shS2.createRow(0);
+        shS2.createRow(1);
+        shS2.createRow(2);
+        shS2.createRow(3);
+        shS2.getRow(0).createCell(1);
+        shS2.getRow(0).createCell(2);
+        shS2.getRow(1).createCell(0);
+        shS2.getRow(2).createCell(0);
+        shS2.getRow(3).createCell(0);
+        shS2.getRow(0).getCell(1).setCellValue("VHT");
+        shS2.getRow(0).getCell(2).setCellValue("Delay");
+        shS2.getRow(1).getCell(0).setCellValue("Non-Origin Sections");
+        shS2.getRow(2).getCell(0).setCellValue("Origin Sections");
+        shS2.getRow(3).getCell(0).setCellValue("Total");
+        shS2.getRow(0).getCell(1).setCellStyle(headerCellStyle);
+        shS2.getRow(0).getCell(2).setCellStyle(headerCellStyle);
+        shS2.getRow(1).getCell(0).setCellStyle(headerCellStyle);
+        shS2.getRow(2).getCell(0).setCellStyle(headerCellStyle);
+        shS2.getRow(3).getCell(0).setCellStyle(headerCellStyle);
+        
         TimeSeries vht_no = mySimData.get_vht_for_network_nonsources(null);
         TimeSeries vht_o = mySimData.get_vht_for_network_sources(null);
 
@@ -319,6 +399,13 @@ public class ScenarioPerformanceController {
         l = String.format("Origins = %.1f (%d%%)", d_o, 100-p_no);
         vhtPieData2.add(new PieChart.Data(l, d_o));
         
+        shS2.getRow(1).createCell(1);
+        shS2.getRow(2).createCell(1);
+        shS2.getRow(3).createCell(1);
+        shS2.getRow(1).getCell(1).setCellValue(d_n);
+        shS2.getRow(2).getCell(1).setCellValue(d_o);
+        shS2.getRow(3).getCell(1).setCellValue(d_n + d_o);
+        
         chart = new PieChart(vhtPieData2);
         //chart.setTitle("Total VHT (" + (int)Math.round(total_vht) + ")");
         chart.setLegendVisible(false);      
@@ -334,8 +421,11 @@ public class ScenarioPerformanceController {
         String label_units = UserSettings.unitsSpeed;
         double cc = UserSettings.speedConversionMap.get("mph"+label_units);
         String label_thres = String.format("(%.1f veh.-hr., Speed Threshold: %.0f %s)", total_delay, cc*v_thres, label_units);
-        if (v_thres < 0)
+        String label_thres2 = String.format("(veh.-hr.; Speed Threshold: %.0f %s)", cc*v_thres, label_units);
+        if (v_thres < 0) {
             label_thres = String.format("(%.1f veh.-hr., Speed Threshold: Free Flow Speed)", total_delay);
+            label_thres2 = "(veh.-hr.; Speed Threshold: Free Flow Speed)";
+        }
         
         chart = new PieChart(delayPieData1);
         chart.setTitle("Total Delay " + label_thres);
@@ -364,6 +454,16 @@ public class ScenarioPerformanceController {
             for (double v : vals)
                 d_o += v;
         }
+        
+        shS1.getRow(0).getCell(3).setCellValue("Delay " + label_thres2);
+        shS2.getRow(0).getCell(2).setCellValue("Delay " + label_thres2);
+        
+        shS2.getRow(1).createCell(2);
+        shS2.getRow(2).createCell(2);
+        shS2.getRow(3).createCell(2);
+        shS2.getRow(1).getCell(2).setCellValue(d_n);
+        shS2.getRow(2).getCell(2).setCellValue(d_o);
+        shS2.getRow(3).getCell(2).setCellValue(d_n + d_o);
 
         p_no = (int) Math.round(100 * d_n / (d_n + d_o));
         l = String.format("Non-Origins = %.1f (%d%%)", d_n, p_no);
@@ -386,6 +486,12 @@ public class ScenarioPerformanceController {
     
     public void fillTabAggregates() {
         vbAggregates.getChildren().clear();
+        
+        hrA.createCell(0);
+        hrA.getCell(0).setCellValue("Time");
+        hrA.getCell(0).setCellStyle(headerCellStyle);
+        
+        
         String label;
         XYChart.Series dataSeries, dataSeries_mng, dataSeries_aux, dataSeries_total;
         List<XYDataItem> xydata, xydata_src;
@@ -418,7 +524,8 @@ public class ScenarioPerformanceController {
         double[] total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
             total[i] = 0;
-        for (Commodity c : listVT) {
+        for (int ii = 0; ii < numVT; ii++) {
+            Commodity c = listVT.get(ii);
             dataSeries = new XYChart.Series();
             dataSeries.setName(c.get_name());
             xydata = mySimData.get_vmt_for_network(cset(c)).get_XYSeries(c.get_name()).getItems();
@@ -426,12 +533,38 @@ public class ScenarioPerformanceController {
             sz = xydata.size();
 
             for (int i = 0; i < max_sz; i++) {
-                if (i < sz) {
-                    xy = xydata.get(i);
-                    dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                    total[i] += xy.getYValue();
-                } else {
-                    dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                if (ii == 0) {
+                    shA.createRow(i + 1);
+                    shA.getRow(i + 1).createCell(0);
+                    shA.getRow(i + 1).getCell(0).setCellValue(Misc.seconds2timestring((float) (start + i*dt), ":"));
+                }
+                
+                if (i == 0) {
+                    hrA.createCell(wbCol + ii);
+                    hrA.getCell(wbCol + ii).setCellValue(c.get_name() + " VMT" + per_buf);
+                    hrA.getCell(wbCol + ii).setCellStyle(headerCellStyle);
+
+                    if ((ii == numVT - 1) && (numVT > 1)) {
+                        hrA.createCell(wbCol + numVT);
+                        hrA.getCell(wbCol + numVT).setCellValue("Total VMT" + per_buf);
+                        hrA.getCell(wbCol + numVT).setCellStyle(headerCellStyle);
+                    }
+                }
+                
+                double val = 0;
+                
+                if (i < sz)
+                    val = xydata.get(i).getYValue();
+                
+                total[i] += val;
+                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
+                
+                shA.getRow(i + 1).createCell(wbCol + ii);
+                shA.getRow(i + 1).getCell(wbCol + ii).setCellValue(val);
+
+                if ((ii == numVT - 1) && (numVT > 1)) {
+                    shA.getRow(i + 1).createCell(wbCol + numVT);
+                    shA.getRow(i + 1).getCell(wbCol + numVT).setCellValue(total[i]);
                 }
             }
             vmtChart.getData().add(dataSeries);
@@ -441,8 +574,12 @@ public class ScenarioPerformanceController {
         dataSeries_total.setName("Total");
         for (int i = 0; i < max_sz; i++)
             dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-        if (listVT.size() > 1)
+        if (numVT > 1) {
             vmtChart.getData().add(dataSeries_total);
+            wbCol++;
+        }
+            
+        wbCol += numVT;
 
         vmtChart.setCreateSymbols(false);
         vmtChart.setLegendSide(Side.BOTTOM);
@@ -476,7 +613,8 @@ public class ScenarioPerformanceController {
         total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
             total[i] = 0;
-        for (Commodity c : listVT) {
+        for (int ii = 0; ii < numVT; ii++) {
+            Commodity c = listVT.get(ii);
             dataSeries = new XYChart.Series();
             dataSeries.setName(c.get_name());
             xydata = mySimData.get_vht_for_network(cset(c)).get_XYSeries(c.get_name()).getItems();
@@ -484,13 +622,22 @@ public class ScenarioPerformanceController {
             sz = xydata.size();
 
             for (int i = 0; i < max_sz; i++) {
-                if (i < sz) {
-                    xy = xydata.get(i);
-                    dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                    total[i] += xy.getYValue();
-                } else {
-                    dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                if (i == 0) {
+                    hrA.createCell(wbCol + ii);
+                    hrA.getCell(wbCol + ii).setCellValue(c.get_name() + " VHT" + per_buf);
+                    hrA.getCell(wbCol + ii).setCellStyle(headerCellStyle);
                 }
+                
+                double val = 0;
+                
+                if (i < sz)
+                    val = xydata.get(i).getYValue();
+                
+                total[i] += val;
+                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
+                
+                shA.getRow(i + 1).createCell(wbCol + ii);
+                shA.getRow(i + 1).getCell(wbCol + ii).setCellValue(val);
             }
             vhtChart1.getData().add(dataSeries);
         }
@@ -499,8 +646,10 @@ public class ScenarioPerformanceController {
         dataSeries_total.setName("Total");
         for (int i = 0; i < max_sz; i++)
             dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-        if (listVT.size() > 1)
+        if (numVT > 1)
             vhtChart1.getData().add(dataSeries_total);
+        
+        wbCol += numVT;
 
         vhtChart1.setCreateSymbols(false);
         vhtChart1.setLegendSide(Side.BOTTOM);
@@ -536,13 +685,22 @@ public class ScenarioPerformanceController {
         xydata = mySimData.get_vht_for_network_nonsources(null).get_XYSeries("Non-Origin Sections").getItems();
         sz = xydata.size();
         for (int i = 0; i < max_sz; i++) {
-            if (i < sz) {
-                xy = xydata.get(i);
-                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                total[i] += xy.getYValue();
-            } else {
-                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+            if (i == 0) {
+                hrA.createCell(wbCol);
+                hrA.getCell(wbCol).setCellValue("VHT in Non-Origin Sections" + per_buf);
+                hrA.getCell(wbCol).setCellStyle(headerCellStyle);
             }
+
+            double val = 0;
+
+            if (i < sz)
+                val = xydata.get(i).getYValue();
+
+            total[i] += val;
+            dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
+
+            shA.getRow(i + 1).createCell(wbCol);
+            shA.getRow(i + 1).getCell(wbCol).setCellValue(val);
         }
         vhtChart2.getData().add(dataSeries);
 
@@ -552,13 +710,29 @@ public class ScenarioPerformanceController {
         xydata = ts.get_XYSeries("Origin Sections").getItems();
         sz = xydata.size();
         for (int i = 0; i < max_sz; i++) {
-            if (i < sz) {
-                xy = xydata.get(i);
-                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                total[i] += xy.getYValue();
-            } else {
-                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+            if (i == 0) {
+                hrA.createCell(wbCol + 1);
+                hrA.getCell(wbCol + 1).setCellValue("VHT in Origin Sections" + per_buf);
+                hrA.getCell(wbCol + 1).setCellStyle(headerCellStyle);
+
+                hrA.createCell(wbCol + 2);
+                hrA.getCell(wbCol + 2).setCellValue("Total VHT" + per_buf);
+                hrA.getCell(wbCol + 2).setCellStyle(headerCellStyle);
             }
+
+            double val = 0;
+
+            if (i < sz)
+                val = xydata.get(i).getYValue();
+
+            total[i] += val;
+            dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
+
+            shA.getRow(i + 1).createCell(wbCol + 1);
+            shA.getRow(i + 1).getCell(wbCol + 1).setCellValue(val);
+
+            shA.getRow(i + 1).createCell(wbCol + 2);
+            shA.getRow(i + 1).getCell(wbCol + 2).setCellValue(total[i]);
         }
         vhtChart2.getData().add(dataSeries);
 
@@ -566,8 +740,9 @@ public class ScenarioPerformanceController {
         dataSeries_total.setName("Total");
         for (int i = 0; i < max_sz; i++)
             dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-        if (listVT.size() > 1)
-            vhtChart2.getData().add(dataSeries_total);
+        
+        vhtChart2.getData().add(dataSeries_total);
+        wbCol += 3;
 
         vhtChart2.setCreateSymbols(false);
         vhtChart2.setLegendSide(Side.BOTTOM);
@@ -592,8 +767,11 @@ public class ScenarioPerformanceController {
         double cc = UserSettings.speedConversionMap.get("mph"+label_units);
         double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;
         String label_thres = String.format("(Speed Threshold: %.0f %s)", cc*v_thres, label_units);
-        if (v_thres < 0)
+        String label_thres2 = String.format("(veh.-hr.; Speed Threshold: %.0f %s)", cc*v_thres, label_units);
+        if (v_thres < 0) {
             label_thres = "(Speed Threshold: Free Flow Speed)";
+            label_thres2 = "(veh.-hr.; Speed Threshold: Free Flow Speed)";
+        }
         xAxis = new NumberAxis();
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
@@ -611,7 +789,8 @@ public class ScenarioPerformanceController {
         total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
             total[i] = 0;
-        for (Commodity c : listVT) {
+        for (int ii = 0; ii < numVT; ii++) {
+            Commodity c = listVT.get(ii);
             dataSeries = new XYChart.Series();
             dataSeries.setName(c.get_name());
             xydata = mySimData.get_delay_for_network(cset(c), (float)v_thres).get_XYSeries(c.get_name()).getItems();
@@ -619,13 +798,22 @@ public class ScenarioPerformanceController {
             sz = xydata.size();
 
             for (int i = 0; i < max_sz; i++) {
-                if (i < sz) {
-                    xy = xydata.get(i);
-                    dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                    total[i] += xy.getYValue();
-                } else {
-                    dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                if (i == 0) {
+                    hrA.createCell(wbCol + ii);
+                    hrA.getCell(wbCol + ii).setCellValue(c.get_name() + " Delay" + per_buf + " " + label_thres2);
+                    hrA.getCell(wbCol + ii).setCellStyle(headerCellStyle);
                 }
+                
+                double val = 0;
+                
+                if (i < sz)
+                    val = xydata.get(i).getYValue();
+                
+                total[i] += val;
+                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
+                
+                shA.getRow(i + 1).createCell(wbCol + ii);
+                shA.getRow(i + 1).getCell(wbCol + ii).setCellValue(val);
             }
             delayChart1.getData().add(dataSeries);
         }
@@ -634,8 +822,10 @@ public class ScenarioPerformanceController {
         dataSeries_total.setName("Total");
         for (int i = 0; i < max_sz; i++)
             dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-        if (listVT.size() > 1)
+        if (numVT > 1)
             delayChart1.getData().add(dataSeries_total);
+            
+        wbCol += numVT;
 
         delayChart1.setCreateSymbols(false);
         delayChart1.setLegendSide(Side.BOTTOM);
@@ -671,13 +861,22 @@ public class ScenarioPerformanceController {
         xydata = mySimData.get_delay_for_network_nonsources(null, (float)v_thres).get_XYSeries("Non-Origin Sections").getItems();
         sz = xydata.size();
         for (int i = 0; i < max_sz; i++) {
-            if (i < sz) {
-                xy = xydata.get(i);
-                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                total[i] += xy.getYValue();
-            } else {
-                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+            if (i == 0) {
+                hrA.createCell(wbCol);
+                hrA.getCell(wbCol).setCellValue("Delay in Non-Origin Sections" + per_buf + " " + label_thres2);
+                hrA.getCell(wbCol).setCellStyle(headerCellStyle);
             }
+
+            double val = 0;
+
+            if (i < sz)
+                val = xydata.get(i).getYValue();
+
+            total[i] += val;
+            dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
+
+            shA.getRow(i + 1).createCell(wbCol);
+            shA.getRow(i + 1).getCell(wbCol).setCellValue(val);
         }
         delayChart2.getData().add(dataSeries);
 
@@ -687,13 +886,29 @@ public class ScenarioPerformanceController {
         xydata = ts.get_XYSeries("Origin Sections").getItems();
         sz = xydata.size();
         for (int i = 0; i < max_sz; i++) {
-            if (i < sz) {
-                xy = xydata.get(i);
-                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                total[i] += xy.getYValue();
-            } else {
-                dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+            if (i == 0) {
+                hrA.createCell(wbCol + 1);
+                hrA.getCell(wbCol + 1).setCellValue("Delay in Origin Sections" + per_buf + " " + label_thres2);
+                hrA.getCell(wbCol + 1).setCellStyle(headerCellStyle);
+
+                hrA.createCell(wbCol + 2);
+                hrA.getCell(wbCol + 2).setCellValue("Total Delay" + per_buf + " " + label_thres2);
+                hrA.getCell(wbCol + 2).setCellStyle(headerCellStyle);
             }
+
+            double val = 0;
+
+            if (i < sz)
+                val = xydata.get(i).getYValue();
+
+            total[i] += val;
+            dataSeries.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
+
+            shA.getRow(i + 1).createCell(wbCol + 1);
+            shA.getRow(i + 1).getCell(wbCol + 1).setCellValue(val);
+
+            shA.getRow(i + 1).createCell(wbCol + 2);
+            shA.getRow(i + 1).getCell(wbCol + 2).setCellValue(total[i]);
         }
         delayChart2.getData().add(dataSeries);
 
@@ -701,8 +916,9 @@ public class ScenarioPerformanceController {
         dataSeries_total.setName("Total");
         for (int i = 0; i < max_sz; i++)
             dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-        if (listVT.size() > 1)
-            delayChart2.getData().add(dataSeries_total);
+
+        delayChart2.getData().add(dataSeries_total);
+        wbCol += 3;
 
         delayChart2.setCreateSymbols(false);
         delayChart2.setLegendSide(Side.BOTTOM);
