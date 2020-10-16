@@ -2302,8 +2302,7 @@ public class LinkEditorController {
     @FXML
     void onToggleUseFRFlows(ActionEvent event) {
         CheckBox cb = (CheckBox)event.getSource();
-        useFRFlows = cb.isSelected();
-        ((LinkOfframp)this.myLink).set_use_fr_flows(useFRFlows);
+        useFRFlows = !((LinkOfframp)myLink).get_use_fr_flows(); //cb.isSelected();
         gridFRFlow.setVisible(useFRFlows);         
         gridSR.setVisible(!useFRFlows); 
         cbUseFRFlows.setSelected(useFRFlows);

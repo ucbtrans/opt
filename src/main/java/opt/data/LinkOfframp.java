@@ -10,7 +10,7 @@ public class LinkOfframp extends LinkRamp {
 
     private Map<Long, Profile1D> splits = new HashMap<>();     // commodity -> Profile1D
     public Map<Long, Profile1D> frflows = new HashMap<>();     // commodity -> Profile1D
-    public boolean usefrflows;
+    public boolean usefrflows = false;
     public float ctrldt;
 
     /////////////////////////////////////
@@ -72,7 +72,6 @@ public class LinkOfframp extends LinkRamp {
             list.add(0d);
             Profile1D prof = new Profile1D(0f,(float)default_dt,list);
             frflows.put(comm_id,prof);
-            usefrflows = true;
             return prof;
         }
     }

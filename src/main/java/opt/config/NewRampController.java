@@ -38,6 +38,7 @@ import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.UserSettings;
 import opt.data.AbstractLink;
+import opt.data.LinkOfframp;
 import opt.data.ParametersRamp;
 import opt.utils.ModifiedDoubleStringConverter;
 import opt.utils.ModifiedIntegerStringConverter;
@@ -325,8 +326,10 @@ public class NewRampController {
 
         if (is_onramp)
             myLink.get_segment().add_or(params);
-        else
-            myLink.get_segment().add_fr(params);
+        else {
+            LinkOfframp fr = myLink.get_segment().add_fr(params);
+            fr.set_use_fr_flows(false);
+        }
 
         appMainController.clearSimData();
         appMainController.objectNameUpdate(myLink);
