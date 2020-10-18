@@ -105,6 +105,10 @@ import org.jfree.ui.RectangleInsets;
 import java.util.concurrent.TimeUnit;
 import javafx.scene.control.Separator;
 import opt.data.TimeMatrix;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -168,8 +172,25 @@ public class RoutePerformanceController {
     private JFreeChart densityManagedChart;
     
     private List<Commodity> listVT = null;
+    private int numVT;
     
     private Workbook workbook = null;
+    private Sheet shSpeedGP = null;
+    private Sheet shSpeedMng = null;
+    private Sheet shFlowGP = null;
+    private Sheet shFlowMng = null;
+    private Sheet shDensityGP = null;
+    private Sheet shDensityMng = null;
+    private Sheet shA = null;
+    private Row hrSpeedGP = null;
+    private Row hrSpeedMng = null;
+    private Row hrFlowGP = null;
+    private Row hrFlowMng = null;
+    private Row hrDensityGP = null;
+    private Row hrDensityMng = null;
+    private Row hrA = null;
+    private CellStyle headerCellStyle = null;
+    private int wbCol = 0;
             
     
     @FXML // fx:id="routePerformanceMainPane"
@@ -254,9 +275,8 @@ public class RoutePerformanceController {
         myRoute = rt;
         mySimData = sdata;
         
-        workbook = new XSSFWorkbook();
-        
         listVT = Misc.makeListVT(mySimData.fwyscenario.get_commodities());
+        numVT = listVT.size();
         start = mySimData.fwyscenario.get_start_time();
         
         timeLabel = "Time (hours)";
@@ -265,6 +285,77 @@ public class RoutePerformanceController {
             timeLabel = "Time (minutes)";
             timeDivider = 60.0;
         }
+        
+        maxLinkLength = 0;
+        double lcc = UserSettings.lengthConversionMap.get("meters"+UserSettings.unitsLength);
+        List<AbstractLink> links = myRoute.get_link_sequence();
+        for (AbstractLink l : links) {
+            maxLinkLength = Math.max(maxLinkLength, lcc*l.get_length_meters());
+
+            if (l.get_mng_lanes() > 0)
+                hasManagedLanes = true;
+
+            if (l.get_aux_lanes() > 0)
+                hasAuxLanes = true;
+        }
+        
+        String vUnits = UserSettings.unitsSpeed;
+        String fUnits = UserSettings.unitsFlow;
+        String dUnits = UserSettings.unitsDensity;
+        String hdr = "Time \\ Distance (" + UserSettings.unitsLength + ")";
+        
+        workbook = new XSSFWorkbook();
+        
+        org.apache.poi.ss.usermodel.Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerFont.setFontHeightInPoints((short)10);
+        headerFont.setColor(IndexedColors.BLUE.getIndex());
+        headerCellStyle = workbook.createCellStyle();
+        headerCellStyle.setFont(headerFont);
+        wbCol = 1;
+        
+        shA = workbook.createSheet("Aggregates");
+        hrA = shA.createRow(0);
+        
+        shSpeedGP = workbook.createSheet("GP Lane Speed (" + vUnits + ")");
+        hrSpeedGP = shSpeedGP.createRow(0);
+        hrSpeedGP.createCell(0);
+        hrSpeedGP.getCell(0).setCellValue(hdr);
+        hrSpeedGP.getCell(0).setCellStyle(headerCellStyle);
+        if (hasManagedLanes) {
+            shSpeedMng = workbook.createSheet("Managed Lane Speed (" + vUnits + ")");
+            hrSpeedMng = shSpeedMng.createRow(0);
+            hrSpeedMng.createCell(0);
+            hrSpeedMng.getCell(0).setCellValue(hdr);
+            hrSpeedMng.getCell(0).setCellStyle(headerCellStyle);
+        }
+        
+        shFlowGP = workbook.createSheet("GP Lane Flow (" + fUnits + ")");
+        hrFlowGP = shFlowGP.createRow(0);
+        hrFlowGP.createCell(0);
+        hrFlowGP.getCell(0).setCellValue(hdr);
+        hrFlowGP.getCell(0).setCellStyle(headerCellStyle);
+        if (hasManagedLanes) {
+            shFlowMng = workbook.createSheet("Managed Lane Flow (" + fUnits + ")");
+            hrFlowMng = shFlowMng.createRow(0);
+            hrFlowMng.createCell(0);
+            hrFlowMng.getCell(0).setCellValue(hdr);
+            hrFlowMng.getCell(0).setCellStyle(headerCellStyle);
+        }
+        
+        shDensityGP = workbook.createSheet("GP Lane Density (" + dUnits + ")");
+        hrDensityGP = shDensityGP.createRow(0);
+        hrDensityGP.createCell(0);
+        hrDensityGP.getCell(0).setCellValue(hdr);
+        hrDensityGP.getCell(0).setCellStyle(headerCellStyle);
+        if (hasManagedLanes) {
+            shDensityMng = workbook.createSheet("Managed Lane Density (" + dUnits + ")");
+            hrDensityMng = shDensityMng.createRow(0);
+            hrDensityMng.createCell(0);
+            hrDensityMng.getCell(0).setCellValue(hdr);
+            hrDensityMng.getCell(0).setCellStyle(headerCellStyle);
+        }
+
         
         long startTime = System.nanoTime();
         processRouteData();
@@ -296,7 +387,6 @@ public class RoutePerformanceController {
         maxCellLength = 0;
         minCellLengthM = Double.MAX_VALUE;
         maxCellLengthM = 0;
-        maxLinkLength = 0;
         routeLength = 0;
         minSpeed = 0;
         maxSpeed = 0;
@@ -304,8 +394,6 @@ public class RoutePerformanceController {
         maxFlow = 0;
         minDensity = 0;
         maxDensity = 0;
-        hasManagedLanes = false;
-        hasAuxLanes = false;
         List<AbstractLink> links = myRoute.get_link_sequence();
         
         double lcc = UserSettings.lengthConversionMap.get("meters"+UserSettings.unitsLength);
@@ -340,16 +428,6 @@ public class RoutePerformanceController {
         int ySizeM = 0;
         if (vmtrx_mng != null)
             ySizeM = vmtrx_mng.length;
-        
-        for (AbstractLink l : links) {
-            maxLinkLength = Math.max(maxLinkLength, lcc*l.get_length_meters());
-
-            if (l.get_mng_lanes() > 0)
-                hasManagedLanes = true;
-
-            if (l.get_aux_lanes() > 0)
-                hasAuxLanes = true;
-        }
 
         speedDataGP = new double[3][xSize*ySize];
         speedDataManaged = new double[3][xSize*ySize];
@@ -365,8 +443,38 @@ public class RoutePerformanceController {
         
         for (int i = 0; i < xSize; i++) {
             double hour = (start + i*dt) / timeDivider;
+            String ts = Misc.seconds2timestring((float) (start + i*dt), ":");
             double dd = 0.0;
             double ddM = 0.0;
+            
+            shSpeedGP.createRow(i + 1);
+            shSpeedGP.getRow(i + 1).createCell(0);
+            shSpeedGP.getRow(i + 1).getCell(0).setCellValue(ts);
+            shSpeedGP.getRow(i + 1).getCell(0).setCellStyle(headerCellStyle);
+            shFlowGP.createRow(i + 1);
+            shFlowGP.getRow(i + 1).createCell(0);
+            shFlowGP.getRow(i + 1).getCell(0).setCellValue(ts);
+            shFlowGP.getRow(i + 1).getCell(0).setCellStyle(headerCellStyle);
+            shDensityGP.createRow(i + 1);
+            shDensityGP.getRow(i + 1).createCell(0);
+            shDensityGP.getRow(i + 1).getCell(0).setCellValue(ts);
+            shDensityGP.getRow(i + 1).getCell(0).setCellStyle(headerCellStyle);
+            
+            if (hasManagedLanes) {
+                shSpeedMng.createRow(i + 1);
+                shSpeedMng.getRow(i + 1).createCell(0);
+                shSpeedMng.getRow(i + 1).getCell(0).setCellValue(ts);
+                shSpeedMng.getRow(i + 1).getCell(0).setCellStyle(headerCellStyle);
+                shFlowMng.createRow(i + 1);
+                shFlowMng.getRow(i + 1).createCell(0);
+                shFlowMng.getRow(i + 1).getCell(0).setCellValue(ts);
+                shFlowMng.getRow(i + 1).getCell(0).setCellStyle(headerCellStyle);
+                shDensityMng.createRow(i + 1);
+                shDensityMng.getRow(i + 1).createCell(0);
+                shDensityMng.getRow(i + 1).getCell(0).setCellValue(ts);
+                shDensityMng.getRow(i + 1).getCell(0).setCellStyle(headerCellStyle);
+            }
+            
             for (int j = 0; j < ySize; j++) {
                 if (i == 0) {
                     if (j > 0)
@@ -375,6 +483,16 @@ public class RoutePerformanceController {
                     minCellLength = Math.min(minCellLength, cell_lengths.get(j));
                     maxCellLength = Math.max(maxCellLength, cell_lengths.get(j));
                     routeLength += lcc2 * cell_lengths.get(j);
+                    
+                    shSpeedGP.getRow(0).createCell(j + 1);
+                    shSpeedGP.getRow(0).getCell(j + 1).setCellValue(lcc2 * cell_lengths.get(j));
+                    shSpeedGP.getRow(0).getCell(j + 1).setCellStyle(headerCellStyle);
+                    shFlowGP.getRow(0).createCell(j + 1);
+                    shFlowGP.getRow(0).getCell(j + 1).setCellValue(lcc2 * cell_lengths.get(j));
+                    shFlowGP.getRow(0).getCell(j + 1).setCellStyle(headerCellStyle);
+                    shDensityGP.getRow(0).createCell(j + 1);
+                    shDensityGP.getRow(0).getCell(j + 1).setCellValue(lcc2 * cell_lengths.get(j));
+                    shDensityGP.getRow(0).getCell(j + 1).setCellStyle(headerCellStyle);
                 } else {
                     dd = dist[j];
                 }
@@ -402,6 +520,13 @@ public class RoutePerformanceController {
                     minDensity = Math.min(minDensity, densityDataGP[2][idx]);
                     maxDensity = Math.max(maxDensity, densityDataGP[2][idx]);
                 }
+                
+                shSpeedGP.getRow(i + 1).createCell(j + 1);
+                shSpeedGP.getRow(i + 1).getCell(j + 1).setCellValue(speedDataGP[2][idx]);
+                shFlowGP.getRow(i + 1).createCell(j + 1);
+                shFlowGP.getRow(i + 1).getCell(j + 1).setCellValue(flowDataGP[2][idx]);
+                shDensityGP.getRow(i + 1).createCell(j + 1);
+                shDensityGP.getRow(i + 1).getCell(j + 1).setCellValue(densityDataGP[2][idx]);
             }
             
             if (hasManagedLanes) {
@@ -412,6 +537,16 @@ public class RoutePerformanceController {
                         distM[j] = ddM;
                         minCellLengthM = Math.min(minCellLengthM, cell_lengths.get(j));
                         maxCellLengthM = Math.max(maxCellLengthM, cell_lengthsM.get(j));
+                        
+                        shSpeedMng.getRow(0).createCell(j + 1);
+                        shSpeedMng.getRow(0).getCell(j + 1).setCellValue(lcc2 * cell_lengths.get(j));
+                        shSpeedMng.getRow(0).getCell(j + 1).setCellStyle(headerCellStyle);
+                        shFlowMng.getRow(0).createCell(j + 1);
+                        shFlowMng.getRow(0).getCell(j + 1).setCellValue(lcc2 * cell_lengths.get(j));
+                        shFlowMng.getRow(0).getCell(j + 1).setCellStyle(headerCellStyle);
+                        shDensityMng.getRow(0).createCell(j + 1);
+                        shDensityMng.getRow(0).getCell(j + 1).setCellValue(lcc2 * cell_lengths.get(j));
+                        shDensityMng.getRow(0).getCell(j + 1).setCellStyle(headerCellStyle);
                     } else {
                         ddM = distM[j];
                     }
@@ -439,6 +574,13 @@ public class RoutePerformanceController {
                         minDensity = Math.min(minDensity, densityDataManaged[2][idx]);
                         maxDensity = Math.max(maxDensity, densityDataManaged[2][idx]);
                     }
+                    
+                    shSpeedMng.getRow(i + 1).createCell(j + 1);
+                    shSpeedMng.getRow(i + 1).getCell(j + 1).setCellValue(speedDataManaged[2][idx]);
+                    shFlowMng.getRow(i + 1).createCell(j + 1);
+                    shFlowMng.getRow(i + 1).getCell(j + 1).setCellValue(flowDataManaged[2][idx]);
+                    shDensityMng.getRow(i + 1).createCell(j + 1);
+                    shDensityMng.getRow(i + 1).getCell(j + 1).setCellValue(densityDataManaged[2][idx]);
                 }
             }
         }
@@ -810,15 +952,14 @@ public class RoutePerformanceController {
             per_buf = " per Hour";
         else if (disp_dt > 60) 
             per_buf = " per " + (dt / 3600.0) + " Hours";
-        int num_comms = listVT.size();
-        TimeSeries[] vmt_series_gp = new TimeSeries[num_comms];
-        TimeSeries[] vmt_series_mng = new TimeSeries[num_comms];
-        TimeSeries[] vht_series_gp = new TimeSeries[num_comms];
-        TimeSeries[] vht_series_mng = new TimeSeries[num_comms];
-        TimeSeries[] delay_series_gp = new TimeSeries[num_comms];
-        TimeSeries[] delay_series_mng = new TimeSeries[num_comms];
+        TimeSeries[] vmt_series_gp = new TimeSeries[numVT];
+        TimeSeries[] vmt_series_mng = new TimeSeries[numVT];
+        TimeSeries[] vht_series_gp = new TimeSeries[numVT];
+        TimeSeries[] vht_series_mng = new TimeSeries[numVT];
+        TimeSeries[] delay_series_gp = new TimeSeries[numVT];
+        TimeSeries[] delay_series_mng = new TimeSeries[numVT];
 
-        for (int i = 0; i < num_comms; i++) {
+        for (int i = 0; i < numVT; i++) {
             vmt_series_gp[i] = null;
             vmt_series_mng[i] = null;
             vht_series_gp[i] = null;
@@ -829,6 +970,7 @@ public class RoutePerformanceController {
         double cc = UserSettings.speedConversionMap.get("mph"+label_units);
         double v_thres = UserSettings.defaultFreeFlowSpeedThresholdForDelayMph;
         String label_thres = String.format("(Speed Threshold: %.0f %s)", cc*v_thres, label_units);
+        String label_thres2 = String.format("(veh.-hr.; Speed Threshold: %.0f %s)", cc*v_thres, label_units);
 
         List<AbstractLink> links = myRoute.get_link_sequence();
 
@@ -838,7 +980,7 @@ public class RoutePerformanceController {
                 v_thres0 = UserSettings.speedConversionMap.get("kphmph") * l.get_gp_freespeed_kph();
             SimDataLink sdl = mySimData.linkdata.get(l.id);
             if (sdl != null) {
-                for (int i = 0; i < num_comms; i++) {
+                for (int i = 0; i < numVT; i++) {
                     TimeSeries ts = sdl.get_vmt(lgset_gp, cset(listVT.get(i)));
                     if (ts != null) {
                         if (vmt_series_gp[i] == null)
@@ -934,13 +1076,13 @@ public class RoutePerformanceController {
         vmtChart.setTitle(label_gp);
 
         int max_sz = 0;
-        for (int k = 0; k < num_comms; k++) {
+        for (int k = 0; k < numVT; k++) {
             max_sz = Math.max(max_sz, vmt_series_gp[k].values.length);
         }
         double[] total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
             total[i] = 0;
-        for (int k = 0; k < num_comms; k++) {
+        for (int k = 0; k < numVT; k++) {
             dataSeries_gp = new XYChart.Series();
             dataSeries_gp.setName(listVT.get(k).get_name());
             xydata_gp = vmt_series_gp[k].get_XYSeries(listVT.get(k).get_name()).getItems();
@@ -948,12 +1090,38 @@ public class RoutePerformanceController {
             sz_gp = xydata_gp.size();
 
             for (int i = 0; i < max_sz; i++) {
-                if (i < sz_gp) {
-                    xy = xydata_gp.get(i);
-                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                    total[i] += xy.getYValue();
-                } else {
-                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                if (k == 0) {
+                    shA.createRow(i + 1);
+                    shA.getRow(i + 1).createCell(0);
+                    shA.getRow(i + 1).getCell(0).setCellValue(Misc.seconds2timestring((float) (start + i*dt), ":"));
+                }
+                
+                if (i == 0) {
+                    hrA.createCell(wbCol + k);
+                    hrA.getCell(wbCol + k).setCellValue(listVT.get(k).get_name() + " " + label_gp);
+                    hrA.getCell(wbCol + k).setCellStyle(headerCellStyle);
+
+                    if ((k == numVT - 1) && (numVT > 1)) {
+                        hrA.createCell(wbCol + numVT);
+                        hrA.getCell(wbCol + numVT).setCellValue("Total " + label_gp);
+                        hrA.getCell(wbCol + numVT).setCellStyle(headerCellStyle);
+                    }
+                }
+                
+                double val = 0;
+                
+                if (i < sz_gp)
+                    val = xydata_gp.get(i).getYValue();
+                
+                total[i] += val;
+                dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
+                
+                shA.getRow(i + 1).createCell(wbCol + k);
+                shA.getRow(i + 1).getCell(wbCol + k).setCellValue(val);
+
+                if ((k == numVT - 1) && (numVT > 1)) {
+                    shA.getRow(i + 1).createCell(wbCol + numVT);
+                    shA.getRow(i + 1).getCell(wbCol + numVT).setCellValue(total[i]);
                 }
             }
             vmtChart.getData().add(dataSeries_gp);
@@ -963,8 +1131,12 @@ public class RoutePerformanceController {
         dataSeries_total.setName("Total");
         for (int i = 0; i < max_sz; i++)
             dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-        if (listVT.size() > 1)
+        if (numVT > 1) {
             vmtChart.getData().add(dataSeries_total);
+            wbCol++;
+        }
+        
+        wbCol += numVT;
 
         vmtChart.setCreateSymbols(false);
         vmtChart.setLegendSide(Side.BOTTOM);
@@ -987,13 +1159,13 @@ public class RoutePerformanceController {
             vmtChart.setTitle(label_mng);
 
             max_sz = 0;
-            for (int k = 0; k < num_comms; k++) {
+            for (int k = 0; k < numVT; k++) {
                 if (vmt_series_gp[k] != null)
                     max_sz = Math.max(max_sz, vmt_series_gp[k].values.length);
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
-            for (int k = 0; k < num_comms; k++) {
+            for (int k = 0; k < numVT; k++) {
                 dataSeries_mng = new XYChart.Series();
                 dataSeries_mng.setName(listVT.get(k).get_name());
                 xydata_mng = vmt_series_mng[k].get_XYSeries(listVT.get(k).get_name()).getItems();
@@ -1001,12 +1173,32 @@ public class RoutePerformanceController {
                 sz_mng = xydata_mng.size();
 
                 for (int i = 0; i < max_sz; i++) {
-                    if (i < sz_mng) {
-                        xy = xydata_mng.get(i);
-                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                        total[i] += xy.getYValue();
-                    } else {
-                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                    if (i == 0) {
+                        hrA.createCell(wbCol + k);
+                        hrA.getCell(wbCol + k).setCellValue(listVT.get(k).get_name() + " " + label_mng);
+                        hrA.getCell(wbCol + k).setCellStyle(headerCellStyle);
+
+                        if ((k == numVT - 1) && (numVT > 1)) {
+                            hrA.createCell(wbCol + numVT);
+                            hrA.getCell(wbCol + numVT).setCellValue("Total " + label_mng);
+                            hrA.getCell(wbCol + numVT).setCellStyle(headerCellStyle);
+                        }
+                    }
+
+                    double val = 0;
+
+                    if (i < sz_mng)
+                        val = xydata_mng.get(i).getYValue();
+
+                    total[i] += val;
+                    dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
+
+                    shA.getRow(i + 1).createCell(wbCol + k);
+                    shA.getRow(i + 1).getCell(wbCol + k).setCellValue(val);
+
+                    if ((k == numVT - 1) && (numVT > 1)) {
+                        shA.getRow(i + 1).createCell(wbCol + numVT);
+                        shA.getRow(i + 1).getCell(wbCol + numVT).setCellValue(total[i]);
                     }
                 }
                 vmtChart.getData().add(dataSeries_mng);
@@ -1016,8 +1208,12 @@ public class RoutePerformanceController {
             dataSeries_total.setName("Total");
             for (int i = 0; i < max_sz; i++)
                 dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-            if (listVT.size() > 1)
+            if (numVT > 1) {
                 vmtChart.getData().add(dataSeries_total);
+                wbCol++;
+            }
+        
+            wbCol += numVT;
 
             vmtChart.setCreateSymbols(false);
             vmtChart.setLegendSide(Side.BOTTOM);
@@ -1049,13 +1245,13 @@ public class RoutePerformanceController {
         vhtChart.setTitle(label_gp);
 
         max_sz = 0;
-        for (int k = 0; k < num_comms; k++) {
+        for (int k = 0; k < numVT; k++) {
             max_sz = Math.max(max_sz, vht_series_gp[k].values.length);
         }
         total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
             total[i] = 0;
-        for (int k = 0; k < num_comms; k++) {
+        for (int k = 0; k < numVT; k++) {
             dataSeries_gp = new XYChart.Series();
             dataSeries_gp.setName(listVT.get(k).get_name());
             xydata_gp = vht_series_gp[k].get_XYSeries(listVT.get(k).get_name()).getItems();
@@ -1063,12 +1259,32 @@ public class RoutePerformanceController {
             sz_gp = xydata_gp.size();
 
             for (int i = 0; i < max_sz; i++) {
-                if (i < sz_gp) {
-                    xy = xydata_gp.get(i);
-                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                    total[i] += xy.getYValue();
-                } else {
-                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                if (i == 0) {
+                    hrA.createCell(wbCol + k);
+                    hrA.getCell(wbCol + k).setCellValue(listVT.get(k).get_name() + " " + label_gp);
+                    hrA.getCell(wbCol + k).setCellStyle(headerCellStyle);
+
+                    if ((k == numVT - 1) && (numVT > 1)) {
+                        hrA.createCell(wbCol + numVT);
+                        hrA.getCell(wbCol + numVT).setCellValue("Total " + label_gp);
+                        hrA.getCell(wbCol + numVT).setCellStyle(headerCellStyle);
+                    }
+                }
+                
+                double val = 0;
+                
+                if (i < sz_gp)
+                    val = xydata_gp.get(i).getYValue();
+                
+                total[i] += val;
+                dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
+                
+                shA.getRow(i + 1).createCell(wbCol + k);
+                shA.getRow(i + 1).getCell(wbCol + k).setCellValue(val);
+
+                if ((k == numVT - 1) && (numVT > 1)) {
+                    shA.getRow(i + 1).createCell(wbCol + numVT);
+                    shA.getRow(i + 1).getCell(wbCol + numVT).setCellValue(total[i]);
                 }
             }
             vhtChart.getData().add(dataSeries_gp);
@@ -1078,8 +1294,12 @@ public class RoutePerformanceController {
         dataSeries_total.setName("Total");
         for (int i = 0; i < max_sz; i++)
             dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-        if (listVT.size() > 1)
+        if (numVT > 1) {
             vhtChart.getData().add(dataSeries_total);
+            wbCol++;
+        }
+        
+        wbCol += numVT;
 
         vhtChart.setCreateSymbols(false);
         vhtChart.setLegendSide(Side.BOTTOM);
@@ -1102,13 +1322,13 @@ public class RoutePerformanceController {
             vhtChart.setTitle(label_mng);
 
             max_sz = 0;
-            for (int k = 0; k < num_comms; k++) {
+            for (int k = 0; k < numVT; k++) {
                 if (vht_series_gp[k] != null)
                     max_sz = Math.max(max_sz, vht_series_gp[k].values.length);
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
-            for (int k = 0; k < num_comms; k++) {
+            for (int k = 0; k < numVT; k++) {
                 dataSeries_mng = new XYChart.Series();
                 dataSeries_mng.setName(listVT.get(k).get_name());
                 xydata_mng = vht_series_mng[k].get_XYSeries(listVT.get(k).get_name()).getItems();
@@ -1116,12 +1336,32 @@ public class RoutePerformanceController {
                 sz_mng = xydata_mng.size();
 
                 for (int i = 0; i < max_sz; i++) {
-                    if (i < sz_mng) {
-                        xy = xydata_mng.get(i);
-                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                        total[i] += xy.getYValue();
-                    } else {
-                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                    if (i == 0) {
+                        hrA.createCell(wbCol + k);
+                        hrA.getCell(wbCol + k).setCellValue(listVT.get(k).get_name() + " " + label_mng);
+                        hrA.getCell(wbCol + k).setCellStyle(headerCellStyle);
+
+                        if ((k == numVT - 1) && (numVT > 1)) {
+                            hrA.createCell(wbCol + numVT);
+                            hrA.getCell(wbCol + numVT).setCellValue("Total " + label_mng);
+                            hrA.getCell(wbCol + numVT).setCellStyle(headerCellStyle);
+                        }
+                    }
+
+                    double val = 0;
+
+                    if (i < sz_mng)
+                        val = xydata_mng.get(i).getYValue();
+
+                    total[i] += val;
+                    dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
+
+                    shA.getRow(i + 1).createCell(wbCol + k);
+                    shA.getRow(i + 1).getCell(wbCol + k).setCellValue(val);
+
+                    if ((k == numVT - 1) && (numVT > 1)) {
+                        shA.getRow(i + 1).createCell(wbCol + numVT);
+                        shA.getRow(i + 1).getCell(wbCol + numVT).setCellValue(total[i]);
                     }
                 }
                 vhtChart.getData().add(dataSeries_mng);
@@ -1131,8 +1371,12 @@ public class RoutePerformanceController {
             dataSeries_total.setName("Total");
             for (int i = 0; i < max_sz; i++)
                 dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-            if (listVT.size() > 1)
+            if (numVT > 1) {
                 vhtChart.getData().add(dataSeries_total);
+                wbCol++;
+            }
+        
+            wbCol += numVT;
 
             vhtChart.setCreateSymbols(false);
             vhtChart.setLegendSide(Side.BOTTOM);
@@ -1161,18 +1405,20 @@ public class RoutePerformanceController {
         yAxis.setLabel("Delay (veh.-hr.)");
 
         LineChart delayChart = new LineChart(xAxis, yAxis);
-        if (v_thres < 0)
+        if (v_thres < 0) {
             label_thres = "(Speed Threshold: Free Flow Speed)";
+            label_thres2 = "(veh.-hr.; Speed Threshold: Free Flow Speed)";
+        }
         delayChart.setTitle(label_gp + label_thres);
 
         max_sz = 0;
-        for (int k = 0; k < num_comms; k++) {
+        for (int k = 0; k < numVT; k++) {
             max_sz = Math.max(max_sz, delay_series_gp[k].values.length);
         }
         total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
             total[i] = 0;
-        for (int k = 0; k < num_comms; k++) {
+        for (int k = 0; k < numVT; k++) {
             dataSeries_gp = new XYChart.Series();
             dataSeries_gp.setName(listVT.get(k).get_name());
             xydata_gp = delay_series_gp[k].get_XYSeries(listVT.get(k).get_name()).getItems();
@@ -1180,12 +1426,32 @@ public class RoutePerformanceController {
             sz_gp = xydata_gp.size();
 
             for (int i = 0; i < max_sz; i++) {
-                if (i < sz_gp) {
-                    xy = xydata_gp.get(i);
-                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                    total[i] += xy.getYValue();
-                } else {
-                    dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                if (i == 0) {
+                    hrA.createCell(wbCol + k);
+                    hrA.getCell(wbCol + k).setCellValue(listVT.get(k).get_name() + " " + label_gp + label_thres2);
+                    hrA.getCell(wbCol + k).setCellStyle(headerCellStyle);
+
+                    if ((k == numVT - 1) && (numVT > 1)) {
+                        hrA.createCell(wbCol + numVT);
+                        hrA.getCell(wbCol + numVT).setCellValue("Total " + label_gp + label_thres2);
+                        hrA.getCell(wbCol + numVT).setCellStyle(headerCellStyle);
+                    }
+                }
+                
+                double val = 0;
+                
+                if (i < sz_gp)
+                    val = xydata_gp.get(i).getYValue();
+                
+                total[i] += val;
+                dataSeries_gp.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
+                
+                shA.getRow(i + 1).createCell(wbCol + k);
+                shA.getRow(i + 1).getCell(wbCol + k).setCellValue(val);
+
+                if ((k == numVT - 1) && (numVT > 1)) {
+                    shA.getRow(i + 1).createCell(wbCol + numVT);
+                    shA.getRow(i + 1).getCell(wbCol + numVT).setCellValue(total[i]);
                 }
             }
             delayChart.getData().add(dataSeries_gp);
@@ -1195,8 +1461,12 @@ public class RoutePerformanceController {
         dataSeries_total.setName("Total");
         for (int i = 0; i < max_sz; i++)
             dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-        if (listVT.size() > 1)
+        if (numVT > 1) {
             delayChart.getData().add(dataSeries_total);
+            wbCol++;
+        }
+        
+        wbCol += numVT;
 
         delayChart.setCreateSymbols(false);
         delayChart.setLegendSide(Side.BOTTOM);
@@ -1219,13 +1489,13 @@ public class RoutePerformanceController {
             delayChart.setTitle(label_mng + label_thres);
 
             max_sz = 0;
-            for (int k = 0; k < num_comms; k++) {
+            for (int k = 0; k < numVT; k++) {
                 if (delay_series_gp[k] != null)
                     max_sz = Math.max(max_sz, delay_series_gp[k].values.length);
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
-            for (int k = 0; k < num_comms; k++) {
+            for (int k = 0; k < numVT; k++) {
                 dataSeries_mng = new XYChart.Series();
                 dataSeries_mng.setName(listVT.get(k).get_name());
                 xydata_mng = delay_series_mng[k].get_XYSeries(listVT.get(k).get_name()).getItems();
@@ -1233,12 +1503,32 @@ public class RoutePerformanceController {
                 sz_mng = xydata_mng.size();
 
                 for (int i = 0; i < max_sz; i++) {
-                    if (i < sz_mng) {
-                        xy = xydata_mng.get(i);
-                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, xy.getYValue()));
-                        total[i] += xy.getYValue();
-                    } else {
-                        dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, 0));
+                    if (i == 0) {
+                        hrA.createCell(wbCol + k);
+                        hrA.getCell(wbCol + k).setCellValue(listVT.get(k).get_name() + " " + label_mng + label_thres2);
+                        hrA.getCell(wbCol + k).setCellStyle(headerCellStyle);
+
+                        if ((k == numVT - 1) && (numVT > 1)) {
+                            hrA.createCell(wbCol + numVT);
+                            hrA.getCell(wbCol + numVT).setCellValue("Total " + label_mng + label_thres2);
+                            hrA.getCell(wbCol + numVT).setCellStyle(headerCellStyle);
+                        }
+                    }
+
+                    double val = 0;
+
+                    if (i < sz_mng)
+                        val = xydata_mng.get(i).getYValue();
+
+                    total[i] += val;
+                    dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
+
+                    shA.getRow(i + 1).createCell(wbCol + k);
+                    shA.getRow(i + 1).getCell(wbCol + k).setCellValue(val);
+
+                    if ((k == numVT - 1) && (numVT > 1)) {
+                        shA.getRow(i + 1).createCell(wbCol + numVT);
+                        shA.getRow(i + 1).getCell(wbCol + numVT).setCellValue(total[i]);
                     }
                 }
                 delayChart.getData().add(dataSeries_mng);
@@ -1248,8 +1538,12 @@ public class RoutePerformanceController {
             dataSeries_total.setName("Total");
             for (int i = 0; i < max_sz; i++)
                 dataSeries_total.getData().add(new XYChart.Data((start+i*dt)/timeDivider, total[i]));
-            if (listVT.size() > 1)
+            if (numVT > 1) {
                 delayChart.getData().add(dataSeries_total);
+                wbCol++;
+            }
+        
+            wbCol += numVT;
 
             delayChart.setCreateSymbols(false);
             delayChart.setLegendSide(Side.BOTTOM);
