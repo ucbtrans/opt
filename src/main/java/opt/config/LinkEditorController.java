@@ -2488,7 +2488,6 @@ public class LinkEditorController {
             return;
         
         float dt = 60 * dtFRFlowSpinnerValueFactory.getValue();
-        float ctrldt = 100f; //0.5f*dt;
         ObservableList<ObservableList<Object>> myItems = tableFRFlow.getItems();
         int numSteps = myItems.size();
         int num_vt = listVT.size();
@@ -2515,7 +2514,7 @@ public class LinkEditorController {
             }
             
             try {
-                ((LinkOfframp)myLink).set_frflow(listVT.get(j).getId(), ctrldt, dt, values,useFRFlows);
+                ((LinkOfframp)myLink).set_frflow(listVT.get(j).getId(), dt, values,useFRFlows);
             } catch(Exception e) {
                 opt.utils.Dialogs.ExceptionDialog("Cannot set off-amp flow for vehicle type '" + listVT.get(j).get_name() + "'...", e);
             }

@@ -117,7 +117,7 @@ public class Scenario {
             for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
                 this.commodities.put(comm.getId(),new Commodity(comm.getId(),comm.getName(),comm.getPvequiv()));
 
-  }
+    }
 
     protected Scenario clone() {
         Scenario jscn_cpy = new Scenario(this.my_fwy_scenario);
@@ -602,12 +602,14 @@ public class Scenario {
                 for(LinkOfframp fr : frs){
                     if(!fr.frflows.containsKey(commid))
                         continue;
+
+                    Profile1D frflowprof = fr.frflows.get(commid);
                     jaxb.Profile prof = new jaxb.Profile();
                     profs.getProfile().add(prof);
                     prof.setStartTime(fr.get_use_fr_flows()?30f:100000f);
-                    prof.setDt(300f);
+                    prof.setDt(frflowprof.dt);
                     prof.setId(fr.id);
-                    prof.setContent(OTMUtils.comma_format(fr.frflows.get(commid).values));
+                    prof.setContent(OTMUtils.comma_format(frflowprof.values));
                 }
             }
         }

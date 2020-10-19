@@ -93,7 +93,7 @@ public class LinkOfframp extends LinkRamp {
         this.splits.put(comm_id, profile);
     }
 
-    public final void set_frflow(Long comm_id,float ctrldt,float profdt, double[] values,boolean usefrflows) throws Exception {
+    public final void set_frflow(Long comm_id,float profdt, double[] values,boolean usefrflows) throws Exception {
         Profile1D profile = new Profile1D(0f,profdt);
         for(double v : values)
             profile.add_entry(v);
