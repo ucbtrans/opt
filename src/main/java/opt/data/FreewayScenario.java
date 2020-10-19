@@ -481,8 +481,8 @@ public class FreewayScenario {
         }
 
         // controller ................................
-        float ctrl_start_time = jcnt.getStartTime();
-        boolean usefrflows = ctrl_start_time!=100000;
+//        float ctrl_start_time = jcnt.getStartTime();
+//        boolean usefrflows = ctrl_start_time!=100000;
 
         if(jcnt.getProfiles()!=null) {
             for (jaxb.Profile p : jcnt.getProfiles().getProfile()) {
@@ -494,7 +494,7 @@ public class FreewayScenario {
 
                 Profile1D profile = new Profile1D(prof_start_time, prof_dt, prof_flow);
                 LinkOfframp fr = (LinkOfframp) scenario.links.get(frid);
-                fr.set_use_fr_flows(usefrflows);
+                fr.set_use_fr_flows(profile.start_time!=100000);
                 fr.set_frflow(commid,profile);
 
             }
