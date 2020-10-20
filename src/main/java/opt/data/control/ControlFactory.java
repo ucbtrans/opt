@@ -101,9 +101,9 @@ public class ControlFactory {
 		return new ControllerRampMeterFixedRate(fwyscn,dt,has_queue_control,override_threshold,min_rate_vphpl,max_rate_vphpl,rate_vphpl);
 	}
 
-	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn, float dt, boolean has_queue_control,float override_threshold, float min_rate_vphpl, float max_rate_vphpl,Long sensor_id, long sensor_link_id, float sensor_offset) throws Exception {
+	public static ControllerRampMeterAlinea create_controller_alinea(FreewayScenario fwyscn, float dt, boolean has_queue_control,float override_threshold, float min_rate_vphpl, float max_rate_vphpl, long sensor_link_id, float sensor_offset) throws Exception {
 		parameters_check(dt);
-		return new ControllerRampMeterAlinea(fwyscn,dt,has_queue_control,override_threshold,min_rate_vphpl,max_rate_vphpl,sensor_id,sensor_link_id,sensor_offset);
+		return new ControllerRampMeterAlinea(fwyscn,dt,has_queue_control,override_threshold,min_rate_vphpl,max_rate_vphpl,sensor_link_id,sensor_offset);
 	}
 
 	public static ControllerLgRestrict create_controller_hovhot(FreewayScenario fwyscn, Set<Long> tolled_comms, Set<Long> disallowed_comms, Set<Long> free_comms, Float dt, Double toll_coef, int [][] vplph_to_cents_table, Double qos_speed_threshold_kph) throws Exception {
@@ -147,7 +147,6 @@ public class ControlFactory {
 				override_threshold,
 				min_rate_vphpl,
 				max_rate_vphpl,
-				jsn.getId(),
 				jsn.getLinkId(),
 				jsn.getPosition());
 

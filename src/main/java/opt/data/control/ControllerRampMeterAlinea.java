@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class ControllerRampMeterAlinea extends AbstractControllerRampMeter {
 
-	protected long sensor_id;
+//	protected Long sensor_id;
 	protected long sensor_link_id;
 	protected float sensor_offset;
 
@@ -15,15 +15,11 @@ public class ControllerRampMeterAlinea extends AbstractControllerRampMeter {
 	// construction
 	////////////////////////////////
 
-	public ControllerRampMeterAlinea(FreewayScenario scn,float dt, boolean has_queue_control,float override_threshold, float min_rate_vph, float max_rate_vph,Long sensor_id, long sensor_link_id, float sensor_offset) throws Exception {
+	public ControllerRampMeterAlinea(FreewayScenario scn,float dt, boolean has_queue_control,float override_threshold, float min_rate_vph, float max_rate_vph, long sensor_link_id, float sensor_offset) throws Exception {
 		super(dt,control.AbstractController.Algorithm.rm_alinea,has_queue_control,override_threshold,min_rate_vph,max_rate_vph);
-
-		// feedback sensor
-		this.sensor_id = sensor_id;
+//		this.sensor_id = sensor_id;
 		this.sensor_link_id = sensor_link_id;
 		this.sensor_offset = sensor_offset;
-//		Sensor sns = ControlFactory.create_sensor(scn,sensor_id,sensor_link_id,sensor_offset,this);
-//		add_sensor(sns);
 	}
 
 	////////////////////////////////

@@ -2674,7 +2674,6 @@ public class LinkEditorController {
                         override_threshold,
                         min_rate_vphpl,
                         max_rate_vphpl,
-                        null,
                         sensor_link.get_id(),
                         sensor_link.get_length_meters() / 2f);
                     break;

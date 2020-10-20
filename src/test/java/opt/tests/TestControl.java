@@ -21,7 +21,6 @@ public class TestControl extends AbstractTest{
 					0.8f,
 					100f,
 					900f,
-					null,
 					9l,
 					100);
 			assertNotNull(cntrl);
