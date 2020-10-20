@@ -873,7 +873,6 @@ public class AppMainController {
             return;
         try {
             String filetype = fileChooser.getSelectedExtensionFilter().getDescription();
-            projectFilePath = file.getAbsolutePath();
             projectFileDir = file.getParentFile();
             prefs.put(this.optProjectFileDir_String, projectFileDir.getAbsolutePath());
 
