@@ -44,6 +44,9 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
@@ -441,6 +444,26 @@ public class RouteController {
     /***************************************************************************
      * Callbacks 
      **************************************************************************/
+    
+    @FXML
+    void linksOnMouseClick(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            int idx = listSections.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= routeSegments.size()))
+                return;
+            appMainController.selectLink(routeSegments.get(idx).fwy());
+        }
+    }
+    
+    @FXML
+    void linksOnKeyPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            int idx = listSections.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= routeSegments.size()))
+                return;
+            appMainController.selectLink(routeSegments.get(idx).fwy());
+        }
+    }
     
     @FXML
     private void onRouteNameChange(ActionEvent event) {

@@ -107,7 +107,7 @@ public class UserSettings {
     
     public static double defaultQosSpeedThresholdKph = 72.4205;
     
-    public static double defaultLaneChoice_keep = 0.6931;   // positive utility of not changing lanes
+    public static double defaultLaneChoice_keep = 1.8;   // positive utility of not changing lanes
     public static double defaultLaneChoice_rhovpmplane = 0.0115; // positive utility of choosing a lane with density in vpm
     public static double defaultLaneChoice_tollcents = 0.0053;     // positive utility of not paying a toll in cents
     
