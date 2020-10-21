@@ -6,12 +6,17 @@ import java.util.*;
 
 public class SimDataLanegroup {
 
+    protected float ffspeed_mph;
     private Map<Long, double []> vehs;    // commid->vehs over time [veh]
     private Map<Long, double []> flws;    // commid->flw over time [vph]
 
     protected List<SimCellData> celldata;
 
-    public SimDataLanegroup(models.fluid.FluidLaneGroup lg, Set<Long> commids,boolean storecelldata,boolean storelgdata,int numtime){
+    public SimDataLanegroup(models.fluid.FluidLaneGroup lg, Set<Long> commids,boolean storecelldata,boolean storelgdata,int numtime,float simdt_hr){
+
+        int numcells = lg.cells.size();
+        double link_length_miles = lg.link.length / 1609.344;
+        ffspeed_mph = (float) (lg.ffspeed_cell_per_dt * link_length_miles/numcells/simdt_hr);
 
         if(storelgdata){
             vehs = new HashMap<>();

@@ -18,7 +18,6 @@ public class SimDataLink {
     public SimDataLink my_ghost_sink; // link data for an downstream ghost link
 
     public double link_length_miles;
-    protected float ffspeed_mph;
 
     public SimDataLink(SimDataScenario scndata, AbstractLink optlink, common.Link otmlink, Set<Long> commids, boolean storecelldata, boolean storelgdata, int numtime){
 
@@ -31,26 +30,23 @@ public class SimDataLink {
         lgid2type = new HashMap<>();
 
         models.fluid.FluidLaneGroup lg;
+        float simdt_hr = scndata.fwyscenario.get_sim_dt_sec() / 3600f;
 
         if(optlink.has_mng()){
             lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(1);
             lgid2type.put(lg.id,LaneGroupType.mng);
-            lgData.put(LaneGroupType.mng,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime));
+            lgData.put(LaneGroupType.mng,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime,simdt_hr));
         }
 
         lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(optlink.get_mng_lanes()+1);
-        int numcells = lg.cells.size();
         lgid2type.put(lg.id,LaneGroupType.gp);
-        lgData.put(LaneGroupType.gp,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime));
-
-        float simdt_hr = scndata.fwyscenario.get_sim_dt_sec() / 3600f;
-        ffspeed_mph = (float) (lg.ffspeed_cell_per_dt * link_length_miles/numcells/simdt_hr);
+        lgData.put(LaneGroupType.gp,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime,simdt_hr));
 
         if(optlink.has_aux()){
             lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(
                     optlink.get_mng_lanes() + optlink.get_gp_lanes() + 1);
             lgid2type.put(lg.id,LaneGroupType.aux);
-            lgData.put(LaneGroupType.aux,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime));
+            lgData.put(LaneGroupType.aux,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime,simdt_hr));
         }
 
     }
@@ -136,6 +132,7 @@ public class SimDataLink {
                 sumflw += lg.get_sum_flw_for_time(X.commids, k, scndata.haslgdata);
                 sumveh += lg.get_sum_veh_for_time(X.commids, k, scndata.haslgdata);
             }
+            double ffspeed_mph = X.lgDatas.iterator().next().ffspeed_mph;
             speeds[k] = sumveh<1 ? ffspeed_mph : length_miles*sumflw/sumveh;
             if(speeds[k]>ffspeed_mph)
                 speeds[k] = ffspeed_mph;
@@ -239,7 +236,7 @@ public class SimDataLink {
         
         double my_thres = threshold_mph;
         if (my_thres < 0)
-            my_thres = ffspeed_mph;
+            my_thres = X.lgDatas.iterator().next().ffspeed_mph;
 
         double length_over_threshold = scndata.haslgdata ? link_length_miles/my_thres : cell_length() / my_thres;
         double [] delays = new double [scndata.numtime()];

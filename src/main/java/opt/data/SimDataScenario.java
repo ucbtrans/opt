@@ -491,11 +491,15 @@ public class SimDataScenario {
                     double [] sumflw = new double[numtime];
                     double [] sumveh = new double[numtime];
 
+                    double count = 0d;
+                    double ffspeed_mph = 0d; // just take the average over lanegroups
                     for(LaneGroupType lgtype : lgtypes){
 
                         SimDataLanegroup lgdata = lkdata.lgData.get(lgtype);
                         if(lgdata==null)
                             continue;
+                        ffspeed_mph += lgdata.ffspeed_mph;
+                        count +=1d;
                         SimCellData cd = lgdata.celldata.get(cellindex);
                         for (long commid : cd.vehs.keySet()) {
                             Misc.add_in_place(sumflw,cd.flws.get(commid));
@@ -503,11 +507,13 @@ public class SimDataScenario {
                         }
                     }
 
+                    ffspeed_mph /= count;
+
                     double [] speeds = new double[numtime];
                     for(int k=0;k<numtime;k++) {
-                        speeds[k] = sumveh[k]<1 ? lkdata.ffspeed_mph : cell_length_miles*sumflw[k]/sumveh[k];
-                        if(speeds[k]>lkdata.ffspeed_mph)
-                            speeds[k] = lkdata.ffspeed_mph;
+                        speeds[k] = sumveh[k]<1 ? ffspeed_mph : cell_length_miles*sumflw[k]/sumveh[k];
+                        if(speeds[k]>ffspeed_mph)
+                            speeds[k] = ffspeed_mph;
                     }
 
                     X.add_timeseries(i++,speeds);
