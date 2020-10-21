@@ -797,7 +797,7 @@ public class LinkPerformanceController {
                     double val = 0;
 
                     if (i < sz_mng)
-                        val = xydata_gp.get(i).getYValue();
+                        val = xydata_mng.get(i).getYValue();
 
                     total[i] += val;
                     dataSeries_mng.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
@@ -875,7 +875,7 @@ public class LinkPerformanceController {
                     double val = 0;
 
                     if (i < sz_aux)
-                        val = xydata_gp.get(i).getYValue();
+                        val = xydata_aux.get(i).getYValue();
 
                     total[i] += val;
                     dataSeries_aux.getData().add(new XYChart.Data((start+i*dt)/timeDivider, val));
