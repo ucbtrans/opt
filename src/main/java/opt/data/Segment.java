@@ -1,5 +1,7 @@
 package opt.data;
 
+import opt.data.control.AbstractController;
+import opt.data.control.ControlSchedule;
 import utils.OTMUtils;
 
 import java.util.*;
@@ -307,6 +309,10 @@ public final class Segment implements Comparable {
             return;
 
         Scenario scenario = my_fwy_scenario.scenario;
+
+        for(Map<AbstractController.Type, ControlSchedule> a : link.schedules.values())
+            for(ControlSchedule schedule : a.values())
+                schedule.links.remove(link);
 
         // disconnect from start and end nodes
         Node start_node = scenario.nodes.get(link.start_node_id);

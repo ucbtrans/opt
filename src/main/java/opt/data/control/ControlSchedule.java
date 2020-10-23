@@ -17,7 +17,7 @@ public class ControlSchedule implements Comparable {
     protected AbstractController.Type controlType;
     protected List<ScheduleEntry> entries;
 
-    protected Set<AbstractLink> links;
+    public Set<AbstractLink> links;
     protected LaneGroupType lgtype;
 
     ////////////////////////////////
