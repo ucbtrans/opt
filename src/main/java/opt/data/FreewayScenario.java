@@ -1162,12 +1162,19 @@ public class FreewayScenario {
 
             // create params
             ParametersFreeway newparams = new ParametersFreeway("",link.get_lanes(),
-                    0,false,false,0,
+                    link.get_mng_lanes(),
+                    false,false,
+                    link.get_aux_lanes(),
                     link.get_length_meters(),
                     link.get_gp_capacity_vphpl(),
                     link.get_gp_jam_density_vpkpl(),
                     link.get_gp_freespeed_kph(),
-                    Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN);
+                    link.get_mng_capacity_vphpl(),
+                    link.get_mng_jam_density_vpkpl(),
+                    link.get_mng_freespeed_kph(),
+                    link.get_aux_capacity_vphpl(),
+                    link.get_aux_jam_density_vpkpl(),
+                    link.get_aux_ff_speed_kph());
 
             // create new link
             LinkGhost newlink = new LinkGhost(
@@ -1190,7 +1197,7 @@ public class FreewayScenario {
             scenario.nodes.get(link.start_node_id).in_links.add(newlink.id);                   // MODIFIED EXISTING NODE
 
             // transfer demands to new link
-            link.demands = new HashMap<>();                                                 // REMOVE EXISTING DEMANDS
+            link.demands = new HashMap<>();                                                   // REMOVE EXISTING DEMANDS
 
         }
 
@@ -1218,12 +1225,19 @@ public class FreewayScenario {
 
             // create params
             ParametersFreeway newparams = new ParametersFreeway("",link.get_lanes(),
-                    0,false,false,0,
+                    link.get_mng_lanes(),
+                    false,false,
+                    link.get_aux_lanes(),
                     link.get_length_meters(),
                     link.get_gp_capacity_vphpl(),
                     link.get_gp_jam_density_vpkpl(),
                     link.get_gp_freespeed_kph(),
-                    Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN);
+                    link.get_mng_capacity_vphpl(),
+                    link.get_mng_jam_density_vpkpl(),
+                    link.get_mng_freespeed_kph(),
+                    link.get_aux_capacity_vphpl(),
+                    link.get_aux_jam_density_vpkpl(),
+                    link.get_aux_ff_speed_kph());
 
             // create new link
             LinkGhost newlink = new LinkGhost(
