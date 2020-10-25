@@ -28,10 +28,22 @@ public class TestProject extends AbstractTest {
     @Test
     public void test_save() {
         try {
-            String infile = "/home/gomes/Dropbox/gabriel/_transfer/hov/A.opt";
-            String outfile = "/home/gomes/Dropbox/gabriel/_transfer/hov/B.opt";
+            String infile = "/home/gomes/Downloads/issue_125.opt";
+            String outfile = "/home/gomes/Downloads/zzz.opt";
             Project project = ProjectFactory.load_project(infile,true);
             ProjectFactory.save_project(project,outfile);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void test_save_xml() {
+        try {
+            String infile = "/home/gomes/Downloads/issue_215.opt";
+            String outfile = "/home/gomes/Downloads/zzz.xml";
+            Project project = ProjectFactory.load_project(infile,true);
+            ProjectFactory.save_scenario(project.get_scenarios().iterator().next(),outfile,true);
         } catch (Exception e) {
             fail(e.getMessage());
         }
