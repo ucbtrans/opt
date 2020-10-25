@@ -303,9 +303,9 @@ public class Scenario {
                     rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.mng,dn_link,LaneGroupType.mng) );
 
                 // II) add gp-> gp
-                if(ghostlinks!=null && (ghostlinks.contains(up_link) || ghostlinks.contains(dn_link)))
-                    rcs.add( make_road_connection(my_fwy_scenario,up_link,null,dn_link,null) );
-                else
+//                if(ghostlinks!=null && (ghostlinks.contains(up_link) || ghostlinks.contains(dn_link)))
+//                    rcs.add( make_road_connection(my_fwy_scenario,up_link,null,dn_link,null) );
+//                else
                     rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,dn_link,LaneGroupType.gp) );
 
             }
