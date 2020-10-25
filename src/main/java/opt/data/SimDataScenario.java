@@ -115,31 +115,40 @@ public class SimDataScenario {
                 .map(s->(OutputCellSumVehicles)s)
                 .collect(toSet());
 
+        Set<OutputCellSumVehiclesDwn> vehsdwn = otmdev.otm.output.get_data().stream()
+                .filter(s->s.type==AbstractOutput.Type.cell_sumvehdwn)
+                .map(s->(OutputCellSumVehiclesDwn)s)
+                .collect(toSet());
+
         for(Long commid : commids){
             Optional<OutputCellFlow> oflw = flws.stream().filter(s->s.get_commodity_id()==commid).findFirst();
             Optional<OutputCellSumVehicles> oveh = vehs.stream().filter(s->s.get_commodity_id()==commid).findFirst();
+            Optional<OutputCellSumVehiclesDwn> ovehdwn = vehsdwn.stream().filter(s->s.get_commodity_id()==commid).findFirst();
 
-            if(!oflw.isPresent() || !oveh.isPresent())
+            if(!oflw.isPresent() || !oveh.isPresent() || !ovehdwn.isPresent())
                 continue;
 
             OutputCellFlow flw = oflw.get();
             OutputCellSumVehicles veh = oveh.get();
+            OutputCellSumVehiclesDwn vehdwn = ovehdwn.get();
 
             for(FluidLaneGroup flg : flw.ordered_lgs) {
 
                 if(!linkdata.containsKey(flg.link.getId()))
                     continue;
 
-
                 SimDataLink lkdata = linkdata.get(flg.link.getId());
                 LaneGroupType lgtype = lkdata.lgid2type.get(flg.id);
                 SimDataLanegroup lgdata = lkdata.lgData.get(lgtype);
                 List<AbstractOutputTimedCell.CellProfile> flw_cellprofs = flw.lgprofiles.get(flg.id);
                 List<AbstractOutputTimedCell.CellProfile> veh_cellprofs = veh.lgprofiles.get(flg.id);
+                List<AbstractOutputTimedCell.CellProfile> vehdwn_cellprofs = vehdwn.lgprofiles.get(flg.id);
+
                 for(int i=0;i<flw_cellprofs.size();i++)
                     lgdata.celldata.get(i).set(commid,
                             flw_cellprofs.get(i).profile.values,
                             veh_cellprofs.get(i).profile.values,
+                            vehdwn_cellprofs.get(i).profile.values,
                             sim_dt,outdt);
             }
 

@@ -123,6 +123,7 @@ public class OTMTask  extends Task {
 				for(Long commid : fwyscenario.get_commodities().keySet()){
 					otmdev.otm.output().request_cell_flw(commid, linkids, outdt);
 					otmdev.otm.output().request_cell_sum_veh(commid, linkids, outdt);
+					otmdev.otm.output().request_cell_sum_veh_dwn(commid, linkids, outdt);
 				}
 			}
 

@@ -128,6 +128,20 @@ public class SimDataLanegroup {
         return X;
     }
 
+    protected double get_sum_vehdwn_for_time(Set<Long> commids, int k, boolean uselg) {
+        if(commids==null)
+            commids = get_comm_ids();
+        double X = 0d;
+        if(uselg)
+            System.err.println("NOT IMPLEMENTED");
+        else
+            for (SimCellData cd : celldata)
+                for(Long cid : commids)
+                    X += cd.vehsdwn.get(cid)[k];
+        return X;
+    }
+
+
     protected double get_sum_veh_for_time(Set<Long> commids, int k, boolean uselg) {
         if(commids==null)
             commids = get_comm_ids();

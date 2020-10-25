@@ -1,26 +1,28 @@
 package opt.data;
 
-import opt.utils.Misc;
-
 import java.util.*;
 
 public class SimCellData {
 
     public Map<Long, double []> vehs;    // commid->vehs over time [veh]
+    public Map<Long, double []> vehsdwn;    // commid->vehs over time [veh]
     public Map<Long, double []> flws;    // commid->flw over time [vph]
 
     public SimCellData(Set<Long> commids,int numtime){
         vehs = new HashMap<>();
+        vehsdwn = new HashMap<>();
         flws = new HashMap<>();
         for(Long commid : commids) {
             vehs.put(commid, new double[numtime]);
+            vehsdwn.put(commid, new double[numtime]);
             flws.put(commid, new double[numtime]);
         }
     }
 
-    protected void set(long commid,List<Double> flwdata,List<Double> vehdata,float sim_dt_sec,float out_dt_sec){
+    protected void set(long commid,List<Double> flwdata,List<Double> vehdata,List<Double> vehdwndata,float sim_dt_sec,float out_dt_sec){
         int numtime = vehdata.size();
         double [] veh = new double[numtime];
+        double [] vehdwn = new double[numtime];
         double [] flw = new double[numtime];
         double alpha = 3600d/out_dt_sec;
         double beta = sim_dt_sec/out_dt_sec;
@@ -30,22 +32,24 @@ public class SimCellData {
                 double this_flow = k==0 ? 0d : (flwdata.get(k) - flwdata.get(k-1)) * alpha;
                 flw[k] = this_flow;
                 veh[k] = beta * vehdata.get(k);
+                vehdwn[k] = beta * vehdwndata.get(k);
             }
         }
 
         vehs.put(commid,veh);
+        vehsdwn.put(commid,vehdwn);
         flws.put(commid,flw);
     }
 
     protected double[] get_speed(float ffspeed_mph,double cell_length_miles){
-        int numtime = vehs.values().iterator().next().length;
+        int numtime = vehsdwn.values().iterator().next().length;
         double [] speeds = new double[numtime];
         for(int k=0;k<numtime;k++) {
             double sumflw = 0d;
             double sumveh = 0d;
-            for (long commid : vehs.keySet()) {
+            for (long commid : vehsdwn.keySet()) {
                 sumflw += flws.get(commid)[k];
-                sumveh += vehs.get(commid)[k];
+                sumveh += vehsdwn.get(commid)[k];
             }
             speeds[k] = sumveh<1 ? ffspeed_mph : cell_length_miles*sumflw/sumveh;
             if(speeds[k]>ffspeed_mph)

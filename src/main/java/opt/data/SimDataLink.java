@@ -125,15 +125,17 @@ public class SimDataLink {
 
         double length_miles = scndata.haslgdata ? link_length_miles : cell_length();
         double [] speeds = new double [numtime()];
+        double ffspeed_mph = X.lgDatas.iterator().next().ffspeed_mph;
         for(int k=0;k<numtime();k++) {
             double sumflw = 0d;
             double sumveh = 0d;
+
             for(SimDataLanegroup lg : X.lgDatas) {
                 sumflw += lg.get_sum_flw_for_time(X.commids, k, scndata.haslgdata);
-                sumveh += lg.get_sum_veh_for_time(X.commids, k, scndata.haslgdata);
+                sumveh += lg.get_sum_vehdwn_for_time(X.commids, k, scndata.haslgdata);
             }
-            double ffspeed_mph = X.lgDatas.iterator().next().ffspeed_mph;
-            speeds[k] = sumveh<1 ? ffspeed_mph : length_miles*sumflw/sumveh;
+            speeds[k] = sumveh<1 || sumflw<1  ? ffspeed_mph : length_miles*sumflw/sumveh;
+
             if(speeds[k]>ffspeed_mph)
                 speeds[k] = ffspeed_mph;
         }
