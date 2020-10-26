@@ -183,10 +183,15 @@ public class RouteController {
         }
         
         if (seg.equals(target)) {
-            if (!visited.contains(seg)) {
-                sub.add(seg);
+            /*if (!visited.contains(seg)) {
                 visited.add(seg);
-            }
+            }*/
+            sub.add(seg);
+            
+            for (Segment s : sub)
+                if (visited.contains(s))
+                    visited.remove(s);
+            
             result.add(sub);
             return result;
         }
