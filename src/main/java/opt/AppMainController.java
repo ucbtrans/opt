@@ -156,6 +156,9 @@ public class AppMainController {
     private ContextMenu routesCM = new ContextMenu(); 
     private MenuItem cmNewRoute = new MenuItem("New Route");
     
+    private boolean linksOpen = false;
+    private boolean routesOpen = false;
+    
     @FXML // fx:id="topPane"
     private VBox topPane; // Value injected by FXMLLoader
 
@@ -357,11 +360,13 @@ public class AppMainController {
             th.setDaemon(true);
             th.start();
             leftStatus.setText("Simulating scenario \"" + selectedScenario.name + "\"...");
+            menuFileNewProject.setDisable(true);
+            menuFileOpenProject.setDisable(true);
             menuSimulationRun.setDisable(true);
             menuSimulationExportResultsToExcel.setDisable(true);
             menuSimulationFullExcelReport.setDisable(true);
         }
-        catch(Exception e){
+        catch(Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Error running OPT project", e);
         }
         
@@ -381,6 +386,8 @@ public class AppMainController {
     public void completeSimulation() {
         unbindProgressBar();
         menuSimulationRun.setDisable(false);
+        menuFileNewProject.setDisable(false);
+        menuFileOpenProject.setDisable(false);
         reportTabPane.setDisable(false);
         leftStatus.setText("Simulation completed!");
         if ((selectedScenario != null) &&
@@ -653,6 +660,8 @@ public class AppMainController {
                 links_node.getChildren().add(link_node);
             }
             
+            links_node.setExpanded(linksOpen);
+            
             TreeItem<String> routes_node = new TreeItem<String>(routesTreeItem, new ImageView(imageFolder));    
             scenario_node.getChildren().add(routes_node);
             for (Route route : scenario.get_routes()) {
@@ -664,6 +673,8 @@ public class AppMainController {
                 object2tree.put(route, route_node);
                 routes_node.getChildren().add(route_node); 
             }
+            
+            routes_node.setExpanded(routesOpen);
             
             //TreeItem<String> events_node = new TreeItem<String>(eventsTreeItem, new ImageView(imageFolder));    
             //scenario_node.getChildren().add(events_node);
@@ -904,7 +915,7 @@ public class AppMainController {
     
     @FXML
     void onClickMenuHelpAbout(ActionEvent event) {
-        String version = "2020-09-16";
+        String version = "2020-10-21";
         opt.utils.Dialogs.InformationDialog(null, "OPT development version " + version);
     }
     
@@ -944,6 +955,12 @@ public class AppMainController {
         selectedTreeItem = treeItem;
         if (treeItem.equals(projectTree.getRoot()))
             return;
+        
+        if (treeItem.getValue().equals(roadLinksTreeItem))
+            linksOpen = !treeItem.isExpanded();
+        
+        if (treeItem.getValue().equals(routesTreeItem))
+            routesOpen = !treeItem.isExpanded();
         
         setSelectedScenario(treeItem);
         
@@ -1202,6 +1219,8 @@ public class AppMainController {
         configAnchorPane.getChildren().clear();
         infoAnchorPane.getChildren().clear();
 
+        linksOpen = false;
+        routesOpen = false;
     }
     
     

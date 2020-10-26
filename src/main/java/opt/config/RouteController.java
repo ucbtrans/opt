@@ -81,14 +81,17 @@ public class RouteController {
     private Segment firstSegment = null;
     private Segment lastSegment = null;
     
+    private RouteDisplay routeDisplay = null;
+    
+    
     @FXML // fx:id="scenarioEditorMainPane"
     private SplitPane scenarioEditorMainPane; // Value injected by FXMLLoader
 
     @FXML // fx:id="canvasParent"
     private AnchorPane canvasParent; // Value injected by FXMLLoader
 
-    @FXML // fx:id="scenarioEditorCanvas"
-    private Canvas scenarioEditorCanvas; // Value injected by FXMLLoader
+    @FXML // fx:id="routeEditorCanvas"
+    private Canvas routeEditorCanvas; // Value injected by FXMLLoader
     
     @FXML // fx:id="deleteRoute"
     private Button deleteRoute; // Value injected by FXMLLoader
@@ -337,9 +340,12 @@ public class RouteController {
             inputStage.initModality(Modality.APPLICATION_MODAL);
             inputStage.setResizable(false);
             inputStage.showAndWait();
-            if ((selectedRouteIndex >= 0) && (selectedRouteIndex < seg_sequences.size()))
+            if ((selectedRouteIndex >= 0) && (selectedRouteIndex < seg_sequences.size())) {
                 routeSegments = seg_sequences.get(selectedRouteIndex);
+            }
         }
+        
+        routeDisplay.setRouteSegments(routeSegments);
         
         int sz = routeSegments.size();
         if (sz > 0) {
@@ -372,6 +378,21 @@ public class RouteController {
         
         cbDestination.valueProperty().addListener((observable, oldValue, newValue) -> {
             onDestinationChange();
+        });
+        
+        routeEditorCanvas.widthProperty().bind(canvasParent.widthProperty());
+        routeEditorCanvas.heightProperty().bind(canvasParent.heightProperty());
+
+        routeEditorCanvas.widthProperty().addListener((observable, oldValue, newValue) -> {
+           if ((ignoreChange) || (routeDisplay == null))
+               return;
+           routeDisplay.execute();
+        });
+        
+        routeEditorCanvas.heightProperty().addListener((observable, oldValue, newValue) -> {
+           if ((ignoreChange) || (routeDisplay == null))
+               return;
+           routeDisplay.execute();
         });
     }
     
@@ -432,6 +453,9 @@ public class RouteController {
         cbOriginUpdate();
         cbDestinationUpdate();
         
+        routeDisplay = new RouteDisplay(routeEditorCanvas, routeSegments);
+        routeDisplay.execute();
+        
         ignoreChange = false;
     }
     
@@ -447,21 +471,53 @@ public class RouteController {
     
     @FXML
     void linksOnMouseClick(MouseEvent event) {
+        if (ignoreChange)
+            return;
+        
+        int idx = listSections.getSelectionModel().getSelectedIndex();
+        if ((idx < 0) || (idx >= routeSegments.size()))
+            return;
+        
+        routeDisplay.setSelected(idx);
+        
         if (event.getClickCount() == 2) {
-            int idx = listSections.getSelectionModel().getSelectedIndex();
-            if ((idx < 0) || (idx >= routeSegments.size()))
-                return;
             appMainController.selectLink(routeSegments.get(idx).fwy());
         }
     }
     
     @FXML
     void linksOnKeyPressed(KeyEvent event) {
+        if (ignoreChange)
+            return;
+        
+        event.consume();
+        
+        int idx = listSections.getSelectionModel().getSelectedIndex();
+        if ((idx < 0) || (idx >= routeSegments.size()))
+            return;
+            
         if (event.getCode() == KeyCode.ENTER) {
-            int idx = listSections.getSelectionModel().getSelectedIndex();
-            if ((idx < 0) || (idx >= routeSegments.size()))
-                return;
             appMainController.selectLink(routeSegments.get(idx).fwy());
+            return;
+        }
+        
+        if ((event.getCode() == KeyCode.LEFT) ||
+            (event.getCode() == KeyCode.UP) ||
+            (event.getCode() == KeyCode.RIGHT) ||
+            (event.getCode() == KeyCode.DOWN)) {
+            if (event.getCode() == KeyCode.LEFT)
+                idx--;
+            if (event.getCode() == KeyCode.RIGHT)
+                idx++;
+            
+            if ((idx < 0) || (idx >= routeSegments.size())) {
+                listSections.getSelectionModel().clearSelection();
+                idx = -1;
+            }
+            else
+                listSections.getSelectionModel().select(idx);
+            routeDisplay.setSelected(idx);
+            listSections.requestFocus();
         }
     }
     
@@ -521,6 +577,68 @@ public class RouteController {
         
         ignoreChange = false;
     }
+    
+    
+    @FXML
+    void canvasOnMoseClicked(MouseEvent event) {
+        if (ignoreChange)
+            return;
+        
+        double x = event.getX();
+        double y = event.getY();
+        
+        int idx = routeDisplay.getClickedMultiBox(x, y);
+        
+        if ((idx < 0) || (idx >= routeSegments.size())) {
+            listSections.getSelectionModel().clearSelection();
+            return;
+        }
+        
+        if (event.getClickCount() == 2) {
+            appMainController.selectLink(routeSegments.get(idx).fwy());
+        } else if (event.getClickCount() == 1) {
+            listSections.getSelectionModel().select(idx);
+            listSections.requestFocus();
+            listSections.getFocusModel().focus(idx);
+        }    
+    }
+    
+    @FXML
+    void canvasOnKeyPressed(KeyEvent event) {
+        if (ignoreChange)
+            return;
+        
+        int idx = routeDisplay.getSelected();
+        if ((idx < 0) || (idx >= routeSegments.size()))
+            return;
+        
+        if (event.getCode() == KeyCode.ENTER) {
+            appMainController.selectLink(routeSegments.get(idx).fwy());
+            return;
+        }
+        
+        if ((event.getCode() == KeyCode.LEFT) ||
+            (event.getCode() == KeyCode.UP) ||
+            (event.getCode() == KeyCode.RIGHT) ||
+            (event.getCode() == KeyCode.DOWN)) {
+            if (event.getCode() == KeyCode.LEFT)
+                idx--;
+            if (event.getCode() == KeyCode.RIGHT)
+                idx++;
+            
+            if ((idx < 0) || (idx >= routeSegments.size())) {
+                listSections.getSelectionModel().clearSelection();
+                idx = -1;
+            }
+            else
+                listSections.getSelectionModel().select(idx);
+            routeDisplay.setSelected(idx);
+            listSections.requestFocus();
+        }
+        
+        //event.consume();
+    }
+
     
     
 }
