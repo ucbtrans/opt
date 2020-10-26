@@ -303,6 +303,18 @@ public class ControlSchedule implements Comparable {
         link.remove_schedule( get_lgtype(),get_controlType());
     }
 
+    public void remove_commodity(long comm_id){
+        for(ScheduleEntry entry : entries)
+            if(entry.cntrl instanceof ControllerLgRestrict)
+                ((ControllerLgRestrict)entry.cntrl).remove_commodity(comm_id);
+    }
+
+    public void add_commodity(long comm_id){
+        for(ScheduleEntry entry : entries)
+            if(entry.cntrl instanceof ControllerLgRestrict)
+                ((ControllerLgRestrict)entry.cntrl).add_commodity(comm_id);
+    }
+
     ////////////////////////////////
     // private
     ////////////////////////////////

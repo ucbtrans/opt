@@ -84,6 +84,12 @@ public class ControllerLgRestrict extends AbstractController {
 		refresh_type();
 	}
 
+	public void add_commodity(long comm_id){
+		if(!comm2permission.containsKey(comm_id))
+			comm2permission.put(comm_id,Permission.Free);
+		refresh_type();
+	}
+
 	public Double get_toll_coef() {
 		return toll_coef;
 	}
@@ -133,7 +139,7 @@ public class ControllerLgRestrict extends AbstractController {
 			return control.AbstractController.Algorithm.lg_restrict;
 	}
 
-////////////////////////////////
+	////////////////////////////////
 	// AbstractController
 	////////////////////////////////
 
