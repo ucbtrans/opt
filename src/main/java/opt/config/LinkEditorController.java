@@ -2938,7 +2938,7 @@ public class LinkEditorController {
             }
         }
         
-        
+
         GraphicsContext g = linkEditorCanvas.getGraphicsContext2D();
         //g.setFill(Color.WHITE);
         g.clearRect(0, 0, width, height);
@@ -2953,34 +2953,10 @@ public class LinkEditorController {
         double x1 = x0 + lane_length;
         
         int total_ramp_lanes = 0;
-        int num_ramps = myLink.get_segment().num_out_ors();
-        for (int i = 0; i < num_ramps; i++) {
-            int l_count = myLink.get_segment().out_ors(i).get_gp_lanes() +
-                          myLink.get_segment().out_ors(i).get_mng_lanes();
-            if (l_count > total_ramp_lanes)
-                total_ramp_lanes = l_count;
-        }
-        num_ramps = myLink.get_segment().num_in_ors();
-        for (int i = 0; i < num_ramps; i++) {
-            int l_count = myLink.get_segment().in_ors(i).get_gp_lanes() +
-                          myLink.get_segment().in_ors(i).get_mng_lanes();
-            if (l_count > total_ramp_lanes)
-                total_ramp_lanes = l_count;
-        }
-        num_ramps = myLink.get_segment().num_out_frs();
-        for (int i = 0; i < num_ramps; i++) {
-            int l_count = myLink.get_segment().out_frs(i).get_gp_lanes() +
-                          myLink.get_segment().out_frs(i).get_mng_lanes();
-            if (l_count > total_ramp_lanes)
-                total_ramp_lanes = l_count;
-        }
-        num_ramps = myLink.get_segment().num_in_frs();
-        for (int i = 0; i < num_ramps; i++) {
-            int l_count = myLink.get_segment().in_frs(i).get_gp_lanes() +
-                          myLink.get_segment().in_frs(i).get_mng_lanes();
-            if (l_count > total_ramp_lanes)
-                total_ramp_lanes = l_count;
-        }
+        for (AbstractLink r : myLink.get_segment().get_ors())
+            total_ramp_lanes = Math.max(total_ramp_lanes, r.get_lanes());
+        for (AbstractLink r : myLink.get_segment().get_frs())
+            total_ramp_lanes = Math.max(total_ramp_lanes, r.get_lanes());
         double coeff = Math.min(1.0, (double)total_lanes/(double)total_ramp_lanes);
         
         
@@ -2994,7 +2970,7 @@ public class LinkEditorController {
             
             if (myLink.get_type() == AbstractLink.Type.freeway) {
                 // Draw outer on-ramps
-                num_ramps = myLink.get_segment().num_out_ors();
+                int num_ramps = myLink.get_segment().num_out_ors();
                 double delta = 0.0;
                 for (int i = 0; i < num_ramps; i++) {
                     int or_gp = myLink.get_segment().out_ors(i).get_gp_lanes();

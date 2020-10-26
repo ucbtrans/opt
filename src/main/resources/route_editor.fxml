@@ -13,19 +13,12 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
 <SplitPane id="routeEditorPane" fx:id="routeEditorPane" dividerPositions="0.3141809290953545" orientation="VERTICAL" prefHeight="820.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.config.RouteController">
   <items>
       <AnchorPane id="canvasParent" fx:id="canvasParent" minHeight="236.0" minWidth="600.0" prefHeight="262.0" prefWidth="898.0">
          <children>
-            <Canvas id="scenarioEditorCanvas" fx:id="scenarioEditorCanvas" height="254.0" width="898.0" />
-            <Text layoutX="83.0" layoutY="136.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Later, this area will be used to display the route">
-               <font>
-                  <Font size="24.0" />
-               </font>
-            </Text>
+            <Canvas id="routeEditorCanvas" fx:id="routeEditorCanvas" height="254.0" onKeyPressed="#canvasOnKeyPressed" onMouseClicked="#canvasOnMoseClicked" width="898.0" />
          </children>
       </AnchorPane>
       <AnchorPane prefHeight="605.0" prefWidth="898.0">
