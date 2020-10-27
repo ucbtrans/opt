@@ -919,6 +919,10 @@ public class FreewayScenario {
 
         Commodity new_comm = new Commodity(max_id,name,pvequiv);
         scenario.commodities.put(new_comm.id,new_comm);
+        
+        List<ControlSchedule> lane_policies = get_schedules_for_controltype(AbstractController.Type.LgRestrict);
+        lane_policies.forEach((cs) -> { cs.add_commodity(new_comm.id); });
+        
         return new_comm;
     }
 
@@ -934,6 +938,8 @@ public class FreewayScenario {
                 .findFirst();
 
         if(comm_id.isPresent() && scenario.commodities.containsKey(comm_id.get())) {
+            List<ControlSchedule> lane_policies = get_schedules_for_controltype(AbstractController.Type.LgRestrict);
+            lane_policies.forEach((cs) -> { cs.remove_commodity(comm_id.get()); });
             remove_commodity(comm_id.get());
             return true;
         }
@@ -948,6 +954,8 @@ public class FreewayScenario {
      */
     public boolean delete_commodity_with_id(Long comm_id){
         if( scenario.commodities.containsKey(comm_id) ){
+            List<ControlSchedule> lane_policies = get_schedules_for_controltype(AbstractController.Type.LgRestrict);
+            lane_policies.forEach((cs) -> { cs.remove_commodity(comm_id); });
             remove_commodity(comm_id);
             return true;
         }

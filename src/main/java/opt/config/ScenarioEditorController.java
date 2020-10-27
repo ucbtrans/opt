@@ -500,6 +500,9 @@ public class ScenarioEditorController {
                 case Tolled:
                     t_tolled.add(c);
                     break;
+                default:
+                    t_free.add(c);
+                    break;
             }
         }
         
@@ -676,6 +679,8 @@ public class ScenarioEditorController {
             return;
         
         launchVehicleTypeWindow(null);
+        
+        initLanePolicies();
     }
 
     @FXML
@@ -700,6 +705,8 @@ public class ScenarioEditorController {
         
         myScenario.delete_commodity_with_name(listVT.get(idx).get_name());
         makeListVT(myScenario.get_commodities());
+        
+        initLanePolicies();
     }
     
     
