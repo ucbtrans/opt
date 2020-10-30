@@ -376,8 +376,10 @@ public class AppMainController {
     public void attachSimDataToScenario(SimDataScenario d, Exception e) {
         if (d == null)
             return;
-        if (e != null)
+        if (e != null) {
             opt.utils.Dialogs.ExceptionDialog("Error in simulation", e);
+            return;
+        }
         scenario2simData.put(d.fwyscenario, d);
         mySimScenario = d.fwyscenario;
         simdata = d;
