@@ -100,7 +100,7 @@ public class UserSettings {
     public static double defaultStartTime = 0.0;
     public static double defaultSimulationDuration = 86400.0;
 
-    public static float defaultMaxCellLength = 100f;
+    public static float defaultMaxCellLength = 200f;
 
     public static double defaultControlDtSeconds = 30;
     public static double queueOverrideTriggerThreshold = 0.2;
@@ -450,7 +450,7 @@ public class UserSettings {
             defaultSimulationDuration = Double.parseDouble(pv);
         pv = props.getProperty("defaultMaxCellLength");
         if (pv != null)
-            defaultMaxCellLength = Float.parseFloat(pv);
+            ;//defaultMaxCellLength = Float.parseFloat(pv); //FIXME: uncomment
         pv = props.getProperty("defaultDemandDtMinutes");
         if (pv != null)
             defaultDemandDtMinutes = Integer.parseInt(pv);

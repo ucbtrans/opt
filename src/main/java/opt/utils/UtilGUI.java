@@ -38,6 +38,20 @@ import org.jfree.chart.ChartUtilities;
  * @author Alex Kurzhanskiy
  */
 public class UtilGUI {
+    
+    public static javafx.scene.paint.Color[][] jfxColorPairs = {
+        {javafx.scene.paint.Color.BLUE, javafx.scene.paint.Color.DARKBLUE},
+        {javafx.scene.paint.Color.GREEN, javafx.scene.paint.Color.DARKGREEN},
+        {javafx.scene.paint.Color.SALMON, javafx.scene.paint.Color.DARKSALMON},
+        {javafx.scene.paint.Color.CYAN, javafx.scene.paint.Color.DARKCYAN},
+        {javafx.scene.paint.Color.MAGENTA, javafx.scene.paint.Color.DARKMAGENTA},
+        {javafx.scene.paint.Color.ORANGE, javafx.scene.paint.Color.DARKORANGE},
+        {javafx.scene.paint.Color.VIOLET, javafx.scene.paint.Color.DARKVIOLET},
+        {javafx.scene.paint.Color.ORCHID, javafx.scene.paint.Color.DARKORCHID},
+        {javafx.scene.paint.Color.RED, javafx.scene.paint.Color.DARKRED},
+        {javafx.scene.paint.Color.GOLDENROD, javafx.scene.paint.Color.DARKGOLDENROD}
+    };
+    
 	
     /**
      * Returns n-dimensional array of colors for given nx3 integer array of RGB values. 
@@ -352,6 +366,7 @@ public class UtilGUI {
         float[] hsb =  Color.RGBtoHSB(rgb[ii][0], rgb[ii][1], rgb[ii][2], null);
         return Color.getHSBColor(hsb[0], hsb[1], hsb[2]);
     }
+    
     
     
     

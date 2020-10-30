@@ -108,6 +108,8 @@ public class ScenarioEditorController {
     private SpinnerValueFactory<Double> a0SpinnerValueFactory = null;
     private SpinnerValueFactory<Double> a1SpinnerValueFactory = null;
     
+    private NetworkDisplay networkDisplay = null;
+    
     
     @FXML // fx:id="scenarioEditorMainPane"
     private SplitPane scenarioEditorMainPane; // Value injected by FXMLLoader
@@ -363,6 +365,22 @@ public class ScenarioEditorController {
         
         freeLinks.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         policyLinks.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        
+        scenarioEditorCanvas.widthProperty().bind(canvasParent.widthProperty());
+        scenarioEditorCanvas.heightProperty().bind(canvasParent.heightProperty());
+
+        scenarioEditorCanvas.widthProperty().addListener((observable, oldValue, newValue) -> {
+           if ((ignoreChange) || (networkDisplay == null))
+               return;
+           networkDisplay.execute();
+        });
+        
+        scenarioEditorCanvas.heightProperty().addListener((observable, oldValue, newValue) -> {
+           if ((ignoreChange) || (networkDisplay == null))
+               return;
+           networkDisplay.execute();
+        });
+
     }
     
      
@@ -381,6 +399,9 @@ public class ScenarioEditorController {
         makeListVT(myScenario.get_commodities());
         initScenarioTiming();
         initLanePolicies();
+        
+        networkDisplay = new NetworkDisplay(scenarioEditorCanvas, myScenario);
+        networkDisplay.execute();
         
         ignoreChange = false;
     }
@@ -974,6 +995,34 @@ public class ScenarioEditorController {
         if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
             onDeleteController(null);
         }
+    }
+    
+    
+    @FXML
+    void canvasOnMouseClicked(MouseEvent event) {
+        if (ignoreChange)
+            return;
+        
+        Segment s = networkDisplay.canvasOnMouseClicked(event);
+        if (s == null)
+            return;
+        
+        appMainController.selectLink(s.fwy());
+    }
+    
+    
+    @FXML
+    void canvasOnKeyPressed(KeyEvent event) {
+        if (ignoreChange)
+            return;
+        
+        Segment s = networkDisplay.canvasOnKeyPressed(event);
+        scenarioEditorCanvas.requestFocus();
+        
+        if (s == null)
+            return;
+        
+        appMainController.selectLink(s.fwy());
     }
 
     

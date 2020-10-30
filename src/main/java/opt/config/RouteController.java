@@ -585,7 +585,7 @@ public class RouteController {
     
     
     @FXML
-    void canvasOnMoseClicked(MouseEvent event) {
+    void canvasOnMouseClicked(MouseEvent event) {
         if (ignoreChange)
             return;
         

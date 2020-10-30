@@ -26,17 +26,19 @@
 package opt.config;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.LinkConnector;
 import opt.data.Segment;
+import opt.utils.UtilGUI;
 
 
 
@@ -46,6 +48,7 @@ import opt.data.Segment;
  * @author akurzhan@berkeley.edu
  */
 public class RouteDisplay {
+    private final double dashes_thres = 3;
     private final double deg2rad = 0.0174533;
     private final double ramp_angle = 55.0;
     private final double c_gap = 100.0; // meters
@@ -58,12 +61,17 @@ public class RouteDisplay {
     private double routeLength = 0; // meters
     
     private final List<MultiXYBox> multiBoxes = new ArrayList<>();
-    private final Set<AbstractLink> setOR = new HashSet<>();
-    private final Set<AbstractLink> setFR = new HashSet<>();
     
-    private List<Segment> segments = null;
     private Canvas canvas;
+    private List<Segment> segments = null;
+    private double maxRouteLength = -1;
     private int selectedIndex = -1;
+    
+    private Map<AbstractLink, Color[]> ramp2colors = null;
+    
+    private double v_lb = 0;
+    private double v_ub = 0;
+    
     
     public RouteDisplay() { }
     
@@ -72,9 +80,24 @@ public class RouteDisplay {
         segments = rs;
     }
     
+    public RouteDisplay(Canvas c, List<Segment> rs, double mrl) {
+        this(c, rs);
+        maxRouteLength = mrl;
+    }
+    
     
     public void setCanvas(Canvas c) {
         canvas = c;
+    }
+    
+    
+    public void setMaxRouteLength(double mrl) {
+        maxRouteLength = mrl;
+    }
+    
+    
+    public List<Segment> getRouteSegments() {
+        return segments;
     }
     
     
@@ -88,6 +111,16 @@ public class RouteDisplay {
     }
     
     
+    public void setRamp2Colors(Map<AbstractLink, Color[]> r2c) {
+        ramp2colors = r2c;
+    }
+    
+    
+    public double getVLB() { return v_lb; }
+    
+    public double getVUB() { return v_ub; }
+    
+    
     public int getSelected() {
         return selectedIndex;
     }
@@ -95,7 +128,7 @@ public class RouteDisplay {
     
     public void setSelected(int idx) {
         selectedIndex = idx;
-        draw();
+        draw(1, 0);
     }    
     
     
@@ -115,8 +148,12 @@ public class RouteDisplay {
     private void initRouteProperties() {
         maxLanes = 0;
         routeLength = 0;
-        setOR.clear();
-        setFR.clear();
+        
+        if (ramp2colors == null)
+            ramp2colors = new HashMap<AbstractLink, Color[]>();
+        
+        int ccnt = 0;
+        int numCS = UtilGUI.jfxColorPairs.length;
         
         int sz = segments.size();
         for (int i = 0; i < sz; i++) {
@@ -131,10 +168,19 @@ public class RouteDisplay {
                 routeLength += 2 * c_gap;
                 AbstractLink up = l.get_up_link();
                 AbstractLink dn = l.get_dn_link();
-                if (up != null)
-                    setFR.add(up);
-                if (dn != null)
-                    setOR.add(dn);
+                Color[] clr = new Color[2];
+                clr[0] = UtilGUI.jfxColorPairs[ccnt][0];
+                clr[1] = UtilGUI.jfxColorPairs[ccnt][1];
+
+                if ((up != null) && (!ramp2colors.containsKey(up)))
+                    ramp2colors.put(up, clr);
+
+                if ((dn != null) && (!ramp2colors.containsKey(dn)))
+                    ramp2colors.put(dn, clr);
+
+                ccnt++;
+                if (ccnt >= numCS)
+                    ccnt = 0;
             }
         }
     }
@@ -187,26 +233,39 @@ public class RouteDisplay {
     
     
     
-    public void computeGeometry() {
+    public void computeGeometry(double num_routes, double route_num) {
         boolean rightSideRoads = UserSettings.rightSideRoads;
         
         double width = canvas.getWidth();
-        double height = canvas.getHeight();
+        double c_height = canvas.getHeight();
+        double height = c_height / num_routes;
+        double y0 = route_num * height;
         GraphicsContext gc = canvas.getGraphicsContext2D();
+        
+        v_lb = y0;
+        v_ub = y0 + height;
         
         initRouteProperties();
         
-        double y_c = 0.5 * height;
-        double ln_width = height/24;
-        if (maxLanes > 12) { // we want the road segment to take about half of the canvas 
+        multiBoxes.clear();
+        double y_c = y0 + 0.5 * height;
+        double ln_width = height/20;
+        if (maxLanes > 10) { // we want the road segment to take about half of the canvas 
             ln_width = Math.sqrt(2)*(height/(2 * maxLanes));
         }
+        boolean show_dashes = true;
+            if (ln_width < dashes_thres)
+                show_dashes = false;
         double y_b = y_c - 0.5 * (maxGPLanes + maxAuxLanes) * ln_width;
-        double x_scale = (1 - 2 * h_margin) * width / routeLength;
-        multiBoxes.clear();
+        
+        double rl = maxRouteLength;
+        if (rl < 0)
+            rl = routeLength;
+        double x_scale = (1 - 2 * h_margin) * width / rl;
+        
         
         if (rightSideRoads) {
-            double xl = h_margin * width;
+            double xl = (width / 2) - (x_scale * routeLength / 2);
             
             for (Segment s : segments) {
                 AbstractLink l = s.fwy();
@@ -229,6 +288,9 @@ public class RouteDisplay {
                 double coeff = Math.min(1.0, (double)l.get_lanes()/(double)maxRampLanes);
                 double r_ln_width = coeff * ln_width;
                 r_ln_width = Math.min(r_ln_width, (xu - xl) / (6 * Math.abs(Math.cos(ramp_angle*deg2rad)) * maxRampLanes));
+                boolean r_show_dashes = true;
+                if (r_ln_width < dashes_thres)
+                    r_show_dashes = false;
                 double ramp_length = Math.min(xu - xl, l.get_lanes() * ln_width);
                 
                 
@@ -246,8 +308,8 @@ public class RouteDisplay {
                         double ryu = ryl + r_mng * r_ln_width;
                         XYBox b = new XYBox(rxl, rxu, ryl, ryu);
                         b.setColor(Color.BLACK);
-                        if (setOR.contains(r))
-                            b.setColor(Color.DARKBLUE);
+                        if (ramp2colors.containsKey(r))
+                            b.setColor(ramp2colors.get(r)[1]);
                         orb.addBox(b);
                         ryl = ryu;
                     }
@@ -255,11 +317,12 @@ public class RouteDisplay {
                         double ryu = ryl + r_gp * r_ln_width;
                         XYBox b = new XYBox(rxl, rxu, ryl, ryu);
                         b.setColor(Color.DARKGREY);
-                        if (setOR.contains(r))
-                            b.setColor(Color.BLUE);
+                        if (ramp2colors.containsKey(r))
+                            b.setColor(ramp2colors.get(r)[0]);
                         orb.addBox(b);
                     }
-                    orb.setDashes(computeDashes(r));
+                    if (r_show_dashes)
+                        orb.setDashes(computeDashes(r));
                     orb.setLineWidth(1);
                     orb.setAngle(-ramp_angle);
                     mb.addBox(orb);
@@ -280,8 +343,8 @@ public class RouteDisplay {
                         double ryu = ryl + r_mng * r_ln_width;
                         XYBox b = new XYBox(rxl, rxu, ryl, ryu);
                         b.setColor(Color.BLACK);
-                        if (setOR.contains(r))
-                            b.setColor(Color.DARKBLUE);
+                        if (ramp2colors.containsKey(r))
+                            b.setColor(ramp2colors.get(r)[1]);
                         orb.addBox(b);
                         ryl = ryu;
                     }
@@ -289,11 +352,12 @@ public class RouteDisplay {
                         double ryu = ryl + r_gp * r_ln_width;
                         XYBox b = new XYBox(rxl, rxu, ryl, ryu);
                         b.setColor(Color.DARKGREY);
-                        if (setOR.contains(r))
-                            b.setColor(Color.BLUE);
+                        if (ramp2colors.containsKey(r))
+                            b.setColor(ramp2colors.get(r)[0]);
                         orb.addBox(b);
                     }
-                    orb.setDashes(computeDashes(r));
+                    if (r_show_dashes)
+                        orb.setDashes(computeDashes(r));
                     orb.setLineWidth(1);
                     orb.setAngle(ramp_angle);
                     mb.addBox(orb);
@@ -315,8 +379,8 @@ public class RouteDisplay {
                         double ryu = ryl + r_mng * r_ln_width;
                         XYBox b = new XYBox(rxl, rxu, ryl, ryu);
                         b.setColor(Color.BLACK);
-                        if (setFR.contains(r))
-                            b.setColor(Color.DARKBLUE);
+                        if (ramp2colors.containsKey(r))
+                            b.setColor(ramp2colors.get(r)[1]);
                         frb.addBox(b);
                         ryl = ryu;
                     }
@@ -324,11 +388,12 @@ public class RouteDisplay {
                         double ryu = ryl + r_gp * r_ln_width;
                         XYBox b = new XYBox(rxl, rxu, ryl, ryu);
                         b.setColor(Color.DARKGREY);
-                        if (setFR.contains(r))
-                            b.setColor(Color.BLUE);
+                        if (ramp2colors.containsKey(r))
+                            b.setColor(ramp2colors.get(r)[0]);
                         frb.addBox(b);
                     }
-                    frb.setDashes(computeDashes(r));
+                    if (r_show_dashes)
+                        frb.setDashes(computeDashes(r));
                     frb.setLineWidth(1);
                     frb.setAngle(ramp_angle);
                     mb.addBox(frb);
@@ -349,8 +414,8 @@ public class RouteDisplay {
                         double ryu = ryl + r_mng * r_ln_width;
                         XYBox b = new XYBox(rxl, rxu, ryl, ryu);
                         b.setColor(Color.BLACK);
-                        if (setFR.contains(r))
-                            b.setColor(Color.DARKBLUE);
+                        if (ramp2colors.containsKey(r))
+                            b.setColor(ramp2colors.get(r)[1]);
                         frb.addBox(b);
                         ryl = ryu;
                     }
@@ -358,11 +423,12 @@ public class RouteDisplay {
                         double ryu = ryl + r_gp * r_ln_width;
                         XYBox b = new XYBox(rxl, rxu, ryl, ryu);
                         b.setColor(Color.DARKGREY);
-                        if (setFR.contains(r))
-                            b.setColor(Color.BLUE);
+                        if (ramp2colors.containsKey(r))
+                            b.setColor(ramp2colors.get(r)[0]);
                         frb.addBox(b);
                     }
-                    frb.setDashes(computeDashes(r));
+                    if (r_show_dashes)
+                        frb.setDashes(computeDashes(r));
                     frb.setLineWidth(1);
                     frb.setAngle(-ramp_angle);
                     mb.addBox(frb);
@@ -371,7 +437,8 @@ public class RouteDisplay {
                 
                 
                 XYBox mlb = new XYBox();
-                mlb.setDashes(computeDashes(l));
+                if (show_dashes)
+                    mlb.setDashes(computeDashes(l));
                 mlb.setLineWidth(1);
                 if (mng > 0) {
                     yu = yl + mng*ln_width;
@@ -408,12 +475,13 @@ public class RouteDisplay {
     }
     
     
-    public void draw() {
+    public void draw(double num_routes, double route_num) {
         double width = canvas.getWidth();
-        double height = canvas.getHeight();
+        double c_height = canvas.getHeight();
+        double height = c_height / num_routes;
+        double y0 = route_num * height;
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, width, height);
-        
+        gc.clearRect(0, y0, width, y0 + height);
         multiBoxes.forEach((mb) -> { mb.fill(); });
         
         if ((selectedIndex < 0) || (selectedIndex >= multiBoxes.size()))
@@ -427,9 +495,16 @@ public class RouteDisplay {
         bb.stroke();
     }
     
+    
     public void execute() {
-        computeGeometry();
-        draw();
+        computeGeometry(1, 0);
+        draw(1, 0);
+    }
+    
+    
+    public void execute(double num_routes, double route_num) {
+        computeGeometry(num_routes, route_num);
+        draw(num_routes, route_num);
     }
 
     
