@@ -26,7 +26,7 @@
   <items>
       <AnchorPane id="canvasParent" fx:id="canvasParent" minHeight="270.0" minWidth="600.0" prefHeight="301.0" prefWidth="898.0">
          <children>
-            <Canvas id="scenarioEditorCanvas" fx:id="scenarioEditorCanvas" focusTraversable="true" height="275.0" onKeyPressed="#canvasOnKeyPressed" onMouseClicked="#canvasOnMouseClicked" width="898.0" />
+            <Canvas id="scenarioEditorCanvas" fx:id="scenarioEditorCanvas" focusTraversable="true" height="275.0" onKeyPressed="#canvasOnKeyPressed" onMouseClicked="#canvasOnMouseClicked" onMouseMoved="#canvasOnMouseMoved" width="898.0" />
          </children>
       </AnchorPane>
       <AnchorPane>

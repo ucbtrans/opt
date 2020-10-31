@@ -26,15 +26,19 @@
 package opt.config;
 
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
+import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.FreewayScenario;
 import opt.data.LinkConnector;
@@ -54,6 +58,7 @@ public class NetworkDisplay {
     private int numRoutes = 0;
     
     private Map<AbstractLink, Color[]> ramp2colors = new HashMap<AbstractLink, Color[]>();
+    private Tooltip tooltip = null;
     
     private int selectedRoute = -1;
     private int selectedIndex = -1;
@@ -61,8 +66,10 @@ public class NetworkDisplay {
     
     public NetworkDisplay() { }
     
-    public NetworkDisplay(Canvas c, FreewayScenario s) {
+    public NetworkDisplay(Canvas c, Tooltip tt, FreewayScenario s) {
         canvas = c;
+        tooltip = tt;
+        tooltip.setText("");
         myScenario = s;
         setCRColors(myScenario.get_connectors());
         setRoutes(myScenario.get_linear_freeway_segments());
@@ -136,6 +143,33 @@ public class NetworkDisplay {
                routeDisplays.get(i).setSelected(-1);
         
         canvas.requestFocus();
+    }
+    
+    
+    public void canvasOnMouseMoved(MouseEvent event) {
+        double x = event.getX();
+        double y = event.getY();
+        int rd = -1;
+        
+        for (int i = 0; i < numRoutes; i++)
+            if ((y >= routeDisplays.get(i).getVLB()) &&
+                (y <= routeDisplays.get(i).getVUB())) {
+                rd = i;
+                break;
+            }
+
+        int si = routeDisplays.get(rd).getClickedMultiBox(x, y);
+        
+        if (si < 0) {
+            tooltip.setText("");
+            return;
+        }
+        
+        AbstractLink l = routeDisplays.get(rd).getRouteSegments().get(si).fwy();
+        String units = UserSettings.unitsLength;
+        double len = UserSettings.lengthConversionMap.get("meters" + units) * l.get_length_meters();
+        tooltip.setText(new Formatter().format("%s\n(%.2f %s)", l.get_name(), len, units).toString());
+        tooltip.setTextAlignment(TextAlignment.CENTER);
     }
     
     

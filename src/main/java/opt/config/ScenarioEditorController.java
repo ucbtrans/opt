@@ -50,6 +50,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -109,6 +110,8 @@ public class ScenarioEditorController {
     private SpinnerValueFactory<Double> a1SpinnerValueFactory = null;
     
     private NetworkDisplay networkDisplay = null;
+    
+    private Tooltip ttCanvas = new Tooltip();
     
     
     @FXML // fx:id="scenarioEditorMainPane"
@@ -381,6 +384,7 @@ public class ScenarioEditorController {
            networkDisplay.execute();
         });
 
+        Tooltip.install(scenarioEditorCanvas, ttCanvas);
     }
     
      
@@ -400,7 +404,7 @@ public class ScenarioEditorController {
         initScenarioTiming();
         initLanePolicies();
         
-        networkDisplay = new NetworkDisplay(scenarioEditorCanvas, myScenario);
+        networkDisplay = new NetworkDisplay(scenarioEditorCanvas, ttCanvas, myScenario);
         networkDisplay.execute();
         
         ignoreChange = false;
@@ -997,6 +1001,14 @@ public class ScenarioEditorController {
         }
     }
     
+    
+    @FXML
+    void canvasOnMouseMoved(MouseEvent event) {
+        if (ignoreChange)
+            return;
+        
+        networkDisplay.canvasOnMouseMoved(event);
+    }
     
     @FXML
     void canvasOnMouseClicked(MouseEvent event) {
