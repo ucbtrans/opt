@@ -296,8 +296,6 @@ public class UserSettings {
     }
     
     
-    public static LinkEditorController linkEditorController = null;
-    
 
     
     public static double convertLength(double value, String fromUnits, String toUnits) {
@@ -450,7 +448,7 @@ public class UserSettings {
             defaultSimulationDuration = Double.parseDouble(pv);
         pv = props.getProperty("defaultMaxCellLength");
         if (pv != null)
-            ;//defaultMaxCellLength = Float.parseFloat(pv); //FIXME: uncomment
+            defaultMaxCellLength = Float.parseFloat(pv); 
         pv = props.getProperty("defaultDemandDtMinutes");
         if (pv != null)
             defaultDemandDtMinutes = Integer.parseInt(pv);

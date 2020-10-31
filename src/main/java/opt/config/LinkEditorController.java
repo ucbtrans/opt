@@ -1061,7 +1061,6 @@ public class LinkEditorController {
         myLink = lnk;
         useFRFlows = false;
         
-        UserSettings.linkEditorController = this;
         appMainController.setLeftStatus("");
     
         listVT.clear();
