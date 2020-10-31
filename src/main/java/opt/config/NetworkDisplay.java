@@ -30,6 +30,7 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
@@ -127,7 +128,7 @@ public class NetworkDisplay {
         
         routeDisplays.clear();
         for (List<Segment> ls : lls) {
-            RouteDisplay rd = new RouteDisplay(canvas, ls, maxLength);
+            RouteDisplay rd = new RouteDisplay(canvas, null, ls, maxLength);
             rd.setRamp2Colors(ramp2colors);
             routeDisplays.add(rd);
         }
@@ -162,6 +163,8 @@ public class NetworkDisplay {
         
         if (si < 0) {
             tooltip.setText("");
+            tooltip.hide();
+            canvas.setCursor(Cursor.DEFAULT);
             return;
         }
         
@@ -170,6 +173,7 @@ public class NetworkDisplay {
         double len = UserSettings.lengthConversionMap.get("meters" + units) * l.get_length_meters();
         tooltip.setText(new Formatter().format("%s\n(%.2f %s)", l.get_name(), len, units).toString());
         tooltip.setTextAlignment(TextAlignment.CENTER);
+        canvas.setCursor(Cursor.HAND);
     }
     
     
@@ -191,7 +195,7 @@ public class NetworkDisplay {
         
         setSelected();
         
-        if ((selectedRoute < 0) || (selectedIndex < 0) || (event.getClickCount() != 2))
+        if ((selectedRoute < 0) || (selectedIndex < 0) || (event.getClickCount() > 2))
             return null;
         
         return routeDisplays.get(selectedRoute).getRouteSegments().get(selectedIndex);

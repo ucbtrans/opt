@@ -43,6 +43,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -82,7 +83,7 @@ public class RouteController {
     private Segment lastSegment = null;
     
     private RouteDisplay routeDisplay = null;
-    
+    private Tooltip ttCanvas = new Tooltip();
     
     @FXML // fx:id="scenarioEditorMainPane"
     private SplitPane scenarioEditorMainPane; // Value injected by FXMLLoader
@@ -399,6 +400,8 @@ public class RouteController {
                return;
            routeDisplay.execute();
         });
+        
+        Tooltip.install(routeEditorCanvas, ttCanvas);
     }
     
     
@@ -458,7 +461,7 @@ public class RouteController {
         cbOriginUpdate();
         cbDestinationUpdate();
         
-        routeDisplay = new RouteDisplay(routeEditorCanvas, routeSegments);
+        routeDisplay = new RouteDisplay(routeEditorCanvas, ttCanvas, routeSegments);
         routeDisplay.execute();
         
         ignoreChange = false;
@@ -599,13 +602,21 @@ public class RouteController {
             return;
         }
         
-        if (event.getClickCount() == 2) {
-            appMainController.selectLink(routeSegments.get(idx).fwy());
-        } else if (event.getClickCount() == 1) {
-            listSections.getSelectionModel().select(idx);
-            listSections.requestFocus();
-            listSections.getFocusModel().focus(idx);
-        }    
+        if (event.getClickCount() <= 2)
+            appMainController.selectLink(routeSegments.get(idx).fwy()); 
+    }
+    
+    
+    @FXML
+    void canvasOnMouseMoved(MouseEvent event) {
+        if (ignoreChange)
+            return;
+        
+        int idx = routeDisplay.canvasOnMouseMoved(event);
+        
+        listSections.getSelectionModel().select(idx);
+        listSections.requestFocus();
+        listSections.getFocusModel().focus(idx);
     }
     
     @FXML

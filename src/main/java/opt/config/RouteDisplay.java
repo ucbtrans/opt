@@ -26,14 +26,19 @@
 package opt.config;
 
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.LinkConnector;
@@ -67,6 +72,8 @@ public class RouteDisplay {
     private double maxRouteLength = -1;
     private int selectedIndex = -1;
     
+    private Tooltip tooltip = null;
+    
     private Map<AbstractLink, Color[]> ramp2colors = null;
     
     private double v_lb = 0;
@@ -75,13 +82,14 @@ public class RouteDisplay {
     
     public RouteDisplay() { }
     
-    public RouteDisplay(Canvas c, List<Segment> rs) {
+    public RouteDisplay(Canvas c, Tooltip tt, List<Segment> rs) {
         canvas = c;
+        tooltip = tt;
         segments = rs;
     }
     
-    public RouteDisplay(Canvas c, List<Segment> rs, double mrl) {
-        this(c, rs);
+    public RouteDisplay(Canvas c, Tooltip tt, List<Segment> rs, double mrl) {
+        this(c, tt, rs);
         maxRouteLength = mrl;
     }
     
@@ -141,6 +149,31 @@ public class RouteDisplay {
             }
         setSelected(-1);
         return -1;
+    }
+    
+    
+    public int canvasOnMouseMoved(MouseEvent event) {
+        int idx = getClickedMultiBox(event.getX(), event.getY());
+        
+        if (idx < 0) {
+            if (tooltip != null) {
+                tooltip.setText("");
+                tooltip.hide();
+            }
+            canvas.setCursor(Cursor.DEFAULT);
+            return idx;
+        }
+        
+        AbstractLink l = segments.get(idx).fwy();
+        String units = UserSettings.unitsLength;
+        double len = UserSettings.lengthConversionMap.get("meters" + units) * l.get_length_meters();
+        if (tooltip != null) {
+            tooltip.setText(new Formatter().format("%s\n(%.2f %s)", l.get_name(), len, units).toString());
+            tooltip.setTextAlignment(TextAlignment.CENTER);
+        }
+        
+        canvas.setCursor(Cursor.HAND);
+        return idx;
     }
     
     
