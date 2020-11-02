@@ -143,7 +143,7 @@
                                     <Tooltip text="How  often the metering rate is updated" wrapText="true" />
                                  </tooltip>
                               </Spinner>
-                              <Label text="Lane Choice Model Price Influencer:" GridPane.columnIndex="2" GridPane.rowIndex="6" GridPane.valignment="BOTTOM">
+                              <Label text="Lane Choice Price Influencer (1/cents):" GridPane.columnIndex="2" GridPane.rowIndex="6" GridPane.valignment="BOTTOM">
                                  <GridPane.margin>
                                     <Insets left="20.0" />
                                  </GridPane.margin>

@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<GridPane id="topPane" fx:id="topPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.config.PreferencesController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+  </columnConstraints>
+  <rowConstraints>
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="0.333343505859375" percentHeight="6.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="119.33331298828125" minHeight="10.0" percentHeight="6.0" prefHeight="119.33331298828125" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="119.33331298828125" minHeight="10.0" percentHeight="6.0" prefHeight="119.33331298828125" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="111.6666259765625" minHeight="0.0" prefHeight="26.33331298828125" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnSpan="2" GridPane.rowSpan="15">
+        <tabs>
+          <Tab text="Scenario Parameters">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <GridPane layoutX="7.0" layoutY="14.0" prefHeight="601.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="Default Scenario Start Time:" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label text="Default Simulation Duration:" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label text="Default Demand Update Period (minutes):" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label text="Default Split Ratio Update Period (minutes):" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label text="Default Off-Ramp Flow Update Period (minutes):" GridPane.halignment="RIGHT" GridPane.rowIndex="7" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label text="Reporting Step for Simulation Results (minutes):" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelMaxCellLength" fx:id="labelMaxCellLength" text="Default Max Cell Length:" GridPane.halignment="RIGHT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label text="Contour Data Spatial Granularity:" GridPane.halignment="RIGHT" GridPane.rowIndex="13" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <TextField id="startTime" fx:id="startTime" alignment="CENTER_RIGHT" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" text="00:00" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <TextField id="simulationDuration" fx:id="simulationDuration" alignment="CENTER_RIGHT" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" text="00:00" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <Spinner id="spDemandDt" fx:id="spDemandDt" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spSRDt" fx:id="spSRDt" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spFRFDt" fx:id="spFRFDt" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="7" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spOutDt" fx:id="spOutDt" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="10" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spMaxCellLength" fx:id="spMaxCellLength" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <ComboBox id="cbContourSpatial" fx:id="cbContourSpatial" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="13" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </ComboBox>
+                           </children>
+                        </GridPane>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+            <Tab text="Traffic Parameters">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <GridPane layoutX="7.0" layoutY="14.0" prefHeight="601.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label id="labelGPCapacity" fx:id="labelGPCapacity" text="Default General Purpose Lane Capacity:" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelManagedCapacity" fx:id="labelManagedCapacity" text="Default Managed Lane Capacity:" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelAuxCapacity" fx:id="labelAuxCapacity" text="Default Auxiliary Lane Capacity:" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelGPFFSpeed" fx:id="labelGPFFSpeed" text="Default General Purpose Lane Free Flow Speed:" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelManagedFFSpeed" fx:id="labelManagedFFSpeed" text="Default Managed Lane Free Flow Speed:" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelAuxFFSpeed" fx:id="labelAuxFFSpeed" text="Default Auxiliary Lane Free Flow Speed:" GridPane.halignment="RIGHT" GridPane.rowIndex="7" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelGPJamDensity" fx:id="labelGPJamDensity" text="Default General Purpose Lane Jam Density:" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelManagedJamDensity" fx:id="labelManagedJamDensity" text="Default Managed Lane Jam Density:" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelAuxJamDensity" fx:id="labelAuxJamDensity" text="Default Auxiliary Lane Jam Density:" GridPane.halignment="RIGHT" GridPane.rowIndex="11" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelSpeedThresholdDelay" fx:id="labelSpeedThresholdDelay" text="Speed Threshold for Delay Computation:" GridPane.halignment="RIGHT" GridPane.rowIndex="13" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Spinner id="spGPCapacity" fx:id="spGPCapacity" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spManagedCapacity" fx:id="spManagedCapacity" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spAuxCapacity" fx:id="spAuxCapacity" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spGPFFSpeed" fx:id="spGPFFSpeed" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spManagedFFSpeed" fx:id="spManagedFFSpeed" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spAuxFFSpeed" fx:id="spAuxFFSpeed" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="7" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spGPJamDensity" fx:id="spGPJamDensity" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spManagedJamDensity" fx:id="spManagedJamDensity" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="10" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spAuxJamDensity" fx:id="spAuxJamDensity" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="11" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spSpeedThresholdDelay" fx:id="spSpeedThresholdDelay" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="13" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                           </children>
+                        </GridPane>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+            <Tab text="Lane Choice">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <GridPane layoutX="7.0" layoutY="14.0" prefHeight="601.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="Lane Keeping Parameter:" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelA1" fx:id="labelA1" text="Default Traffic Density Influencer:" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelA2" fx:id="labelA2" text="Default Toll Price Influencer (1/cents):" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelQosSpeed" fx:id="labelQosSpeed" text="Default QoS Speed Threshold for Managed Lanes:" GridPane.halignment="RIGHT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Spinner id="spA0" fx:id="spA0" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spA1" fx:id="spA1" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spA2" fx:id="spA2" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spQosSpeed" fx:id="spQosSpeed" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                           </children>
+                        </GridPane>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+            <Tab text="Ramp Metering">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <GridPane layoutX="7.0" layoutY="14.0" prefHeight="601.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="Control Invocation Period (seconds):" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelMinGPRate" fx:id="labelMinGPRate" text="Min Metering Rate for General Purpose Lane:" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelMaxGPRate" fx:id="labelMaxGPRate" text="Max Metering Rate for General Purpose Lane:" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelMinManagedRate" fx:id="labelMinManagedRate" text="Min Metering Rate for Managed Lane:" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label id="labelMaxManagedRate" fx:id="labelMaxManagedRate" text="Max Metering Rate for Managed Lane:" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label text="Queue Override Trigger Offset:" GridPane.halignment="RIGHT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Spinner id="spControlDt" fx:id="spControlDt" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spMinRateGP" fx:id="spMinRateGP" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spMaxRateGP" fx:id="spMaxRateGP" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spMinRateManaged" fx:id="spMinRateManaged" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="8" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spMaxRateManaged" fx:id="spMaxRateManaged" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <Spinner id="spQOverrideOffset" fx:id="spQOverrideOffset" editable="true" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                           </children>
+                        </GridPane>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+            <Tab text="Measurement Units">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <GridPane layoutX="7.0" layoutY="14.0" prefHeight="601.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="Length:" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label text="Speed:" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label text="Flow:" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label text="Density:" GridPane.halignment="RIGHT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <ComboBox id="cbUnitsLength" fx:id="cbUnitsLength" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </ComboBox>
+                              <ComboBox id="cbUnitsSpeed" fx:id="cbUnitsSpeed" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </ComboBox>
+                              <ComboBox id="cbUnitsFlow" fx:id="cbUnitsFlow" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </ComboBox>
+                              <ComboBox id="cbUnitsDensity" fx:id="cbUnitsDensity" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets right="20.0" />
+                                 </GridPane.margin>
+                              </ComboBox>
+                           </children>
+                        </GridPane>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+      <Button id="buttonReset" fx:id="buttonReset" cancelButton="true" mnemonicParsing="false" onAction="#onReset" prefHeight="25.0" prefWidth="75.0" text="Reset" GridPane.rowIndex="15">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Button>
+      <ButtonBar GridPane.columnIndex="1" GridPane.rowIndex="15">
+         <buttons>
+            <Button id="buttonCancel" fx:id="buttonCancel" cancelButton="true" mnemonicParsing="false" onAction="#onCancel" prefHeight="25.0" prefWidth="75.0" text="Cancel" />
+            <Button id="buttonOK" fx:id="buttonOK" defaultButton="true" mnemonicParsing="false" onAction="#onOK" prefHeight="25.0" prefWidth="75.0" text="OK" />
+         </buttons>
+         <GridPane.margin>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </GridPane.margin>
+      </ButtonBar>
+      <!-- <TextField id="textEndTime" fx:id="textEndTime" alignment="CENTER_RIGHT" layoutX="30.0" layoutY="98.0" maxWidth="200.0" prefHeight="25.0" prefWidth="200.0" text="00:00" GridPane.columnIndex="1" GridPane.rowIndex="1">
+         <tooltip>
+            <Tooltip text="Enter the metering start time in the format 'hhmm'. Should not be smaler than start time." wrapText="true" />
+         </tooltip>
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </TextField> -->
+     <!--  <Label id="labelRecRate" fx:id="labelRecRate" layoutX="30.0" layoutY="100.0" text="Recommended Rate per Lane (vph):" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label id="labelMaxRate" fx:id="labelMaxRate" layoutX="30.0" layoutY="170.0" text="Maximum Rate per Lane (vph):" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Spinner id="spinnerRecRate" fx:id="spinnerRecRate" editable="true" layoutX="30.0" layoutY="192.0" maxWidth="200.0" prefHeight="25.0" prefWidth="200.0" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+         <tooltip>
+            <Tooltip text="Cannot meter below this rate" wrapText="true" />
+         </tooltip>
+      </Spinner>
+      <Spinner id="spinnerMaxRate" fx:id="spinnerMaxRate" editable="true" layoutX="30.0" layoutY="122.0" maxWidth="200.0" prefHeight="25.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+         <tooltip>
+            <Tooltip text="Cannot meter above this rate" wrapText="true" />
+         </tooltip>
+      </Spinner>
+      <Label text="Invocation Period (seconds):" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Spinner id="controlDt" fx:id="controlDt" editable="true" maxWidth="200.0" prefHeight="25.0" prefWidth="200.0" GridPane.rowIndex="5">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+         <tooltip>
+            <Tooltip text="How  often the metering rate is updated" wrapText="true" />
+         </tooltip>
+      </Spinner>
+      <CheckBox id="cbQueueControl" fx:id="cbQueueControl" mnemonicParsing="false" text="Queue Control" GridPane.columnIndex="1" GridPane.rowIndex="5">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+         <tooltip>
+            <Tooltip text="Override metering rate when vehicle queue is too large " wrapText="true" />
+         </tooltip>
+      </CheckBox> -->
+   </children>
+</GridPane>

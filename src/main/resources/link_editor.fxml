@@ -350,7 +350,7 @@
                                                       <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                                                    </padding>
                                                    <children>
-                                                      <Label id="labelDemandUpdatePeriod" fx:id="labelDemandUpdatePeriod" text="Demand Update Period (min):">
+                                                      <Label id="labelDemandUpdatePeriod" fx:id="labelDemandUpdatePeriod" text="Demand Update Period (minutes):">
                                                          <GridPane.margin>
                                                             <Insets />
                                                          </GridPane.margin>
@@ -404,7 +404,7 @@
                                                       <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                                                    </padding>
                                                    <children>
-                                                      <Label text="Split Ratio Update Period (min):">
+                                                      <Label text="Split Ratio Update Period (minutes):">
                                                          <GridPane.margin>
                                                             <Insets />
                                                          </GridPane.margin>
@@ -450,7 +450,7 @@
                                                       <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                                                    </padding>
                                                    <children>
-                                                      <Label text="Flow Update Period (min):">
+                                                      <Label text="Flow Update Period (minutes):">
                                                          <GridPane.margin>
                                                             <Insets />
                                                          </GridPane.margin>

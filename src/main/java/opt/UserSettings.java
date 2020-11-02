@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import opt.config.LinkEditorController;
 import opt.data.ParametersFreeway;
 import opt.data.ParametersRamp;
 
@@ -98,7 +97,7 @@ public class UserSettings {
     
 //    public static int defaultSimulationDtSeconds = 5;
     public static double defaultStartTime = 0.0;
-    public static double defaultSimulationDuration = 86400.0;
+    public static double defaultSimulationDuration = 28800.0;
 
     public static float defaultMaxCellLength = 200f;
 
@@ -330,6 +329,8 @@ public class UserSettings {
     private static String userSettingsFileName = null;
     
     public static void load() {
+        reset();
+        
         String home = System.getProperty("user.home");
         if (home == null)
             home = System.getProperty("java.io.tmpdir");
@@ -572,5 +573,74 @@ public class UserSettings {
     
     
     
+    
+    
+    public static void reset() {
+        rightSideRoads = true; // Read from user settings file
+    
+        unitsLength = unitsLengthOptions[3]; // Read from user settings file
+        unitsSpeed = unitsSpeedOptions[2]; // Read from user settings file
+        unitsFlow = unitsFlowOptions[4]; // Read from user settings file
+        unitsDensity = unitsDensityOptions[2]; // Read from user settings file
+    
+        defaultMergePriority = 0.5; // ramp merge priority
+    
+        defaultRampLengthMeters = 322; // meters
+    
+        defaultOnrampGPLanes = 1;
+        defaultOfframpGPLanes = 1;
+        defaultConnectorGPLanes = 2;
+        defaultFreewayGPLanes = 3;
+    
+        defaultOnrampManagedLanes = 1;
+        defaultOfframpManagedLanes = 0;
+        defaultConnectorManagedLanes = 1;
+        defaultFreewayManagedLanes = 1;
+    
+        defaultOnrampAuxLanes = 0;
+        defaultOfframpAuxLanes = 0;
+        defaultConnectorAuxLanes = 0;
+        defaultFreewayAuxLanes = 0;
+    
+        defaultGPLaneCapacityVph = 1900;
+        defaultManagedLaneCapacityVph = 1800;
+        defaultAuxLaneCapacityVph = 950;
+    
+        defaultGPLaneFreeFlowSpeedKph = 105;
+        defaultManagedLaneFreeFlowSpeedKph = 115;
+        defaultAuxLaneFreeFlowSpeedKph = 90;
+    
+        defaultGPLaneJamDensityVpk = 110;
+        defaultManagedLaneJamDensityVpk = 110;
+        defaultAuxLaneJamDensityVpk = 110;
+    
+        defaultFreeFlowSpeedThresholdForDelayMph = 45;
+    
+        defaultDemandDtMinutes = 5;
+        defaultSRDtMinutes = 5;
+        defaultFRFlowDtMinutes = 5;
+    
+        defaultStartTime = 0.0;
+        defaultSimulationDuration = 28800.0;
+
+        defaultMaxCellLength = 200f;
+
+        defaultControlDtSeconds = 30;
+        queueOverrideTriggerThreshold = 0.2;
+    
+        defaultQosSpeedThresholdKph = 72.4205;
+    
+        defaultLaneChoice_keep = 1.8;   // positive utility of not changing lanes
+        defaultLaneChoice_rhovpmplane = 0.0115; // positive utility of choosing a lane with density in vpm
+        defaultLaneChoice_tollcents = 0.0053;     // positive utility of not paying a toll in cents
+    
+        minGPRampMeteringRatePerLaneVph = 160;
+        minManagedRampMeteringRatePerLaneVph = 320;
+        maxGPRampMeteringRatePerLaneVph = 1200;
+        maxManagedRampMeteringRatePerLaneVph = 1400;
+    
+        reportingPeriodSeconds = 300; // 5 minutes
+        contourDataPerCell = true;
+    }
     
 }

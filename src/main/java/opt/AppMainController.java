@@ -63,6 +63,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.util.Callback;
 import jaxb.Parameter;
 import opt.config.*;
@@ -95,6 +96,10 @@ public class AppMainController {
     
     private Map<TreeItem, Object> tree2object = new HashMap<TreeItem, Object>();
     private Map<Object, TreeItem> object2tree = new HashMap<Object, TreeItem>();
+    
+    private GridPane preferencesPane = null;
+    private PreferencesController preferencesController = null;
+    private Scene preferencesScene = null;
     
     private SplitPane scenarioEditorPane = null;
     private ScenarioEditorController scenarioEditorController = null;
@@ -555,6 +560,12 @@ public class AppMainController {
             routeChoiceController = loader.getController();
             routeController.setRouteChoiceControllerAndScene(routeChoiceController, new Scene(routeChoicePane));
             
+            
+            loader = new FXMLLoader(getClass().getResource("/preferences_editor.fxml"));
+            preferencesPane = loader.load();
+            preferencesController = loader.getController();
+            preferencesScene = new Scene(preferencesPane);
+            
         } catch (IOException e) {
             opt.utils.Dialogs.ExceptionDialog("Cannot initialize UI modules...", e);
         }
@@ -833,6 +844,23 @@ public class AppMainController {
         } catch (Exception ex) {
             opt.utils.Dialogs.ExceptionDialog("Error saving OPT project", ex);
         }
+    }
+    
+    
+    
+    @FXML
+    private void onClickMenuFilePreferences(ActionEvent event) {
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(preferencesScene);
+        preferencesController.initWithLatestPreferences();
+        String title = "User Preferences";
+        inputStage.setTitle(title);
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+        processTreeSelection(selectedTreeItem);
     }
     
     

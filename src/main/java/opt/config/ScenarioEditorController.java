@@ -329,7 +329,7 @@ public class ScenarioEditorController {
             onDurationChange(null);
         });
         
-        a0SpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(-1000.0, 1000.0, 1.0, 1);
+        a0SpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(Double.MIN_VALUE, Double.MAX_VALUE, 1.0, 1);
         a0SpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter("#.####", 1.0));
         spA0.setValueFactory(a0SpinnerValueFactory);
         spA0.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -345,7 +345,7 @@ public class ScenarioEditorController {
             opt.utils.WidgetFunctionality.commitEditorText(spA0, a0);
         });
         
-        a1SpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(-1000.0, 1000.0, 1.0, 1);
+        a1SpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(Double.MIN_VALUE, Double.MAX_VALUE, 1.0, 1);
         a1SpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter("#.####", 1.0));
         spA1.setValueFactory(a1SpinnerValueFactory);
         spA1.valueProperty().addListener((observable, oldValue, newValue) -> {
