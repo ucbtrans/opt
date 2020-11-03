@@ -25,6 +25,7 @@
  **/
 package opt.config;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.event.ActionEvent;
@@ -51,12 +52,14 @@ public class NewRampMeterController {
     
     private boolean managedLanes = false;
     
+    private List<control.AbstractController.Algorithm> ctrlAlgos = new ArrayList<>();
+    
 
     @FXML // fx:id="topPane"
     private GridPane topPane; // Value injected by FXMLLoader
 
     @FXML // fx:id="listRM"
-    private ChoiceBox<control.AbstractController.Algorithm> listRM; // Value injected by FXMLLoader
+    private ChoiceBox<String> listRM; // Value injected by FXMLLoader
 
     @FXML // fx:id="buttonCancel"
     private Button buttonCancel; // Value injected by FXMLLoader
@@ -96,10 +99,12 @@ public class NewRampMeterController {
         
         buttonOK.setDisable(true);
         listRM.getItems().clear();
+        ctrlAlgos.clear();
         
         List<control.AbstractController.Algorithm> ctrl_set = ControlFactory.get_available_ramp_metering_algorithms();
         for (control.AbstractController.Algorithm ctrl : ctrl_set) {
-            listRM.getItems().add(ctrl);
+            listRM.getItems().add(ControlFactory.cntrl_alg_name.AtoB(ctrl));
+            ctrlAlgos.add(ctrl);
         }
     }
     
@@ -128,7 +133,7 @@ public class NewRampMeterController {
         }
 
 
-        linkEditorController.prepareNewController(listRM.getItems().get(idx), managedLanes);
+        linkEditorController.prepareNewController(ctrlAlgos.get(idx), managedLanes);
         
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();

@@ -27,7 +27,7 @@ public class ControlFactory {
 		x.add(control.AbstractController.Algorithm.rm_alinea);
 		x.add(control.AbstractController.Algorithm.rm_fixed_rate);
 		x.add(control.AbstractController.Algorithm.rm_open);
-		x.add(control.AbstractController.Algorithm.rm_closed);
+		//x.add(control.AbstractController.Algorithm.rm_closed);
 		return x;
 	}
 

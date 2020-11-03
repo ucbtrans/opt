@@ -419,6 +419,7 @@ public class PreferencesController {
         
         
         /// Traffic Flow Parameters ////////////////////////////////////////////
+        
         units = UserSettings.unitsFlow;
         labelGPCapacity.setText("Default General Purpose Lane Capacity (" + units + "):");
         labelManagedCapacity.setText("Default Managed Lane Capacity (" + units + "):");
