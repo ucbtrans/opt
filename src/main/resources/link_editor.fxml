@@ -51,7 +51,7 @@
                                                 <Insets left="10.0" />
                                              </HBox.margin>
                                              <tooltip>
-                                                <Tooltip id="ttAddSectionUpstream" fx:id="ttAddSectionUpstream" text="Attach new freeway section upstream" />
+                                                <Tooltip id="ttAddSectionUpstream" fx:id="ttAddSectionUpstream" text="Create and insert new freeway section upstream" />
                                              </tooltip>
                                           </Button>
                                           <Button id="connectSectionUpstream" fx:id="connectSectionUpstream" defaultButton="true" mnemonicParsing="false" onAction="#onConnectSectionUpstreamAction" prefWidth="130.0" text="&lt;&lt; Connect Section" visible="false">
@@ -75,7 +75,7 @@
                                                 <Insets right="10.0" />
                                              </HBox.margin>
                                              <tooltip>
-                                                <Tooltip id="ttAddSectionDownstream" fx:id="ttAddSectionDownstream" text="Attach new freeway section downstream" />
+                                                <Tooltip id="ttAddSectionDownstream" fx:id="ttAddSectionDownstream" text="Create and insert new freeway section downstream" />
                                              </tooltip>
                                           </Button>
                                        </children>
