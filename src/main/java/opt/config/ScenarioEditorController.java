@@ -1036,6 +1036,121 @@ public class ScenarioEditorController {
         
         appMainController.selectLink(s.fwy());
     }
+    
+    
+    
+    @FXML
+    void freeLinksOnMouseClicked(MouseEvent event) {
+        if (ignoreChange)
+            return;
+        
+        int idx = freeLinks.getSelectionModel().getSelectedIndex();
+        if ((idx < 0) || (idx >= linksFreeForPolicy.size()))
+            return;
+        
+        AbstractLink lnk = linksFreeForPolicy.get(idx);
+        
+        networkDisplay.findLink(lnk);
+        freeLinks.requestFocus();
+        
+        if (event.getClickCount() == 2) {
+            appMainController.selectLink(lnk);
+        }
+    }
+    
+    @FXML
+    void freeLinksOnKeyPressed(KeyEvent event) {
+        if (ignoreChange)
+            return;
+        
+        event.consume();
+        
+        int idx = freeLinks.getSelectionModel().getSelectedIndex();
+        if ((idx < 0) || (idx >= linksFreeForPolicy.size()))
+            return;
+            
+        if (event.getCode() == KeyCode.ENTER) {
+            appMainController.selectLink(linksFreeForPolicy.get(idx));
+            return;
+        }
+        
+        if ((event.getCode() == KeyCode.LEFT) ||
+            (event.getCode() == KeyCode.UP) ||
+            (event.getCode() == KeyCode.RIGHT) ||
+            (event.getCode() == KeyCode.DOWN)) {
+            if (event.getCode() == KeyCode.LEFT)
+                idx--;
+            if (event.getCode() == KeyCode.RIGHT)
+                idx++;
+            
+            if ((idx < 0) || (idx >= linksFreeForPolicy.size()))
+                freeLinks.getSelectionModel().clearSelection();
+            else {
+                freeLinks.getSelectionModel().select(idx);
+                networkDisplay.findLink(linksFreeForPolicy.get(idx));
+            }
+            freeLinks.requestFocus();
+        }
+    }
+    
+    
+    @FXML
+    void policyLinksOnMouseClicked(MouseEvent event) {
+        if (ignoreChange)
+            return;
+        
+        List<AbstractLink> pll = selectedPolicy.get_ordered_links();
+        
+        int idx = policyLinks.getSelectionModel().getSelectedIndex();
+        if ((idx < 0) || (idx >= pll.size()))
+            return;
+        
+        AbstractLink lnk = pll.get(idx);
+        
+        networkDisplay.findLink(lnk);
+        policyLinks.requestFocus();
+        
+        if (event.getClickCount() == 2) {
+            appMainController.selectLink(lnk);
+        }
+    }
+    
+    @FXML
+    void policyLinksOnKeyPressed(KeyEvent event) {
+        if (ignoreChange)
+            return;
+        
+        event.consume();
+        
+        List<AbstractLink> pll = selectedPolicy.get_ordered_links();
+        
+        int idx = policyLinks.getSelectionModel().getSelectedIndex();
+        if ((idx < 0) || (idx >= pll.size()))
+            return;
+            
+        if (event.getCode() == KeyCode.ENTER) {
+            appMainController.selectLink(pll.get(idx));
+            return;
+        }
+        
+        if ((event.getCode() == KeyCode.LEFT) ||
+            (event.getCode() == KeyCode.UP) ||
+            (event.getCode() == KeyCode.RIGHT) ||
+            (event.getCode() == KeyCode.DOWN)) {
+            if (event.getCode() == KeyCode.LEFT)
+                idx--;
+            if (event.getCode() == KeyCode.RIGHT)
+                idx++;
+            
+            if ((idx < 0) || (idx >= pll.size()))
+                policyLinks.getSelectionModel().clearSelection();
+            else {
+                policyLinks.getSelectionModel().select(idx);
+                networkDisplay.findLink(pll.get(idx));
+            }
+            policyLinks.requestFocus();
+        }
+    }
 
     
 }

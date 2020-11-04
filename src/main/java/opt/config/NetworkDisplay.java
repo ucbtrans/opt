@@ -274,6 +274,21 @@ public class NetworkDisplay {
     }
     
     
+    public void findLink(AbstractLink lnk) {
+        if (lnk instanceof LinkConnector)
+            return;
+        
+        for (int i = 0; i < numRoutes; i++) {
+            int idx = routeDisplays.get(i).findLink(lnk);
+            if (idx >= 0) {
+                selectedRoute = i;
+                selectedIndex = idx;
+                setSelected();
+            }
+        }
+    }
+    
+    
     
     public void execute() {
         double width = canvas.getWidth();

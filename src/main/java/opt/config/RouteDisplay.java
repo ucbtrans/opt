@@ -195,6 +195,41 @@ public class RouteDisplay {
     }
     
     
+    public int findLink(AbstractLink lnk) {
+        int sz = segments.size();      
+        for (int i = 0; i < sz; i++) {
+            Segment s = segments.get(i);
+            
+            if (lnk.equals(s.fwy()))
+                return i;
+            
+            if (lnk instanceof opt.data.LinkOnramp) {
+                int nor = s.num_out_ors();
+                for (int j = 0; j < nor; j++)
+                    if (lnk.equals(s.out_ors(j)))
+                        return i;
+                nor = s.num_in_ors();
+                for (int j = 0; j < nor; j++)
+                    if (lnk.equals(s.in_ors(j)))
+                        return i;
+            }
+            
+            if (lnk instanceof opt.data.LinkOfframp) {
+                int nfr = s.num_out_frs();
+                for (int j = 0; j < nfr; j++)
+                    if (lnk.equals(s.out_frs(j)))
+                        return i;
+                nfr = s.num_in_frs();
+                for (int j = 0; j < nfr; j++)
+                    if (lnk.equals(s.in_frs(j)))
+                        return i;
+            }
+        }
+        
+        return -1;
+    }
+    
+    
     
     private void initRouteProperties() {
         maxLanes = 0;

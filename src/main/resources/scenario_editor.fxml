@@ -282,10 +282,10 @@
                                                                           </rowConstraints>
                                                                            <children>
                                                                               <Label text="Road Sections without Lane Policy:" GridPane.rowIndex="1" />
-                                                                              <ListView id="freeLinks" fx:id="freeLinks" GridPane.rowIndex="2" GridPane.rowSpan="9" />
+                                                                              <ListView id="freeLinks" fx:id="freeLinks" onKeyPressed="#freeLinksOnKeyPressed" onMouseClicked="#freeLinksOnMouseClicked" GridPane.rowIndex="2" GridPane.rowSpan="9" />
                                                                               <Button id="addToPolicy" fx:id="addToPolicy" defaultButton="true" mnemonicParsing="false" onAction="#onAddToPolicy" prefWidth="142.0" text="Add to Policy &gt;&gt;" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
                                                                               <Label text="Road Sections under Policy:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                                                              <ListView id="policyLinks" fx:id="policyLinks" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.rowSpan="9" />
+                                                                              <ListView id="policyLinks" fx:id="policyLinks" onKeyPressed="#policyLinksOnKeyPressed" onMouseClicked="#policyLinksOnMouseClicked" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.rowSpan="9" />
                                                                               <Button id="removeFromPolicy" fx:id="removeFromPolicy" mnemonicParsing="false" onAction="#onRemoveFromPolicy" prefWidth="142.0" text="&lt;&lt; Remove from Policy" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
                                                                            </children>
                                                                         </GridPane>
