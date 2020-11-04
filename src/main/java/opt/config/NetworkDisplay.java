@@ -275,8 +275,12 @@ public class NetworkDisplay {
     
     
     public void findLink(AbstractLink lnk) {
-        if (lnk instanceof LinkConnector)
+        if (lnk instanceof LinkConnector) {
+            selectedRoute = -1;
+            selectedIndex = -1;
+            setSelected();
             return;
+        }
         
         for (int i = 0; i < numRoutes; i++) {
             int idx = routeDisplays.get(i).findLink(lnk);
