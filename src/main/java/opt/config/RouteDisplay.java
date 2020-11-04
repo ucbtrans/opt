@@ -137,7 +137,13 @@ public class RouteDisplay {
     public void setSelected(int idx) {
         selectedIndex = idx;
         draw(1, 0);
-    }    
+    } 
+    
+    
+    public void setSelected(int idx, double num_routes, double route_num) {
+        selectedIndex = idx;
+        draw(num_routes, route_num);
+    } 
     
     
     public int getClickedMultiBox(double x, double y) {
@@ -148,6 +154,18 @@ public class RouteDisplay {
                 return i;
             }
         setSelected(-1);
+        return -1;
+    }
+    
+    
+    public int getClickedMultiBox(double x, double y, double num_routes, double route_num) {
+        int sz = multiBoxes.size();
+        for (int i = sz - 1; i >= 0; i--)
+            if (multiBoxes.get(i).isinside(x, y)) {
+                setSelected(i, num_routes, route_num);
+                return i;
+            }
+        setSelected(-1, num_routes, route_num);
         return -1;
     }
     
@@ -516,7 +534,7 @@ public class RouteDisplay {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, y0, width, y0 + height);
         multiBoxes.forEach((mb) -> { mb.fill(); });
-        
+
         if ((selectedIndex < 0) || (selectedIndex >= multiBoxes.size()))
             return;
         

@@ -139,9 +139,9 @@ public class NetworkDisplay {
     private void setSelected() {
         for (int i = 0; i < numRoutes; i++)
            if (i == selectedRoute)
-               routeDisplays.get(selectedRoute).setSelected(selectedIndex);
+               routeDisplays.get(selectedRoute).setSelected(selectedIndex, numRoutes, i);
            else
-               routeDisplays.get(i).setSelected(-1);
+               routeDisplays.get(i).setSelected(-1, numRoutes, i);
         
         canvas.requestFocus();
     }
@@ -159,7 +159,11 @@ public class NetworkDisplay {
                 break;
             }
 
-        int si = routeDisplays.get(rd).getClickedMultiBox(x, y);
+        int si = routeDisplays.get(rd).getClickedMultiBox(x, y, numRoutes, rd);
+        
+        selectedRoute = rd;
+        selectedIndex = si;
+        setSelected();
         
         if (si < 0) {
             tooltip.setText("");
@@ -228,8 +232,10 @@ public class NetworkDisplay {
                 selectedIndex--;
                 if (selectedIndex < 0)
                     selectedRoute--;
-            } else
-                selectedIndex--;
+            } else {
+                selectedRoute--;
+                selectedIndex = routeDisplays.get(selectedRoute).getRouteSegments().size() - 1;
+            }
             
             setSelected();
             return null;
@@ -254,8 +260,10 @@ public class NetworkDisplay {
                     selectedRoute = -1;
                     selectedIndex = -1;
                 }
-            } else
-                selectedIndex++;
+            } else {
+                selectedRoute++;
+                selectedIndex = 0;
+            }
             
             setSelected();
             return null;
