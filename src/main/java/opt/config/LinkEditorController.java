@@ -1228,7 +1228,7 @@ public class LinkEditorController {
                  ttAddSectionDownstream.setText("Create and insert a new freeway section downstream");
              ttAddSectionUpstream.setText("Create and attach a new freeway section upstream");
              if (myLink.get_up_link() != null) 
-                 ttAddSectionDownstream.setText("Create and insert a new freeway section upstream");
+                 ttAddSectionUpstream.setText("Create and insert a new freeway section upstream");
              ttConnectDownstream.setText("Connect to beginning of downstream freeway segment");
              ttConnectUpstream.setText("Connect to end of upstream freeway segment");
         } else if (myLink.get_type() == AbstractLink.Type.connector) {

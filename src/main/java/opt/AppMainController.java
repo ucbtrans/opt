@@ -949,7 +949,7 @@ public class AppMainController {
     
     @FXML
     void onClickMenuHelpAbout(ActionEvent event) {
-        String version = "2020-10-21";
+        String version = "Alpha - 2020-11-06";
         opt.utils.Dialogs.InformationDialog(null, "OPT development version " + version);
     }
     
