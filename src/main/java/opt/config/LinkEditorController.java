@@ -2024,7 +2024,8 @@ public class LinkEditorController {
                 numSteps = Math.max(numSteps, lst.size());
                 profiles.add(lst);
             } else {
-                pdt = Math.min(pdt, UserSettings.defaultDemandDtMinutes * 60);
+                if (pdt == Integer.MAX_VALUE)
+                    pdt = Math.min(pdt, UserSettings.defaultDemandDtMinutes * 60);
                 List<Double> lst = new ArrayList<>();
                 lst.add(0.0);
                 profiles.add(lst);
@@ -2200,7 +2201,7 @@ public class LinkEditorController {
             });
             col.setReorderable(false);
             Profile1D cdp = ((LinkOfframp)myLink).get_splits(listVT.get(i).getId(),
-                    Math.min(pdt, UserSettings.defaultSRDtMinutes * 60));
+                    pdt == Integer.MAX_VALUE ? UserSettings.defaultSRDtMinutes * 60 : pdt);
             if (cdp != null) {
                 pdt = Math.min(pdt, cdp.get_dt());
                 List<Double> lst = cdp.get_values();
@@ -2393,8 +2394,9 @@ public class LinkEditorController {
                 setFRFlow();
             });
             col.setReorderable(false);
-            double dt = Math.min(pdt, UserSettings.defaultFRFlowDtMinutes * 60);
-            Profile1D cdp = ((LinkOfframp)myLink).get_frflows(listVT.get(i).getId(), dt);
+            
+            Profile1D cdp = ((LinkOfframp)myLink).get_frflows(listVT.get(i).getId(), 
+                    pdt == Integer.MAX_VALUE ? UserSettings.defaultSRDtMinutes * 60 : pdt);
             if (cdp != null) {
                 pdt = Math.min(pdt, cdp.get_dt());
                 List<Double> lst = cdp.get_values();
@@ -2407,7 +2409,8 @@ public class LinkEditorController {
                 numSteps = Math.max(numSteps, lst.size());
                 profiles.add(lst);
             } else {
-                pdt = Math.min(pdt, UserSettings.defaultFRFlowDtMinutes * 60);
+                if (pdt == Integer.MAX_VALUE)
+                    pdt = Math.min(pdt, UserSettings.defaultFRFlowDtMinutes * 60);
                 List<Double> lst = new ArrayList<>();
                 lst.add(0.0);
                 profiles.add(lst);
