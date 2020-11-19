@@ -558,7 +558,7 @@ public class Scenario {
 
                 long ctrlid = my_fwy_scenario.new_schedule_id();
 
-                Set<LinkOfframp> frs = all_frs.stream().filter(f->f.frflows.containsKey(commid)).collect(Collectors.toSet());
+                Set<LinkOfframp> frs = all_frs.stream().filter(f->f.usefrflows && f.frflows.containsKey(commid)).collect(Collectors.toSet());
 
                 // actuator ............................
                 jaxb.Actuator act = new jaxb.Actuator();
