@@ -270,6 +270,7 @@ public class FreewayScenario {
                     case "schedule":
                         read_schedule(jcnt, actuators, sensors, sch_names);
                         break;
+                    case "frflow":              // TODO remove this
                     case "linkflow":
                         read_frflow(jcnt, actuators);
                         break;
