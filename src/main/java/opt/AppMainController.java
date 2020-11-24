@@ -72,6 +72,7 @@ import opt.performance.LinkPerformanceController;
 import opt.performance.RoutePerformanceController;
 import opt.performance.ScenarioPerformanceController;
 import opt.utils.Misc;
+import opt.utils.Version;
 import org.apache.poi.ss.usermodel.Workbook;
 
 
@@ -951,8 +952,14 @@ public class AppMainController {
     
     @FXML
     void onClickMenuHelpAbout(ActionEvent event) {
-        String version = "Alpha - 2020-11-06";
-        opt.utils.Dialogs.InformationDialog(null, "OPT development version " + version);
+        String versionName = "OPT Alpha release";
+        String optgit = Version.getOPTGitHash();
+        String otmgit = Version.getOTMSimGitHash();
+        String date = "2020/11/06";
+        String content = String.format("%s\nDate: %s\nOPT git hash: %s...\nOTM git hash: %s...",versionName,date,
+                optgit.substring(0,10),otmgit.substring(0,10));
+        System.out.println(content);
+        opt.utils.Dialogs.InformationDialog(null, content);
     }
     
     
