@@ -354,16 +354,18 @@ public class AppMainController {
             return;
 
         clearSimData();
-        
+
         try {
 
             // Set the number of divisions of the progress bar
             int progbar_steps = 50;
             boolean celloutput = opt.UserSettings.contourDataPerCell;
 
-            Thread th = new Thread(new OTMTask(this, selectedScenario, (float)UserSettings.reportingPeriodSeconds, progbar_steps, celloutput, !celloutput, null));
+            OTMTask task = new OTMTask(this, selectedScenario, (float)UserSettings.reportingPeriodSeconds, progbar_steps, celloutput, !celloutput, null);
+            Thread th = new Thread(task);
             th.setDaemon(true);
             th.start();
+
             leftStatus.setText("Simulating scenario \"" + selectedScenario.name + "\"...");
             menuFileNewProject.setDisable(true);
             menuFileOpenProject.setDisable(true);

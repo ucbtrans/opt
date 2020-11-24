@@ -564,7 +564,7 @@ public class Scenario {
                 jaxb.Actuator act = new jaxb.Actuator();
                 jacts.getActuator().add(act);
                 act.setId(ctrlid);
-                act.setType("split");
+                act.setType("flowtolink");
 
                 jaxb.Parameters aps = new jaxb.Parameters();
                 act.setParameters(aps);
@@ -588,7 +588,7 @@ public class Scenario {
                 jaxb.Controller ctrl = new jaxb.Controller();
                 jcntrls.getController().add(ctrl);
                 ctrl.setId(ctrlid);
-                ctrl.setType("frflow");
+                ctrl.setType("linkflow");
                 ctrl.setDt(simdt);
                 ctrl.setStartTime(0f);
 

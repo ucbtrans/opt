@@ -143,6 +143,8 @@ public class OTMTask  extends Task {
 			if(logger!=null)
 				logger.write("initialize");
 
+			otmdev.otm.advance(fwyscenario.get_start_time());
+
 			int steps_taken = 0;
 			while(steps_taken<simsteps){
 
@@ -163,6 +165,8 @@ public class OTMTask  extends Task {
 					});
 				}
 			}
+
+			otmdev.otm.terminate();
 
 			if(logger!=null)
 				logger.write("run");
