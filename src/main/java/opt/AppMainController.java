@@ -958,7 +958,6 @@ public class AppMainController {
         String date = "2020/11/06";
         String content = String.format("%s\nDate: %s\nOPT git hash: %s...\nOTM git hash: %s...",versionName,date,
                 optgit.substring(0,10),otmgit.substring(0,10));
-        System.out.println(content);
         opt.utils.Dialogs.InformationDialog(null, content);
     }
     
