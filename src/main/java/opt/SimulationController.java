@@ -118,7 +118,7 @@ public class SimulationController {
     @FXML
     void cancelSimulation(ActionEvent event) {
         taskOTM.cancel();
-        unbindProgressBar();
+        //unbindProgressBar();
     }
     
 }

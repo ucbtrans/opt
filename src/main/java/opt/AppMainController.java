@@ -335,7 +335,7 @@ public class AppMainController {
     public void unbindProgressBar() {
         //simProgressBar.progressProperty().unbind();
         //simProgressBar.setVisible(false);
-        simulationController.unbindProgressBar();
+        ;//simulationController.unbindProgressBar();
     }
     
     
@@ -401,7 +401,7 @@ public class AppMainController {
     
     
     public void completeSimulation() {
-        unbindProgressBar();
+        simulationController.unbindProgressBar();
         menuSimulationRun.setDisable(false);
         menuFileNewProject.setDisable(false);
         menuFileOpenProject.setDisable(false);
