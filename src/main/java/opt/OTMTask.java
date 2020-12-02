@@ -112,6 +112,7 @@ public class OTMTask  extends Task {
 
 		simdata = null;
 		exception = null;
+		boolean is_canceled = false;
 
 		try {
 
@@ -148,8 +149,10 @@ public class OTMTask  extends Task {
 			int steps_taken = 0;
 			while(steps_taken<simsteps){
 
-				if (isCancelled())
+				if (isCancelled()) {
+					is_canceled = true;
 					break;
+				}
 
 				// advance otm, get back information
 				otmdev.otm.advance(sim_dt);
@@ -168,10 +171,14 @@ public class OTMTask  extends Task {
 
 			otmdev.otm.terminate();
 
-			if(logger!=null)
-				logger.write("run");
+			if(logger!=null) {
+				if(is_canceled)
+					logger.write("run canceled");
+				else
+					logger.write("run");
+			}
 
-			simdata = new SimDataScenario(fwyscenario,otmdev,outdt,celloutput,lgoutput);
+			simdata = is_canceled ? null : new SimDataScenario(fwyscenario,otmdev,outdt,celloutput,lgoutput);
 
 			if(logger!=null)
 				logger.write("output");
