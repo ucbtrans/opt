@@ -72,7 +72,6 @@ import opt.performance.LinkPerformanceController;
 import opt.performance.RoutePerformanceController;
 import opt.performance.ScenarioPerformanceController;
 import opt.utils.Misc;
-import opt.utils.Version;
 import org.apache.poi.ss.usermodel.Workbook;
 
 
@@ -101,6 +100,10 @@ public class AppMainController {
     private GridPane preferencesPane = null;
     private PreferencesController preferencesController = null;
     private Scene preferencesScene = null;
+    
+    private GridPane simProgressPane = null;
+    private SimulationController simulationController = null;
+    private Scene simProgressScene = null;
     
     private SplitPane scenarioEditorPane = null;
     private ScenarioEditorController scenarioEditorController = null;
@@ -324,13 +327,15 @@ public class AppMainController {
     }
     
     public void bindProgressBar(ReadOnlyDoubleProperty prop) {
-        simProgressBar.progressProperty().bind(prop);
-        simProgressBar.setVisible(true);
+        //simProgressBar.progressProperty().bind(prop);
+        //simProgressBar.setVisible(true);
+        simulationController.bindProgressBar(prop);
     }
 
     public void unbindProgressBar() {
-        simProgressBar.progressProperty().unbind();
-        simProgressBar.setVisible(false);
+        //simProgressBar.progressProperty().unbind();
+        //simProgressBar.setVisible(false);
+        ;//simulationController.unbindProgressBar();
     }
     
     
@@ -355,28 +360,26 @@ public class AppMainController {
             return;
 
         clearSimData();
-
-        try {
-
-            // Set the number of divisions of the progress bar
-            int progbar_steps = 50;
-            boolean celloutput = opt.UserSettings.contourDataPerCell;
-
-            OTMTask task = new OTMTask(this, selectedScenario, (float)UserSettings.reportingPeriodSeconds, progbar_steps, celloutput, !celloutput, null);
-            Thread th = new Thread(task);
-            th.setDaemon(true);
-            th.start();
-
-            leftStatus.setText("Simulating scenario \"" + selectedScenario.name + "\"...");
-            menuFileNewProject.setDisable(true);
-            menuFileOpenProject.setDisable(true);
-            menuSimulationRun.setDisable(true);
-            menuSimulationExportResultsToExcel.setDisable(true);
-            menuSimulationFullExcelReport.setDisable(true);
-        }
-        catch(Exception e) {
-            opt.utils.Dialogs.ExceptionDialog("Error running OPT project", e);
-        }
+        
+        leftStatus.setText("Simulating scenario \"" + selectedScenario.name + "\"...");
+        menuFileNewProject.setDisable(true);
+        menuFileOpenProject.setDisable(true);
+        menuSimulationRun.setDisable(true);
+        menuSimulationExportResultsToExcel.setDisable(true);
+        menuSimulationFullExcelReport.setDisable(true);
+        
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(simProgressScene);
+        simulationController.initWithScenarioData(this, selectedScenario);
+        String title = "Simulation is Running...";
+        inputStage.setTitle(title);
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+        
+        
         
     }
     
@@ -398,7 +401,7 @@ public class AppMainController {
     
     
     public void completeSimulation() {
-        unbindProgressBar();
+        simulationController.unbindProgressBar();
         menuSimulationRun.setDisable(false);
         menuFileNewProject.setDisable(false);
         menuFileOpenProject.setDisable(false);
@@ -568,6 +571,12 @@ public class AppMainController {
             preferencesPane = loader.load();
             preferencesController = loader.getController();
             preferencesScene = new Scene(preferencesPane);
+            
+            
+            loader = new FXMLLoader(getClass().getResource("/simulation_run.fxml"));
+            simProgressPane = loader.load();
+            simulationController = loader.getController();
+            simProgressScene = new Scene(simProgressPane);
             
         } catch (IOException e) {
             opt.utils.Dialogs.ExceptionDialog("Cannot initialize UI modules...", e);
