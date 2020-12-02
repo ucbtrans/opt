@@ -361,6 +361,30 @@ public class AppMainController {
             return;
 
         clearSimData();
+<<<<<<< HEAD
+
+        try {
+
+            // Set the number of divisions of the progress bar
+            int progbar_steps = 50;
+            boolean celloutput = opt.UserSettings.contourDataPerCell;
+
+            OTMTask task = new OTMTask(this, selectedScenario, (float)UserSettings.reportingPeriodSeconds, progbar_steps, celloutput, !celloutput, null);
+            Thread th = new Thread(task);
+            th.setDaemon(true);
+            th.start();
+
+            leftStatus.setText("Simulating scenario \"" + selectedScenario.name + "\"...");
+            menuFileNewProject.setDisable(true);
+            menuFileOpenProject.setDisable(true);
+            menuSimulationRun.setDisable(true);
+            menuSimulationExportResultsToExcel.setDisable(true);
+            menuSimulationFullExcelReport.setDisable(true);
+        }
+        catch(Exception e) {
+            opt.utils.Dialogs.ExceptionDialog("Error running OPT project", e);
+        }
+=======
         
         leftStatus.setText("Simulating scenario \"" + selectedScenario.name + "\"...");
         menuFileNewProject.setDisable(true);
@@ -381,6 +405,7 @@ public class AppMainController {
         inputStage.showAndWait();
         
         
+>>>>>>> master
         
     }
     
