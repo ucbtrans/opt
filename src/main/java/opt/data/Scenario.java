@@ -296,7 +296,7 @@ public class Scenario {
                 continue;
 
             // gp->gp and mng->mng for offramps, freeways, and connectors
-            if( (up_link instanceof LinkFreewayOrConnector) || (up_link instanceof LinkOfframp) ) {
+            if( (up_link instanceof LinkFreewayOrConnector) || (up_link instanceof LinkOfframp) || (up_link instanceof LinkGhost) ) {
 
                 // I) mng->mng
                 if( up_link.has_mng() & dn_link.has_mng())
@@ -311,7 +311,7 @@ public class Scenario {
             }
 
             // case freeway
-            if(up_link instanceof LinkFreeway){
+            if( (up_link instanceof LinkFreeway) || (up_link instanceof LinkGhost)){
 
                 // III) aux->aux
                 if( (dn_link instanceof LinkFreeway) && up_link.has_aux() && dn_link.has_aux())
