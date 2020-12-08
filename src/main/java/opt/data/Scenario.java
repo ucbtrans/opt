@@ -589,7 +589,6 @@ public class Scenario {
                 jcntrls.getController().add(ctrl);
                 ctrl.setId(ctrlid);
                 ctrl.setType("linkflow");
-                ctrl.setDt(simdt);
                 ctrl.setStartTime(0f);
 
                 jaxb.TargetActuators ta = new jaxb.TargetActuators();
@@ -606,7 +605,7 @@ public class Scenario {
                     Profile1D frflowprof = fr.frflows.get(commid);
                     jaxb.Profile prof = new jaxb.Profile();
                     profs.getProfile().add(prof);
-                    prof.setStartTime(fr.get_use_fr_flows()?30f:100000f);
+                    prof.setStartTime(fr.get_use_fr_flows()?simdt:100000f);
                     prof.setDt(frflowprof.dt);
                     prof.setId(fr.id);
                     prof.setContent(OTMUtils.comma_format(frflowprof.values));
