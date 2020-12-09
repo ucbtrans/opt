@@ -19,7 +19,7 @@ public class SimDataLink {
 
     public double link_length_miles;
 
-    public SimDataLink(SimDataScenario scndata, AbstractLink optlink, common.Link otmlink, Set<Long> commids, boolean storecelldata, boolean storelgdata, int numtime){
+    public SimDataLink(SimDataScenario scndata, AbstractLink optlink, core.Link otmlink, Set<Long> commids, boolean storecelldata, boolean storelgdata, int numtime){
 
         this.id = otmlink.getId();
         this.scndata = scndata;

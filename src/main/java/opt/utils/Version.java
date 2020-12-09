@@ -8,7 +8,7 @@ public class Version {
 
 
     public static String getOTMSimGitHash(){
-        InputStream inputStream = runner.OTM.class.getResourceAsStream("/otm-sim.properties");
+        InputStream inputStream = cmd.OTM.class.getResourceAsStream("/otm-sim.properties");
         Properties properties = new Properties();
         try {
             properties.load(inputStream);
@@ -28,7 +28,7 @@ public class Version {
     }
 
     public static String getOPTGitHash(){
-        InputStream inputStream = runner.OTM.class.getResourceAsStream("/opt.properties");
+        InputStream inputStream = cmd.OTM.class.getResourceAsStream("/opt.properties");
         Properties properties = new Properties();
         try {
             properties.load(inputStream);

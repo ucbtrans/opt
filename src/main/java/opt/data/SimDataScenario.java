@@ -1,7 +1,7 @@
 package opt.data;
 
-import api.OTMdev;
-import common.AbstractLaneGroup;
+import api.OTM;
+import core.AbstractLaneGroup;
 import models.fluid.FluidLaneGroup;
 import opt.utils.Misc;
 import output.*;
@@ -19,7 +19,7 @@ public class SimDataScenario {
     public boolean hascelldata;
     public boolean haslgdata;
 
-    public SimDataScenario(FreewayScenario fwyscenario, OTMdev otmdev,float outdt,boolean storecelldata,boolean storelgdata){
+    public SimDataScenario(FreewayScenario fwyscenario, OTM otmdev, float outdt, boolean storecelldata, boolean storelgdata){
         this.fwyscenario = fwyscenario;
         this.outdt = outdt;
         this.hascelldata = storecelldata;
@@ -60,14 +60,14 @@ public class SimDataScenario {
 
     }
 
-    private void read_lg_data(OTMdev otmdev,Set<Long> commids,float sim_dt){
+    private void read_lg_data(OTM otmdev,Set<Long> commids,float sim_dt){
 
-        Set<OutputLaneGroupFlow> flws = otmdev.otm.output.get_data().stream()
+        Set<OutputLaneGroupFlow> flws = otmdev.output.get_data().stream()
                 .filter(s->s.type==AbstractOutput.Type.lanegroup_flw)
                 .map(s->(OutputLaneGroupFlow)s)
                 .collect(toSet());
 
-        Set<OutputLaneGroupSumVehicles> vehs = otmdev.otm.output.get_data().stream()
+        Set<OutputLaneGroupSumVehicles> vehs = otmdev.output.get_data().stream()
                 .filter(s->s.type==AbstractOutput.Type.lanegroup_sumveh)
                 .map(s->(OutputLaneGroupSumVehicles)s)
                 .collect(toSet());
@@ -103,19 +103,19 @@ public class SimDataScenario {
 
     }
 
-    private void read_cell_data(OTMdev otmdev,Set<Long> commids,float sim_dt){
+    private void read_cell_data(OTM otmdev,Set<Long> commids,float sim_dt){
 
-        Set<OutputCellFlow> flws = otmdev.otm.output.get_data().stream()
+        Set<OutputCellFlow> flws = otmdev.output.get_data().stream()
                 .filter(s->s.type==AbstractOutput.Type.cell_flw)
                 .map(s->(OutputCellFlow)s)
                 .collect(toSet());
 
-        Set<OutputCellSumVehicles> vehs = otmdev.otm.output.get_data().stream()
+        Set<OutputCellSumVehicles> vehs = otmdev.output.get_data().stream()
                 .filter(s->s.type==AbstractOutput.Type.cell_sumveh)
                 .map(s->(OutputCellSumVehicles)s)
                 .collect(toSet());
 
-        Set<OutputCellSumVehiclesDwn> vehsdwn = otmdev.otm.output.get_data().stream()
+        Set<OutputCellSumVehiclesDwn> vehsdwn = otmdev.output.get_data().stream()
                 .filter(s->s.type==AbstractOutput.Type.cell_sumvehdwn)
                 .map(s->(OutputCellSumVehiclesDwn)s)
                 .collect(toSet());
