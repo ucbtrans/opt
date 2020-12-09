@@ -314,7 +314,7 @@ public class Scenario {
             if( (up_link instanceof LinkFreeway) || (up_link instanceof LinkGhost)){
 
                 // III) aux->aux
-                if( (dn_link instanceof LinkFreeway) && up_link.has_aux() && dn_link.has_aux())
+                if( ((dn_link instanceof LinkFreeway) || (dn_link instanceof LinkGhost)) && up_link.has_aux() && dn_link.has_aux())
                     rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.aux,dn_link,LaneGroupType.aux) );
 
                 // IV) mng->inner offramp or gp->inner offramp
