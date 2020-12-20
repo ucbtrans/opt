@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:prj xmlns="opentrafficmodels" xmlns:ns2="https://github.com/ucbtrans/opt">
+    <ns2:scns>
+        <ns2:scn name="A" description="description A">
+            <scenario>
+                <commodities>
+                    <commodity id="0" name="Car" pvequiv="1.0" pathfull="false"/>
+                </commodities>
+                <network>
+                    <nodes>
+                        <node id="1"/>
+                        <node id="2"/>
+                    </nodes>
+                    <links>
+                        <link id="1" length="100.0" full_lanes="3" start_node_id="1" end_node_id="2" roadparam="0" roadgeom="0" road_type="freeway"/>
+                    </links>
+                    <roadgeoms>
+                        <roadgeom id="0">
+                            <add_lanes isopen="true" side="in" roadparam="1" lanes="1"/>
+                        </roadgeom>
+                    </roadgeoms>
+                    <roadconnections/>
+                    <roadparams>
+                        <roadparam id="0" capacity="1900.0" speed="105.00506" jam_density="109.99847"/>
+                        <roadparam id="1" capacity="1800.0" speed="115.00554" jam_density="109.99847"/>
+                    </roadparams>
+                </network>
+                <models>
+                    <model type="ctm" name="ctm" is_default="true">
+                        <model_params sim_dt="3.0" max_cell_length="193.11974"/>
+                    </model>
+                </models>
+                <lanechanges>
+                    <lanechange dt="0.0" type="logit" is_default="true">
+                        <parameters>
+                            <parameter name="keep" value="0.693100"/>
+                            <parameter name="rho_vpkmplane" value="0.007147"/>
+                        </parameters>
+                    </lanechange>
+                </lanechanges>
+                <demands/>
+                <splits/>
+                <controllers/>
+                <actuators/>
+                <sensors/>
+            </scenario>
+            <ns2:sim starttime="0.0" duration="86400.0"/>
+            <ns2:lnks>
+                <ns2:lnk id="1" name="A -&gt; B"/>
+            </ns2:lnks>
+            <ns2:sgmts>
+                <ns2:sgmt type="fwy" id="1" name="A -&gt; B" fwy="1"/>
+            </ns2:sgmts>
+            <ns2:schds/>
+            <ns2:routes/>
+        </ns2:scn>
+    </ns2:scns>
+</ns2:prj>

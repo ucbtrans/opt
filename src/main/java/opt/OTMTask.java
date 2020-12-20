@@ -122,16 +122,16 @@ public class OTMTask  extends Task {
 
 			if(celloutput) {
 				for(Long commid : fwyscenario.get_commodities().keySet()){
-					otmdev.output().request_cell_flw(commid, linkids, outdt);
-					otmdev.output().request_cell_sum_veh(commid, linkids, outdt);
-					otmdev.output().request_cell_sum_veh_dwn(commid, linkids, outdt);
+					otmdev.output.request_cell_flw(null,null,commid, linkids, outdt);
+					otmdev.output.request_cell_sum_veh(null,null,commid, linkids, outdt);
+					otmdev.output.request_cell_sum_veh_dwn(null,null,commid, linkids, outdt);
 				}
 			}
 
 			if(lgoutput) {
 				for(Long commid : fwyscenario.get_commodities().keySet()) {
-					otmdev.output().request_lanegroup_flw(commid, linkids, outdt);
-					otmdev.output().request_lanegroup_sum_veh(commid, linkids, outdt);
+					otmdev.output.request_lanegroup_flw(null,null,commid, linkids, outdt);
+					otmdev.output.request_lanegroup_sum_veh(null,null,commid, linkids, outdt);
 				}
 			}
 

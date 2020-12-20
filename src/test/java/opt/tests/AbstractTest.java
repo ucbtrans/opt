@@ -1,31 +1,52 @@
 package opt.tests;
 
-import opt.data.FreewayScenario;
-import opt.data.ProjectFactory;
-import opt.data.Project;
+import org.junit.runners.Parameterized;
 
 import java.io.File;
-
-import static org.junit.Assert.fail;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 public abstract class AbstractTest {
 
-    static protected String get_test_fullpath(String testname){
-        return (new File("src/test/resources/" + testname)).getAbsolutePath();
+    protected static String output_folder = "temp/";
+    protected static HashMap<String,String> test_configs;
+
+    static {
+        test_configs = new HashMap<>();
+        test_configs.put("create_new_project","create_new_project.opt");
+        test_configs.put("create_new_project_2com","create_new_project_2com.opt");
+        test_configs.put("demand","demand.opt");
+        test_configs.put("on_ramp_at_cap","on_ramp_at_cap.opt");
+        test_configs.put("on_ramp_above_cap","on_ramp_above_cap.opt");
+        test_configs.put("on_ramp_AUX","on_ramp_AUX.opt");
+        test_configs.put("on_off_ramp_AUX","on_off_ramp_AUX.opt");
+        test_configs.put("off_ramp_AUX","off_ramp_AUX.opt");
+        test_configs.put("off_ramp_AUX_split_ratio","off_ramp_AUX_split_ratio.opt");
+        test_configs.put("on_off_ramp_AUX_split_ratio","on_off_ramp_AUX_split_ratio.opt");
+        test_configs.put("multiple_off_ramps_split","multiple_off_ramps_split.opt");
+        test_configs.put("multiple_off_ramps_hov_split","multiple_off_ramps_hov_split.opt");
+        test_configs.put("inner_outer_off_ramp","inner_outer_off_ramp.opt");
+        test_configs.put("on_ramp_fixed_meter","on_ramp_fixed_meter.opt");
+        test_configs.put("on_ramp_fixed_meter_queue_override","on_ramp_fixed_meter_queue_override.opt");
+        test_configs.put("on_ramp_alinea_meter","on_ramp_alinea_meter.opt");
     }
 
-    public static class TestData {
-        Project project;
-        FreewayScenario scenario;
-        public TestData(String project_name){
-            try {
-                project = ProjectFactory.load_project(get_test_fullpath(project_name),true);
-                scenario = project.get_scenario_with_name("scenarioA");
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-                fail();
-            }
-        }
+    static protected String get_test_fullpath(String testname){
+        return (new File("src/test/resources/" + test_configs.get(testname))).getAbsolutePath();
+    }
+
+    public static Collection<String> get_test_config_names() {
+        return test_configs.keySet();
+    }
+
+    @Parameterized.Parameters
+    public static Collection getConfigs(){
+        ArrayList<String []> x = new ArrayList<>();
+        Collection<String> all_configs = get_test_config_names();
+        for(String s : all_configs)
+            x.add(new String[]{s});
+        return x;
     }
 
 }
