@@ -1,6 +1,7 @@
 package opt.tests;
 
 import opt.Benchmarker;
+import org.junit.Ignore;
 import org.junit.Test;
 import utils.OTMUtils;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+@Ignore
 public class TestBenchmarkSpeed {
 
     float duration = 36000f;

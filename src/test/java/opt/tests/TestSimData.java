@@ -5,6 +5,7 @@ import opt.OTMTask;
 import opt.utils.Misc;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import java.util.Set;
 
 import static org.junit.Assert.fail;
 
+@Ignore
 public class TestSimData extends AbstractTest {
 
     final long car = 0l;

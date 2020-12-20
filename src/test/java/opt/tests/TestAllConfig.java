@@ -2,6 +2,7 @@ package opt.tests;
 
 import opt.data.Project;
 import opt.data.ProjectFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -53,6 +54,7 @@ public class TestAllConfig extends AbstractTest {
     }
 
     @Test
+    @Ignore
     public void test_run_all_scenarios(){
         System.out.println(testname + " run");
         try {
