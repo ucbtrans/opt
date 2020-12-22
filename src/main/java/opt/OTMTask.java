@@ -1,6 +1,6 @@
 package opt;
 
-import api.OTMdev;
+import api.OTM;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import opt.data.*;
@@ -13,7 +13,7 @@ public class OTMTask  extends Task {
 
 	private AppMainController mainController;
 	private FreewayScenario fwyscenario;
-	private OTMdev otmdev;
+	private OTM otmdev;
 
 	private boolean celloutput;
 	private boolean lgoutput;
@@ -74,12 +74,11 @@ public class OTMTask  extends Task {
 			if(logger!=null)
 				logger.write("to_jaxb");
 
-			api.OTM otm = new api.OTM();
-			otm.load_from_jaxb(jscenario,false);
+			this.otmdev = new api.OTM();
+			otmdev.load_from_jaxb(jscenario,false);
 			if(logger!=null)
 				logger.write("otm_load");
 
-			this.otmdev = new OTMdev(otm);
 		} catch (Exception e) {
 			fwyscenario.remove_ghost_pieces();
 			throw new Exception(e);
@@ -123,28 +122,28 @@ public class OTMTask  extends Task {
 
 			if(celloutput) {
 				for(Long commid : fwyscenario.get_commodities().keySet()){
-					otmdev.otm.output().request_cell_flw(commid, linkids, outdt);
-					otmdev.otm.output().request_cell_sum_veh(commid, linkids, outdt);
-					otmdev.otm.output().request_cell_sum_veh_dwn(commid, linkids, outdt);
+					otmdev.output.request_cell_flw(null, null, commid, linkids, outdt);
+					otmdev.output.request_cell_sum_veh(null, null, commid, linkids, outdt);
+					otmdev.output.request_cell_sum_veh_dwn(null, null, commid, linkids, outdt);
 				}
 			}
 
 			if(lgoutput) {
 				for(Long commid : fwyscenario.get_commodities().keySet()) {
-					otmdev.otm.output().request_lanegroup_flw(commid, linkids, outdt);
-					otmdev.otm.output().request_lanegroup_sum_veh(commid, linkids, outdt);
+					otmdev.output.request_lanegroup_flw(null, null, commid, linkids, outdt);
+					otmdev.output.request_lanegroup_sum_veh(null, null, commid, linkids, outdt);
 				}
 			}
 
 			if(logger!=null)
 				logger.write("requests");
 
-			otmdev.otm.initialize(fwyscenario.get_start_time());
+			otmdev.initialize(fwyscenario.get_start_time());
 
 			if(logger!=null)
 				logger.write("initialize");
 
-			otmdev.otm.advance(fwyscenario.get_start_time());
+			otmdev.advance(fwyscenario.get_start_time());
 
 			int steps_taken = 0;
 			while(steps_taken<simsteps){
@@ -155,7 +154,7 @@ public class OTMTask  extends Task {
 				}
 
 				// advance otm, get back information
-				otmdev.otm.advance(sim_dt);
+				otmdev.advance(sim_dt);
 				steps_taken += 1;
 
 				// progress bar
@@ -169,7 +168,7 @@ public class OTMTask  extends Task {
 				}
 			}
 
-			otmdev.otm.terminate();
+			otmdev.terminate();
 
 			if(logger!=null) {
 				if(is_canceled)

@@ -229,7 +229,8 @@ public class ControlSchedule implements Comparable {
                         entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_rmopen(fwyscn)));
                         break;
                     case LgRestrict:
-                        entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_hovhot(fwyscn,null,null,null,null,null,null,null)));
+                        Set<Long> all_comms = this.fwyscn.get_commodities().keySet();
+                        entries.add(new ScheduleEntry(0f, ControlFactory.create_controller_hovhot(fwyscn,null,null,all_comms,null,null,null,null)));
                         break;
                 }
             } catch (Exception e) {

@@ -1,6 +1,6 @@
 package opt.data;
 
-import geometry.Side;
+import core.geometry.Side;
 import jaxb.*;
 import opt.UserSettings;
 import opt.data.control.*;

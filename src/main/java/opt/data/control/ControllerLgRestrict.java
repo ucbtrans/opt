@@ -206,6 +206,7 @@ public class ControllerLgRestrict extends AbstractController {
 				Parameter n = new Parameter();
 				n.setName("qos_speed_threshold_kph");
 				n.setValue(qos_speed_threshold_kph.toString());
+				n.setValue(qos_speed_threshold_kph.toString());
 				params.add(n);
 			}
 
