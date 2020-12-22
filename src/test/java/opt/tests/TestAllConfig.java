@@ -4,13 +4,9 @@ import opt.OTMTask;
 import opt.data.FreewayScenario;
 import opt.data.Project;
 import opt.data.ProjectFactory;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import output.AbstractOutput;
-import output.OutputLinkFlow;
-import output.OutputLinkVehicles;
 import utils.OTMUtils;
 
 import java.io.File;
@@ -64,7 +60,7 @@ public class TestAllConfig extends AbstractTest {
 
     @Test
 //    @Ignore
-    public void test_run_all_scenarios(){
+    public void test_run(){
         System.out.println(testname + " run");
         try {
             Project project = ProjectFactory.load_project(get_test_fullpath(testname),true);
@@ -83,8 +79,9 @@ public class TestAllConfig extends AbstractTest {
 //            }
 
             // check the output against expects
-            for(String output_path : task.get_file_names())
+            for(String output_path : task.get_file_names()) {
                 compare_files(output_path);
+            }
 
         } catch (Exception e) {
             fail(e.getMessage());

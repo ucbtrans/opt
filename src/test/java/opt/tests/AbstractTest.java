@@ -14,8 +14,6 @@ public abstract class AbstractTest {
 
     static {
         test_configs = new HashMap<>();
-        test_configs.put("create_new_project","create_new_project.opt");
-        test_configs.put("create_new_project_2com","create_new_project_2com.opt");
         test_configs.put("demand","demand.opt");
         test_configs.put("on_ramp_at_cap","on_ramp_at_cap.opt");
         test_configs.put("on_ramp_above_cap","on_ramp_above_cap.opt");

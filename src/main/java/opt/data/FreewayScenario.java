@@ -1150,7 +1150,11 @@ public class FreewayScenario {
         this.ghost_pieces = new GhostPieces();
 
         // ghost sources................................................
-        Set<AbstractLink> source_links = scenario.links.values().stream().filter(link -> link.is_source()).collect(toSet());
+        List<AbstractLink> source_links = scenario.links.values().stream().filter(link -> link.is_source()).collect(Collectors.toList());
+
+        // sort by id. This is so that the test harness is repeatable.
+        Collections.sort(source_links);
+
         for (AbstractLink link : source_links) {
 
             // create a new segment
@@ -1207,10 +1211,13 @@ public class FreewayScenario {
         }
 
         // ghost sinks................................................
-        Set<Segment> sink_segments_with_offramps = this.segments.values().stream()
+        List<Segment> sink_segments_with_offramps = this.segments.values().stream()
                 .filter(s->s.fwy.get_dn_segment()==null)
                 .filter(s->!s.get_frs().isEmpty())
-                .collect(toSet());
+                .collect(toList());
+
+        // sort by name. This is so that the test harness is repeatable.
+        Collections.sort(sink_segments_with_offramps);
 
         for (Segment segment : sink_segments_with_offramps) {
 

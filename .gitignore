@@ -2,3 +2,4 @@
 .idea/
 temp/
 target/
+src/main/resources/otm.xsd
