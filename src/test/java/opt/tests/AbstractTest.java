@@ -33,7 +33,7 @@ public abstract class AbstractTest {
     }
 
     static protected String get_test_fullpath(String testname){
-        return (new File("src/test/resources/" + test_configs.get(testname))).getAbsolutePath();
+        return (new File("src/test/resources/test_configs/" + test_configs.get(testname))).getAbsolutePath();
     }
 
     public static Collection<String> get_test_config_names() {

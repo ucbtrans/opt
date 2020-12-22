@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:prj xmlns="opentrafficmodels" xmlns:ns2="https://github.com/ucbtrans/opt">
+    <ns2:scns>
+        <ns2:scn name="A" description="Project Test">
+            <scenario>
+                <commodities>
+                    <commodity id="0" name="SOV" pvequiv="1.0" pathfull="false"/>
+                    <commodity id="1" name="HOV" pvequiv="1.0" pathfull="false"/>
+                </commodities>
+                <network>
+                    <nodes>
+                        <node id="1"/>
+                        <node id="2"/>
+                        <node id="3"/>
+                        <node id="4"/>
+                        <node id="5"/>
+                        <node id="6"/>
+                        <node id="7"/>
+                    </nodes>
+                    <links>
+                        <link id="1" length="321.868" full_lanes="3" start_node_id="1" end_node_id="2" roadparam="1" road_type="freeway"/>
+                        <link id="2" length="321.86713" full_lanes="3" start_node_id="2" end_node_id="3" roadparam="3" road_type="freeway"/>
+                        <link id="4" length="321.86624" full_lanes="3" start_node_id="3" end_node_id="5" roadparam="4" roadgeom="1" road_type="freeway"/>
+                        <link id="5" length="321.86536" full_lanes="3" start_node_id="5" end_node_id="6" roadparam="6" road_type="freeway"/>
+                        <link id="6" length="321.9991" full_lanes="1" start_node_id="7" end_node_id="3" roadparam="0" roadgeom="0" road_type="onramp"/>
+                    </links>
+                    <roadgeoms>
+                        <roadgeom id="0">
+                            <add_lanes isopen="true" side="in" roadparam="5" lanes="1"/>
+                        </roadgeom>
+                        <roadgeom id="1">
+                            <add_lanes side="out" roadparam="2" lanes="1"/>
+                        </roadgeom>
+                    </roadgeoms>
+                    <roadconnections>
+                        <roadconnection id="5" in_link="1" in_link_lanes="1#3" out_link="2" out_link_lanes="1#3"/>
+                        <roadconnection id="6" in_link="2" in_link_lanes="1#3" out_link="4" out_link_lanes="1#3"/>
+                        <roadconnection id="7" in_link="4" in_link_lanes="1#3" out_link="5" out_link_lanes="1#3"/>
+                        <roadconnection id="8" in_link="6" out_link="4" out_link_lanes="4#4"/>
+                    </roadconnections>
+                    <roadparams>
+                        <roadparam id="0" capacity="2000.0" speed="105.006065" jam_density="109.99815"/>
+                        <roadparam id="1" capacity="2000.0" speed="105.00607" jam_density="109.99816"/>
+                        <roadparam id="2" capacity="2000.0" speed="90.0052" jam_density="109.99816"/>
+                        <roadparam id="3" capacity="2000.0" speed="105.00607" jam_density="109.99816"/>
+                        <roadparam id="4" capacity="2000.0" speed="105.00709" jam_density="109.997856"/>
+                        <roadparam id="5" capacity="1800.0" speed="115.006645" jam_density="109.99815"/>
+                        <roadparam id="6" capacity="2000.0" speed="105.00607" jam_density="109.99816"/>
+                    </roadparams>
+                </network>
+                <models>
+                    <model type="ctm" name="ctm" is_default="true">
+                        <model_params sim_dt="5.0" max_cell_length="193.11974"/>
+                    </model>
+                </models>
+                <lanechanges>
+                    <lanechange dt="0.0" type="logit" is_default="true">
+                        <parameters>
+                            <parameter name="keep" value="0.693100"/>
+                            <parameter name="rho_vpkmplane" value="0.007147"/>
+                        </parameters>
+                    </lanechange>
+                </lanechanges>
+                <demands>
+                    <demand commodity_id="0" link_id="1" start_time="0.0" dt="3600.0">3750.0</demand>
+                    <demand commodity_id="1" link_id="1" start_time="0.0" dt="3600.0">1250.0</demand>
+                    <demand commodity_id="0" link_id="6" start_time="0.0" dt="3600.0">825.0</demand>
+                    <demand commodity_id="1" link_id="6" start_time="0.0" dt="3600.0">275.0</demand>
+                </demands>
+                <splits/>
+                <controllers>
+                    <controller id="1" type="schedule">
+                        <target_actuators ids="1"/>
+                        <schedule>
+                            <entry type="rm_open" start_time="0.0"/>
+                        </schedule>
+                    </controller>
+                    <controller id="2" type="schedule">
+                        <target_actuators ids="2"/>
+                        <schedule>
+                            <entry type="rm_open" start_time="0.0"/>
+                        </schedule>
+                    </controller>
+                </controllers>
+                <actuators>
+                    <actuator id="1" type="meter">
+                        <actuator_target type="lanegroups" lanegroups="6(2#2)"/>
+                    </actuator>
+                    <actuator id="2" type="meter">
+                        <actuator_target type="lanegroups" lanegroups="6(1#1)"/>
+                    </actuator>
+                </actuators>
+                <sensors/>
+            </scenario>
+            <ns2:sim starttime="0.0" duration="14400.0"/>
+            <ns2:lnks>
+                <ns2:lnk id="1" name="A -&gt; B"/>
+                <ns2:lnk id="2" name="B -&gt; C"/>
+                <ns2:lnk id="4" name="C -&gt; D"/>
+                <ns2:lnk id="5" name="D -&gt; E"/>
+                <ns2:lnk id="6" name="C -&gt; "/>
+            </ns2:lnks>
+            <ns2:sgmts>
+                <ns2:sgmt type="fwy" id="1" name="A -&gt; B" fwy="1"/>
+                <ns2:sgmt type="fwy" id="2" name="B -&gt; C" fwy="2"/>
+                <ns2:sgmt type="fwy" id="3" name="C -&gt; D" fwy="4" out_ors="6"/>
+                <ns2:sgmt type="fwy" id="4" name="D -&gt; E" fwy="5"/>
+            </ns2:sgmts>
+            <ns2:schds>
+                <ns2:schd id="1" name="GP Lane Ramp Metering Scheme"/>
+                <ns2:schd id="2" name="Managed Lane Ramp Metering Scheme"/>
+            </ns2:schds>
+            <ns2:routes>
+                <ns2:route id="1" name="New Route" sgmts="1,2,3,4"/>
+            </ns2:routes>
+        </ns2:scn>
+    </ns2:scns>
+</ns2:prj>

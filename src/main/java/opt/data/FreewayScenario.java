@@ -1007,10 +1007,6 @@ public class FreewayScenario {
     // run
     /////////////////////////////////////
 
-    public void run_on_new_thread() throws Exception {
-        throw new Exception("NOT IMPLEMENTED!");
-    }
-
     public jaxb.Scn to_jaxb() throws Exception {
 
         jaxb.Scn scn = new jaxb.Scn();

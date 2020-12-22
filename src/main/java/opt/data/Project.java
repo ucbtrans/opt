@@ -69,21 +69,6 @@ public class Project {
     }
 
     /////////////////////////////////////
-    // run
-    /////////////////////////////////////
-
-    public void run_all_scenarios() throws Exception {
-        for(FreewayScenario scenario : scenarios.values())
-            scenario.run_on_new_thread();
-    }
-
-    public void run_scenario(String scenario_name) throws Exception {
-        if(!scenarios.containsKey(scenario_name))
-            throw new Exception("Unknown scenario");
-        scenarios.get(scenario_name).run_on_new_thread();
-    }
-
-    /////////////////////////////////////
     // getters / setters
     /////////////////////////////////////
 

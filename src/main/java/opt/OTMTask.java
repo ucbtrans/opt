@@ -4,6 +4,7 @@ import api.OTM;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import opt.data.*;
+import output.AbstractOutput;
 
 import java.util.List;
 import java.util.Set;
@@ -13,27 +14,25 @@ public class OTMTask  extends Task {
 
 	private AppMainController mainController;
 	private FreewayScenario fwyscenario;
-	private OTM otmdev;
+	private OTM otm;
 
 	private boolean celloutput;
 	private boolean lgoutput;
 
 	private int simsteps;
-	private float outdt;
+	private Float outdt;
 	private int step_per_progbar_update;
 
 	private Exception exception;
 	private SimDataScenario simdata;
 
-	public OTMTask(AppMainController mainController, FreewayScenario fwyscenario, float outdt, int progbar_steps, boolean celloutput, boolean lgoutput, Benchmarker logger) throws Exception {
+	public OTMTask(AppMainController mainController, FreewayScenario fwyscenario, Float xoutdt, int progbar_steps, boolean celloutput, boolean lgoutput, Benchmarker logger) throws Exception {
 
 		this.mainController = mainController;
 		this.fwyscenario = fwyscenario;
-		this.outdt = outdt;
+		this.outdt = xoutdt;
 		this.celloutput = celloutput;
 		this.lgoutput = lgoutput;
-
-		assert(outdt==300f);
 
 		if(!celloutput && !lgoutput)
 			throw new Exception("No data requested");
@@ -66,16 +65,19 @@ public class OTMTask  extends Task {
 
 			this.step_per_progbar_update = Math.max( simsteps / progbar_steps , 1);
 
+			if(this.outdt==null)
+				this.outdt = simdt;
+
 			// check outdt is multiple of simdt
-			if(outdt%simdt > 0.01)
+			if(this.outdt%simdt > 0.01)
 				throw new Exception("Reporting time step should be a multiple of simulation time step.");
 
 			jaxb.Scenario jscenario = fwyscenario.get_scenario().to_jaxb();
 			if(logger!=null)
 				logger.write("to_jaxb");
 
-			this.otmdev = new api.OTM();
-			otmdev.load_from_jaxb(jscenario,false);
+			this.otm = new api.OTM();
+			otm.load_from_jaxb(jscenario,false);
 			if(logger!=null)
 				logger.write("otm_load");
 
@@ -87,7 +89,7 @@ public class OTMTask  extends Task {
 
 	@Override
 	protected Object call()  {
-		this.run_simulation(null);
+		this.run_simulation(null,null,null);
 		return null;
 	}
 
@@ -107,7 +109,7 @@ public class OTMTask  extends Task {
 		});
 	}
 
-	public SimDataScenario run_simulation(Benchmarker logger){
+	public SimDataScenario run_simulation(String prefix, String output_folder,Benchmarker logger){
 
 		simdata = null;
 		exception = null;
@@ -122,28 +124,28 @@ public class OTMTask  extends Task {
 
 			if(celloutput) {
 				for(Long commid : fwyscenario.get_commodities().keySet()){
-					otmdev.output.request_cell_flw(null, null, commid, linkids, outdt);
-					otmdev.output.request_cell_sum_veh(null, null, commid, linkids, outdt);
-					otmdev.output.request_cell_sum_veh_dwn(null, null, commid, linkids, outdt);
+					otm.output.request_cell_flw(prefix,output_folder,commid,linkids,outdt);
+					otm.output.request_cell_sum_veh(prefix,output_folder,commid,linkids,outdt);
+					otm.output.request_cell_sum_veh_dwn(prefix,output_folder,commid,linkids,outdt);
 				}
 			}
 
 			if(lgoutput) {
 				for(Long commid : fwyscenario.get_commodities().keySet()) {
-					otmdev.output.request_lanegroup_flw(null, null, commid, linkids, outdt);
-					otmdev.output.request_lanegroup_sum_veh(null, null, commid, linkids, outdt);
+					otm.output.request_lanegroup_flw(prefix,output_folder,commid,linkids,outdt);
+					otm.output.request_lanegroup_sum_veh(prefix,output_folder,commid,linkids,outdt);
 				}
 			}
 
 			if(logger!=null)
 				logger.write("requests");
 
-			otmdev.initialize(fwyscenario.get_start_time());
+			otm.initialize(fwyscenario.get_start_time());
 
 			if(logger!=null)
 				logger.write("initialize");
 
-			otmdev.advance(fwyscenario.get_start_time());
+			otm.advance(fwyscenario.get_start_time());
 
 			int steps_taken = 0;
 			while(steps_taken<simsteps){
@@ -154,7 +156,7 @@ public class OTMTask  extends Task {
 				}
 
 				// advance otm, get back information
-				otmdev.advance(sim_dt);
+				otm.advance(sim_dt);
 				steps_taken += 1;
 
 				// progress bar
@@ -168,7 +170,7 @@ public class OTMTask  extends Task {
 				}
 			}
 
-			otmdev.terminate();
+			otm.terminate();
 
 			if(logger!=null) {
 				if(is_canceled)
@@ -177,7 +179,7 @@ public class OTMTask  extends Task {
 					logger.write("run");
 			}
 
-			simdata = is_canceled ? null : new SimDataScenario(fwyscenario,otmdev,outdt,celloutput,lgoutput);
+			simdata = is_canceled ? null : new SimDataScenario(fwyscenario, otm,outdt,celloutput,lgoutput);
 
 			if(logger!=null)
 				logger.write("output");
@@ -194,4 +196,11 @@ public class OTMTask  extends Task {
 		return simdata;
 	}
 
+	public Set<AbstractOutput> get_data(){
+		return otm.output.get_data();
+	}
+
+	public Set<String> get_file_names(){
+		return otm.output.get_file_names();
+	}
 }

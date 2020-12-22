@@ -1,9 +1,4 @@
 *.iml
 .idea/
+temp/
 target/
-src/test/resources/project_saved.opt
-src/test/resources/project_saved_scenarioA.xml
-src/test/resources/project_saved_scenarioB.xml
-src/test/resources/project_saved_scenarioC.xml
-src/main/resources/otm.xsd
-
