@@ -24,7 +24,7 @@ public class SimDataLink {
         this.id = otmlink.getId();
         this.scndata = scndata;
         this.link = optlink;
-        this.link_length_miles = otmlink.length / 1609.344;
+        this.link_length_miles = otmlink.get_full_length() / 1609.344;
 
         lgData = new HashMap<>();
         lgid2type = new HashMap<>();
@@ -33,19 +33,19 @@ public class SimDataLink {
         float simdt_hr = scndata.fwyscenario.get_sim_dt_sec() / 3600f;
 
         if(optlink.has_mng()){
-            lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(1);
-            lgid2type.put(lg.id,LaneGroupType.mng);
+            lg = (models.fluid.FluidLaneGroup) otmlink.get_lanegroup_for_dn_lane(1);
+            lgid2type.put(lg.getId(),LaneGroupType.mng);
             lgData.put(LaneGroupType.mng,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime,simdt_hr));
         }
 
-        lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(optlink.get_mng_lanes()+1);
-        lgid2type.put(lg.id,LaneGroupType.gp);
+        lg = (models.fluid.FluidLaneGroup) otmlink.get_lanegroup_for_dn_lane(optlink.get_mng_lanes()+1);
+        lgid2type.put(lg.getId(),LaneGroupType.gp);
         lgData.put(LaneGroupType.gp,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime,simdt_hr));
 
         if(optlink.has_aux()){
-            lg = (models.fluid.FluidLaneGroup) otmlink.dnlane2lanegroup.get(
+            lg = (models.fluid.FluidLaneGroup) otmlink.get_lanegroup_for_dn_lane(
                     optlink.get_mng_lanes() + optlink.get_gp_lanes() + 1);
-            lgid2type.put(lg.id,LaneGroupType.aux);
+            lgid2type.put(lg.getId(),LaneGroupType.aux);
             lgData.put(LaneGroupType.aux,new SimDataLanegroup(lg,commids,storecelldata,storelgdata,numtime,simdt_hr));
         }
 

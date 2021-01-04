@@ -20,7 +20,6 @@ public class LaneChangeModel {
         jaxb.Lanechanges jlcs = new jaxb.Lanechanges();
         jaxb.Lanechange jlc = new jaxb.Lanechange();
         jlcs.getLanechange().add(jlc);
-        jlc.setIsDefault(true);
         jlc.setDt(dt);
         jlc.setType("logit");
         jaxb.Parameters prams = new jaxb.Parameters();

@@ -15,7 +15,7 @@ public class SimDataLanegroup {
     public SimDataLanegroup(models.fluid.FluidLaneGroup lg, Set<Long> commids,boolean storecelldata,boolean storelgdata,int numtime,float simdt_hr){
 
         int numcells = lg.cells.size();
-        double link_length_miles = lg.link.length / 1609.344;
+        double link_length_miles =  lg.get_link().get_full_length() / 1609.344;
         ffspeed_mph = (float) (lg.ffspeed_cell_per_dt * link_length_miles/numcells/simdt_hr);
 
         if(storelgdata){

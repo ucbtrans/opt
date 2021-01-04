@@ -91,7 +91,7 @@ public class ControlSchedule implements Comparable {
         switch(controlType){
 
             case RampMetering:
-                jact.setType("meter");
+                jact.setType("lg_capacity");
                 jtgt = new jaxb.ActuatorTarget();
                 jact.setActuatorTarget(jtgt);
                 jtgt.setType("lanegroups");

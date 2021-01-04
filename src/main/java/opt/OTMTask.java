@@ -76,8 +76,7 @@ public class OTMTask  extends Task {
 			if(logger!=null)
 				logger.write("to_jaxb");
 
-			this.otm = new api.OTM();
-			otm.load_from_jaxb(jscenario,false);
+			this.otm = OTM.load_from_jaxb(jscenario,false);
 			if(logger!=null)
 				logger.write("otm_load");
 
@@ -191,6 +190,9 @@ public class OTMTask  extends Task {
 			fwyscenario.remove_ghost_pieces();
 			if(mainController!=null)
 				Platform.runLater(() -> { mainController.attachSimDataToScenario(simdata,exception); } );
+			else
+				if(exception!=null)
+					System.err.println(exception.getMessage());
 		}
 
 		return simdata;

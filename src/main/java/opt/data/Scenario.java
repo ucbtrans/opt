@@ -176,6 +176,8 @@ public class Scenario {
         params.setSimDt(simdt);
         model.setModelParams(params);
 
+        model.setLanechanges(this.my_fwy_scenario.lcmodel.to_jaxb());
+
         /////////////////////////////////////////////////////
         // commodities
         jaxb.Commodities jComms = new jaxb.Commodities();
@@ -612,10 +614,6 @@ public class Scenario {
                 }
             }
         }
-
-        /////////////////////////////////////////////////////
-        // lane change model
-        jScn.setLanechanges(this.my_fwy_scenario.lcmodel.to_jaxb());
 
         return jScn;
     }

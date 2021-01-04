@@ -48,17 +48,17 @@
                 </network>
                 <models>
                     <model type="ctm" name="ctm" is_default="true">
+                        <lanechanges>
+                            <lanechange dt="0.0" type="logit" is_default="true">
+                                <parameters>
+                                    <parameter name="keep" value="0.693100"/>
+                                    <parameter name="rho_vpkmplane" value="0.007147"/>
+                                </parameters>
+                            </lanechange>
+                        </lanechanges>
                         <model_params sim_dt="5.0" max_cell_length="193.11974"/>
                     </model>
                 </models>
-                <lanechanges>
-                    <lanechange dt="0.0" type="logit" is_default="true">
-                        <parameters>
-                            <parameter name="keep" value="0.693100"/>
-                            <parameter name="rho_vpkmplane" value="0.007147"/>
-                        </parameters>
-                    </lanechange>
-                </lanechanges>
                 <demands>
                     <demand commodity_id="0" link_id="1" start_time="0.0" dt="3600.0">3750.0</demand>
                     <demand commodity_id="1" link_id="1" start_time="0.0" dt="3600.0">1250.0</demand>

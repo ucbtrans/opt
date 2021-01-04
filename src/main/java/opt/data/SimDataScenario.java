@@ -19,7 +19,7 @@ public class SimDataScenario {
     public boolean hascelldata;
     public boolean haslgdata;
 
-    public SimDataScenario(FreewayScenario fwyscenario, OTM otmdev, float outdt, boolean storecelldata, boolean storelgdata){
+    public SimDataScenario(FreewayScenario fwyscenario, OTM otm, float outdt, boolean storecelldata, boolean storelgdata){
         this.fwyscenario = fwyscenario;
         this.outdt = outdt;
         this.hascelldata = storecelldata;
@@ -37,16 +37,16 @@ public class SimDataScenario {
         }
 
         // initialize linkdata
-        Set<Long> commids = otmdev.scenario.commodities.keySet();
+        Set<Long> commids = otm.scenario.commodities.keySet();
         this.linkdata = new HashMap<>();
         for(AbstractLink optlink : fwyscenario.get_links())
-            linkdata.put(optlink.id, new SimDataLink(this,optlink, otmdev.scenario.network.links.get(optlink.id), commids,storecelldata,storelgdata,numtime));
+            linkdata.put(optlink.id, new SimDataLink(this,optlink, otm.scenario.network.links.get(optlink.id), commids,storecelldata,storelgdata,numtime));
 
         if(hascelldata)
-            read_cell_data(otmdev,commids,sim_dt);
+            read_cell_data(otm,commids,sim_dt);
 
         if(haslgdata)
-            read_lg_data(otmdev,commids,sim_dt);
+            read_lg_data(otm,commids,sim_dt);
 
         // link ghost sinks and sources
         for(LinkGhost glink : fwyscenario.ghost_pieces.links){
@@ -87,15 +87,15 @@ public class SimDataScenario {
 
                 FluidLaneGroup flg = (FluidLaneGroup) alg;
 
-                if(!linkdata.containsKey(flg.link.getId()))
+                if(!linkdata.containsKey(flg.get_link().getId()))
                     continue;
 
-                SimDataLink lkdata = linkdata.get(flg.link.getId());
-                LaneGroupType lgtype = lkdata.lgid2type.get(flg.id);
+                SimDataLink lkdata = linkdata.get(flg.get_link().getId());
+                LaneGroupType lgtype = lkdata.lgid2type.get(flg.getId());
                 SimDataLanegroup lgdata = lkdata.lgData.get(lgtype);
                 lgdata.set_lg_data(commid,
-                        flw.lgprofiles.get(alg.id).profile.values,
-                        veh.lgprofiles.get(alg.id).profile.values,
+                        flw.lgprofiles.get(alg.getId()).profile.values,
+                        veh.lgprofiles.get(alg.getId()).profile.values,
                         sim_dt,outdt);
 
             }
@@ -134,15 +134,15 @@ public class SimDataScenario {
 
             for(FluidLaneGroup flg : flw.ordered_lgs) {
 
-                if(!linkdata.containsKey(flg.link.getId()))
+                if(!linkdata.containsKey(flg.get_link().getId()))
                     continue;
 
-                SimDataLink lkdata = linkdata.get(flg.link.getId());
-                LaneGroupType lgtype = lkdata.lgid2type.get(flg.id);
+                SimDataLink lkdata = linkdata.get(flg.get_link().getId());
+                LaneGroupType lgtype = lkdata.lgid2type.get(flg.getId());
                 SimDataLanegroup lgdata = lkdata.lgData.get(lgtype);
-                List<AbstractOutputTimedCell.CellProfile> flw_cellprofs = flw.lgprofiles.get(flg.id);
-                List<AbstractOutputTimedCell.CellProfile> veh_cellprofs = veh.lgprofiles.get(flg.id);
-                List<AbstractOutputTimedCell.CellProfile> vehdwn_cellprofs = vehdwn.lgprofiles.get(flg.id);
+                List<AbstractOutputTimedCell.CellProfile> flw_cellprofs = flw.lgprofiles.get(flg.getId());
+                List<AbstractOutputTimedCell.CellProfile> veh_cellprofs = veh.lgprofiles.get(flg.getId());
+                List<AbstractOutputTimedCell.CellProfile> vehdwn_cellprofs = vehdwn.lgprofiles.get(flg.getId());
 
                 for(int i=0;i<flw_cellprofs.size();i++)
                     lgdata.celldata.get(i).set(commid,

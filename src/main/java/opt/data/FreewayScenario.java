@@ -66,6 +66,30 @@ public class FreewayScenario {
         // model
         if (jaxb_scenario.getModels() != null) {
             jaxb.Model model = jaxb_scenario.getModels().getModel().get(0);
+
+            // lane change model
+            if (model.getLanechanges()!=null && !model.getLanechanges().getLanechange().isEmpty()) {
+                assert (model.getLanechanges().getLanechange().size() == 1);
+                jaxb.Lanechange lc = model.getLanechanges().getLanechange().get(0);
+                float dt = lc.getDt();
+                double keep = UserSettings.defaultLaneChoice_keep;
+                double rho_vpkmplane = UserSettings.defaultLaneChoice_rhovpmplane / 1.609;
+                for (jaxb.Parameter p : lc.getParameters().getParameter()) {
+                    switch (p.getName()) {
+                        case "keep":
+                            keep = Double.parseDouble(p.getValue());
+                            break;
+                        case "rho_vpkmplane":
+                            rho_vpkmplane = Double.parseDouble(p.getValue());
+                            break;
+                    }
+                }
+                this.lcmodel = new LaneChangeModel(dt, keep, rho_vpkmplane * 1.609);
+
+            } else {
+                this.lcmodel = new LaneChangeModel(UserSettings.defaultLaneChoice_keep, UserSettings.defaultLaneChoice_rhovpmplane);
+            }
+
             set_max_celllength_meters(model.getModelParams().getMaxCellLength());
         }
 
@@ -278,29 +302,6 @@ public class FreewayScenario {
                         throw new Exception("Unknown controller type.");
                 }
             }
-        }
-
-        // lane change model
-        if (jaxb_scenario.getLanechanges()!=null && !jaxb_scenario.getLanechanges().getLanechange().isEmpty()) {
-            assert (jaxb_scenario.getLanechanges().getLanechange().size() == 1);
-            jaxb.Lanechange lc = jaxb_scenario.getLanechanges().getLanechange().get(0);
-            float dt = lc.getDt();
-            double keep = UserSettings.defaultLaneChoice_keep;
-            double rho_vpkmplane = UserSettings.defaultLaneChoice_rhovpmplane / 1.609;
-            for (jaxb.Parameter p : lc.getParameters().getParameter()) {
-                switch (p.getName()) {
-                    case "keep":
-                        keep = Double.parseDouble(p.getValue());
-                        break;
-                    case "rho_vpkmplane":
-                        rho_vpkmplane = Double.parseDouble(p.getValue());
-                        break;
-                }
-            }
-            this.lcmodel = new LaneChangeModel(dt, keep, rho_vpkmplane * 1.609);
-
-        } else {
-            this.lcmodel = new LaneChangeModel(UserSettings.defaultLaneChoice_keep, UserSettings.defaultLaneChoice_rhovpmplane);
         }
 
         // max ids
