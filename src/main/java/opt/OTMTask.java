@@ -1,6 +1,5 @@
 package opt;
 
-import api.OTM;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import opt.data.*;
@@ -14,7 +13,7 @@ public class OTMTask  extends Task {
 
 	private AppMainController mainController;
 	private FreewayScenario fwyscenario;
-	private OTM otm;
+	private core.OTM otm;
 
 	private boolean celloutput;
 	private boolean lgoutput;
@@ -76,7 +75,7 @@ public class OTMTask  extends Task {
 			if(logger!=null)
 				logger.write("to_jaxb");
 
-			this.otm = OTM.load_from_jaxb(jscenario,false);
+			this.otm = new core.OTM(jscenario,false);
 			if(logger!=null)
 				logger.write("otm_load");
 

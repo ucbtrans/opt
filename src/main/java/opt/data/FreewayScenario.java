@@ -71,7 +71,6 @@ public class FreewayScenario {
             if (model.getLanechanges()!=null && !model.getLanechanges().getLanechange().isEmpty()) {
                 assert (model.getLanechanges().getLanechange().size() == 1);
                 jaxb.Lanechange lc = model.getLanechanges().getLanechange().get(0);
-                float dt = lc.getDt();
                 double keep = UserSettings.defaultLaneChoice_keep;
                 double rho_vpkmplane = UserSettings.defaultLaneChoice_rhovpmplane / 1.609;
                 for (jaxb.Parameter p : lc.getParameters().getParameter()) {
@@ -84,7 +83,7 @@ public class FreewayScenario {
                             break;
                     }
                 }
-                this.lcmodel = new LaneChangeModel(dt, keep, rho_vpkmplane * 1.609);
+                this.lcmodel = new LaneChangeModel(keep, rho_vpkmplane * 1.609);
 
             } else {
                 this.lcmodel = new LaneChangeModel(UserSettings.defaultLaneChoice_keep, UserSettings.defaultLaneChoice_rhovpmplane);

@@ -51,7 +51,7 @@
                 <models>
                     <model type="ctm" name="ctm" is_default="true">
                         <lanechanges>
-                            <lanechange dt="0.0" type="logit" is_default="true">
+                            <lanechange type="logit">
                                 <parameters>
                                     <parameter name="keep" value="0.693100"/>
                                     <parameter name="rho_vpkmplane" value="0.007147"/>

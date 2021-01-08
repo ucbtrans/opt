@@ -43,7 +43,7 @@ public class Project {
                 jaxb.Scenario jaxb_scenario = null;
                 if(has_file){
                     String scn_file = (new File(folder,jaxb_scn.getFile())).getAbsolutePath();
-                    jaxb_scenario = JaxbLoader.load_scenario(scn_file,validate);
+                    jaxb_scenario = JaxbLoader.load_scenario(scn_file);
                 }
 
                 if(has_scenario)

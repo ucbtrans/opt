@@ -3,13 +3,6 @@ package opt.data;
 public class LaneChangeModel {
     double keep;
     double density_vpmileplane;
-    float dt = 0f;
-
-    public LaneChangeModel(float dt,double keep, double density_vpmileplane) {
-        this.dt = dt;
-        this.keep = keep;
-        this.density_vpmileplane = density_vpmileplane;
-    }
 
     public LaneChangeModel(double keep, double density_vpmileplane) {
         this.keep = keep;
@@ -20,7 +13,6 @@ public class LaneChangeModel {
         jaxb.Lanechanges jlcs = new jaxb.Lanechanges();
         jaxb.Lanechange jlc = new jaxb.Lanechange();
         jlcs.getLanechange().add(jlc);
-        jlc.setDt(dt);
         jlc.setType("logit");
         jaxb.Parameters prams = new jaxb.Parameters();
         jlc.setParameters(prams);
