@@ -215,6 +215,19 @@ public abstract class AbstractLink implements Comparable {
         return null;
     }
 
+    public final boolean has_lgtype(LaneGroupType lgtype){
+        switch(lgtype){
+            case mng:
+                return has_mng();
+            case gp:
+                return true;
+            case aux:
+                return has_aux();
+            default:
+                return false;
+        }
+    }
+
     /////////////////////////////////////
     // segment getters
     /////////////////////////////////////

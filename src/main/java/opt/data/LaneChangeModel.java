@@ -11,9 +11,9 @@ public class LaneChangeModel {
 
     public jaxb.Lanechanges to_jaxb(){
         jaxb.Lanechanges jlcs = new jaxb.Lanechanges();
+        jlcs.setType("logit");
         jaxb.Lanechange jlc = new jaxb.Lanechange();
         jlcs.getLanechange().add(jlc);
-        jlc.setType("logit");
         jaxb.Parameters prams = new jaxb.Parameters();
         jlc.setParameters(prams);
         jaxb.Parameter p1 = new jaxb.Parameter();

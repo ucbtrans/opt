@@ -2,6 +2,8 @@ package opt.data;
 
 import opt.UserSettings;
 import opt.data.control.*;
+import opt.data.event.*;
+import opt.utils.DataUtils;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
@@ -17,6 +19,7 @@ public class FreewayScenario {
     private Long max_seg_id;
     private Long max_schedule_id;
     private Long max_rc_id;
+    private Long max_event_id;
 
     public String name;
     public String description;
@@ -303,6 +306,152 @@ public class FreewayScenario {
             }
         }
 
+        // events .........
+        AbstractLink link;
+        List<AbstractLink> links;
+        Set<LaneGroupType> lgtypes;
+        List<LaneGroupType> lane2lgtype;
+        LaneGroupType lgtype0,lgtype1;
+
+        if(jaxb_scenario.getEvents()!=null)
+            for(jaxb.Event jev : jaxb_scenario.getEvents().getEvent()) {
+                AbstractEvent event;
+
+                long id = jev.getId();
+                String type = jev.getType();
+                float timestamp = jev.getTimestamp();
+                String jname = jev.getName();
+
+                switch(jev.getType()){
+
+                    case "linktgl":
+
+                        if(!jev.getEventTarget().getType().equals("links"))
+                            throw new Exception("Bad event target type");
+
+                        links = new ArrayList<>();
+                        for(long link_id : OTMUtils.csv2longlist(jev.getEventTarget().getIds())){
+                            if(!scenario.links.containsKey(link_id))
+                                throw new Exception("Bad link id in event target.");
+                            links.add(scenario.links.get(link_id));
+                        }
+
+                        boolean isopen = true;
+                        if(jev.getParameters()!=null)
+                            for(jaxb.Parameter p : jev.getParameters().getParameter())
+                                if(p.getName().equals("isopen"))
+                                    isopen = Boolean.parseBoolean(p.getValue());
+
+                        event = new EventLinkToggle(id,type,timestamp,jname,links,isopen);
+                        break;
+
+                    case "controltgl":
+
+                        if(!jev.getEventTarget().getType().equals("controllers"))
+                            throw new Exception("Bad event target type");
+
+                        // get the controllers
+                        List<ControlSchedule> controllers = new ArrayList<>();
+                        for(long cntrl_id : OTMUtils.csv2longlist(jev.getEventTarget().getIds())){
+                            Optional<ControlSchedule> ocntrl = scenario.links.values().stream()
+                                    .flatMap(lnk->lnk.schedules.values().stream())
+                                    .flatMap(m->m.values().stream())
+                                    .filter(c->c.getId()==cntrl_id)
+                                    .findFirst();
+
+                            if(!ocntrl.isPresent())
+                                throw new Exception("Bad controller id in event target.");
+
+                            controllers.add( ocntrl.get() );
+                        }
+
+                        boolean ison = true;
+                        if(jev.getParameters()!=null)
+                            for(jaxb.Parameter p : jev.getParameters().getParameter())
+                                if(p.getName().equals("ison"))
+                                    ison = Boolean.parseBoolean(p.getValue());
+
+                        event = new EventControlToggle(id,type,timestamp,jname,controllers,ison);
+                        break;
+
+                    case "lglanes":
+
+                        if(!jev.getEventTarget().getType().equals("lanegroups"))
+                            throw new Exception("Bad event target type");
+
+                        links = new ArrayList<>();
+                        lgtypes = new HashSet<>();
+                        for(LaneGroup lg : DataUtils.read_lanegroups(jev.getEventTarget().getLanegroups(),scenario.links)){
+                            if(!scenario.links.containsKey(lg.linkid))
+                                throw new Exception("Bad linkid in target lane group");
+                            link = scenario.links.get(lg.linkid);
+                            links.add(link);
+                            lane2lgtype = link.lane2lgtype();
+                            lgtype0 = lane2lgtype.get(lg.lanes[0]-1);
+                            lgtype1 = lane2lgtype.get(lg.lanes[1]-1);
+                            if(lgtype0!=lgtype1)
+                                throw new Exception("Bad lanes in target lane group");
+                            lgtypes.add(lgtype0);
+                        }
+
+                        if(lgtypes.size()!=1)
+                            throw new Exception("lgtypes.size()!=1");
+
+                        Integer deltalanes = null;
+                        if(jev.getParameters()!=null)
+                            for(jaxb.Parameter p : jev.getParameters().getParameter())
+                                if(p.getName().equals("lanes"))
+                                    deltalanes = Integer.parseInt(p.getValue());
+                        event = new EventLanegroupLanes(id,type,timestamp,jname,links,lgtypes.iterator().next(),deltalanes);
+                        break;
+
+                    case "lgfd":
+
+                        if(!jev.getEventTarget().getType().equals("lanegroups"))
+                            throw new Exception("Bad event target type");
+
+                        links = new ArrayList<>();
+                        lgtypes = new HashSet<>();
+                        for(LaneGroup lg : DataUtils.read_lanegroups(jev.getEventTarget().getLanegroups(),scenario.links)){
+                            if(!scenario.links.containsKey(lg.linkid))
+                                throw new Exception("Bad linkid in target lane group");
+                            link = scenario.links.get(lg.linkid);
+                            links.add(link);
+                            lane2lgtype = link.lane2lgtype();
+                            lgtype0 = lane2lgtype.get(lg.lanes[0]-1);
+                            lgtype1 = lane2lgtype.get(lg.lanes[1]-1);
+                            if(lgtype0!=lgtype1)
+                                throw new Exception("Bad lanes in target lane group");
+                            lgtypes.add(lgtype0);
+                        }
+
+                        Float capacity_vphpl = null;
+                        Float jam_density_vpkpl = null;
+                        Float ff_speed_kph = null;
+                        for(jaxb.Parameter p : jev.getParameters().getParameter()){
+                            switch(p.getName()){
+                                case "capacity":
+                                    capacity_vphpl = Float.parseFloat(p.getValue());
+                                    break;
+                                case "jam_density":
+                                    jam_density_vpkpl = Float.parseFloat(p.getValue());
+                                    break;
+                                case "speed":
+                                    ff_speed_kph = Float.parseFloat(p.getValue());
+                                    break;
+                            }
+                        }
+                        FDparams fd_mult = new FDparams(capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
+                        event = new EventLanegroupFD(id,type,timestamp,jname,links,lgtypes.iterator().next(),fd_mult);
+                        break;
+
+                    default:
+                        throw new Exception("Bad type in events.");
+                }
+
+                scenario.events.put(jev.getId(),event);
+            }
+
         // max ids
         reset_max_ids();
 
@@ -338,8 +487,8 @@ public class FreewayScenario {
         scn_cpy.max_node_id = max_node_id;
         scn_cpy.max_seg_id = max_seg_id;
         scn_cpy.max_schedule_id = max_schedule_id;
-//        scn_cpy.max_sensor_id = max_sensor_id;
         scn_cpy.max_rc_id = max_rc_id;
+        scn_cpy.max_event_id = max_event_id;
         scn_cpy.scenario = scenario.clone();
         for(Map.Entry<Long,Segment> e : segments.entrySet()) {
             Segment new_segment = e.getValue().clone();
@@ -731,10 +880,6 @@ public class FreewayScenario {
         return segments.containsKey(id) ? segments.get(id) : null;
     }
 
-    /////////////////////////////////////
-    // segment create / delete
-    /////////////////////////////////////
-
     /**
      * Create an isolated segment
      * @return A new segment
@@ -883,7 +1028,7 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
-    // commodity getters and setters
+    // API commodity
     /////////////////////////////////////
 
     /**
@@ -991,6 +1136,84 @@ public class FreewayScenario {
     }
 
     /////////////////////////////////////
+    // API events
+    /////////////////////////////////////
+
+    public EventLinkToggle add_event_linktoggle(float timestamp, String name, List<AbstractLink> links, boolean isopen) throws Exception {
+        EventLinkToggle event = new EventLinkToggle(new_event_id(),"linktgl",timestamp,name,links,isopen);
+        if(event_conflicts(event))
+            throw new Exception("Event conflicts.");
+        scenario.events.put(event.id,event);
+        return event;
+    }
+
+    public EventControlToggle add_event_controltoggle(float timestamp, String name, List<ControlSchedule> controllers, boolean ison) throws Exception {
+        EventControlToggle event = new EventControlToggle(new_event_id(),"controltgl",timestamp,name,controllers,ison);
+        if(event_conflicts(event))
+            throw new Exception("Event conflicts.");
+        scenario.events.put(event.id,event);
+        return event;
+    }
+
+    public EventLanegroupLanes add_event_lglanes(float timestamp, String name, List<AbstractLink> links, LaneGroupType lgtype, Integer delta_lanes) throws Exception {
+        EventLanegroupLanes event = new EventLanegroupLanes(new_event_id(),"lglanes",timestamp,name,links,lgtype,delta_lanes);
+        if(event_conflicts(event))
+            throw new Exception("Event conflicts.");
+        scenario.events.put(event.id,event);
+        return event;
+    }
+
+    public EventLanegroupFD add_event_lgfd(float timestamp, String name,List<AbstractLink> links,LaneGroupType lgtype,FDparams fd_mult) throws Exception {
+        EventLanegroupFD event = new EventLanegroupFD(new_event_id(),"lgfd",timestamp,name,links,lgtype,fd_mult);
+        if(event_conflicts(event))
+            throw new Exception("Event conflicts.");
+        scenario.events.put(event.id,event);
+        return event;
+    }
+
+    public void delete_event_by_id(long eventid){
+        scenario.events.remove(eventid);
+    }
+
+    public boolean event_conflicts(AbstractEvent aevent){
+
+        Set<AbstractEvent> conflicts = new HashSet<>();
+
+        if(aevent instanceof EventControlToggle){
+            EventControlToggle event = (EventControlToggle) aevent;
+            conflicts = scenario.events.values().stream()
+                    .filter(x->x.timestamp==event.timestamp)
+                    .filter(x->x instanceof EventControlToggle)
+                    .map(x -> (EventControlToggle) x)
+                    .filter( x-> !Collections.disjoint(x.get_controller_ids(),event.get_controller_ids()))
+                    .collect(toSet());
+        }
+
+        if(aevent instanceof EventLinkToggle){
+            EventLinkToggle event = (EventLinkToggle) aevent;
+            conflicts = scenario.events.values().stream()
+                    .filter(x->x.timestamp==event.timestamp)
+                    .filter(x->x instanceof EventLinkToggle)
+                    .map(x->(EventLinkToggle) x)
+                    .filter(x->!Collections.disjoint(x.get_link_ids(),event.get_link_ids()))
+                    .collect(toSet());
+        }
+
+        if(aevent instanceof AbstractEventLaneGroup){
+            AbstractEventLaneGroup event = (AbstractEventLaneGroup) aevent;
+            conflicts = scenario.events.values().stream()
+                    .filter(x->x.timestamp==event.timestamp)
+                    .filter(x->x instanceof AbstractEventLaneGroup)
+                    .map(x->(AbstractEventLaneGroup) x)
+                    .filter(x->x.get_lgtype()==event.get_lgtype())
+                    .filter(x->!Collections.disjoint(x.get_link_ids(),event.get_link_ids()))
+                    .collect(toSet());
+        }
+
+        return !conflicts.isEmpty();
+    }
+
+    /////////////////////////////////////
     // utilities
     /////////////////////////////////////
 
@@ -1079,6 +1302,7 @@ public class FreewayScenario {
             max_schedule_id = 0l;
 //            max_sensor_id = 0l;
             max_rc_id = 0l;
+            max_event_id = 0l;
             return;
         }
 
@@ -1112,6 +1336,13 @@ public class FreewayScenario {
 
         // rc
         max_rc_id = 0l;
+
+
+        // events
+        Optional<Long> opt_max_event_id = scenario.events.keySet().stream()
+                .max(Comparator.comparing(Long::valueOf));
+        max_event_id = opt_max_event_id.isPresent() ? opt_max_event_id.get() : 0l;
+
     }
 
     protected long new_link_id(){
@@ -1124,6 +1355,10 @@ public class FreewayScenario {
 
     protected long new_seg_id(){
         return ++max_seg_id;
+    }
+
+    protected long new_event_id(){
+        return ++max_event_id;
     }
 
     public long new_schedule_id(){

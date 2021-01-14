@@ -5,6 +5,7 @@ import jaxb.*;
 import opt.UserSettings;
 import opt.data.control.*;
 import opt.data.control.Sensor;
+import opt.data.event.*;
 import profiles.Profile1D;
 import utils.OTMUtils;
 
@@ -18,6 +19,7 @@ public class Scenario {
     protected Map<Long, Node> nodes = new HashMap<>();
     public Map<Long, AbstractLink> links = new HashMap<>();
     protected Map<Long, Commodity> commodities = new HashMap<>();
+    protected Map<Long, AbstractEvent> events = new HashMap<>();
 
 	/////////////////////////////////////
     // construction
@@ -132,27 +134,6 @@ public class Scenario {
             jscn_cpy.commodities.put(e.getKey(),e.getValue().clone());
 
         return jscn_cpy;
-    }
-
-    /////////////////////////////////////
-    // network
-    /////////////////////////////////////
-
-    public AbstractLink get_link_with_id(long id){
-        return links.get(id);
-    }
-
-    public float compute_max_simdt_sec(float maxcelllength_meters){
-        float simdt = Float.POSITIVE_INFINITY;
-        for(AbstractLink link : links.values()){
-            float r = link.params.length/maxcelllength_meters;
-            int num_cells = OTMUtils.approximately_equals(r%1.0,0.0) ? (int) r :  1+((int) r);
-            float cell_length_meters = link.params.length/num_cells;
-            float vc_mps = link.get_fastest_ffspeed_kph() * 1000f / 3600f;
-            float simdtl = cell_length_meters / vc_mps;
-            simdt = Math.min(simdt ,simdtl );
-        }
-        return simdt;
     }
 
     public jaxb.Scenario to_jaxb() throws Exception {
@@ -308,7 +289,7 @@ public class Scenario {
 //                if(ghostlinks!=null && (ghostlinks.contains(up_link) || ghostlinks.contains(dn_link)))
 //                    rcs.add( make_road_connection(my_fwy_scenario,up_link,null,dn_link,null) );
 //                else
-                    rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,dn_link,LaneGroupType.gp) );
+                rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,dn_link,LaneGroupType.gp) );
 
             }
 
@@ -615,7 +596,35 @@ public class Scenario {
             }
         }
 
+        /////////////////////////////////////////////////////
+        // events
+        jaxb.Events jevent = new jaxb.Events();
+        jScn.setEvents(jevent);
+        for(AbstractEvent event : events.values())
+            jevent.getEvent().add(event.to_jaxb());
+
         return jScn;
+    }
+
+    /////////////////////////////////////
+    // network
+    /////////////////////////////////////
+
+    public AbstractLink get_link_with_id(long id){
+        return links.get(id);
+    }
+
+    public float compute_max_simdt_sec(float maxcelllength_meters){
+        float simdt = Float.POSITIVE_INFINITY;
+        for(AbstractLink link : links.values()){
+            float r = link.params.length/maxcelllength_meters;
+            int num_cells = OTMUtils.approximately_equals(r%1.0,0.0) ? (int) r :  1+((int) r);
+            float cell_length_meters = link.params.length/num_cells;
+            float vc_mps = link.get_fastest_ffspeed_kph() * 1000f / 3600f;
+            float simdtl = cell_length_meters / vc_mps;
+            simdt = Math.min(simdt ,simdtl );
+        }
+        return simdt;
     }
 
     /////////////////////////////////////
