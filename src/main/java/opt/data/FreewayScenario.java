@@ -50,7 +50,7 @@ public class FreewayScenario {
         scenario = new Scenario(this);
         create_isolated_segment(segmentname,params, AbstractLink.Type.freeway);
         scenario.commodities.put(0l,new Commodity(0l,"Car",1f));
-        this.lcmodel = new LaneChangeModel(UserSettings.defaultLaneChoice_keep, UserSettings.defaultLaneChoice_rhovpmplane);
+        this.lcmodel = new LaneChangeModel(UserSettings.defaultLaneChoice_alpha, UserSettings.defaultLaneChoice_epsilon,UserSettings.defaultLaneChoice_gamma);
         reset_max_ids();
     }
 
@@ -74,22 +74,26 @@ public class FreewayScenario {
             if (model.getLanechanges()!=null && !model.getLanechanges().getLanechange().isEmpty()) {
                 assert (model.getLanechanges().getLanechange().size() == 1);
                 jaxb.Lanechange lc = model.getLanechanges().getLanechange().get(0);
-                double keep = UserSettings.defaultLaneChoice_keep;
-                double rho_vpkmplane = UserSettings.defaultLaneChoice_rhovpmplane / 1.609;
+                double alpha = UserSettings.defaultLaneChoice_alpha;
+                double epsilon = UserSettings.defaultLaneChoice_epsilon;
+                double gamma = UserSettings.defaultLaneChoice_gamma;
                 for (jaxb.Parameter p : lc.getParameters().getParameter()) {
                     switch (p.getName()) {
-                        case "keep":
-                            keep = Double.parseDouble(p.getValue());
+                        case "alpha":
+                            alpha = Double.parseDouble(p.getValue());
                             break;
-                        case "rho_vpkmplane":
-                            rho_vpkmplane = Double.parseDouble(p.getValue());
+                        case "epsilon":
+                            epsilon = Double.parseDouble(p.getValue());
+                            break;
+                        case "gamma":
+                            gamma = Double.parseDouble(p.getValue());
                             break;
                     }
                 }
-                this.lcmodel = new LaneChangeModel(keep, rho_vpkmplane * 1.609);
+                this.lcmodel = new LaneChangeModel(alpha, epsilon, gamma);
 
             } else {
-                this.lcmodel = new LaneChangeModel(UserSettings.defaultLaneChoice_keep, UserSettings.defaultLaneChoice_rhovpmplane);
+                this.lcmodel = new LaneChangeModel(UserSettings.defaultLaneChoice_alpha, UserSettings.defaultLaneChoice_epsilon,UserSettings.defaultLaneChoice_gamma);
             }
 
             set_max_celllength_meters(model.getModelParams().getMaxCellLength());
@@ -709,20 +713,22 @@ public class FreewayScenario {
     // API lane change model
     /////////////////////////////////////
 
+    // TODO remove this
     public double get_lc_keep(){
-        return lcmodel.keep;
+        return Double.NaN;
     }
 
+    // TODO remove this
     public double get_lc_density_vpmilepl(){
-        return lcmodel.density_vpmileplane;
+        return Double.NaN;
     }
 
+    // TODO remove this
     public void set_lc_keep(double x){
-        lcmodel.keep = x;
     }
 
+    // TODO remove this
     public void set_lc_density_vpmilepl(double x){
-        lcmodel.density_vpmileplane = x;
     }
 
     /////////////////////////////////////

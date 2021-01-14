@@ -105,10 +105,14 @@ public class UserSettings {
     public static double queueOverrideTriggerThreshold = 0.2;
     
     public static double defaultQosSpeedThresholdKph = 72.4205;
-    
-    public static double defaultLaneChoice_keep = 1.8;   // positive utility of not changing lanes
-    public static double defaultLaneChoice_rhovpmplane = 0.0115; // positive utility of choosing a lane with density in vpm
-    public static double defaultLaneChoice_tollcents = 0.0053;     // positive utility of not paying a toll in cents
+
+    public static double defaultLaneChoice_keep = Double.NaN;       // no longer used
+    public static double defaultLaneChoice_rhovpmplane = Double.NaN;     // no longer used
+    public static double defaultLaneChoice_tollcents = Double.NaN;     // no longer used
+
+    public static double defaultLaneChoice_alpha = 1.0;
+    public static double defaultLaneChoice_epsilon = 1.0;
+    public static double defaultLaneChoice_gamma = 300d;
     
     public static double minGPRampMeteringRatePerLaneVph = 160;
     public static double minManagedRampMeteringRatePerLaneVph = 320;
