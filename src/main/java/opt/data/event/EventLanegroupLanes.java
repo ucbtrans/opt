@@ -24,7 +24,7 @@ public class EventLanegroupLanes extends AbstractEventLaneGroup  {
             jevent.setParameters(pmtrs);
             jaxb.Parameter pmtr = new jaxb.Parameter();
             pmtrs.getParameter().add(pmtr);
-            pmtr.setName("lanes");
+            pmtr.setName("dlanes");
             pmtr.setValue(String.format("%d",delta_lanes));
         }
 

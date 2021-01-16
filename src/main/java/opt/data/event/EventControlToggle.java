@@ -34,7 +34,7 @@ public class EventControlToggle extends AbstractEvent {
         jaxb.EventTarget jtgt = new jaxb.EventTarget();
         jevent.setEventTarget(jtgt);
         jtgt.setIds(OTMUtils.comma_format(controllers.stream().map(x->x.getId()).collect(toList())));
-        jtgt.setType("controllers");
+        jtgt.setType("actuators");
 
         jaxb.Parameters pmtrs = new jaxb.Parameters();
         jevent.setParameters(pmtrs);

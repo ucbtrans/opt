@@ -349,9 +349,9 @@ public class FreewayScenario {
                         event = new EventLinkToggle(id,type,timestamp,jname,links,isopen);
                         break;
 
-                    case "controltgl":
+                    case "acttgl":
 
-                        if(!jev.getEventTarget().getType().equals("controllers"))
+                        if(!jev.getEventTarget().getType().equals("actuators"))
                             throw new Exception("Bad event target type");
 
                         // get the controllers
@@ -401,12 +401,12 @@ public class FreewayScenario {
                         if(lgtypes.size()!=1)
                             throw new Exception("lgtypes.size()!=1");
 
-                        Integer deltalanes = null;
+                        Integer dlanes = null;
                         if(jev.getParameters()!=null)
                             for(jaxb.Parameter p : jev.getParameters().getParameter())
-                                if(p.getName().equals("lanes"))
-                                    deltalanes = Integer.parseInt(p.getValue());
-                        event = new EventLanegroupLanes(id,type,timestamp,jname,links,lgtypes.iterator().next(),deltalanes);
+                                if(p.getName().equals("dlanes"))
+                                    dlanes = Integer.parseInt(p.getValue());
+                        event = new EventLanegroupLanes(id,type,timestamp,jname,links,lgtypes.iterator().next(),dlanes);
                         break;
 
                     case "lgfd":
@@ -1154,7 +1154,7 @@ public class FreewayScenario {
     }
 
     public EventControlToggle add_event_controltoggle(float timestamp, String name, List<ControlSchedule> controllers, boolean ison) throws Exception {
-        EventControlToggle event = new EventControlToggle(new_event_id(),"controltgl",timestamp,name,controllers,ison);
+        EventControlToggle event = new EventControlToggle(new_event_id(),"acttgl",timestamp,name,controllers,ison);
         if(event_conflicts(event))
             throw new Exception("Event conflicts.");
         scenario.events.put(event.id,event);
