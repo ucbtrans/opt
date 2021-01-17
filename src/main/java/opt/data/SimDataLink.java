@@ -247,10 +247,11 @@ public class SimDataLink {
         for(int k=0;k<scndata.numtime();k++) {
 
             for(SimDataLanegroup lg : X.lgDatas) {
-                veh = lg.get_sum_veh_for_time(X.commids, k, scndata.haslgdata);
+                veh = lg.get_sum_vehdwn_for_time(X.commids, k, scndata.haslgdata);
                 if(veh>0d){
                     flw = lg.get_sum_flw_for_time(X.commids, k, scndata.haslgdata);
-                    delays[k] += Math.max( 0d, (veh-flw*length_over_threshold)*dt_hr );
+                    double val = veh-flw*length_over_threshold;
+                    delays[k] += Math.max( 0d, val*dt_hr );
                 }
             }
 
@@ -261,7 +262,7 @@ public class SimDataLink {
                 for(LaneGroupType lgtype : X.lgtypes) {
                     if(my_ghost_source.lgData.containsKey(lgtype)){
                         SimDataLanegroup lg = my_ghost_source.lgData.get(lgtype);
-                        veh = lg.get_sum_veh_for_time(X.commids, k, scndata.haslgdata);
+                        veh = lg.get_sum_vehdwn_for_time(X.commids, k, scndata.haslgdata);
                         if(veh>0d) {
                             flw = lg.get_sum_flw_for_time(X.commids, k, scndata.haslgdata);
                             delays[k] += veh == 0d ? 0d : Math.max(0d, (veh - flw * source_length_over_threshold) * dt_hr);

@@ -132,6 +132,7 @@ public class OTMTask  extends Task {
 				for(Long commid : fwyscenario.get_commodities().keySet()) {
 					otm.output.request_lanegroup_flw(prefix,output_folder,commid,linkids,outdt);
 					otm.output.request_lanegroup_sum_veh(prefix,output_folder,commid,linkids,outdt);
+					otm.output.request_lanegroup_sum_veh_dwn(prefix,output_folder,commid,linkids,outdt);
 				}
 			}
 

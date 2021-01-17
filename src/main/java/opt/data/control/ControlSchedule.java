@@ -101,7 +101,7 @@ public class ControlSchedule implements Comparable {
                 break;
 
             case LgRestrict:
-                jact.setType("lg_restrict");
+                jact.setType("lg_allowcomm");
                 jtgt = new jaxb.ActuatorTarget();
                 jact.setActuatorTarget(jtgt);
                 jtgt.setType("lanegroups");

@@ -72,16 +72,24 @@ public class SimDataScenario {
                 .map(s->(OutputLaneGroupSumVehicles)s)
                 .collect(toSet());
 
+        Set<OutputLaneGroupSumVehiclesDwn> vehsdwn = otmdev.output.get_data().stream()
+                .filter(s->s.type==AbstractOutput.Type.lanegroup_sumvehdwn)
+                .map(s->(OutputLaneGroupSumVehiclesDwn)s)
+                .collect(toSet());
+
+
         for(Long commid : commids){
 
             Optional<OutputLaneGroupFlow> oflw = flws.stream().filter(s->s.get_commodity_id()==commid).findFirst();
             Optional<OutputLaneGroupSumVehicles> oveh = vehs.stream().filter(s->s.get_commodity_id()==commid).findFirst();
+            Optional<OutputLaneGroupSumVehiclesDwn> ovehdwn = vehsdwn.stream().filter(s->s.get_commodity_id()==commid).findFirst();
 
-            if(!oflw.isPresent() || !oveh.isPresent())
+            if(!oflw.isPresent() || !oveh.isPresent() || !ovehdwn.isPresent())
                 continue;
 
             OutputLaneGroupFlow flw = oflw.get();
             OutputLaneGroupSumVehicles veh = oveh.get();
+            OutputLaneGroupSumVehiclesDwn vehdwn = ovehdwn.get();
 
             for(AbstractLaneGroup alg : veh.ordered_lgs) {
 
@@ -96,6 +104,7 @@ public class SimDataScenario {
                 lgdata.set_lg_data(commid,
                         flw.lgprofiles.get(alg.getId()).profile.values,
                         veh.lgprofiles.get(alg.getId()).profile.values,
+                        vehdwn.lgprofiles.get(alg.getId()).profile.values,
                         sim_dt,outdt);
 
             }

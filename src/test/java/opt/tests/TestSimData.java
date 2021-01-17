@@ -19,7 +19,7 @@ public class TestSimData extends AbstractTest {
 
     final long car = 0l;
     final long truck = 1l;
-    final long linkid = 3l;
+    final long linkid = 1l;
     final long routeA = 3l;
     final long routeB = 2l;
     SimDataScenario simdata;
@@ -32,7 +32,7 @@ public class TestSimData extends AbstractTest {
         // load
         OTMTask task = null;
 //        String project_file_name = get_test_fullpath("project.opt");
-        String project_file_name = "/home/gomes/Downloads/issue_165.opt";
+        String project_file_name = "/home/gomes/Desktop/x/issue_248.opt";
         boolean validate = true;
         try {
             Project project = ProjectFactory.load_project(project_file_name,validate);
@@ -82,8 +82,8 @@ public class TestSimData extends AbstractTest {
     public void network_delay(){
         XYSeriesCollection A = new XYSeriesCollection();
         A.addSeries(simdata.get_delay_for_network(null,20f).get_XYSeries("20 mph"));
-        A.addSeries(simdata.get_delay_for_network(null,35f).get_XYSeries("35 mph"));
-        A.addSeries(simdata.get_delay_for_network(null,50f).get_XYSeries("50 mph"));
+//        A.addSeries(simdata.get_delay_for_network(null,35f).get_XYSeries("35 mph"));
+//        A.addSeries(simdata.get_delay_for_network(null,50f).get_XYSeries("50 mph"));
         TestPlot.plot(A,
                 "network delay",
                 "veh hours",
