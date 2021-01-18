@@ -1418,7 +1418,9 @@ public class FreewayScenario {
             scenario.nodes.put(newnode.id,newnode);                                                  // ADDED GHOST NODE
 
             // create params
-            ParametersFreeway newparams = new ParametersFreeway("",link.get_lanes(),
+            ParametersFreeway newparams = new ParametersFreeway(
+                    "",
+                    link.get_lanes(),
                     0,
                     false,
                     false,
@@ -1485,10 +1487,13 @@ public class FreewayScenario {
             scenario.nodes.put(newnode.id,newnode);                                                  // ADDED GHOST NODE
 
             // create params
-            ParametersFreeway newparams = new ParametersFreeway("",link.get_lanes(),
-                    link.get_mng_lanes(),
-                    false,false,
-                    link.get_aux_lanes(),
+            ParametersFreeway newparams = new ParametersFreeway(
+                    "",
+                    link.get_lanes(),
+                    0,
+                    false,
+                    false,
+                    0,
                     link.get_length_meters(),
                     link.get_gp_capacity_vphpl(),
                     link.get_gp_jam_density_vpkpl(),
