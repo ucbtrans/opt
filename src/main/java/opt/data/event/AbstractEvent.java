@@ -1,6 +1,7 @@
 package opt.data.event;
 
-public abstract class AbstractEvent {
+public abstract class AbstractEvent implements Comparable<AbstractEvent> {
+
 
     public final long id;
     public final String type;
@@ -23,4 +24,8 @@ public abstract class AbstractEvent {
         return jevent;
     }
 
+    @Override
+    public int compareTo(AbstractEvent that) {
+        return Float.compare(this.timestamp,that.timestamp);
+    }
 }
