@@ -1145,6 +1145,13 @@ public class FreewayScenario {
     // API events
     /////////////////////////////////////
 
+    public List<AbstractEvent> get_events(){
+        List<AbstractEvent> events = new ArrayList<>();
+        events.addAll(scenario.events.values());
+        Collections.sort(events);
+        return events;
+    }
+
     public EventLinkToggle add_event_linktoggle(float timestamp, String name, List<AbstractLink> links, boolean isopen) throws Exception {
         EventLinkToggle event = new EventLinkToggle(new_event_id(),"linktgl",timestamp,name,links,isopen);
         if(event_conflicts(event))
