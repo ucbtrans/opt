@@ -555,11 +555,6 @@
                                           </TabPane>
                                        </content>
                                     </TitledPane>
-                                    <TitledPane id="linkEventPane" fx:id="linkEventPane1" animated="false" disable="true" expanded="false" layoutX="10.0" layoutY="135.0" prefHeight="198.0" prefWidth="514.0" text="Events">
-                                       <content>
-                                          <AnchorPane prefHeight="300.0" prefWidth="512.0" />
-                                       </content>
-                                    </TitledPane>
                                 </panes>
                               </Accordion>
                            </children>

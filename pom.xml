@@ -265,6 +265,13 @@
             <artifactId>javafx-fxml</artifactId>
             <version>11</version>
         </dependency>
+        
+        <!-- JavaFX WebView -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>11</version>
+        </dependency>
 
         <!-- JUNIT -->
         <dependency>
