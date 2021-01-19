@@ -64,7 +64,7 @@
                      <accelerator>
                         <KeyCodeCombination alt="ANY" code="F6" control="UP" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
-            <MenuItem id="menuSimulationFullExcelReport" fx:id="menuSimulationFullExcelReport" disable="true" mnemonicParsing="false" onAction="#onFullExcelReport" text="Full Excel Report" visible="false">
+            <MenuItem id="menuSimulationFullExcelReport" fx:id="menuSimulationFullExcelReport" disable="true" mnemonicParsing="false" onAction="#onFullExcelReport" text="Full Excel Report">
                      <accelerator>
                         <KeyCodeCombination alt="ANY" code="F10" control="UP" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
@@ -73,6 +73,11 @@
         <Menu mnemonicParsing="false" text="Help">
           <items>
             <MenuItem id="menuHelpAbout" fx:id="menuHelpAbout" mnemonicParsing="false" onAction="#onClickMenuHelpAbout" text="About..." />
+                  <MenuItem id="menuHelpOnline" fx:id="menuHelpOnline" mnemonicParsing="false" onAction="#onMenuHelpOnline" text="Online Help">
+                     <accelerator>
+                        <KeyCodeCombination alt="ANY" code="F1" control="UP" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
           </items>
         </Menu>
       </menus>
