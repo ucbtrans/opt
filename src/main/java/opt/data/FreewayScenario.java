@@ -615,42 +615,22 @@ public class FreewayScenario {
     private void read_frflow(jaxb.Controller jcnt,Map<Long,jaxb.Actuator> actuators) throws Exception {
 
         // actuator ..........................
-        long target_act_id = Long.parseLong(jcnt.getTargetActuators().getIds());
-        jaxb.Actuator jact = actuators.get(target_act_id);
-//        List<Long> linksout = null;
-//        Long linkin;
-        Long commid = null;
-        for(jaxb.Parameter p : jact.getParameters().getParameter()){
-            switch(p.getName()){
-//                case "linksout":
-//                    linksout = OTMUtils.csv2longlist(p.getValue());
-//                    break;
-//                case "linkin":
-//                    linkin = Long.parseLong(p.getValue());
-//                    break;
-                case "comm":
-                    commid = Long.parseLong(p.getValue());
-                    break;
-            }
-        }
+        long act_id = Long.parseLong(jcnt.getTargetActuators().getIds());
+        jaxb.Actuator jact = actuators.get(act_id);
+
+        long commid = Long.parseLong(jact.getActuatorTarget().getCommids());
+        float start_time = jcnt.getStartTime();
+        Float dt = jcnt.getDt()==null ? 300f : jcnt.getDt();
 
         // controller ................................
-//        float ctrl_start_time = jcnt.getStartTime();
-//        boolean usefrflows = ctrl_start_time!=100000;
-
         if(jcnt.getProfiles()!=null) {
             for (jaxb.Profile p : jcnt.getProfiles().getProfile()) {
-
                 long frid = p.getId();
-                float prof_start_time = p.getStartTime();
-                float prof_dt = p.getDt();
                 List<Double> prof_flow = OTMUtils.csv2list(p.getContent());
-
-                Profile1D profile = new Profile1D(prof_start_time, prof_dt, prof_flow);
+                Profile1D profile = new Profile1D(start_time, dt, prof_flow);
                 LinkOfframp fr = (LinkOfframp) scenario.links.get(frid);
-                fr.set_use_fr_flows(profile.start_time!=100000);
+                fr.set_use_fr_flows(true);
                 fr.set_frflow(commid,profile);
-
             }
         }
 

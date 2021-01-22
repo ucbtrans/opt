@@ -265,7 +265,8 @@ public class Scenario {
         // road connections .....................................
         jaxb.Roadconnections jRCs = new jaxb.Roadconnections();
         jNet.setRoadconnections(jRCs);
-        List<jaxb.Roadconnection> rcs =jRCs. getRoadconnection();
+        List<jaxb.Roadconnection> jrcs = jRCs.getRoadconnection();
+        Set<RoadConnection> rcs = new HashSet<>();
 
         Set<LinkGhost> ghostlinks = my_fwy_scenario.ghost_pieces==null?null:my_fwy_scenario.ghost_pieces.links;
 
@@ -283,13 +284,15 @@ public class Scenario {
 
                 // I) mng->mng
                 if( up_link.has_mng() & dn_link.has_mng())
-                    rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.mng,dn_link,LaneGroupType.mng) );
+                    jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.mng,dn_link,LaneGroupType.mng) );
 
                 // II) add gp-> gp
-                if(ghostlinks!=null && (ghostlinks.contains(up_link) || ghostlinks.contains(dn_link)))
-                    rcs.add( make_road_connection(my_fwy_scenario,up_link,null,dn_link,null) );
+                if(ghostlinks!=null && ghostlinks.contains(up_link) )
+                    jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,null,dn_link,null) );
+                else if(ghostlinks!=null && ghostlinks.contains(dn_link))
+                    jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.gp,dn_link,null) );
                 else
-                    rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,dn_link,LaneGroupType.gp) );
+                    jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.gp,dn_link,LaneGroupType.gp) );
 
             }
 
@@ -298,22 +301,22 @@ public class Scenario {
 
                 // III) aux->aux
                 if( ((dn_link instanceof LinkFreeway) || (dn_link instanceof LinkGhost)) && up_link.has_aux() && dn_link.has_aux())
-                    rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.aux,dn_link,LaneGroupType.aux) );
+                    jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.aux,dn_link,LaneGroupType.aux) );
 
                 // IV) mng->inner offramp or gp->inner offramp
                 for(LinkOfframp offramp : up_segment.in_frs)
                     if( up_link.has_mng())
-                        rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.mng,offramp,null) );
+                        jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.mng,offramp,null) );
                     else
-                        rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,offramp,null) );
+                        jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.gp,offramp,null) );
 
 
                 // V) gp->outer offramp or aux->outer offramp
                 for(LinkOfframp offramp : up_segment.out_frs)
                     if( up_link.has_aux() )
-                        rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.aux,offramp,null) );
+                        jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.aux,offramp,null) );
                     else
-                        rcs.add( make_road_connection(my_fwy_scenario,up_link,LaneGroupType.gp,offramp,null) );
+                        jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.gp,offramp,null) );
 
             }
 
@@ -325,16 +328,16 @@ public class Scenario {
                 // VI) inner or -> fwy mng OR inner or ->fwy gp
                 if (up_link.get_is_inner())
                     if (dn_link.has_mng())
-                        rcs.add( make_road_connection(my_fwy_scenario, up_link, null, dn_link, LaneGroupType.mng) );
+                        jrcs.add( make_road_connection(my_fwy_scenario,rcs, up_link, null, dn_link, LaneGroupType.mng) );
                     else
-                        rcs.add( make_road_connection(my_fwy_scenario, up_link, null, dn_link, LaneGroupType.gp) );
+                        jrcs.add( make_road_connection(my_fwy_scenario,rcs, up_link, null, dn_link, LaneGroupType.gp) );
 
                 // VII) outer or -> fwy aux OR outer or->fwy gp
                 if (!up_link.get_is_inner())
                     if (dn_link.has_aux())
-                        rcs.add( make_road_connection(my_fwy_scenario, up_link, null, dn_link, LaneGroupType.aux) );
+                        jrcs.add( make_road_connection(my_fwy_scenario,rcs, up_link, null, dn_link, LaneGroupType.aux) );
                     else
-                        rcs.add( make_road_connection(my_fwy_scenario, up_link, null, dn_link, LaneGroupType.gp) );
+                        jrcs.add( make_road_connection(my_fwy_scenario,rcs, up_link, null, dn_link, LaneGroupType.gp) );
 
             }
 
@@ -375,6 +378,7 @@ public class Scenario {
             if(frs.isEmpty())
                 continue;
 
+            boolean has_fr_flows = frs.stream().anyMatch(x->x.usefrflows);
             LinkFreeway up_ml = (LinkFreeway) segment.fwy;
 
             LinkFreewayOrConnector dn_ml = (LinkFreewayOrConnector) up_ml.dn_link;  // actually Freeway or Ghost
@@ -388,22 +392,25 @@ public class Scenario {
                 Set<Float> dts = new HashSet<>();
                 int prof_size = Integer.MIN_VALUE;
                 for(LinkOfframp fr : frs) {
+                    if(fr.usefrflows)
+                        continue;
                     Profile1D prof = fr.get_splits(comm.id, UserSettings.defaultSRDtMinutes*60);
                     outlink2Profile.put(fr.id, prof);
                     dts.add(prof.dt);
                     prof_size = Math.max(prof_size,prof.get_length());
                 }
 
-                if(dts.size()!=1)
+                if(!outlink2Profile.isEmpty() && dts.size()!=1)
                     System.err.println("RG)@J$G 2-43j");
-                Float dt = dts.iterator().next();
+                Float dt = dts.isEmpty() ? null : dts.iterator().next();
 
                 // pad all offramp profiles
                 for(Profile1D profile : outlink2Profile.values())
                     profile.pad_to_length(prof_size);
 
                 // profile for downstream mainline
-                if(dn_ml!=null) {
+                // only if all offramps are defined by splits. Otherwise split will be computed by controller.
+                if(dn_ml!=null && !has_fr_flows) {
                     Profile1D ml_prof = new Profile1D(0f, dt);
                     for (int i = 0; i < prof_size; i++) {
                         float value = 1f;
@@ -417,18 +424,20 @@ public class Scenario {
                 }
 
                 // to jaxb: offramps
-                jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
-                jsplits.getSplitNode().add(jsplitnode);
-                jsplitnode.setCommodityId(comm.id);
-                jsplitnode.setNodeId(node.id);
-                jsplitnode.setLinkIn(up_ml.id);
-                if(dt!=null)
-                    jsplitnode.setDt(dt);
-                for( Map.Entry<Long,Profile1D> e : outlink2Profile.entrySet() ){
-                    jaxb.Split jsplit = new jaxb.Split();
-                    jsplitnode.getSplit().add(jsplit);
-                    jsplit.setLinkOut(e.getKey());
-                    jsplit.setContent(OTMUtils.comma_format(e.getValue().get_values()));
+                if(!outlink2Profile.isEmpty()) {
+                    jaxb.SplitNode jsplitnode = new jaxb.SplitNode();
+                    jsplits.getSplitNode().add(jsplitnode);
+                    jsplitnode.setCommodityId(comm.id);
+                    jsplitnode.setNodeId(node.id);
+                    jsplitnode.setLinkIn(up_ml.id);
+                    if (dt != null)
+                        jsplitnode.setDt(dt);
+                    for (Map.Entry<Long, Profile1D> e : outlink2Profile.entrySet()) {
+                        jaxb.Split jsplit = new jaxb.Split();
+                        jsplitnode.getSplit().add(jsplit);
+                        jsplit.setLinkOut(e.getKey());
+                        jsplit.setContent(OTMUtils.comma_format(e.getValue().get_values()));
+                    }
                 }
 
             }
@@ -523,75 +532,73 @@ public class Scenario {
                 jsnss.getSensor().add(s.to_jaxb());
 
         /////////////////////////////////////////////////////
-        // offramp flows
+        // onramp and offramp flows
         for(Segment segment : my_fwy_scenario.segments.values()) {
 
             if (segment.fwy.get_type() != AbstractLink.Type.freeway)
                 continue;
 
             LinkFreeway up_ml = (LinkFreeway) segment.fwy;
+            LinkFreewayOrConnector dn_ml = (LinkFreewayOrConnector) up_ml.dn_link;  // actually Freeway or Ghost
 
-            List<LinkOfframp> all_frs = segment.get_frs();
-            Set<Long> commids = all_frs.stream().flatMap(f->f.frflows.keySet().stream()).collect(Collectors.toSet());
+            // controllers for keeping onramp flow on the mainline
+            if(dn_ml!=null) {
+                for (LinkOnramp or : segment.get_ors()) {
 
-            if(commids.isEmpty())
-                continue;
+                    AbstractLink or_up_link = or.get_up_link();
+                    // if the previous is a ghost link with source, then take its demands
+                    if(or_up_link instanceof LinkGhost) {
 
-            for(Long commid : commids){
+                        for (Map.Entry<Long, Profile1D> e : or_up_link.demands.entrySet()) {
+                            Long commid = e.getKey();
+                            Profile1D prof = e.getValue();
+                            if (prof.values.stream().allMatch(v -> v == 0))
+                                continue;
+                            long ctrlid = my_fwy_scenario.new_schedule_id();
 
-                long ctrlid = my_fwy_scenario.new_schedule_id();
+                            // rcid
+                            Optional<RoadConnection> orc = rcs.stream()
+                                    .filter(r -> r.outlink == up_ml.id && r.inlink == or.id)
+                                    .findFirst();
+                            Long rcid = orc.isPresent() ? orc.get().id : null;
 
-                Set<LinkOfframp> frs = all_frs.stream().filter(f->f.usefrflows && f.frflows.containsKey(commid)).collect(Collectors.toSet());
+                            // actuator ............................
+                            jacts.getActuator().add(create_linkflow_actuator(ctrlid, commid, up_ml.id, rcid));
 
-                // actuator ............................
-                jaxb.Actuator act = new jaxb.Actuator();
-                jacts.getActuator().add(act);
-                act.setId(ctrlid);
-                act.setType("flowtolink");
+                            // controller
+                            Map<Long, Profile1D> profiles = new HashMap<>();
+                            profiles.put(dn_ml.id, prof);
+                            jcntrls.getController().add(create_linkflow_controller(ctrlid, profiles));
+                        }
+                    }
+                }
+            }
 
-                jaxb.Parameters aps = new jaxb.Parameters();
-                act.setParameters(aps);
 
-                jaxb.Parameter ap1 = new jaxb.Parameter();
-                aps.getParameter().add(ap1);
-                ap1.setName("linkin");
-                ap1.setValue(String.format("%d",up_ml.id));
+            // controllers for specified offramp flow
+            Set<LinkOfframp> frs_useflow = segment.get_frs().stream()
+                    .filter(f->f.usefrflows)
+                    .collect(Collectors.toSet());
 
-                jaxb.Parameter ap2 = new jaxb.Parameter();
-                aps.getParameter().add(ap2);
-                ap2.setName("linksout");
-                ap2.setValue(OTMUtils.comma_format(frs.stream().map(f->f.id).collect(Collectors.toSet())));
+            if(!frs_useflow.isEmpty()) {
 
-                jaxb.Parameter ap3 = new jaxb.Parameter();
-                aps.getParameter().add(ap3);
-                ap3.setName("comm");
-                ap3.setValue(String.format("%d",commid));
+                for (Long commid : commodities.keySet()) {
 
-                // controller ..............................
-                jaxb.Controller ctrl = new jaxb.Controller();
-                jcntrls.getController().add(ctrl);
-                ctrl.setId(ctrlid);
-                ctrl.setType("linkflow");
-                ctrl.setStartTime(0f);
+                    long ctrlid = my_fwy_scenario.new_schedule_id();
 
-                jaxb.TargetActuators ta = new jaxb.TargetActuators();
-                ctrl.setTargetActuators(ta);
-                ta.setIds(String.format("%d",ctrlid));
+                    // rcid
+                    Optional<RoadConnection> orc = rcs.stream()
+                            .filter(r -> r.outlink == up_ml.id && (r.outlgtype == LaneGroupType.gp || r.outlgtype == null))
+                            .findFirst();
+                    Long rcid = orc.isPresent() ? orc.get().id : null;
 
-                jaxb.Profiles profs = new jaxb.Profiles();
-                ctrl.setProfiles(profs);
+                    // actuator ............................
+                    jacts.getActuator().add(create_linkflow_actuator(ctrlid, commid, up_ml.id, rcid));
 
-                for(LinkOfframp fr : frs){
-                    if(!fr.frflows.containsKey(commid))
-                        continue;
-
-                    Profile1D frflowprof = fr.frflows.get(commid);
-                    jaxb.Profile prof = new jaxb.Profile();
-                    profs.getProfile().add(prof);
-                    prof.setStartTime(fr.get_use_fr_flows()?simdt:100000f);
-                    prof.setDt(frflowprof.dt);
-                    prof.setId(fr.id);
-                    prof.setContent(OTMUtils.comma_format(frflowprof.values));
+                    // controller ..............................
+                    Map<Long, Profile1D> profiles = frs_useflow.stream()
+                            .collect(Collectors.toMap(fr->fr.get_id(),fr->fr.frflows.get(commid)));
+                    jcntrls.getController().add(create_linkflow_controller(ctrlid, profiles));
                 }
             }
         }
@@ -604,6 +611,59 @@ public class Scenario {
             jevent.getEvent().add(event.to_jaxb());
 
         return jScn;
+    }
+
+    private jaxb.Actuator create_linkflow_actuator(long actid,long commid,long linkid,Long rcid){
+
+        // actuator ............................
+        jaxb.Actuator act = new jaxb.Actuator();
+        act.setId(actid);
+        act.setType("flowtolink");
+        act.setPassive("true");
+
+        jaxb.ActuatorTarget acttarg = new jaxb.ActuatorTarget();
+        act.setActuatorTarget(acttarg);
+        acttarg.setType("link");
+        acttarg.setId(String.format("%d",linkid));
+        acttarg.setCommids(String.format("%d",commid));
+
+        jaxb.Parameters aps = new jaxb.Parameters();
+        act.setParameters(aps);
+
+        // it may not be present when saving to .opt, but that doesn't matter
+        if(rcid!=null) {
+            jaxb.Parameter ap1 = new jaxb.Parameter();
+            aps.getParameter().add(ap1);
+            ap1.setName("rcid");
+            ap1.setValue(String.format("%d", rcid));
+        }
+
+        return act;
+    }
+
+    private jaxb.Controller create_linkflow_controller(long ctrlid, Map<Long, Profile1D> profiles){
+        jaxb.Controller ctrl = new jaxb.Controller();
+        ctrl.setId(ctrlid);
+        ctrl.setType("linkflow");
+        ctrl.setStartTime(0f);
+        if(!profiles.isEmpty())
+            ctrl.setDt(profiles.values().iterator().next().dt);
+
+        jaxb.TargetActuators ta = new jaxb.TargetActuators();
+        ctrl.setTargetActuators(ta);
+        ta.setIds(String.format("%d",ctrlid));
+
+        jaxb.Profiles profs = new jaxb.Profiles();
+        ctrl.setProfiles(profs);
+
+        for(Map.Entry<Long, Profile1D> e : profiles.entrySet()){
+            Profile1D profile = e.getValue();
+            jaxb.Profile jprof = new jaxb.Profile();
+            profs.getProfile().add(jprof);
+            jprof.setId(e.getKey());
+            jprof.setContent(OTMUtils.comma_format(profile.values));
+        }
+        return ctrl;
     }
 
     /////////////////////////////////////
@@ -647,7 +707,7 @@ public class Scenario {
 
     }
 
-    private jaxb.Roadconnection make_road_connection(FreewayScenario scn, AbstractLink in_link, LaneGroupType in_lg, AbstractLink out_link, LaneGroupType out_lg){
+    private jaxb.Roadconnection make_road_connection(FreewayScenario scn,Set<RoadConnection> rcs, AbstractLink in_link, LaneGroupType in_lg, AbstractLink out_link, LaneGroupType out_lg){
         jaxb.Roadconnection rc = new jaxb.Roadconnection();
 
         rc.setId(scn.new_rc_id());
@@ -658,6 +718,7 @@ public class Scenario {
         if(out_lg!=null)
             rc.setOutLinkLanes(lanestring(out_link,out_lg));
 
+        rcs.add(new RoadConnection(rc.getId(),in_link.id,in_lg,out_link.id,out_lg));
         return rc;
     }
 
