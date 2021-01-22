@@ -102,6 +102,10 @@ public class AppMainController {
     private PreferencesController preferencesController = null;
     private Scene preferencesScene = null;
     
+    private GridPane helpPane = null;
+    private HelpController helpController = null;
+    private Scene helpScene = null;
+    
     private GridPane simProgressPane = null;
     private SimulationController simulationController = null;
     private Scene simProgressScene = null;
@@ -201,6 +205,9 @@ public class AppMainController {
 
     @FXML // fx:id="menuHelpAbout"
     private MenuItem menuHelpAbout; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="menuHelpOnline"
+    private MenuItem menuHelpOnline; // Value injected by FXMLLoader
 
     @FXML // fx:id="projectTree"
     private TreeView<String> projectTree; // Value injected by FXMLLoader
@@ -572,6 +579,12 @@ public class AppMainController {
             preferencesPane = loader.load();
             preferencesController = loader.getController();
             preferencesScene = new Scene(preferencesPane);
+            
+            
+            loader = new FXMLLoader(getClass().getResource("/help.fxml"));
+            helpPane = loader.load();
+            helpController = loader.getController();
+            helpScene = new Scene(helpPane);
             
             
             loader = new FXMLLoader(getClass().getResource("/simulation_run.fxml"));
@@ -965,10 +978,25 @@ public class AppMainController {
         String versionName = "OPT Alpha release";
         String optgit = Version.getOPTGitHash();
         String otmgit = Version.getOTMSimGitHash();
-        String date = "2020/11/06";
+        String date = "2021/01/31";
         String content = String.format("%s\nDate: %s\nOPT git hash: %s...\nOTM git hash: %s...",versionName,date,
                 optgit.substring(0,10),otmgit.substring(0,10));
         opt.utils.Dialogs.InformationDialog(null, content);
+    }
+    
+    
+    @FXML
+    void onMenuHelpOnline(ActionEvent event) {
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(helpScene);
+        helpController.initHelpBrowser();
+        String title = "OPT Help";
+        inputStage.setTitle(title);
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
     }
     
     
