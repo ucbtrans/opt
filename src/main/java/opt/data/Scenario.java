@@ -410,18 +410,18 @@ public class Scenario {
 
                 // profile for downstream mainline
                 // only if all offramps are defined by splits. Otherwise split will be computed by controller.
-                if(dn_ml!=null && !has_fr_flows) {
-                    Profile1D ml_prof = new Profile1D(0f, dt);
-                    for (int i = 0; i < prof_size; i++) {
-                        float value = 1f;
-                        for (Profile1D fr_prof : outlink2Profile.values())
-                            value -= fr_prof.get_ith_value(i);
-                        if (value < 0)
-                            throw new Exception(String.format("One node %d, commodity %d, offramp splits add up to more than 1.0", node.id, comm.id));
-                        ml_prof.add_entry(value);
-                    }
-                    outlink2Profile.put(dn_ml.id, ml_prof);
-                }
+//                if(dn_ml!=null && !has_fr_flows) {
+//                    Profile1D ml_prof = new Profile1D(0f, dt);
+//                    for (int i = 0; i < prof_size; i++) {
+//                        float value = 1f;
+//                        for (Profile1D fr_prof : outlink2Profile.values())
+//                            value -= fr_prof.get_ith_value(i);
+//                        if (value < 0)
+//                            throw new Exception(String.format("One node %d, commodity %d, offramp splits add up to more than 1.0", node.id, comm.id));
+//                        ml_prof.add_entry(value);
+//                    }
+//                    outlink2Profile.put(dn_ml.id, ml_prof);
+//                }
 
                 // to jaxb: offramps
                 if(!outlink2Profile.isEmpty()) {
@@ -549,25 +549,26 @@ public class Scenario {
                     // if the previous is a ghost link with source, then take its demands
                     if(or_up_link instanceof LinkGhost) {
 
-                        for (Map.Entry<Long, Profile1D> e : or_up_link.demands.entrySet()) {
-                            Long commid = e.getKey();
-                            Profile1D prof = e.getValue();
-                            if (prof.values.stream().allMatch(v -> v == 0))
-                                continue;
-                            long ctrlid = my_fwy_scenario.new_schedule_id();
+                        // rcid
+                        Optional<RoadConnection> orc = rcs.stream()
+                                .filter(r -> r.outlink == up_ml.id && r.inlink == or.id)
+                                .findFirst();
+                        Long rcid = orc.isPresent() ? orc.get().id : null;
 
-                            // rcid
-                            Optional<RoadConnection> orc = rcs.stream()
-                                    .filter(r -> r.outlink == up_ml.id && r.inlink == or.id)
-                                    .findFirst();
-                            Long rcid = orc.isPresent() ? orc.get().id : null;
+
+                        for (Long commid : or_up_link.demands.keySet()) {
+
+                            long ctrlid = my_fwy_scenario.new_schedule_id();
 
                             // actuator ............................
                             jacts.getActuator().add(create_linkflow_actuator(ctrlid, commid, up_ml.id, rcid));
 
                             // controller
+                            Profile1D zeroprof = new Profile1D(0f,0f);
+                            zeroprof.values.add(0d);
                             Map<Long, Profile1D> profiles = new HashMap<>();
-                            profiles.put(dn_ml.id, prof);
+                            for(LinkOfframp fr : segment.get_frs())
+                                profiles.put(fr.id,zeroprof);
                             jcntrls.getController().add(create_linkflow_controller(ctrlid, profiles));
                         }
                     }
