@@ -75,11 +75,11 @@
                         <target_actuators ids="2"/>
                         <schedule>
                             <entry dt="30.0" type="rm_fixed_rate" start_time="0.0">
-<parameters>
-    <parameter name="min_rate_vphpl" value="320"/>
-    <parameter name="rate_vphpl" value="400"/>
-    <parameter name="max_rate_vphpl" value="1400"/>
-</parameters>
+                                <parameters>
+                                    <parameter name="min_rate_vphpl" value="320"/>
+                                    <parameter name="rate_vphpl" value="400"/>
+                                    <parameter name="max_rate_vphpl" value="1400"/>
+                                </parameters>
                             </entry>
                         </schedule>
                     </controller>
@@ -87,20 +87,20 @@
                         <target_actuators ids="1"/>
                         <schedule>
                             <entry dt="30.0" type="rm_alinea" start_time="0.0">
-<feedback_sensors ids="0"/>
-<parameters>
-    <parameter name="min_rate_vphpl" value="300"/>
-    <parameter name="max_rate_vphpl" value="500"/>
-</parameters>
+                                <feedback_sensors ids="0"/>
+                                <parameters>
+                                    <parameter name="min_rate_vphpl" value="300"/>
+                                    <parameter name="max_rate_vphpl" value="500"/>
+                                </parameters>
                             </entry>
                         </schedule>
                     </controller>
                 </controllers>
                 <actuators>
-                    <actuator id="2" type="meter">
+                    <actuator id="2" type="lg_capacity">
                         <actuator_target type="lanegroups" lanegroups="6(1#1)"/>
                     </actuator>
-                    <actuator id="1" type="meter">
+                    <actuator id="1" type="lg_capacity">
                         <actuator_target type="lanegroups" lanegroups="6(2#2)"/>
                     </actuator>
                 </actuators>

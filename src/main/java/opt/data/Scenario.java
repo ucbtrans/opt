@@ -540,9 +540,10 @@ public class Scenario {
 
             LinkFreeway up_ml = (LinkFreeway) segment.fwy;
             LinkFreewayOrConnector dn_ml = (LinkFreewayOrConnector) up_ml.dn_link;  // actually Freeway or Ghost
+            List<LinkOfframp> frs = segment.get_frs();
 
             // controllers for keeping onramp flow on the mainline
-            if(dn_ml!=null) {
+            if(dn_ml!=null && !frs.isEmpty()) {
                 for (LinkOnramp or : segment.get_ors()) {
 
                     AbstractLink or_up_link = or.get_up_link();
@@ -555,7 +556,6 @@ public class Scenario {
                                 .findFirst();
                         Long rcid = orc.isPresent() ? orc.get().id : null;
 
-
                         for (Long commid : or_up_link.demands.keySet()) {
 
                             long ctrlid = my_fwy_scenario.new_schedule_id();
@@ -567,7 +567,7 @@ public class Scenario {
                             Profile1D zeroprof = new Profile1D(0f,0f);
                             zeroprof.values.add(0d);
                             Map<Long, Profile1D> profiles = new HashMap<>();
-                            for(LinkOfframp fr : segment.get_frs())
+                            for(LinkOfframp fr : frs)
                                 profiles.put(fr.id,zeroprof);
                             jcntrls.getController().add(create_linkflow_controller(ctrlid, profiles));
                         }
@@ -577,7 +577,7 @@ public class Scenario {
 
 
             // controllers for specified offramp flow
-            Set<LinkOfframp> frs_useflow = segment.get_frs().stream()
+            Set<LinkOfframp> frs_useflow = frs.stream()
                     .filter(f->f.usefrflows)
                     .collect(Collectors.toSet());
 

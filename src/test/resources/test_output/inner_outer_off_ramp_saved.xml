@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<scenario xmlns="opentrafficmodels">
+    <commodities>
+        <commodity id="0" name="SOV" pvequiv="1.0" pathfull="false"/>
+        <commodity id="1" name="HOV" pvequiv="1.0" pathfull="false"/>
+    </commodities>
+    <network>
+        <nodes>
+            <node id="1"/>
+            <node id="2"/>
+            <node id="3"/>
+            <node id="4"/>
+            <node id="5"/>
+            <node id="6"/>
+            <node id="7"/>
+            <node id="8"/>
+            <node id="9"/>
+            <node id="10"/>
+            <node id="11"/>
+            <node id="12"/>
+            <node id="13"/>
+            <node id="14"/>
+            <node id="15"/>
+            <node id="16"/>
+            <node id="17"/>
+        </nodes>
+        <links>
+            <link id="1" length="321.868" full_lanes="3" start_node_id="1" end_node_id="2" roadparam="2" road_type="freeway"/>
+            <link id="2" length="321.86713" full_lanes="3" start_node_id="2" end_node_id="3" roadparam="2" road_type="freeway"/>
+            <link id="4" length="321.86624" full_lanes="4" start_node_id="3" end_node_id="5" roadparam="1" road_type="freeway"/>
+            <link id="5" length="321.86536" full_lanes="3" start_node_id="5" end_node_id="6" roadparam="2" road_type="freeway"/>
+            <link id="7" length="321.9991" full_lanes="1" start_node_id="5" end_node_id="9" roadparam="3" road_type="offramp"/>
+            <link id="8" length="321.9991" full_lanes="1" start_node_id="10" end_node_id="3" roadparam="3" roadgeom="1" road_type="onramp"/>
+            <link id="13" length="321.9991" full_lanes="1" start_node_id="5" end_node_id="15" roadparam="3" roadgeom="0" road_type="offramp"/>
+            <link id="14" length="321.868" full_lanes="3" start_node_id="16" end_node_id="1" roadparam="2" road_type="freeway"/>
+            <link id="15" length="321.9991" full_lanes="2" start_node_id="17" end_node_id="10" roadparam="3" road_type="freeway"/>
+        </links>
+        <roadgeoms>
+            <roadgeom id="0">
+                <add_lanes isopen="true" side="in" roadparam="0" lanes="1"/>
+            </roadgeom>
+            <roadgeom id="1">
+                <add_lanes isopen="true" side="in" roadparam="0" lanes="1"/>
+            </roadgeom>
+        </roadgeoms>
+        <roadconnections>
+            <roadconnection id="1" in_link="1" in_link_lanes="1#3" out_link="2" out_link_lanes="1#3"/>
+            <roadconnection id="2" in_link="2" in_link_lanes="1#3" out_link="4" out_link_lanes="1#4"/>
+            <roadconnection id="3" in_link="4" in_link_lanes="1#4" out_link="5" out_link_lanes="1#3"/>
+            <roadconnection id="4" in_link="4" in_link_lanes="1#4" out_link="13"/>
+            <roadconnection id="5" in_link="4" in_link_lanes="1#4" out_link="7"/>
+            <roadconnection id="6" in_link="8" out_link="4" out_link_lanes="1#4"/>
+            <roadconnection id="7" in_link="14" out_link="1"/>
+            <roadconnection id="8" in_link="15" out_link="8"/>
+        </roadconnections>
+        <roadparams>
+            <roadparam id="0" capacity="1800.0" speed="115.006645" jam_density="109.99815"/>
+            <roadparam id="1" capacity="2000.0" speed="105.00709" jam_density="109.997856"/>
+            <roadparam id="2" capacity="2000.0" speed="105.00607" jam_density="109.99816"/>
+            <roadparam id="3" capacity="2000.0" speed="105.006065" jam_density="109.99815"/>
+        </roadparams>
+    </network>
+    <models>
+        <model type="ctm" name="ctm" is_default="true">
+            <model_params sim_dt="5.0" max_cell_length="193.11974"/>
+            <lanechanges type="linklinear">
+                <lanechange>
+                    <parameters>
+                        <parameter name="alpha" value="1.000000"/>
+                        <parameter name="epsilon" value="1.300000"/>
+                        <parameter name="gamma" value="30.000000"/>
+                    </parameters>
+                </lanechange>
+            </lanechanges>
+        </model>
+    </models>
+    <demands>
+        <demand commodity_id="0" link_id="14" start_time="0.0" dt="3600.0">3750.0</demand>
+        <demand commodity_id="1" link_id="14" start_time="0.0" dt="3600.0">1250.0</demand>
+        <demand commodity_id="0" link_id="15" start_time="0.0" dt="3600.0">750.0</demand>
+        <demand commodity_id="1" link_id="15" start_time="0.0" dt="3600.0">250.0</demand>
+    </demands>
+    <splits>
+        <split_node node_id="5" commodity_id="0" link_in="4" dt="3600.0">
+            <split link_out="7">0.1</split>
+        </split_node>
+        <split_node node_id="5" commodity_id="1" link_in="4" dt="3600.0">
+            <split link_out="7">0.1</split>
+        </split_node>
+    </splits>
+    <controllers>
+        <controller id="3" type="schedule">
+            <target_actuators ids="3"/>
+            <schedule>
+                <entry type="rm_open" start_time="0.0"/>
+            </schedule>
+        </controller>
+        <controller id="4" type="schedule">
+            <target_actuators ids="4"/>
+            <schedule>
+                <entry type="rm_open" start_time="0.0"/>
+            </schedule>
+        </controller>
+        <controller id="5" type="linkflow" dt="0.0" start_time="0.0">
+            <target_actuators ids="5"/>
+            <profiles>
+                <profile id="7">0.0</profile>
+                <profile id="13">0.0</profile>
+            </profiles>
+        </controller>
+        <controller id="6" type="linkflow" dt="0.0" start_time="0.0">
+            <target_actuators ids="6"/>
+            <profiles>
+                <profile id="7">0.0</profile>
+                <profile id="13">0.0</profile>
+            </profiles>
+        </controller>
+        <controller id="7" type="linkflow" dt="300.0" start_time="0.0">
+            <target_actuators ids="7"/>
+            <profiles>
+                <profile id="13">1500.0</profile>
+            </profiles>
+        </controller>
+        <controller id="8" type="linkflow" dt="300.0" start_time="0.0">
+            <target_actuators ids="8"/>
+            <profiles>
+                <profile id="13">500.0</profile>
+            </profiles>
+        </controller>
+    </controllers>
+    <actuators>
+        <actuator id="3" type="lg_capacity">
+            <actuator_target type="lanegroups" lanegroups="8(2#2)"/>
+        </actuator>
+        <actuator id="4" type="lg_capacity">
+            <actuator_target type="lanegroups" lanegroups="8(1#1)"/>
+        </actuator>
+        <actuator id="5" passive="true" type="flowtolink">
+            <actuator_target id="4" type="link" commids="0"/>
+            <parameters>
+                <parameter name="rcid" value="6"/>
+            </parameters>
+        </actuator>
+        <actuator id="6" passive="true" type="flowtolink">
+            <actuator_target id="4" type="link" commids="1"/>
+            <parameters>
+                <parameter name="rcid" value="6"/>
+            </parameters>
+        </actuator>
+        <actuator id="7" passive="true" type="flowtolink">
+            <actuator_target id="4" type="link" commids="0"/>
+            <parameters>
+                <parameter name="rcid" value="6"/>
+            </parameters>
+        </actuator>
+        <actuator id="8" passive="true" type="flowtolink">
+            <actuator_target id="4" type="link" commids="1"/>
+            <parameters>
+                <parameter name="rcid" value="6"/>
+            </parameters>
+        </actuator>
+    </actuators>
+    <sensors/>
+    <events/>
+</scenario>

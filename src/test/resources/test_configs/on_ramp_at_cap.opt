@@ -79,10 +79,10 @@
                     </controller>
                 </controllers>
                 <actuators>
-                    <actuator id="1" type="meter">
+                    <actuator id="1" type="lg_capacity">
                         <actuator_target type="lanegroups" lanegroups="6(2#2)"/>
                     </actuator>
-                    <actuator id="2" type="meter">
+                    <actuator id="2" type="lg_capacity">
                         <actuator_target type="lanegroups" lanegroups="6(1#1)"/>
                     </actuator>
                 </actuators>

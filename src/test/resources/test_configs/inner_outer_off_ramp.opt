@@ -109,36 +109,28 @@
                     <controller id="5" type="linkflow" start_time="0.0">
                         <target_actuators ids="5"/>
                         <profiles>
-                            <profile start_time="5.0" dt="3600.0" id="13">1500.0</profile>
+                            <profile id="13">1500.0</profile>
                         </profiles>
                     </controller>
                     <controller id="6" type="linkflow" start_time="0.0">
                         <target_actuators ids="6"/>
                         <profiles>
-                            <profile start_time="5.0" dt="3600.0" id="13">500.0</profile>
+                            <profile id="13">500.0</profile>
                         </profiles>
                     </controller>
                 </controllers>
                 <actuators>
-                    <actuator id="4" type="meter">
+                    <actuator id="4" type="lg_capacity">
                         <actuator_target type="lanegroups" lanegroups="8(1#1)"/>
                     </actuator>
-                    <actuator id="3" type="meter">
+                    <actuator id="3" type="lg_capacity">
                         <actuator_target type="lanegroups" lanegroups="8(2#2)"/>
                     </actuator>
                     <actuator id="5" type="flowtolink">
-                        <parameters>
-                            <parameter name="linkin" value="4"/>
-                            <parameter name="linksout" value="13"/>
-                            <parameter name="comm" value="0"/>
-                        </parameters>
+                        <actuator_target type="link" id="4" commids="0"/>
                     </actuator>
                     <actuator id="6" type="flowtolink">
-                        <parameters>
-                            <parameter name="linkin" value="4"/>
-                            <parameter name="linksout" value="13"/>
-                            <parameter name="comm" value="1"/>
-                        </parameters>
+                        <actuator_target type="link" id="4" commids="1"/>
                     </actuator>
                 </actuators>
                 <sensors/>

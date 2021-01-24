@@ -146,35 +146,13 @@
                             <entry type="rm_open" start_time="0.0"/>
                         </schedule>
                     </controller>
-                    <controller id="5" type="linkflow" start_time="0.0">
-                        <target_actuators ids="5"/>
-                        <profiles/>
-                    </controller>
-                    <controller id="6" type="linkflow" start_time="0.0">
-                        <target_actuators ids="6"/>
-                        <profiles/>
-                    </controller>
                 </controllers>
                 <actuators>
-                    <actuator id="4" type="meter">
+                    <actuator id="4" type="lg_capacity">
                         <actuator_target type="lanegroups" lanegroups="8(1#1)"/>
                     </actuator>
-                    <actuator id="3" type="meter">
+                    <actuator id="3" type="lg_capacity">
                         <actuator_target type="lanegroups" lanegroups="8(2#2)"/>
-                    </actuator>
-                    <actuator id="5" type="flowtolink">
-                        <parameters>
-                            <parameter name="linkin" value="4"/>
-                            <parameter name="linksout" value=""/>
-                            <parameter name="comm" value="0"/>
-                        </parameters>
-                    </actuator>
-                    <actuator id="6" type="flowtolink">
-                        <parameters>
-                            <parameter name="linkin" value="4"/>
-                            <parameter name="linksout" value=""/>
-                            <parameter name="comm" value="1"/>
-                        </parameters>
                     </actuator>
                 </actuators>
                 <sensors/>

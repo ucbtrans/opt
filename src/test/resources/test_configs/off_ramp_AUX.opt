@@ -77,30 +77,22 @@
                     <controller id="1" type="linkflow" start_time="0.0">
                         <target_actuators ids="1"/>
                         <profiles>
-                            <profile start_time="5.0" dt="3600.0" id="7">825.0</profile>
+                            <profile id="7">825.0</profile>
                         </profiles>
                     </controller>
                     <controller id="2" type="linkflow" start_time="0.0">
                         <target_actuators ids="2"/>
                         <profiles>
-                            <profile start_time="5.0" dt="3600.0" id="7">275.0</profile>
+                            <profile id="7">275.0</profile>
                         </profiles>
                     </controller>
                 </controllers>
                 <actuators>
                     <actuator id="1" type="flowtolink">
-                        <parameters>
-                            <parameter name="linkin" value="4"/>
-                            <parameter name="linksout" value="7"/>
-                            <parameter name="comm" value="0"/>
-                        </parameters>
+                        <actuator_target type="link" id="4" commids="0"/>
                     </actuator>
                     <actuator id="2" type="flowtolink">
-                        <parameters>
-                            <parameter name="linkin" value="4"/>
-                            <parameter name="linksout" value="7"/>
-                            <parameter name="comm" value="1"/>
-                        </parameters>
+                        <actuator_target type="link" id="4" commids="1"/>
                     </actuator>
                 </actuators>
                 <sensors/>

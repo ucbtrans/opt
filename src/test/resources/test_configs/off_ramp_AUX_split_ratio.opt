@@ -73,32 +73,6 @@
                         <split link_out="7">0.1</split>
                     </split_node>
                 </splits>
-                <controllers>
-                    <controller id="1" type="linkflow" start_time="0.0">
-                        <target_actuators ids="1"/>
-                        <profiles/>
-                    </controller>
-                    <controller id="2" type="linkflow" start_time="0.0">
-                        <target_actuators ids="2"/>
-                        <profiles/>
-                    </controller>
-                </controllers>
-                <actuators>
-                    <actuator id="1" type="flowtolink">
-                        <parameters>
-                            <parameter name="linkin" value="4"/>
-                            <parameter name="linksout" value=""/>
-                            <parameter name="comm" value="0"/>
-                        </parameters>
-                    </actuator>
-                    <actuator id="2" type="flowtolink">
-                        <parameters>
-                            <parameter name="linkin" value="4"/>
-                            <parameter name="linksout" value=""/>
-                            <parameter name="comm" value="1"/>
-                        </parameters>
-                    </actuator>
-                </actuators>
                 <sensors/>
             </scenario>
             <ns2:sim starttime="0.0" duration="14400.0"/>

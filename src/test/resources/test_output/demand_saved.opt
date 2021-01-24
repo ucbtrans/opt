@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:prj xmlns="opentrafficmodels" xmlns:ns2="https://github.com/ucbtrans/opt">
+    <ns2:scns>
+        <ns2:scn name="A" description="Project Test">
+            <scenario>
+                <commodities>
+                    <commodity id="0" name="SOV" pvequiv="1.0" pathfull="false"/>
+                    <commodity id="1" name="HOV" pvequiv="1.0" pathfull="false"/>
+                </commodities>
+                <network>
+                    <nodes>
+                        <node id="1"/>
+                        <node id="2"/>
+                        <node id="3"/>
+                    </nodes>
+                    <links>
+                        <link id="1" length="321.868" full_lanes="3" start_node_id="1" end_node_id="2" roadparam="0" road_type="freeway"/>
+                        <link id="2" length="321.86713" full_lanes="3" start_node_id="2" end_node_id="3" roadparam="0" road_type="freeway"/>
+                    </links>
+                    <roadgeoms/>
+                    <roadconnections>
+                        <roadconnection id="1" in_link="1" in_link_lanes="1#3" out_link="2" out_link_lanes="1#3"/>
+                    </roadconnections>
+                    <roadparams>
+                        <roadparam id="0" capacity="2000.0" speed="105.00607" jam_density="109.99816"/>
+                    </roadparams>
+                </network>
+                <models>
+                    <model type="ctm" name="ctm" is_default="true">
+                        <model_params sim_dt="5.0" max_cell_length="193.11974"/>
+                        <lanechanges type="linklinear">
+                            <lanechange>
+<parameters>
+    <parameter name="alpha" value="1.000000"/>
+    <parameter name="epsilon" value="1.300000"/>
+    <parameter name="gamma" value="30.000000"/>
+</parameters>
+                            </lanechange>
+                        </lanechanges>
+                    </model>
+                </models>
+                <demands>
+                    <demand commodity_id="0" link_id="1" start_time="0.0" dt="3600.0">3750.0</demand>
+                    <demand commodity_id="1" link_id="1" start_time="0.0" dt="3600.0">1250.0</demand>
+                </demands>
+                <splits/>
+                <controllers/>
+                <actuators/>
+                <sensors/>
+                <events/>
+            </scenario>
+            <ns2:sim starttime="0.0" duration="14400.0"/>
+            <ns2:lnks>
+                <ns2:lnk id="1" name="A -&gt; B"/>
+                <ns2:lnk id="2" name="B -&gt; C"/>
+            </ns2:lnks>
+            <ns2:sgmts>
+                <ns2:sgmt type="fwy" id="1" name="A -&gt; B" fwy="1"/>
+                <ns2:sgmt type="fwy" id="2" name="B -&gt; C" fwy="2"/>
+            </ns2:sgmts>
+            <ns2:schds/>
+            <ns2:routes/>
+        </ns2:scn>
+    </ns2:scns>
+</ns2:prj>
