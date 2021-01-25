@@ -2,10 +2,32 @@ package opt.utils;
 
 import opt.data.AbstractLink;
 import opt.data.LaneGroup;
+import opt.data.LinkOnramp;
+import opt.data.LinkOfframp;
+import opt.data.LinkConnector;
 
 import java.util.*;
 
 public class DataUtils {
+    
+    public static String linkInfo(AbstractLink l) {
+        if (l == null)
+            return "";
+        
+        String info = l.get_name();
+        String type = "Freeway";
+        
+        if (l instanceof LinkOnramp)
+            type = "On-Ramp";
+        else if (l instanceof LinkOfframp)
+            type = "Off-Ramp";
+        else if (l instanceof LinkConnector)
+            type = "Connector";
+        
+        
+        
+        return info;
+    }
 
     public static List<LaneGroup> read_lanegroups(String str, Map<Long, AbstractLink> links) throws Exception {
 

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<GridPane id="topPane" fx:id="topPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="opt.config.EventLinksToggle">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+  </columnConstraints>
+  <rowConstraints>
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="0.333343505859375" percentHeight="6.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="119.33331298828125" minHeight="10.0" percentHeight="6.0" prefHeight="119.33331298828125" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="6.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="119.33331298828125" minHeight="10.0" percentHeight="6.0" prefHeight="119.33331298828125" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="111.6666259765625" minHeight="0.0" prefHeight="26.33331298828125" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowSpan="15">
+         <children>
+            <GridPane layoutX="7.0" layoutY="14.0" prefHeight="601.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="465.6666259765625" minWidth="10.0" prefWidth="449.6666259765625" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="450.3333740234375" minWidth="10.0" prefWidth="450.3333740234375" />
+              </columnConstraints>
+              <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label text="Event Name:" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                     <GridPane.margin>
+                        <Insets left="20.0" right="20.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <TextField id="txtName" fx:id="txtName" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" text="New Event" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                     <GridPane.margin>
+                        <Insets right="20.0" />
+                     </GridPane.margin>
+                  </TextField>
+                  <Label text="Activation Time:" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                     <GridPane.margin>
+                        <Insets left="20.0" right="20.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <TextField id="txtTime" fx:id="txtTime" alignment="CENTER_RIGHT" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" text="00:00" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                     <GridPane.margin>
+                        <Insets right="20.0" />
+                     </GridPane.margin>
+                  </TextField>
+                  <Label text="Lane Group:" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                     <GridPane.margin>
+                        <Insets left="20.0" right="20.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <ComboBox id="cbLaneGroup" fx:id="cbLaneGroup" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                     <GridPane.margin>
+                        <Insets right="20.0" />
+                     </GridPane.margin>
+                  </ComboBox>
+                  <GridPane GridPane.columnSpan="2" GridPane.rowIndex="9" GridPane.rowSpan="9">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="343.33331298828125" minWidth="10.0" prefWidth="343.33331298828125" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="282.33331298828125" minWidth="10.0" prefWidth="172.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="345.0" minWidth="10.0" prefWidth="345.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <GridPane.margin>
+                        <Insets left="20.0" right="20.0" />
+                     </GridPane.margin>
+                     <children>
+                        <Label text="Off-Ramps that Can Be Added to Event:" />
+                        <ListView id="lvAllLinks" fx:id="lvAllLinks" onKeyPressed="#freeLinksOnKeyPressed" onMouseClicked="#freeLinksOnMouseClicked" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" GridPane.rowSpan="9" />
+                        <Label text="Off-Ramps Affected by Event:" GridPane.columnIndex="2" />
+                        <ListView id="lvEventLinks" fx:id="lvEventLinks" onKeyPressed="#eventLinksOnKeyPressed" onMouseClicked="#eventLinksOnMouseClicked" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.rowSpan="9" />
+                        <Button id="addToEvent" fx:id="addToEvent" defaultButton="true" mnemonicParsing="false" onAction="#onAddToEvent" prefWidth="142.0" text="Add to Event &gt;&gt;" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+                        <Button id="rmoveFromEvent" fx:id="rmoveFromEvent" mnemonicParsing="false" onAction="#onRmoveFromEvent" prefWidth="142.0" text="&lt;&lt; Remove from Event" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
+                     </children>
+                  </GridPane>
+                  <Label text="Open / Close Road:" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                     <GridPane.margin>
+                        <Insets right="20.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <ComboBox id="cbOpenClose" fx:id="cbOpenClose" maxHeight="25.0" maxWidth="260.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+               </children>
+            </GridPane>
+         </children>
+      </AnchorPane>
+      <ButtonBar GridPane.columnIndex="1" GridPane.rowIndex="15">
+         <buttons>
+            <Button id="buttonCancel" fx:id="buttonCancel" cancelButton="true" mnemonicParsing="false" onAction="#onCancel" prefHeight="25.0" prefWidth="75.0" text="Cancel" />
+            <Button id="buttonOK" fx:id="buttonOK" defaultButton="true" mnemonicParsing="false" onAction="#onOK" prefHeight="25.0" prefWidth="75.0" text="OK" />
+         </buttons>
+         <GridPane.margin>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </GridPane.margin>
+      </ButtonBar>
+      <!-- <TextField id="textEndTime" fx:id="textEndTime" alignment="CENTER_RIGHT" layoutX="30.0" layoutY="98.0" maxWidth="200.0" prefHeight="25.0" prefWidth="200.0" text="00:00" GridPane.columnIndex="1" GridPane.rowIndex="1">
+         <tooltip>
+            <Tooltip text="Enter the metering start time in the format 'hhmm'. Should not be smaler than start time." wrapText="true" />
+         </tooltip>
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </TextField> -->
+     <!--  <Label id="labelRecRate" fx:id="labelRecRate" layoutX="30.0" layoutY="100.0" text="Recommended Rate per Lane (vph):" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label id="labelMaxRate" fx:id="labelMaxRate" layoutX="30.0" layoutY="170.0" text="Maximum Rate per Lane (vph):" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Spinner id="spinnerRecRate" fx:id="spinnerRecRate" editable="true" layoutX="30.0" layoutY="192.0" maxWidth="200.0" prefHeight="25.0" prefWidth="200.0" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+         <tooltip>
+            <Tooltip text="Cannot meter below this rate" wrapText="true" />
+         </tooltip>
+      </Spinner>
+      <Spinner id="spinnerMaxRate" fx:id="spinnerMaxRate" editable="true" layoutX="30.0" layoutY="122.0" maxWidth="200.0" prefHeight="25.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+         <tooltip>
+            <Tooltip text="Cannot meter above this rate" wrapText="true" />
+         </tooltip>
+      </Spinner>
+      <Label text="Invocation Period (seconds):" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Spinner id="controlDt" fx:id="controlDt" editable="true" maxWidth="200.0" prefHeight="25.0" prefWidth="200.0" GridPane.rowIndex="5">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+         <tooltip>
+            <Tooltip text="How  often the metering rate is updated" wrapText="true" />
+         </tooltip>
+      </Spinner>
+      <CheckBox id="cbQueueControl" fx:id="cbQueueControl" mnemonicParsing="false" text="Queue Control" GridPane.columnIndex="1" GridPane.rowIndex="5">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+         <tooltip>
+            <Tooltip text="Override metering rate when vehicle queue is too large " wrapText="true" />
+         </tooltip>
+      </CheckBox> -->
+   </children>
+</GridPane>

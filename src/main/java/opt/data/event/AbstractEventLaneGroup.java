@@ -17,13 +17,8 @@ public class AbstractEventLaneGroup extends AbstractEvent {
 
     public AbstractEventLaneGroup(long id, String type, float timestamp, String name, List<AbstractLink> links, LaneGroupType lgtype) throws Exception {
         super(id, type, timestamp, name);
-        this.links = links;
         this.lgtype = lgtype;
-
-        // check no repeat links
-        Set<AbstractLink> X = new HashSet<>();
-        X.addAll(links);
-        if(X.size()!=links.size())
+        if (!set_links(links))
             throw new Exception("Links in EventControlToggle are not unique");
     }
 
@@ -49,10 +44,31 @@ public class AbstractEventLaneGroup extends AbstractEvent {
     public List<Long> get_link_ids(){
         return links.stream().map(x->x.id).collect(toList());
     }
+    
 
     /////////////////////
     // API
     /////////////////////
+    
+    public List<AbstractLink> get_links() {
+        return links;
+    }
+    
+    public boolean set_links(List<AbstractLink> links) {
+        if (links == null)
+            return false;
+        
+        this.links = links;
+
+        // check no repeat links
+        Set<AbstractLink> X = new HashSet<>();
+        X.addAll(links);
+        if(X.size()!=links.size())
+            return false;
+        
+        return true;
+    }
+    
 
     public void add_link(AbstractLink x) throws Exception {
         if(links.contains(x))

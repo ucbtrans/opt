@@ -56,6 +56,10 @@ public class EventLanegroupFD extends AbstractEventLaneGroup {
     /////////////////////
     // API
     /////////////////////
+    
+    public FDparams get_fd_mult() {
+        return fd_mult;
+    }
 
     public void set_fdmult_to_null(){
         fd_mult=null;

@@ -71,6 +71,10 @@ import opt.data.control.AbstractController;
 import opt.data.control.ControlSchedule;
 import opt.data.control.ControllerLgRestrict;
 import opt.data.control.ScheduleEntry;
+import opt.data.event.AbstractEvent;
+import opt.data.event.EventLanegroupLanes;
+import opt.data.event.EventLanegroupFD;
+import opt.data.event.EventLinkToggle;
 import opt.utils.Misc;
 import opt.utils.ModifiedDoubleStringConverter;
 
@@ -103,8 +107,16 @@ public class ScenarioEditorController {
     
     private List<ScheduleEntry> policyEntries = null;
     
+    private AbstractEvent selectedEvent = null;
+    
     private LaneControlEditorController laneControlEditorController = null;
     private Scene laneControlEditorScene = null;
+    
+    private NewEventController newEventController = null;
+    private Scene newEventScene = null;
+    
+    private EventFD eventFD = null;
+    private Scene eventFDScene = null;
     
     private SpinnerValueFactory<Double> a0SpinnerValueFactory = null;
     private SpinnerValueFactory<Double> a1SpinnerValueFactory = null;
@@ -209,6 +221,15 @@ public class ScenarioEditorController {
 
     @FXML // fx:id="eventPane"
     private TitledPane eventPane; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="listEvents"
+    private ListView<String> listEvents; // Value injected by FXMLLoader
+
+    @FXML // fx:id="onDeleteEvent"
+    private Button onDeleteEvent; // Value injected by FXMLLoader
+
+    @FXML // fx:id="onAddEvent"
+    private Button onAddEvent; // Value injected by FXMLLoader
 
    
     
@@ -251,9 +272,31 @@ public class ScenarioEditorController {
         laneControlEditorScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
     
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the new event controller that is used to
+     *               create a event.
+     */
+    public void setNewEventControllerAndScene(NewEventController ctrl, Scene scn) {
+        newEventController = ctrl;
+        newEventScene = scn;
+        newEventScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
+    }
+    
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the EventFD that is used to
+     *               edit a fundamental diagram event.
+     */
+    public void setEventFDControllerAndScene(EventFD ctrl, Scene scn) {
+        eventFD = ctrl;
+        eventFDScene = scn;
+        //eventFDScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
+    }
     
     
-    void launchVehicleTypeWindow(Commodity comm) {
+    
+    private void launchVehicleTypeWindow(Commodity comm) {
         Stage inputStage = new Stage();
         inputStage.initOwner(primaryStage);
         inputStage.setScene(vehicleTypeScene);
@@ -273,7 +316,7 @@ public class ScenarioEditorController {
     }
     
     
-    void launchLaneControlEditor(ScheduleEntry entry, boolean isnew) {
+    private void launchLaneControlEditor(ScheduleEntry entry, boolean isnew) {
         Stage inputStage = new Stage();
         inputStage.initOwner(primaryStage);
         inputStage.setScene(laneControlEditorScene);
@@ -287,6 +330,37 @@ public class ScenarioEditorController {
         inputStage.setResizable(false);
         inputStage.showAndWait();
         fillLanePolicySchedule();
+    }
+    
+    
+    private void launchEventEditor(AbstractEvent event) {
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        String title = "Event: Change Number of Lanes";
+        
+        if (event instanceof EventLanegroupFD) {
+            title = "Event: Change Traffic Dynamics";
+            inputStage.setScene(eventFDScene);
+            eventFD.initWithScenarioAndEvent(myScenario, (EventLanegroupFD)event);
+        } else if (event instanceof EventLanegroupLanes) {
+            //inputStage.setScene(eventLanesScene);
+            //eventLanes.initWithScenarioAndEvent(myScenario, (EventLanegroupLanes)event);
+        } else if (event instanceof EventLinkToggle) {
+            title = "Event: Open/Close Off-Ramps";
+            //inputStage.setScene(eventLinkToggleScene);
+            //eventLinkToggle.initWithScenarioAndEvent(myScenario, (EventLinkToggle)event);
+        } else {
+            opt.utils.Dialogs.ErrorDialog("Unknown Event Type!", "Not implemented");
+            return;
+        }
+        
+        inputStage.setTitle(title);
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+        
+        populateEventList();
     }
     
     
@@ -403,6 +477,8 @@ public class ScenarioEditorController {
         makeListVT(myScenario.get_commodities());
         initScenarioTiming();
         initLanePolicies();
+        
+        populateEventList();
         
         networkDisplay = new NetworkDisplay(scenarioEditorCanvas, ttCanvas, myScenario);
         networkDisplay.execute();
@@ -633,6 +709,27 @@ public class ScenarioEditorController {
         fillLanePolicyLinks();
     }
     
+    
+    
+    private void populateEventList() {
+        listEvents.getItems().clear();
+        
+        for (AbstractEvent ev : myScenario.get_events()) {
+            String entry = Misc.seconds2timestring(ev.timestamp, ":") + ": " + ev.name + " (";
+            
+            if (ev instanceof EventLanegroupFD)
+                entry += "Change Traffic Dynamics)";
+            else if (ev instanceof EventLanegroupLanes)
+                entry += "Change Number of Lanes)";
+            else if (ev instanceof EventLinkToggle)
+                entry += "Open / Close Off-Ramps)";
+            else
+                continue;
+            
+            listEvents.getItems().add(entry);
+        }
+        
+    }
     
     
     
@@ -1149,6 +1246,89 @@ public class ScenarioEditorController {
                 networkDisplay.findLink(pll.get(idx));
             }
             policyLinks.requestFocus();
+        }
+    }
+    
+    
+    
+    
+    @FXML
+    void onAddEvent(ActionEvent event) {
+        if (ignoreChange)
+            return;
+        
+        selectedEvent = null;
+        
+        Stage inputStage = new Stage();
+        inputStage.initOwner(primaryStage);
+        inputStage.setScene(newEventScene);
+        newEventController.initWithScenario(myScenario);
+        inputStage.setTitle("New Event");
+        inputStage.getIcons().add(new Image(getClass().getResourceAsStream("/OPT_icon.png")));
+        inputStage.initModality(Modality.APPLICATION_MODAL);
+        inputStage.setResizable(false);
+        inputStage.showAndWait();
+        
+        if (selectedEvent != null)
+            launchEventEditor(selectedEvent);
+    }
+    
+    
+    public void prepareEvent(AbstractEvent evt) {
+        selectedEvent = evt;
+    }
+    
+    
+    @FXML
+    void onDeleteEvent(ActionEvent event) {
+        if (ignoreChange)
+            return;
+        
+        List<AbstractEvent> events = myScenario.get_events();
+        int idx = listEvents.getSelectionModel().getSelectedIndex();
+        if ((idx < 0) || (idx >= events.size()))
+            return;
+        
+        String header = "You are deleting event '" + events.get(idx).name + "'...";
+        if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?"))
+            return;
+        
+        myScenario.delete_event_by_id(events.get(idx).id);
+        populateEventList();
+        setProjectModified(true);
+    }
+    
+    
+    @FXML
+    void listEventsOnMouseClick(MouseEvent event) {
+        if (ignoreChange)
+            return;
+        
+        if (event.getClickCount() == 2) {
+            List<AbstractEvent> events = myScenario.get_events();
+            int idx = listEvents.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= events.size()))
+                return;
+            launchEventEditor(events.get(idx));
+        }
+    }
+    
+    
+    @FXML
+    void listEventsOnKeyPressed(KeyEvent event) {
+        if (ignoreChange)
+            return;
+        
+        List<AbstractEvent> events = myScenario.get_events();
+        
+        if (event.getCode() == KeyCode.ENTER) {
+            int idx = listEvents.getSelectionModel().getSelectedIndex();
+            if ((idx < 0) || (idx >= events.size()))
+                return;
+            launchEventEditor(events.get(idx));
+        }
+        if ((event.getCode() == KeyCode.DELETE) || (event.getCode() == KeyCode.BACK_SPACE)) {
+            onDeleteEvent(null);
         }
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020, Regents of the University of California
+ * Copyright (c) 2021, Regents of the University of California
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,36 +27,31 @@ package opt.config;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import opt.data.AbstractLink;
+import opt.data.FreewayScenario;
+import opt.data.LaneGroupType;
 import opt.data.control.ControlFactory;
-
+import opt.data.event.AbstractEvent;
 
 /**
- * Controller for the pop-up dialog that creates a new ramp meter.
+ * UI to choose the type of the new event.
  * 
  * @author Alex Kurzhanskiy
  */
-public class NewRampMeterController {
-    private LinkEditorController linkEditorController = null;
-    private AbstractLink myLink = null;
+public class NewEventController {
+    private ScenarioEditorController scenarioEditorController = null;
+    private FreewayScenario myScenario = null;
     
-    private boolean managedLanes = false;
-    
-    private List<control.AbstractController.Algorithm> ctrlAlgos = new ArrayList<>();
-    
-
     @FXML // fx:id="topPane"
     private GridPane topPane; // Value injected by FXMLLoader
 
-    @FXML // fx:id="listRM"
-    private ChoiceBox<String> listRM; // Value injected by FXMLLoader
+    @FXML // fx:id="listEventTypes"
+    private ChoiceBox<String> listEventTypes; // Value injected by FXMLLoader
 
     @FXML // fx:id="buttonCancel"
     private Button buttonCancel; // Value injected by FXMLLoader
@@ -69,40 +64,36 @@ public class NewRampMeterController {
     
     /**
      * This function should be called once: during the initialization.
-     * @param ctrl - pointer to the link editor controller from where this
+     * @param ctrl - pointer to the scenario editor controller from where this
      *               sub-window is launched.
      */
-    public void setLinkEditorController(LinkEditorController ctrl) {
-        linkEditorController = ctrl;
+    public void setScenarioEditorController(ScenarioEditorController ctrl) {
+        scenarioEditorController = ctrl;
     }
     
     
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
-        listRM.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (listRM.getSelectionModel().getSelectedIndex() < 0)
+        listEventTypes.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (listEventTypes.getSelectionModel().getSelectedIndex() < 0)
                 buttonOK.setDisable(true);
             else
                 buttonOK.setDisable(false);
         });
+        
     }
     
     
     
-    public void initWithLink(AbstractLink lnk, boolean ml) {
-        myLink = lnk;
-        managedLanes = ml;
-        
+    public void initWithScenario(FreewayScenario s) {
+        myScenario = s;
         buttonOK.setDisable(true);
-        listRM.getItems().clear();
-        ctrlAlgos.clear();
         
-        List<control.AbstractController.Algorithm> ctrl_set = ControlFactory.get_available_ramp_metering_algorithms();
-        for (control.AbstractController.Algorithm ctrl : ctrl_set) {
-            listRM.getItems().add(ControlFactory.cntrl_alg_name.AtoB(ctrl));
-            ctrlAlgos.add(ctrl);
-        }
+        listEventTypes.getItems().clear();
+        listEventTypes.getItems().add("Change Number of Lanes");
+        listEventTypes.getItems().add("Change Traffic Dynamics");
+        listEventTypes.getItems().add("Open / Close Off-Ramps");
     }
     
     
@@ -115,22 +106,42 @@ public class NewRampMeterController {
 
     @FXML
     void onCancel(ActionEvent event) {
-        linkEditorController.prepareNewController(null, managedLanes);
+       // scenarioEditorController.prepareNewEvent(null);
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();
     }
 
     @FXML
     void onOK(ActionEvent event) {
-        int idx = listRM.getSelectionModel().getSelectedIndex();
+        int idx = listEventTypes.getSelectionModel().getSelectedIndex();
         
         if (idx < 0) {
-            opt.utils.Dialogs.WarningDialog("No ramp metering algorithm selected!", "Please, choose a ramp meter from the list...");
+            opt.utils.Dialogs.WarningDialog("No event type selected!", "Please, choose an event type from the list...");
             return;
         }
 
-
-        linkEditorController.prepareNewController(ctrlAlgos.get(idx), managedLanes);
+        AbstractEvent evt;
+        try {
+            switch (idx) {
+                case 0:
+                    evt = myScenario.add_event_lglanes(0, "Add/Remove lane(s)", new ArrayList<>(), LaneGroupType.gp, 0);
+                    break;
+                case 1:
+                    evt = myScenario.add_event_lgfd(0, "Change traffic dynamics", new ArrayList<>(), LaneGroupType.gp, null);
+                    break;
+                case 2:
+                    evt = myScenario.add_event_linktoggle(0, "Open/Close off-ramp(s)", new ArrayList<>(), true);
+                    break;
+                default:
+                    evt = null;
+                    break;
+            }
+        } catch (Exception ex) {
+            opt.utils.Dialogs.ExceptionDialog("Cannot create event!", ex);
+            return;
+        }
+        
+        scenarioEditorController.prepareEvent(evt);
         
         Stage stage = (Stage) topPane.getScene().getWindow();
         stage.close();

@@ -65,13 +65,13 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.util.Callback;
-import jaxb.Parameter;
 import opt.config.*;
 import opt.data.*;
 import opt.performance.LinkPerformanceController;
 import opt.performance.RoutePerformanceController;
 import opt.performance.ScenarioPerformanceController;
 import opt.utils.Misc;
+import opt.utils.UtilGUI;
 import opt.utils.Version;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -145,6 +145,16 @@ public class AppMainController {
 
     private GridPane rampMeterFixedRatePane = null;
     private RampMeterFixed rampMeterFixed = null;
+    
+    private GridPane newEventPane = null;
+    private NewEventController newEventController = null;
+    
+    private GridPane eventFDPane = null;
+    private EventFD eventFD = null;
+    
+    private GridPane eventLanesPane = null;
+    //private EventLanes eventLanes = null;
+    
     
     private SplitPane routeEditorPane = null;
     private RouteController routeController = null;
@@ -556,6 +566,20 @@ public class AppMainController {
             rampMeterFixed.setLinkEditorController(linkEditorController);
             linkEditorController.setRampMeterFixedRateControllerAndScene(rampMeterFixed, new Scene(rampMeterFixedRatePane));
             
+            // Event controllers
+            loader = new FXMLLoader(getClass().getResource("/new_event.fxml"));
+            newEventPane = loader.load();
+            newEventController = loader.getController();
+            newEventController.setScenarioEditorController(scenarioEditorController);
+            scenarioEditorController.setNewEventControllerAndScene(newEventController, new Scene(newEventPane));
+            
+            loader = new FXMLLoader(getClass().getResource("/event_fd.fxml"));
+            eventFDPane = loader.load();
+            eventFD = loader.getController();
+            eventFD.setScenarioEditorController(scenarioEditorController);
+            scenarioEditorController.setEventFDControllerAndScene(eventFD, new Scene(eventFDPane));
+            
+            
             // Route controllers
             loader = new FXMLLoader(getClass().getResource("/route_editor.fxml"));
             routeEditorPane = loader.load();
@@ -578,13 +602,15 @@ public class AppMainController {
             loader = new FXMLLoader(getClass().getResource("/preferences_editor.fxml"));
             preferencesPane = loader.load();
             preferencesController = loader.getController();
-            preferencesScene = new Scene(preferencesPane);
+            int[] dims = UtilGUI.getWindowDims(700, 700);
+            preferencesScene = new Scene(preferencesPane, dims[0], dims[1]);
             
             
             loader = new FXMLLoader(getClass().getResource("/help.fxml"));
             helpPane = loader.load();
             helpController = loader.getController();
-            helpScene = new Scene(helpPane);
+            dims = UtilGUI.getWindowDims(700, 850);
+            helpScene = new Scene(helpPane, dims[0], dims[1]);
             
             
             loader = new FXMLLoader(getClass().getResource("/simulation_run.fxml"));

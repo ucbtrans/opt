@@ -29,7 +29,9 @@ package opt.utils;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import javafx.geometry.Rectangle2D;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import org.jfree.chart.ChartUtilities;
 
 
@@ -38,6 +40,21 @@ import org.jfree.chart.ChartUtilities;
  * @author Alex Kurzhanskiy
  */
 public class UtilGUI {
+    
+    public static int[] getWindowDims(int W, int H) {
+        int sW = W;
+        int sH = H;
+
+        Rectangle2D bounds = Screen.getPrimary().getBounds();
+        if (bounds.getHeight() < H)
+            sH = (int)Math.round(0.9 * bounds.getHeight());
+        if (bounds.getWidth() < W)
+            sW = (int)Math.round(0.9 * bounds.getWidth());
+        
+        int[] dims = {sW, sH};
+        
+        return dims;
+    }
     
     public static javafx.scene.paint.Color[][] jfxColorPairs = {
         {javafx.scene.paint.Color.BLUE, javafx.scene.paint.Color.DARKBLUE},
