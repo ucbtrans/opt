@@ -49,12 +49,12 @@ public class FreewayScenario {
         this.description = description;
         scenario = new Scenario(this);
         create_isolated_segment(segmentname,params, AbstractLink.Type.freeway);
-        scenario.commodities.put(0l,new Commodity(0l,"Car",1f));
+        scenario.commodities.put(0l,new Commodity(0l,"Car",1f, Commodity.EmissionsClass.car));
         this.lcmodel = new LaneChangeModel(UserSettings.defaultLaneChoice_alpha, UserSettings.defaultLaneChoice_epsilon,UserSettings.defaultLaneChoice_gamma);
         reset_max_ids();
     }
 
-    public FreewayScenario(String name,String description,jaxb.Sim sim,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Routes jaxb_routes,jaxb.Schds jaxb_schds,jaxb.Scenario jaxb_scenario) throws Exception {
+    public FreewayScenario(String name,String description,jaxb.Sim sim,jaxb.Lnks jaxb_lnks,jaxb.Sgmts jaxb_segments,jaxb.Routes jaxb_routes,jaxb.Schds jaxb_schds,jaxb.Comms jcomms,jaxb.Scenario jaxb_scenario) throws Exception {
 
         reset_max_ids();
 
@@ -101,6 +101,15 @@ public class FreewayScenario {
 
         // create Scenario object
         this.scenario = new Scenario(this, jaxb_scenario);
+
+        // attach commodity emission class
+        if( jcomms!=null)
+            for(jaxb.Comm jcomm : jcomms.getComm()){
+                if(scenario.commodities.containsKey(jcomm.getId())){
+                    Commodity.EmissionsClass eclass = Commodity.EmissionsClass.valueOf(jcomm.getEclass());
+                    scenario.commodities.get(jcomm.getId()).set_class(eclass);
+                }
+            }
 
         // attach link names
         if (jaxb_lnks != null)
@@ -1042,14 +1051,14 @@ public class FreewayScenario {
      * @param name
      * @return
      */
-    public Commodity create_commodity(String name, float pvequiv){
+    public Commodity create_commodity(String name, float pvequiv, Commodity.EmissionsClass eclass){
         long max_id;
         if(scenario.commodities.isEmpty())
             max_id = 0;
         else
             max_id = scenario.commodities.values().stream().mapToLong(x->x.id).max().getAsLong() + 1;
 
-        Commodity new_comm = new Commodity(max_id,name,pvequiv);
+        Commodity new_comm = new Commodity(max_id,name,pvequiv,eclass);
         scenario.commodities.put(new_comm.id,new_comm);
         
         List<ControlSchedule> lane_policies = get_schedules_for_controltype(AbstractController.Type.LgRestrict);
@@ -1266,13 +1275,19 @@ public class FreewayScenario {
             jaxb.Lnk lnk = new jaxb.Lnk();
             lnk.setId(link.id);
             lnk.setName(link.get_name());
-//            lnk.setManagedLanes(BigInteger.valueOf(link.get_mng_lanes()));
-//            lnk.setManagedLanesBarrier(Boolean.valueOf(link.get_mng_barrier()));
-//            lnk.setManagedLanesSeparated(Boolean.valueOf(link.get_mng_separated()));
-//            lnk.setAuxLanes(BigInteger.valueOf(link.get_aux_lanes()));
             if(link.get_is_inner())
                 lnk.setIsInner(true);
             lnks.getLnk().add(lnk);
+        }
+
+        // commodities
+        jaxb.Comms jcomms = new jaxb.Comms();
+        scn.setComms(jcomms);
+        for(Commodity comm : scenario.commodities.values()){
+            jaxb.Comm jcomm = new jaxb.Comm();
+            jcomms.getComm().add(jcomm);
+            jcomm.setId(comm.getId());
+            jcomm.setEclass(comm.get_eclass().toString());
         }
 
         return scn;

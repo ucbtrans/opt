@@ -33,6 +33,7 @@
 				<xs:element ref="opt:sgmts" minOccurs="0" maxOccurs="1" />
 				<xs:element ref="opt:schds" minOccurs="0" maxOccurs="1" />
 				<xs:element ref="opt:routes" minOccurs="0" maxOccurs="1" />
+				<xs:element ref="opt:comms" minOccurs="0" maxOccurs="1" />
 			</xs:all>
 			<xs:attribute name="name" type="xs:string" default="unnamed" />
 			<xs:attribute name="description" type="xs:string" default="unnamed" />
@@ -82,6 +83,16 @@
 		</xs:complexType>
 	</xs:element>
 
+
+	<xs:element name="comms">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="opt:comm" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
 	<xs:element name="lnk">
 		<xs:complexType>
 			<xs:attribute name="id" type="xs:long" use="required" />
@@ -126,6 +137,13 @@
 			<xs:attribute name="id" type="xs:long" use="required"/>
 			<xs:attribute name="name" type="xs:string" default="unnamed" />
 			<xs:attribute name="sgmts" type="xs:string" default="" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="comm">
+		<xs:complexType>
+			<xs:attribute name="id" type="xs:long" use="required"/>
+			<xs:attribute name="eclass" type="xs:string" default="car" />
 		</xs:complexType>
 	</xs:element>
 

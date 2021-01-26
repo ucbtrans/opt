@@ -154,6 +154,8 @@ public class VehicleTypeController {
 
     @FXML
     void onOK(ActionEvent event) {
+
+        Commodity.EmissionsClass eclass = Commodity.EmissionsClass.car; // TODO READ THIS FROM UI
         String name = vtName.getText();
         double num_cars = numCarsSpinnerValueFactory.getValue();
         num_cars = Math.min(Math.max(0.1, num_cars), 10);
@@ -168,7 +170,7 @@ public class VehicleTypeController {
             if (name.equals(""))
                 name = "New Vehicle Type";
             name = opt.utils.Misc.validateAndCorrectVehicleTypeName(name, myScenario, myCommodity);
-            myScenario.create_commodity(name, (float)num_cars);
+            myScenario.create_commodity(name, (float)num_cars, eclass);
         }
         
         appMainController.setProjectModified(true);

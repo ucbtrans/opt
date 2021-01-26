@@ -2,22 +2,26 @@ package opt.data;
 
 public class Commodity {
 
+    public enum EmissionsClass {car, truck, bus}
+
     protected final long id;
     protected String name;
     protected float pvequiv;    // size factor as compared to a passenger vehicle.
+    protected EmissionsClass eclass;
 
     /////////////////////////////////////
     // construction
     /////////////////////////////////////
 
-    public Commodity(long id, String name, float pvequiv) {
+    public Commodity(long id, String name, float pvequiv, EmissionsClass eclass) {
         this.id = id;
         this.name = name;
         this.pvequiv = pvequiv;
+        this.eclass = eclass;
     }
 
     public Commodity clone(){
-        return new Commodity(id,name, pvequiv);
+        return new Commodity(id,name, pvequiv, eclass);
     }
 
     /////////////////////////////////////
@@ -44,6 +48,17 @@ public class Commodity {
         if(x>0f)
             pvequiv = x;
     }
+
+    public EmissionsClass get_eclass(){
+        return eclass;
+    }
+
+    public void set_class(EmissionsClass eclass){
+        if(eclass==null)
+            return;
+        this.eclass = eclass;
+    }
+
     /////////////////////////////////////
     // override
     /////////////////////////////////////
@@ -52,18 +67,5 @@ public class Commodity {
     public String toString() {
         return String.format("id=%d, name=%s, weight=%s", id, name, pvequiv);
     }
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        Commodity commodity = (Commodity) o;
-//        return id == commodity.id &&  name.equals(commodity.name) && pvequiv == commodity.pvequiv;
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(id, name, pvequiv);
-//    }
 
 }
