@@ -260,6 +260,10 @@ public class Scenario {
             // road geoms
             if(x.roadGeom.notEmpty())
                 jaxbLink.setRoadgeom(geom2id.get(x.roadGeom));
+
+            if((link instanceof LinkFreewayOrConnector) && link.dn_link!=null)
+                jaxbLink.setAltNextLink(link.dn_link.id);
+
         }
 
         // road connections .....................................

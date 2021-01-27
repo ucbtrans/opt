@@ -2,7 +2,6 @@ package opt.data.event;
 
 public abstract class AbstractEvent implements Comparable<AbstractEvent> {
 
-
     public final long id;
     public final String type;
     public float timestamp;

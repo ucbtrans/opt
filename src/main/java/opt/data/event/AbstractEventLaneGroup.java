@@ -10,7 +10,7 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 
-public class AbstractEventLaneGroup extends AbstractEvent {
+public abstract class AbstractEventLaneGroup extends AbstractEvent {
 
     protected List<AbstractLink> links;
     protected LaneGroupType lgtype;
