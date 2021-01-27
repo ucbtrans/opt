@@ -27,10 +27,13 @@ package opt.utils;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import opt.data.AbstractLink;
 
 import opt.data.AbstractLink.Type;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
+import opt.data.LinkOfframp;
+import opt.data.LinkOnramp;
 
 /**
  *
@@ -68,6 +71,29 @@ public class Misc {
             return "Off-Ramp";
         
         return "Unknown";
+    }
+    
+    
+    public static String link2typeString(AbstractLink l) {
+        String str = "Unknown";
+        
+        if (l == null)
+            return str;
+        
+        if (l instanceof LinkOnramp)
+            if (((LinkOnramp)l).get_is_inner())
+                str = "Inner On-Ramp";
+            else
+                str = "On-Ramp";
+        else if (l instanceof LinkOfframp)
+            if (((LinkOfframp)l).get_is_inner())
+                str = "Inner Off-Ramp";
+            else
+                str = "Off-Ramp";
+        else
+            str = linkType2String(l.get_type());
+        
+        return str;
     }
     
     

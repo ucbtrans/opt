@@ -3205,13 +3205,13 @@ public class LinkEditorController {
                 
             }
             
-            String label = Misc.linkType2String(myLink.get_type());
+            String label = Misc.link2typeString(myLink);
             g.setStroke(Color.BLACK);
             g.setFill(Color.BLACK);
             g.setLineDashes();
             g.setFont(new Font("Verdana", 18));
             //g.strokeText(label, 0.46*width, 0.2*height);
-            g.fillText(label, 0.46*width, 0.2*height);
+            g.fillText(label, 0.42*width, 0.2*height);
             
         } else {
             
