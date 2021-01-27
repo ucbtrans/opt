@@ -46,27 +46,27 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.data.AbstractLink;
-import opt.data.FDparams;
 import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
 import opt.data.LinkConnector;
+import opt.data.LinkOfframp;
 import opt.data.Segment;
-import opt.data.event.EventLanegroupFD;
+import opt.data.event.EventLinkToggle;
 import opt.utils.Misc;
-import opt.utils.ModifiedDoubleStringConverter;
+import opt.utils.ModifiedIntegerStringConverter;
 
 
 
 /**
- * Editor for events of type Fundamental Diagram.
+ * Editor for events of type Off-Ramp Open/Close.
  * 
  * @author Alex Kurzhanskiy
  */
-public class EventFD {
+public class EventLinkOC {
     private String originalName;
     private double timeSeconds = 0.0;
     
-    private EventLanegroupFD myEvent = null;
+    private EventLinkToggle myEvent = null;
     private FreewayScenario myScenario = null;
     
     private Set<AbstractLink> linksUnderEvent = new HashSet<AbstractLink>();
@@ -84,29 +84,8 @@ public class EventFD {
     @FXML // fx:id="txtTime"
     private TextField txtTime; // Value injected by FXMLLoader
 
-    @FXML // fx:id="cbLaneGroup"
-    private ComboBox<String> cbLaneGroup; // Value injected by FXMLLoader
-
-    @FXML // fx:id="cbReset"
-    private CheckBox cbReset; // Value injected by FXMLLoader
-
-    @FXML // fx:id="lblV"
-    private Label lblV; // Value injected by FXMLLoader
-
-    @FXML // fx:id="spV"
-    private Spinner<Double> spV; // Value injected by FXMLLoader
-
-    @FXML // fx:id="lblF"
-    private Label lblF; // Value injected by FXMLLoader
-
-    @FXML // fx:id="spF"
-    private Spinner<Double> spF; // Value injected by FXMLLoader
-
-    @FXML // fx:id="lblJD"
-    private Label lblJD; // Value injected by FXMLLoader
-
-    @FXML // fx:id="spJD"
-    private Spinner<Double> spJD; // Value injected by FXMLLoader
+    @FXML // fx:id="cbOpenClose"
+    private ComboBox<String> cbOpenClose; // Value injected by FXMLLoader
 
     @FXML // fx:id="lvAllLinks"
     private ListView<String> lvAllLinks; // Value injected by FXMLLoader
@@ -135,22 +114,9 @@ public class EventFD {
             onActivationTimeChange();
         });
         
-        cbLaneGroup.getItems().clear();
-        cbLaneGroup.getItems().add("GP Lane");
-        cbLaneGroup.getItems().add("Managed Lane");
-        cbLaneGroup.getItems().add("Auxiliary Lane");
-
-        SpinnerValueFactory svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 1.5, 1, 0.1);
-        svf.setConverter(new ModifiedDoubleStringConverter());
-        spV.setValueFactory(svf);
-        
-        svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 1.5, 1, 0.1);
-        svf.setConverter(new ModifiedDoubleStringConverter());
-        spF.setValueFactory(svf);
-        
-        svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 1.5, 1, 0.1);
-        svf.setConverter(new ModifiedDoubleStringConverter());
-        spJD.setValueFactory(svf);
+        cbOpenClose.getItems().clear();
+        cbOpenClose.getItems().add("Open");
+        cbOpenClose.getItems().add("Close");
         
         lvAllLinks.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         lvEventLinks.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -172,7 +138,6 @@ public class EventFD {
         lvEventLinks.getItems().clear();
         linksUnderEvent.clear();
         
-        int lg = Math.max(0, cbLaneGroup.getSelectionModel().getSelectedIndex());
         int cnt = 0;
         
         if (blank) {
@@ -180,7 +145,7 @@ public class EventFD {
             List<AbstractLink> links = myEvent.get_links();
             if (links != null) {
                 for (AbstractLink l : links)
-                    if ((lg == 0) || ((lg == 1) && (l.has_mng())) || ((lg == 2) && (l.has_aux())))
+                    if (l instanceof LinkOfframp)
                         linksOrderedUnderEvent.add(l);
                     else
                         cnt++;
@@ -188,7 +153,7 @@ public class EventFD {
             }
         } else {
             for (AbstractLink l : linksOrderedUnderEvent)
-                if (!((lg == 0) || ((lg == 1) && (l.has_mng())) || ((lg == 2) && (l.has_aux())))) {
+                if (!(l instanceof LinkOfframp)) {
                     linksOrderedUnderEvent.remove(l);
                     cnt++;
                 }
@@ -200,16 +165,12 @@ public class EventFD {
         
         if (cnt > 0) {
             String lt = "managed";
-            if (lg == 2)
-                lt = "auxiliary";
             String sfx = "s";
-            String prfx = "They have";
-            if (cnt == 1) {
+            if (cnt == 1)
                 sfx = "";
-                prfx = "It has";
-            }
-            String header = "Removed " + cnt + " section" + sfx + " from Event";
-            String content = prfx + " no " + lt + " lanes.";
+            
+            String header = "Removed " + cnt + " off-ramp" + sfx + " from Event";
+            String content = "These sections are not in network.";
             opt.utils.Dialogs.InformationDialog(header, content);
         }
     }
@@ -218,20 +179,18 @@ public class EventFD {
         linksFreeForEvent.clear();
         lvAllLinks.getItems().clear();
         
-        int lg = Math.max(0, cbLaneGroup.getSelectionModel().getSelectedIndex());
-        
         List<List<Segment>> seg_list = myScenario.get_linear_freeway_segments();
         for (List<Segment> segments : seg_list)
             for(Segment segment : segments)
                 for (AbstractLink l : segment.get_links())
                     if (!linksUnderEvent.contains(l))
-                        if ((lg == 0) || ((lg == 1) && (l.has_mng())) || ((lg == 2) && (l.has_aux())))
+                        if (l instanceof LinkOfframp)
                             linksFreeForEvent.add(l);
         
         List<LinkConnector> connectors = myScenario.get_connectors();
         for (AbstractLink l : connectors)
             if (!linksUnderEvent.contains(l))
-                if ((lg == 0) || ((lg == 1) && (l.has_mng())) || ((lg == 2) && (l.has_aux())))
+                if (l instanceof LinkOfframp)
                     linksFreeForEvent.add(l);
         
         for (AbstractLink l : linksFreeForEvent)
@@ -240,7 +199,7 @@ public class EventFD {
     
     
        
-    public void initWithScenarioAndEvent(FreewayScenario s, EventLanegroupFD e) {
+    public void initWithScenarioAndEvent(FreewayScenario s, EventLinkToggle e) {
         myScenario = s;
         myEvent = e;
         
@@ -249,28 +208,10 @@ public class EventFD {
         timeSeconds = e.timestamp;
         txtTime.setText(Misc.seconds2timestring((float)timeSeconds, ""));
         
-        LaneGroupType lgt = e.get_lgtype();
         int idx = 0;
-        if (lgt == LaneGroupType.mng)
+        if (!e.isopen)
             idx = 1;
-        else if (lgt == LaneGroupType.aux)
-            idx = 2;
-        
-        cbLaneGroup.getSelectionModel().select(idx);
-        
-        FDparams fdMult = e.get_fd_mult();
-        cbReset.setSelected(fdMult == null);
-        onResetToggle(null);
-        
-        if (fdMult == null) {
-            spV.getValueFactory().setValue(1d);
-            spF.getValueFactory().setValue(1d);
-            spJD.getValueFactory().setValue(1d);
-        } else {
-            spV.getValueFactory().setValue((double)fdMult.ff_speed_kph);
-            spF.getValueFactory().setValue((double)fdMult.capacity_vphpl);
-            spJD.getValueFactory().setValue((double)fdMult.jam_density_vpkpl);
-        }
+        cbOpenClose.getSelectionModel().select(idx);
         
         initEventLinks(true);
         initAllLinks();
@@ -294,19 +235,6 @@ public class EventFD {
         timeSeconds = Misc.timeString2Seconds(buf);
     }
     
-    @FXML
-    void onResetToggle(ActionEvent event) {
-        boolean v = false;
-        if (!cbReset.isSelected())
-            v = true;
-
-        lblV.setVisible(v);
-        lblF.setVisible(v);
-        lblJD.setVisible(v);
-        spV.setVisible(v);
-        spF.setVisible(v);
-        spJD.setVisible(v);
-    }
     
     @FXML
     void onLaneGroupChange(ActionEvent event) {
@@ -431,28 +359,6 @@ public class EventFD {
         myEvent.name = name;
         
         myEvent.timestamp = (float)timeSeconds;
-        
-        myEvent.set_links(new ArrayList<>());
-        LaneGroupType[] lgt = {LaneGroupType.gp, LaneGroupType.mng, LaneGroupType.aux};
-        int idx = Math.max(0, cbLaneGroup.getSelectionModel().getSelectedIndex());
-        try {
-            myEvent.set_lgtype(lgt[idx]);
-        } catch(Exception ex) {
-            opt.utils.Dialogs.ExceptionDialog("Error modifying event", ex);
-        }
-        
-        if (cbReset.isSelected()) {
-            myEvent.set_fdmult_to_null();
-        } else {
-            double v = Math.max(0, Math.min(1.5, spV.getValue()));
-            myEvent.set_ffspeed_mult((float)v);
-            v = Math.max(0, Math.min(1.5, spF.getValue()));
-            myEvent.set_capacity_mult((float)v);
-            v = Math.max(0, Math.min(1.5, spJD.getValue()));
-            myEvent.set_jamdensity_mult((float)v);
-        }
-        
-        myEvent.set_links(new ArrayList<>(linksOrderedUnderEvent));
         
         scenarioEditorController.setProjectModified(true);
         

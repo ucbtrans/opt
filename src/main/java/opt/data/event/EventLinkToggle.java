@@ -19,13 +19,8 @@ public class EventLinkToggle extends AbstractEvent {
     public EventLinkToggle(long id, String type, float timestamp, String name, List<AbstractLink> links, boolean isopen) throws Exception {
         super(id, type, timestamp, name);
         this.isopen = isopen;
-        this.links = links;
-
-        // check no repeat links
-        Set<AbstractLink> X = new HashSet<>();
-        X.addAll(links);
-        if(X.size()!=links.size())
-            throw new Exception("Links in EventControlToggle are not unique");
+        if (!set_links(links))
+            throw new Exception("Links in Event are not unique");
     }
 
     @Override
@@ -54,6 +49,25 @@ public class EventLinkToggle extends AbstractEvent {
     /////////////////////
     // API
     /////////////////////
+    
+    public List<AbstractLink> get_links() {
+        return links;
+    }
+    
+    public boolean set_links(List<AbstractLink> links) {
+        if (links == null)
+            return false;
+        
+        this.links = links;
+
+        // check no repeat links
+        Set<AbstractLink> X = new HashSet<>();
+        X.addAll(links);
+        if(X.size()!=links.size())
+            return false;
+        
+        return true;
+    }
 
     public void add_link(AbstractLink x){
         if(!links.contains(x))

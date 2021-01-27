@@ -72,6 +72,7 @@ import opt.data.control.ControlSchedule;
 import opt.data.control.ControllerLgRestrict;
 import opt.data.control.ScheduleEntry;
 import opt.data.event.AbstractEvent;
+import opt.data.event.AbstractEventLaneGroup;
 import opt.data.event.EventLanegroupLanes;
 import opt.data.event.EventLanegroupFD;
 import opt.data.event.EventLinkToggle;
@@ -117,6 +118,12 @@ public class ScenarioEditorController {
     
     private EventFD eventFD = null;
     private Scene eventFDScene = null;
+    
+    private EventLanes eventLanes = null;
+    private Scene eventLanesScene = null;
+    
+    private EventLinkOC eventLinkOC = null;
+    private Scene eventLinkOCScene = null;
     
     private SpinnerValueFactory<Double> a0SpinnerValueFactory = null;
     private SpinnerValueFactory<Double> a1SpinnerValueFactory = null;
@@ -294,6 +301,28 @@ public class ScenarioEditorController {
         //eventFDScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
     }
     
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the EventLanes that is used to
+     *               edit a lane number change event.
+     */
+    public void setEventLanesControllerAndScene(EventLanes ctrl, Scene scn) {
+        eventLanes = ctrl;
+        eventLanesScene = scn;
+        //eventLanesScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
+    }
+    
+    /**
+     * This function should be called once: during the initialization.
+     * @param ctrl - pointer to the EventLinkOC that is used to
+     *               edit a off-ramp open/close event.
+     */
+    public void setEventLinkOCControllerAndScene(EventLinkOC ctrl, Scene scn) {
+        eventLinkOC = ctrl;
+        eventLinkOCScene = scn;
+        //eventLinkToggleScene.getStylesheets().add(getClass().getResource("/opt.css").toExternalForm());
+    }
+    
     
     
     private void launchVehicleTypeWindow(Commodity comm) {
@@ -343,12 +372,12 @@ public class ScenarioEditorController {
             inputStage.setScene(eventFDScene);
             eventFD.initWithScenarioAndEvent(myScenario, (EventLanegroupFD)event);
         } else if (event instanceof EventLanegroupLanes) {
-            //inputStage.setScene(eventLanesScene);
-            //eventLanes.initWithScenarioAndEvent(myScenario, (EventLanegroupLanes)event);
+            inputStage.setScene(eventLanesScene);
+            eventLanes.initWithScenarioAndEvent(myScenario, (EventLanegroupLanes)event);
         } else if (event instanceof EventLinkToggle) {
             title = "Event: Open/Close Off-Ramps";
-            //inputStage.setScene(eventLinkToggleScene);
-            //eventLinkToggle.initWithScenarioAndEvent(myScenario, (EventLinkToggle)event);
+            inputStage.setScene(eventLinkOCScene);
+            eventLinkOC.initWithScenarioAndEvent(myScenario, (EventLinkToggle)event);
         } else {
             opt.utils.Dialogs.ErrorDialog("Unknown Event Type!", "Not implemented");
             return;
@@ -717,14 +746,26 @@ public class ScenarioEditorController {
         for (AbstractEvent ev : myScenario.get_events()) {
             String entry = Misc.seconds2timestring(ev.timestamp, ":") + ": " + ev.name + " (";
             
-            if (ev instanceof EventLanegroupFD)
-                entry += "Change Traffic Dynamics)";
+            if (ev instanceof EventLanegroupFD) {
+                entry += "Change Traffic Dynamics";
+            }
             else if (ev instanceof EventLanegroupLanes)
-                entry += "Change Number of Lanes)";
+                entry += "Change Number of Lanes";
             else if (ev instanceof EventLinkToggle)
-                entry += "Open / Close Off-Ramps)";
+                entry += "Open / Close Off-Ramps";
             else
                 continue;
+            
+            String lg = "";
+            if ((ev instanceof EventLanegroupFD) || (ev instanceof EventLanegroupLanes)) {
+                LaneGroupType lgt = ((AbstractEventLaneGroup)ev).get_lgtype();
+                lg = " - GP Lanes";
+                if (lgt == LaneGroupType.mng)
+                    lg = " - Managed Lanes";
+                else if (lgt == LaneGroupType.aux)
+                    lg = " - Auxiliary lanes";
+            }
+            entry += lg + ")";
             
             listEvents.getItems().add(entry);
         }
@@ -1272,6 +1313,14 @@ public class ScenarioEditorController {
         if (selectedEvent != null)
             launchEventEditor(selectedEvent);
     }
+    
+    
+    
+    
+    public void selectLink(AbstractLink lnk) {
+        networkDisplay.findLink(lnk);
+    }
+    
     
     
     public void prepareEvent(AbstractEvent evt) {

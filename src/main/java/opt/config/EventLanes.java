@@ -46,27 +46,26 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import opt.data.AbstractLink;
-import opt.data.FDparams;
 import opt.data.FreewayScenario;
 import opt.data.LaneGroupType;
 import opt.data.LinkConnector;
 import opt.data.Segment;
-import opt.data.event.EventLanegroupFD;
+import opt.data.event.EventLanegroupLanes;
 import opt.utils.Misc;
-import opt.utils.ModifiedDoubleStringConverter;
+import opt.utils.ModifiedIntegerStringConverter;
 
 
 
 /**
- * Editor for events of type Fundamental Diagram.
+ * Editor for events of type Lane Open/Close.
  * 
  * @author Alex Kurzhanskiy
  */
-public class EventFD {
+public class EventLanes {
     private String originalName;
     private double timeSeconds = 0.0;
     
-    private EventLanegroupFD myEvent = null;
+    private EventLanegroupLanes myEvent = null;
     private FreewayScenario myScenario = null;
     
     private Set<AbstractLink> linksUnderEvent = new HashSet<AbstractLink>();
@@ -90,24 +89,12 @@ public class EventFD {
     @FXML // fx:id="cbReset"
     private CheckBox cbReset; // Value injected by FXMLLoader
 
-    @FXML // fx:id="lblV"
-    private Label lblV; // Value injected by FXMLLoader
+    @FXML // fx:id="lblLanes"
+    private Label lblLanes; // Value injected by FXMLLoader
 
-    @FXML // fx:id="spV"
-    private Spinner<Double> spV; // Value injected by FXMLLoader
-
-    @FXML // fx:id="lblF"
-    private Label lblF; // Value injected by FXMLLoader
-
-    @FXML // fx:id="spF"
-    private Spinner<Double> spF; // Value injected by FXMLLoader
-
-    @FXML // fx:id="lblJD"
-    private Label lblJD; // Value injected by FXMLLoader
-
-    @FXML // fx:id="spJD"
-    private Spinner<Double> spJD; // Value injected by FXMLLoader
-
+    @FXML // fx:id="spLanes"
+    private Spinner<Integer> spLanes; // Value injected by FXMLLoader
+    
     @FXML // fx:id="lvAllLinks"
     private ListView<String> lvAllLinks; // Value injected by FXMLLoader
 
@@ -140,17 +127,9 @@ public class EventFD {
         cbLaneGroup.getItems().add("Managed Lane");
         cbLaneGroup.getItems().add("Auxiliary Lane");
 
-        SpinnerValueFactory svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 1.5, 1, 0.1);
-        svf.setConverter(new ModifiedDoubleStringConverter());
-        spV.setValueFactory(svf);
-        
-        svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 1.5, 1, 0.1);
-        svf.setConverter(new ModifiedDoubleStringConverter());
-        spF.setValueFactory(svf);
-        
-        svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 1.5, 1, 0.1);
-        svf.setConverter(new ModifiedDoubleStringConverter());
-        spJD.setValueFactory(svf);
+        SpinnerValueFactory svf = new SpinnerValueFactory.IntegerSpinnerValueFactory(-3, 3, 0, 1);
+        svf.setConverter(new ModifiedIntegerStringConverter());
+        spLanes.setValueFactory(svf);
         
         lvAllLinks.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         lvEventLinks.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -240,7 +219,7 @@ public class EventFD {
     
     
        
-    public void initWithScenarioAndEvent(FreewayScenario s, EventLanegroupFD e) {
+    public void initWithScenarioAndEvent(FreewayScenario s, EventLanegroupLanes e) {
         myScenario = s;
         myEvent = e;
         
@@ -258,18 +237,14 @@ public class EventFD {
         
         cbLaneGroup.getSelectionModel().select(idx);
         
-        FDparams fdMult = e.get_fd_mult();
-        cbReset.setSelected(fdMult == null);
+        Integer delta = e.delta_lanes;
+        cbReset.setSelected(delta == null);
         onResetToggle(null);
         
-        if (fdMult == null) {
-            spV.getValueFactory().setValue(1d);
-            spF.getValueFactory().setValue(1d);
-            spJD.getValueFactory().setValue(1d);
+        if (delta == null) {
+            spLanes.getValueFactory().setValue(0);
         } else {
-            spV.getValueFactory().setValue((double)fdMult.ff_speed_kph);
-            spF.getValueFactory().setValue((double)fdMult.capacity_vphpl);
-            spJD.getValueFactory().setValue((double)fdMult.jam_density_vpkpl);
+            spLanes.getValueFactory().setValue(delta);
         }
         
         initEventLinks(true);
@@ -300,12 +275,8 @@ public class EventFD {
         if (!cbReset.isSelected())
             v = true;
 
-        lblV.setVisible(v);
-        lblF.setVisible(v);
-        lblJD.setVisible(v);
-        spV.setVisible(v);
-        spF.setVisible(v);
-        spJD.setVisible(v);
+        lblLanes.setVisible(v);
+        spLanes.setVisible(v);
     }
     
     @FXML
@@ -442,14 +413,10 @@ public class EventFD {
         }
         
         if (cbReset.isSelected()) {
-            myEvent.set_fdmult_to_null();
+            myEvent.delta_lanes = null;
         } else {
-            double v = Math.max(0, Math.min(1.5, spV.getValue()));
-            myEvent.set_ffspeed_mult((float)v);
-            v = Math.max(0, Math.min(1.5, spF.getValue()));
-            myEvent.set_capacity_mult((float)v);
-            v = Math.max(0, Math.min(1.5, spJD.getValue()));
-            myEvent.set_jamdensity_mult((float)v);
+            int v = Math.max(-3, Math.min(3, spLanes.getValue()));
+            myEvent.delta_lanes = v;
         }
         
         myEvent.set_links(new ArrayList<>(linksOrderedUnderEvent));

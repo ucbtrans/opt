@@ -153,7 +153,10 @@ public class AppMainController {
     private EventFD eventFD = null;
     
     private GridPane eventLanesPane = null;
-    //private EventLanes eventLanes = null;
+    private EventLanes eventLanes = null;
+    
+    private GridPane eventLinkOCPane = null;
+    private EventLinkOC eventLinkOC = null;
     
     
     private SplitPane routeEditorPane = null;
@@ -578,6 +581,18 @@ public class AppMainController {
             eventFD = loader.getController();
             eventFD.setScenarioEditorController(scenarioEditorController);
             scenarioEditorController.setEventFDControllerAndScene(eventFD, new Scene(eventFDPane));
+            
+            loader = new FXMLLoader(getClass().getResource("/event_lanes.fxml"));
+            eventLanesPane = loader.load();
+            eventLanes = loader.getController();
+            eventLanes.setScenarioEditorController(scenarioEditorController);
+            scenarioEditorController.setEventLanesControllerAndScene(eventLanes, new Scene(eventLanesPane));
+            
+            loader = new FXMLLoader(getClass().getResource("/event_links_toggle.fxml"));
+            eventLinkOCPane = loader.load();
+            eventLinkOC = loader.getController();
+            eventLinkOC.setScenarioEditorController(scenarioEditorController);
+            scenarioEditorController.setEventLinkOCControllerAndScene(eventLinkOC, new Scene(eventLinkOCPane));
             
             
             // Route controllers

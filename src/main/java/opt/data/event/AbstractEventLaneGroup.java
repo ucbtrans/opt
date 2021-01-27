@@ -19,7 +19,7 @@ public class AbstractEventLaneGroup extends AbstractEvent {
         super(id, type, timestamp, name);
         this.lgtype = lgtype;
         if (!set_links(links))
-            throw new Exception("Links in EventControlToggle are not unique");
+            throw new Exception("Links in Event are not unique");
     }
 
     @Override
