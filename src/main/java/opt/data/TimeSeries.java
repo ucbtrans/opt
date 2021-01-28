@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class TimeSeries {
     public float [] time;
-    public double [] values;
+    protected double [] values;
 
     public TimeSeries(float [] time){
         this.time = time;
@@ -23,6 +23,17 @@ public class TimeSeries {
 
     public float get_dt(){
         return time[1]-time[0];
+    }
+
+    public double [] get_values(){
+        double [] round_values = new double[values.length];
+        for(int i=0;i<values.length;i++)
+            round_values[i] = Math.floor(values[i]*10d)/10d;
+        return round_values;
+    }
+
+    public int num_values(){
+        return values.length;
     }
 
     public void add(TimeSeries ts) throws Exception {
@@ -96,7 +107,7 @@ public class TimeSeries {
         if(values==null)
             return series;
         for(int k=0;k<time.length;k++)
-            series.add(time[k],values[k]);
+            series.add(time[k],Math.floor(10d*values[k])/10d);
         return series;
     }
 

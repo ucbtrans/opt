@@ -266,9 +266,9 @@ public class ScenarioPerformanceController {
             double t_vmt = 0;
             double t_vht = 0;
             double t_delay = 0;
-            double[] vmt_s = mySimData.get_vmt_for_network(cset(listVT.get(i))).values;
-            double[] vht_s = mySimData.get_vht_for_network(cset(listVT.get(i))).values;
-            double[] delay_s = mySimData.get_delay_for_network(cset(listVT.get(i)), (float)v_thres).values;
+            double[] vmt_s = mySimData.get_vmt_for_network(cset(listVT.get(i))).get_values();
+            double[] vht_s = mySimData.get_vht_for_network(cset(listVT.get(i))).get_values();
+            double[] delay_s = mySimData.get_delay_for_network(cset(listVT.get(i)), (float)v_thres).get_values();
             for (int j = 0; j < vmt_s.length; j++) {
                 if (!Double.isNaN(vmt_s[j]))
                     t_vmt += vmt_s[j];
@@ -381,14 +381,14 @@ public class ScenarioPerformanceController {
 
         double d_n = 0.0;
         if (vht_no != null) {
-            double[] vals = vht_no.values;
+            double[] vals = vht_no.get_values();
             for (double v : vals)
                 d_n += v;
         }
 
         double d_o = 0.0;
         if (vht_o != null) {
-            double[] vals = vht_o.values;
+            double[] vals = vht_o.get_values();
             for (double v : vals)
                 d_o += v;
         }
@@ -443,14 +443,14 @@ public class ScenarioPerformanceController {
 
         d_n = 0.0;
         if (delay_no != null) {
-            double[] vals = delay_no.values;
+            double[] vals = delay_no.get_values();
             for (double v : vals)
                 d_n += v;
         }
 
         d_o = 0.0;
         if (delay_o != null) {
-            double[] vals = delay_o.values;
+            double[] vals = delay_o.get_values();
             for (double v : vals)
                 d_o += v;
         }
@@ -519,7 +519,7 @@ public class ScenarioPerformanceController {
         for (Commodity c : listVT) {
             TimeSeries ts = mySimData.get_vmt_for_network(cset(c));
             if (ts != null)
-                max_sz = Math.max(max_sz, ts.values.length);
+                max_sz = Math.max(max_sz, ts.num_values());
         }
         double[] total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
@@ -608,7 +608,7 @@ public class ScenarioPerformanceController {
         for (Commodity c : listVT) {
             TimeSeries ts = mySimData.get_vht_for_network(cset(c));
             if (ts != null)
-                max_sz = Math.max(max_sz, ts.values.length);
+                max_sz = Math.max(max_sz, ts.num_values());
         }
         total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
@@ -674,7 +674,7 @@ public class ScenarioPerformanceController {
         max_sz = 0;
         TimeSeries ts = mySimData.get_vht_for_network(null);
         if (ts != null)
-            max_sz = Math.max(max_sz, ts.values.length);
+            max_sz = Math.max(max_sz, ts.num_values());
 
         total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
@@ -784,7 +784,7 @@ public class ScenarioPerformanceController {
         for (Commodity c : listVT) {
             ts = mySimData.get_delay_for_network(cset(c), (float)v_thres);
             if (ts != null)
-                max_sz = Math.max(max_sz, ts.values.length);
+                max_sz = Math.max(max_sz, ts.num_values());
         }
         total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
@@ -850,7 +850,7 @@ public class ScenarioPerformanceController {
         max_sz = 0;
         ts = mySimData.get_delay_for_network(null, (float)v_thres);
         if (ts != null)
-            max_sz = Math.max(max_sz, ts.values.length);
+            max_sz = Math.max(max_sz, ts.num_values());
 
         total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)

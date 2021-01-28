@@ -34,13 +34,6 @@ public class TestTimeSeries extends AbstractTest {
     }
 
     @Test
-    public void test_mult(){
-        double value = timeseries.values[10];
-        timeseries.mult(2f);
-        assertEquals(timeseries.values[10],value*2d,0.001);
-    }
-
-    @Test
     public void test_resample(){
         XYSeriesCollection seriess = new XYSeriesCollection();
         seriess.addSeries(timeseries.get_XYSeries("original"));

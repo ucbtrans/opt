@@ -364,7 +364,7 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_flw_exiting(lgset_gp, cset(c)).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_flw_exiting(lgset_gp, cset(c)).num_values());
             }
             dt = mySimData.get_flw_exiting(lgset_gp, cset(listVT.get(0))).get_dt();
             double[] total = new double[max_sz];
@@ -449,7 +449,7 @@ public class LinkPerformanceController {
 
         max_sz = 0;
         for (Commodity c : listVT) {
-            max_sz = Math.max(max_sz, mySimData.get_flw_exiting(lgset_gp, cset(c)).values.length);
+            max_sz = Math.max(max_sz, mySimData.get_flw_exiting(lgset_gp, cset(c)).num_values());
         }
         double[] total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
@@ -528,7 +528,7 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_flw_exiting(lgset_mng, cset(c)).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_flw_exiting(lgset_mng, cset(c)).num_values());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
@@ -606,7 +606,7 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_flw_exiting(lgset_aux, cset(c)).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_flw_exiting(lgset_aux, cset(c)).num_values());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
@@ -692,7 +692,7 @@ public class LinkPerformanceController {
 
         max_sz = 0;
         for (Commodity c : listVT) {
-            max_sz = Math.max(max_sz, mySimData.get_veh(lgset_gp, cset(c)).values.length);
+            max_sz = Math.max(max_sz, mySimData.get_veh(lgset_gp, cset(c)).num_values());
         }
         for (int i = 0; i < max_sz; i++)
             total[i] = 0;
@@ -769,7 +769,7 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_veh(lgset_mng, cset(c)).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_veh(lgset_mng, cset(c)).num_values());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
@@ -847,7 +847,7 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_veh(lgset_aux, cset(c)).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_veh(lgset_aux, cset(c)).num_values());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
@@ -947,7 +947,7 @@ public class LinkPerformanceController {
 
         int max_sz = 0;
         for (Commodity c : listVT) {
-            max_sz = Math.max(max_sz, mySimData.get_vmt(lgset_gp, cset(c)).values.length);
+            max_sz = Math.max(max_sz, mySimData.get_vmt(lgset_gp, cset(c)).num_values());
         }
         double[] total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
@@ -1026,7 +1026,7 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_vmt(lgset_mng, cset(c)).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_vmt(lgset_mng, cset(c)).num_values());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
@@ -1104,7 +1104,7 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_vmt(lgset_aux, cset(c)).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_vmt(lgset_aux, cset(c)).num_values());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
@@ -1187,7 +1187,7 @@ public class LinkPerformanceController {
 
         max_sz = 0;
         for (Commodity c : listVT) {
-            max_sz = Math.max(max_sz, mySimData.get_vht(lgset_gp, cset(c)).values.length);
+            max_sz = Math.max(max_sz, mySimData.get_vht(lgset_gp, cset(c)).num_values());
         }
         total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
@@ -1266,7 +1266,7 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_vht(lgset_mng, cset(c)).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_vht(lgset_mng, cset(c)).num_values());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
@@ -1344,7 +1344,7 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_vht(lgset_aux, cset(c)).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_vht(lgset_aux, cset(c)).num_values());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
@@ -1434,7 +1434,7 @@ public class LinkPerformanceController {
 
         max_sz = 0;
         for (Commodity c : listVT) {
-            max_sz = Math.max(max_sz, mySimData.get_delay(lgset_gp, cset(c), (float)v_thres).values.length);
+            max_sz = Math.max(max_sz, mySimData.get_delay(lgset_gp, cset(c), (float)v_thres).num_values());
         }
         total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
@@ -1518,7 +1518,7 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_delay(lgset_mng, cset(c), (float)v_thres).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_delay(lgset_mng, cset(c), (float)v_thres).num_values());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
@@ -1601,7 +1601,7 @@ public class LinkPerformanceController {
 
             max_sz = 0;
             for (Commodity c : listVT) {
-                max_sz = Math.max(max_sz, mySimData.get_delay(lgset_aux, cset(c), (float)v_thres).values.length);
+                max_sz = Math.max(max_sz, mySimData.get_delay(lgset_aux, cset(c), (float)v_thres).num_values());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;

@@ -1077,7 +1077,7 @@ public class RoutePerformanceController {
 
         int max_sz = 0;
         for (int k = 0; k < numVT; k++) {
-            max_sz = Math.max(max_sz, vmt_series_gp[k].values.length);
+            max_sz = Math.max(max_sz, vmt_series_gp[k].num_values());
         }
         double[] total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
@@ -1161,7 +1161,7 @@ public class RoutePerformanceController {
             max_sz = 0;
             for (int k = 0; k < numVT; k++) {
                 if (vmt_series_gp[k] != null)
-                    max_sz = Math.max(max_sz, vmt_series_gp[k].values.length);
+                    max_sz = Math.max(max_sz, vmt_series_gp[k].num_values());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
@@ -1246,7 +1246,7 @@ public class RoutePerformanceController {
 
         max_sz = 0;
         for (int k = 0; k < numVT; k++) {
-            max_sz = Math.max(max_sz, vht_series_gp[k].values.length);
+            max_sz = Math.max(max_sz, vht_series_gp[k].num_values());
         }
         total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
@@ -1324,7 +1324,7 @@ public class RoutePerformanceController {
             max_sz = 0;
             for (int k = 0; k < numVT; k++) {
                 if (vht_series_gp[k] != null)
-                    max_sz = Math.max(max_sz, vht_series_gp[k].values.length);
+                    max_sz = Math.max(max_sz, vht_series_gp[k].num_values());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
@@ -1413,7 +1413,7 @@ public class RoutePerformanceController {
 
         max_sz = 0;
         for (int k = 0; k < numVT; k++) {
-            max_sz = Math.max(max_sz, delay_series_gp[k].values.length);
+            max_sz = Math.max(max_sz, delay_series_gp[k].num_values());
         }
         total = new double[max_sz];
         for (int i = 0; i < max_sz; i++)
@@ -1491,7 +1491,7 @@ public class RoutePerformanceController {
             max_sz = 0;
             for (int k = 0; k < numVT; k++) {
                 if (delay_series_gp[k] != null)
-                    max_sz = Math.max(max_sz, delay_series_gp[k].values.length);
+                    max_sz = Math.max(max_sz, delay_series_gp[k].num_values());
             }
             for (int i = 0; i < max_sz; i++)
                 total[i] = 0;
