@@ -12,6 +12,8 @@ import utils.OTMUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toSet;
+
 public class Scenario {
 
     protected FreewayScenario my_fwy_scenario;
@@ -453,7 +455,7 @@ public class Scenario {
         // collect controllers and filter out invalid ones
         Set<ControlSchedule> schedules = links.values().stream()
                 .flatMap(link->link.get_all_schedules().stream())
-                .collect(Collectors.toSet());
+                .collect(toSet());
 
         jaxb.Controllers jcntrls = new jaxb.Controllers();
         jScn.setControllers(jcntrls);
@@ -514,7 +516,7 @@ public class Scenario {
                 if(!mysensors.isEmpty()){
                     jaxb.FeedbackSensors jsns = new jaxb.FeedbackSensors();
                     jentry.setFeedbackSensors(jsns);
-                    Set<Long> sensor_ids = mysensors.stream().map(s->s.id).collect(Collectors.toSet());
+                    Set<Long> sensor_ids = mysensors.stream().map(s->s.id).collect(toSet());
                     jsns.setIds(OTMUtils.comma_format(sensor_ids));
                 }
 
@@ -558,14 +560,16 @@ public class Scenario {
                         Optional<RoadConnection> orc = rcs.stream()
                                 .filter(r -> r.outlink == up_ml.id && r.inlink == or.id)
                                 .findFirst();
-                        Long rcid = orc.isPresent() ? orc.get().id : null;
+                        Set<Long> rcids = new HashSet<>();
+                        if(orc.isPresent())
+                            rcids.add(orc.get().id);
 
                         for (Long commid : or_up_link.demands.keySet()) {
 
                             long ctrlid = my_fwy_scenario.new_schedule_id();
 
                             // actuator ............................
-                            jacts.getActuator().add(create_linkflow_actuator(ctrlid, commid, up_ml.id, rcid));
+                            jacts.getActuator().add(create_linkflow_actuator(ctrlid, commid, up_ml.id, rcids));
 
                             // controller
                             Profile1D zeroprof = new Profile1D(0f,0f);
@@ -583,7 +587,7 @@ public class Scenario {
             // controllers for specified offramp flow
             Set<LinkOfframp> frs_useflow = frs.stream()
                     .filter(f->f.usefrflows)
-                    .collect(Collectors.toSet());
+                    .collect(toSet());
 
             if(!frs_useflow.isEmpty()) {
 
@@ -592,13 +596,14 @@ public class Scenario {
                     long ctrlid = my_fwy_scenario.new_schedule_id();
 
                     // rcid
-                    Optional<RoadConnection> orc = rcs.stream()
-                            .filter(r -> r.outlink == up_ml.id && (r.outlgtype == LaneGroupType.gp || r.outlgtype == null))
-                            .findFirst();
-                    Long rcid = orc.isPresent() ? orc.get().id : null;
+                    Set<Long> rcids = rcs.stream()
+                            .filter(r -> r.outlink == up_ml.id )
+                            .map(r->r.id)
+                            .collect(toSet());
+
 
                     // actuator ............................
-                    jacts.getActuator().add(create_linkflow_actuator(ctrlid, commid, up_ml.id, rcid));
+                    jacts.getActuator().add(create_linkflow_actuator(ctrlid, commid, up_ml.id, rcids));
 
                     // controller ..............................
                     Map<Long, Profile1D> profiles = frs_useflow.stream()
@@ -618,7 +623,7 @@ public class Scenario {
         return jScn;
     }
 
-    private jaxb.Actuator create_linkflow_actuator(long actid,long commid,long linkid,Long rcid){
+    private jaxb.Actuator create_linkflow_actuator(long actid,long commid,long linkid,Set<Long> rcids){
 
         // actuator ............................
         jaxb.Actuator act = new jaxb.Actuator();
@@ -636,11 +641,11 @@ public class Scenario {
         act.setParameters(aps);
 
         // it may not be present when saving to .opt, but that doesn't matter
-        if(rcid!=null) {
+        if(rcids!=null && !rcids.isEmpty()) {
             jaxb.Parameter ap1 = new jaxb.Parameter();
             aps.getParameter().add(ap1);
-            ap1.setName("rcid");
-            ap1.setValue(String.format("%d", rcid));
+            ap1.setName("rcids");
+            ap1.setValue(OTMUtils.comma_format(rcids));
         }
 
         return act;
