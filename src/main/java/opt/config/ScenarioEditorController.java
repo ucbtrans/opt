@@ -401,8 +401,8 @@ public class ScenarioEditorController {
 
         mapVT.forEach((k, v) -> {
             DecimalFormat df = new DecimalFormat("#.#");
-            double nc = v.get_pvequiv();
-            String s = v.get_name() + ": " + df.format(nc) + " car" + ((nc == 1) ? "" : "s");
+            Commodity.EmissionsClass ec = v.get_eclass();
+            String s = v.get_name() + "   (Cal-BC Emissions Class: " + ec + ")";
             listVT.add(v);
             listVehicleTypes.getItems().add(s);
         });

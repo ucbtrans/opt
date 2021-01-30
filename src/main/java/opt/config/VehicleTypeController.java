@@ -28,6 +28,7 @@ package opt.config;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
@@ -48,7 +49,6 @@ import opt.utils.ModifiedDoubleStringConverter;
  */
 public class VehicleTypeController {
     private AppMainController appMainController = null;
-    private SpinnerValueFactory<Double> numCarsSpinnerValueFactory = null;
     private Commodity myCommodity = null;
     private FreewayScenario myScenario = null;
     
@@ -65,8 +65,8 @@ public class VehicleTypeController {
     @FXML // fx:id="labelNumEquivCars"
     private Label labelNumEquivCars; // Value injected by FXMLLoader
 
-    @FXML // fx:id="spinnerNumCars"
-    private Spinner<Double> spinnerNumCars; // Value injected by FXMLLoader
+    @FXML // fx:id="cbEClass"
+    private ChoiceBox<Commodity.EmissionsClass> cbEClass; // Value injected by FXMLLoader
 
     @FXML // fx:id="buttonCancel"
     private Button buttonCancel; // Value injected by FXMLLoader
@@ -94,34 +94,24 @@ public class VehicleTypeController {
     
     @FXML // This method is called by the FXMLLoader when initialization is complete
     private void initialize() {
-        numCarsSpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 10.0, 0.0, 1);
-        numCarsSpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter());
-        spinnerNumCars.setValueFactory(numCarsSpinnerValueFactory);
-        spinnerNumCars.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (Math.abs(oldValue-newValue) > 0.00001) {
-                onNumCarsChange();
-            }
-        });
-        spinnerNumCars.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue)
-                return;
-            Double dflt = new Double(1);
-            opt.utils.WidgetFunctionality.commitEditorText(spinnerNumCars, dflt);
-        });
+        cbEClass.getItems().clear();
+        cbEClass.getItems().add(Commodity.EmissionsClass.Auto);
+        cbEClass.getItems().add(Commodity.EmissionsClass.Truck);
+        cbEClass.getItems().add(Commodity.EmissionsClass.Bus);
     }
     
     
-     public void initWithCommodityAndScenario(Commodity comm, FreewayScenario scenario) {
-         myCommodity = comm;
-         myScenario = scenario;
-         
-         vtName.setText("New Vehicle Type");
-         numCarsSpinnerValueFactory.setValue(new Double(1.0));
-         if (myCommodity != null) {
-             vtName.setText(myCommodity.get_name());
-             numCarsSpinnerValueFactory.setValue(myCommodity.get_pvequiv());
-         }
-     }
+    public void initWithCommodityAndScenario(Commodity comm, FreewayScenario scenario) {
+        myCommodity = comm;
+        myScenario = scenario;
+
+        vtName.setText("New Vehicle Type");
+        cbEClass.getSelectionModel().select(Commodity.EmissionsClass.Auto);
+        if (myCommodity != null) {
+            vtName.setText(myCommodity.get_name());
+            cbEClass.getSelectionModel().select(comm.get_eclass());
+        }
+    }
     
     
     
@@ -131,19 +121,7 @@ public class VehicleTypeController {
     
     /***************************************************************************
      * CALLBACKS
-     **************************************************************************/
-    
-    private void onNumCarsChange() {
-        double num_cars = numCarsSpinnerValueFactory.getValue();
-        if (num_cars < 0.1) {
-            num_cars = 1.0;
-            if (myCommodity != null)
-                num_cars = myCommodity.get_pvequiv();
-            numCarsSpinnerValueFactory.setValue(num_cars);
-        }
-        return;
-    }
-    
+     **************************************************************************/    
     
     @FXML
     void onCancel(ActionEvent event) {
@@ -155,22 +133,20 @@ public class VehicleTypeController {
     @FXML
     void onOK(ActionEvent event) {
 
-        Commodity.EmissionsClass eclass = Commodity.EmissionsClass.car; // TODO READ THIS FROM UI
+        Commodity.EmissionsClass eclass = cbEClass.getValue();
         String name = vtName.getText();
-        double num_cars = numCarsSpinnerValueFactory.getValue();
-        num_cars = Math.min(Math.max(0.1, num_cars), 10);
         
         if (myCommodity != null) {
             if (name.equals(""))
                 name = myCommodity.get_name();
             name = opt.utils.Misc.validateAndCorrectVehicleTypeName(name, myScenario, myCommodity);
             myCommodity.set_name(name);
-            myCommodity.set_pvequiv((float)num_cars);
+            myCommodity.set_class(eclass);
         } else {
             if (name.equals(""))
                 name = "New Vehicle Type";
             name = opt.utils.Misc.validateAndCorrectVehicleTypeName(name, myScenario, myCommodity);
-            myScenario.create_commodity(name, (float)num_cars, eclass);
+            myScenario.create_commodity(name, 1f, eclass);
         }
         
         appMainController.setProjectModified(true);

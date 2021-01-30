@@ -119,7 +119,7 @@ public class Scenario {
         // commodities
         if(scenario.getCommodities()!=null)
             for(jaxb.Commodity comm : scenario.getCommodities().getCommodity())
-                this.commodities.put(comm.getId(),new Commodity(comm.getId(),comm.getName(),comm.getPvequiv(), Commodity.EmissionsClass.car));
+                this.commodities.put(comm.getId(),new Commodity(comm.getId(),comm.getName(),comm.getPvequiv(), Commodity.EmissionsClass.Auto));
 
     }
 

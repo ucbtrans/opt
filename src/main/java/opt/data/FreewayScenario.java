@@ -49,7 +49,7 @@ public class FreewayScenario {
         this.description = description;
         scenario = new Scenario(this);
         create_isolated_segment(segmentname,params, AbstractLink.Type.freeway);
-        scenario.commodities.put(0l,new Commodity(0l,"Car",1f, Commodity.EmissionsClass.car));
+        scenario.commodities.put(0l,new Commodity(0l,"Car",1f, Commodity.EmissionsClass.Auto));
         this.lcmodel = new LaneChangeModel(UserSettings.defaultLaneChoice_alpha, UserSettings.defaultLaneChoice_epsilon,UserSettings.defaultLaneChoice_gamma);
         reset_max_ids();
     }

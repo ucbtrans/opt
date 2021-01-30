@@ -2,7 +2,7 @@ package opt.data;
 
 public class Commodity {
 
-    public enum EmissionsClass {car, truck, bus}
+    public enum EmissionsClass {Auto, Truck, Bus}
 
     protected final long id;
     protected String name;
