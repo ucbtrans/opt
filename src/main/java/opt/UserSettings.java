@@ -330,6 +330,7 @@ public class UserSettings {
     }
     
     
+    private static String userOPTDir = null;
     private static String userSettingsFileName = null;
     
     public static void load() {
@@ -340,16 +341,36 @@ public class UserSettings {
             home = System.getProperty("java.io.tmpdir");
         if (home == null)
             return;
-        userSettingsFileName = home + File.separator + ".opt.prf";
+        
+        userOPTDir = home + File.separator + ".opt";
+        File directory = new File(userOPTDir);
+        if (! directory.exists()){
+            directory.mkdir();
+            // If you require it to make the entire directory path including parents,
+            // use directory.mkdirs(); here instead.
+        }
+
+        
+        
+        String oldConfig = home + File.separator + ".opt.prf";
+        File oldConfigFile = new File(oldConfig);
+        boolean useOld = false;
+        
+        userSettingsFileName = userOPTDir + File.separator + "config.prf";
         
         File userSettingsFile = new File(userSettingsFileName);
-        if (!userSettingsFile.exists())
-            return;
+        if (!userSettingsFile.exists()) {
+            userSettingsFile = oldConfigFile;
+            useOld = true;
+            if (!userSettingsFile.exists())
+                return;
+        }
         
         Properties props = new Properties();
         try {
-            FileInputStream in = new FileInputStream(userSettingsFileName);
+            FileInputStream in = new FileInputStream(useOld ? oldConfig : userSettingsFileName);
             props.loadFromXML(in);
+            in.close();
         } catch(Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Error reading user preferences", e);
         }
@@ -502,6 +523,9 @@ public class UserSettings {
         if (pv != null)
             maxManagedRampMeteringRatePerLaneVph = Double.parseDouble(pv);
         
+        if (oldConfigFile.exists()) {
+            oldConfigFile.delete();
+        }
     }
     
     
