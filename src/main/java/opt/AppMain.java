@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.io.IOException;
 import javafx.scene.image.Image;
+import opt.performance.EmissionsCalBC;
 
 import opt.utils.UtilGUI;
 
@@ -43,6 +44,7 @@ public class AppMain extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         UserSettings.load();
+        EmissionsCalBC.load();
     }
     
     public void stop() throws IOException {

@@ -330,7 +330,7 @@ public class UserSettings {
     }
     
     
-    private static String userOPTDir = null;
+    public static String userOPTDir = null;
     private static String userSettingsFileName = null;
     
     public static void load() {
