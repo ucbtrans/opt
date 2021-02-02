@@ -35,10 +35,16 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import opt.UserSettings;
+import opt.data.AbstractLink;
 import opt.data.Commodity.EmissionsClass;
+import opt.data.LaneGroupType;
+import opt.data.SimDataLink;
+import opt.data.SimDataScenario;
 
 
 /**
@@ -47,10 +53,13 @@ import opt.data.Commodity.EmissionsClass;
  * @author Alex Kurzhanskiy
  */
 public class EmissionsCalBC {
-    private static int numParams = 14;
-    private static int yearA = 2020;
-    private static int yearB = 2040;
-    private static int currentYear = 2020;
+    public static int numParams = 14;
+    public static int yearA = 2020;
+    public static int yearB = 2040;
+    public static int currentYear = 2020;
+    
+    public static String[] eParams = {"CO", "CO2", "NOX", "PM10", "SOX", "VOC", "PM2.5"};
+    
     private static String defaultLookupTable = "emissionsCalBCLookupTable.csv";
     
     private static String lookupTable = null;
@@ -61,6 +70,10 @@ public class EmissionsCalBC {
     
     private static int minV = 0;
     private static int maxV = 0;
+    
+    private static Set<LaneGroupType> lgset_gp = new HashSet<LaneGroupType>();
+    private static Set<LaneGroupType> lgset_mng = new HashSet<LaneGroupType>();
+    private static Set<LaneGroupType> lgset_aux = new HashSet<LaneGroupType>();
 
     
     
@@ -101,6 +114,7 @@ public class EmissionsCalBC {
                     continue;
                 
                 String key = subs[0] + "," + subs[1];
+                maxV = Math.max(maxV, Integer.parseInt(subs[1]));
                 double[] params = new double[numParams];
                 int len = Math.min(numParams, subs.length - 2);
                 for (int i = 0; i < numParams; i++)
@@ -120,6 +134,13 @@ public class EmissionsCalBC {
         
         currentYear = Calendar.getInstance().get(Calendar.YEAR);
         currentYear = Math.max(yearA, Math.min(currentYear, yearB));
+        
+        lgset_gp.clear();
+        lgset_mng.clear();
+        lgset_aux.clear();
+        lgset_gp.add(LaneGroupType.gp);
+        lgset_mng.add(LaneGroupType.mng);
+        lgset_aux.add(LaneGroupType.aux);
         
         save();
     }
@@ -144,6 +165,34 @@ public class EmissionsCalBC {
         return res;
     }
     
+    
+    
+    public static double[] computeParamAggregates(AbstractLink link, SimDataLink sdata) {
+        int paramCount = numParams / 2;
+        double[] res = new double[paramCount];
+        for (var i = 0; i < paramCount; i++)
+            res[i] = i;
+        //double dt = sdata.get_dt_sec() / 3600d;
+        
+        
+        
+        
+        return res;
+    }
+    
+    
+    public static double[] computeParamAggregates(List<AbstractLink> links, SimDataScenario sdata) {
+        int paramCount = numParams / 2;
+        double[] res = new double[paramCount];
+        for (var i = 0; i < paramCount; i++)
+            res[i] = i;
+        double dt = sdata.get_dt_sec() / 3600d;
+        
+        
+        
+        
+        return res;
+    }
     
     
     

@@ -83,27 +83,18 @@ import org.jfree.chart.block.BlockBorder;
 //import org.jfree.chart.fx.ChartViewer;
 import opt.utils.jfreechart.ChartViewer;
 import opt.utils.jfxutils.chart.JFXChartUtil;
-import org.jfree.chart.fx.interaction.ChartMouseListenerFX;
-import org.jfree.chart.plot.PiePlot;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.LookupPaintScale;
 import org.jfree.chart.renderer.xy.XYBlockRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.title.PaintScaleLegend;
-import org.jfree.chart.title.TextTitle;
-import org.jfree.data.general.DefaultPieDataset;
-import org.jfree.data.general.PieDataset;
 import org.jfree.data.xy.DefaultXYZDataset;
 import org.jfree.data.xy.XYDataItem;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.HorizontalAlignment;
 import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 import java.util.concurrent.TimeUnit;
 import javafx.scene.control.Separator;
+import opt.data.Segment;
 import opt.data.TimeMatrix;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -182,6 +173,7 @@ public class RoutePerformanceController {
     private Sheet shDensityGP = null;
     private Sheet shDensityMng = null;
     private Sheet shA = null;
+    private Sheet shE = null;
     private Row hrSpeedGP = null;
     private Row hrSpeedMng = null;
     private Row hrFlowGP = null;
@@ -189,6 +181,7 @@ public class RoutePerformanceController {
     private Row hrDensityGP = null;
     private Row hrDensityMng = null;
     private Row hrA = null;
+    private Row hrE = null;
     private CellStyle headerCellStyle = null;
     private int wbCol = 0;
             
@@ -219,6 +212,30 @@ public class RoutePerformanceController {
 
     @FXML // fx:id="spEmissions"
     private ScrollPane spEmissions; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="titleCalBC"
+    private Label titleCalBC; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblCO"
+    private Label lblCO; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblCO2"
+    private Label lblCO2; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblNOX"
+    private Label lblNOX; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblPM10"
+    private Label lblPM10; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblSOX"
+    private Label lblSOX; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblVOC"
+    private Label lblVOC; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblPM25"
+    private Label lblPM25; // Value injected by FXMLLoader
     
 
 
@@ -317,6 +334,9 @@ public class RoutePerformanceController {
         shA = workbook.createSheet("Aggregates");
         hrA = shA.createRow(0);
         
+        shE = workbook.createSheet("Cal-BC Emissions");
+        hrE = shE.createRow(0);
+        
         shSpeedGP = workbook.createSheet("GP Lane Speed (" + vUnits + ")");
         hrSpeedGP = shSpeedGP.createRow(0);
         hrSpeedGP.createCell(0);
@@ -374,6 +394,13 @@ public class RoutePerformanceController {
         endTime = System.nanoTime();
         dur = (endTime - startTime) / 1000000000f;
         System.err.println("fillTabAggregates(): " + dur); //FIXME: remove
+        
+        fillTabEmissions();
+        startTime = System.nanoTime();
+        fillTabEmissions();;
+        endTime = System.nanoTime();
+        dur = (endTime - startTime) / 1000000000f;
+        System.err.println("fillTabEmissions();: " + dur); //FIXME: remove
 
              
     }
@@ -1556,6 +1583,35 @@ public class RoutePerformanceController {
             });
             JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(delayChart);
         }
+        
+    }
+    
+    
+    
+    private void fillTabEmissions() {
+        Label[] valsUI = {lblCO, lblCO2, lblNOX, lblPM10, lblSOX, lblVOC, lblPM25};
+        titleCalBC.setText(String.format("Emissions Parameters Computed Based on %d-%d Cal-BC Table", EmissionsCalBC.yearA, EmissionsCalBC.yearB));
+        
+        List<AbstractLink> links = new ArrayList<>();
+        for(Segment segment : myRoute.get_segments())
+            for (AbstractLink l : segment.get_links())
+                links.add(l);       
+        
+        double[] vals = EmissionsCalBC.computeParamAggregates(links, mySimData);
+        
+        int sz = EmissionsCalBC.numParams / 2;
+        Row vr = shE.createRow(1);
+        
+        for (int i = 0; i < sz; i++) {
+            hrE.createCell(i);
+            hrE.getCell(i).setCellValue(EmissionsCalBC.eParams[i]);
+            hrE.getCell(i).setCellStyle(headerCellStyle);
+            vr.createCell(i);
+            vr.getCell(i).setCellValue(vals[i]);
+            valsUI[i].setText(String.format("%.2f", vals[i]));
+        }
+        
+        
         
     }
     

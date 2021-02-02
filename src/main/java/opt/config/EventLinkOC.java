@@ -158,13 +158,12 @@ public class EventLinkOC {
             lvEventLinks.getItems().add(l.get_name());
         
         if (cnt > 0) {
-            String lt = "managed";
             String sfx = "s";
             if (cnt == 1)
                 sfx = "";
             
             String header = "Removed " + cnt + " off-ramp" + sfx + " from Event";
-            String content = "These sections are not in network.";
+            String content = "These off-ramps are not in network.";
             opt.utils.Dialogs.InformationDialog(header, content);
         }
     }
@@ -353,6 +352,9 @@ public class EventLinkOC {
         myEvent.name = name;
         
         myEvent.timestamp = (float)timeSeconds;
+        
+        myEvent.isopen = cbOpenClose.getSelectionModel().getSelectedIndex() == 0;
+        myEvent.set_links(new ArrayList<>(linksOrderedUnderEvent));
         
         scenarioEditorController.setProjectModified(true);
         

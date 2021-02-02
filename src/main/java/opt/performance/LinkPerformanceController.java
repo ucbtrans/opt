@@ -35,6 +35,7 @@ import javafx.geometry.Side;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Tab;
@@ -83,7 +84,9 @@ public class LinkPerformanceController {
     
     private Workbook workbook = null;
     private Sheet sheet = null;
+    private Sheet shE = null;
     private Row headerRow = null;
+    private Row hrE = null;
     private CellStyle headerCellStyle = null;
     private int wbCol = 0;
     private int mngD = 0;
@@ -115,6 +118,30 @@ public class LinkPerformanceController {
 
     @FXML // fx:id="spEmissions"
     private ScrollPane spEmissions; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="titleCalBC"
+    private Label titleCalBC; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblCO"
+    private Label lblCO; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblCO2"
+    private Label lblCO2; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblNOX"
+    private Label lblNOX; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblPM10"
+    private Label lblPM10; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblSOX"
+    private Label lblSOX; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblVOC"
+    private Label lblVOC; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblPM25"
+    private Label lblPM25; // Value injected by FXMLLoader
     
 
 
@@ -169,6 +196,8 @@ public class LinkPerformanceController {
         workbook = new XSSFWorkbook();
         sheet = workbook.createSheet("Performance");
         headerRow = sheet.createRow(0);
+        shE = workbook.createSheet("Cal-BC Emissions");
+        hrE = shE.createRow(0);
         Font headerFont = workbook.createFont();
         headerFont.setBold(true);
         headerFont.setFontHeightInPoints((short)10);
@@ -197,7 +226,7 @@ public class LinkPerformanceController {
         
         fillTabTimeseries();
         fillTabAggregates();
-        //fillTabEmissions();
+        fillTabEmissions();
     }
     
     
@@ -208,7 +237,7 @@ public class LinkPerformanceController {
     }
     
     
-    public void fillTabTimeseries() {
+    private void fillTabTimeseries() {
         String label_gp, label_mng, label_aux, label_units;
         double cc;
         XYChart.Series dataSeries_total;
@@ -258,7 +287,7 @@ public class LinkPerformanceController {
             sheet.getRow(i + 1).getCell(0).setCellValue(Misc.seconds2timestring(start + i*dt, ":"));
             
             if (i == 0) {
-                if (myLink.get_up_link() != null) {
+                if ((myLink.get_up_link() != null) || true) {
                     headerRow.createCell(wbCol);
                     headerRow.getCell(wbCol).setCellValue("GP Lane Speed (" + label_units + ")");
                     headerRow.getCell(wbCol).setCellStyle(headerCellStyle);
@@ -332,7 +361,7 @@ public class LinkPerformanceController {
             }
         });*/
 
-        if (myLink.get_up_link() != null) {// source links have no speed display
+        if ((myLink.get_up_link() != null) || true) {// source links have no speed display
             vbTimeSeries.getChildren().add(speedChart);
             vbTimeSeries.getChildren().add(new Separator());
             wbCol += mngD + auxD + 1;
@@ -918,7 +947,7 @@ public class LinkPerformanceController {
      
     
     
-    public void fillTabAggregates() {
+    private void fillTabAggregates() {
         vbAggregates.getChildren().clear();
         String label_gp, label_mng, label_aux;
         XYChart.Series dataSeries_gp, dataSeries_mng, dataSeries_aux, dataSeries_total;
@@ -1674,7 +1703,25 @@ public class LinkPerformanceController {
         
 
 
+    private void fillTabEmissions() {
+        Label[] valsUI = {lblCO, lblCO2, lblNOX, lblPM10, lblSOX, lblVOC, lblPM25};
+        titleCalBC.setText(String.format("Emissions Parameters Computed Based on %d-%d Cal-BC Table", EmissionsCalBC.yearA, EmissionsCalBC.yearB));
+        
+        double[] vals = EmissionsCalBC.computeParamAggregates(myLink, mySimData);
+        
+        int sz = EmissionsCalBC.numParams / 2;
+        Row vr = shE.createRow(1);
+        
+        for (int i = 0; i < sz; i++) {
+            hrE.createCell(i);
+            hrE.getCell(i).setCellValue(EmissionsCalBC.eParams[i]);
+            hrE.getCell(i).setCellStyle(headerCellStyle);
+            vr.createCell(i);
+            vr.getCell(i).setCellValue(vals[i]);
+            valsUI[i].setText(String.format("%.2f", vals[i]));
+        }
 
+    }
 
 
 

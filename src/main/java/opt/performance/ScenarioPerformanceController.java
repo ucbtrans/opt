@@ -41,6 +41,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Tab;
@@ -59,7 +60,9 @@ import opt.utils.Misc;
 import opt.UserSettings;
 import opt.data.Commodity;
 import opt.data.FreewayScenario;
+import opt.data.LinkConnector;
 import opt.data.Route;
+import opt.data.Segment;
 import opt.utils.jfxutils.chart.JFXChartUtil;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -103,9 +106,11 @@ public class ScenarioPerformanceController {
     private Sheet shS1 = null;
     private Sheet shS2 = null;
     private Sheet shA = null;
+    private Sheet shE = null;
     private Row hrS1 = null;
     private Row hrS2 = null;
     private Row hrA = null;
+    private Row hrE = null;
     private CellStyle headerCellStyle = null;
     private int wbCol = 0;
     
@@ -135,6 +140,30 @@ public class ScenarioPerformanceController {
 
     @FXML // fx:id="spEmissions"
     private ScrollPane spEmissions; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="titleCalBC"
+    private Label titleCalBC; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblCO"
+    private Label lblCO; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblCO2"
+    private Label lblCO2; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblNOX"
+    private Label lblNOX; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblPM10"
+    private Label lblPM10; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblSOX"
+    private Label lblSOX; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblVOC"
+    private Label lblVOC; // Value injected by FXMLLoader
+
+    @FXML // fx:id="lblPM25"
+    private Label lblPM25; // Value injected by FXMLLoader
     
 
 
@@ -187,9 +216,11 @@ public class ScenarioPerformanceController {
         shS1 = workbook.createSheet("Summary 1");
         shS2 = workbook.createSheet("Summary 2");
         shA = workbook.createSheet("Aggregates");
+        shE = workbook.createSheet("Cal-BC Emissions");
         hrS1 = shS1.createRow(0);
         hrS2 = shS2.createRow(0);
         hrA = shA.createRow(0);
+        hrE = shE.createRow(0);
         Font headerFont = workbook.createFont();
         headerFont.setBold(true);
         headerFont.setFontHeightInPoints((short)10);
@@ -211,7 +242,8 @@ public class ScenarioPerformanceController {
         numVT = listVT.size();
         
         fillTabSummary();
-        fillTabAggregates();     
+        fillTabAggregates();
+        fillTabEmissions();
     }
     
     
@@ -930,6 +962,37 @@ public class ScenarioPerformanceController {
                 mouseEvent.consume();
         });
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(delayChart2);
+    }
+    
+    
+    private void fillTabEmissions() {
+        Label[] valsUI = {lblCO, lblCO2, lblNOX, lblPM10, lblSOX, lblVOC, lblPM25};
+        titleCalBC.setText(String.format("Emissions Parameters Computed Based on %d-%d Cal-BC Table", EmissionsCalBC.yearA, EmissionsCalBC.yearB));
+        
+        List<AbstractLink> links = new ArrayList<>();
+        List<List<Segment>> seg_list = myScenario.get_linear_freeway_segments();
+        for (List<Segment> segments : seg_list)
+            for(Segment segment : segments)
+                for (AbstractLink l : segment.get_links())
+                    links.add(l);       
+        List<LinkConnector> connectors = myScenario.get_connectors();
+        for (AbstractLink l : connectors)
+            links.add(l);
+        
+        double[] vals = EmissionsCalBC.computeParamAggregates(links, mySimData);
+        
+        int sz = EmissionsCalBC.numParams / 2;
+        Row vr = shE.createRow(1);
+        
+        for (int i = 0; i < sz; i++) {
+            hrE.createCell(i);
+            hrE.getCell(i).setCellValue(EmissionsCalBC.eParams[i]);
+            hrE.getCell(i).setCellStyle(headerCellStyle);
+            vr.createCell(i);
+            vr.getCell(i).setCellValue(vals[i]);
+            valsUI[i].setText(String.format("%.2f", vals[i]));
+        }
+        
     }
     
     
