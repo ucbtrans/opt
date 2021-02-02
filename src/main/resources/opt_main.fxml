@@ -59,12 +59,11 @@
                      <accelerator>
                         <KeyCodeCombination alt="ANY" code="F5" control="UP" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
-            <SeparatorMenuItem disable="true" mnemonicParsing="false" />
             <MenuItem id="menuSimulationExportResultsToExcel" fx:id="menuSimulationExportResultsToExcel" disable="true" mnemonicParsing="false" onAction="#onExportResultsToExcel" text="Export Results to Excel">
                      <accelerator>
                         <KeyCodeCombination alt="ANY" code="F6" control="UP" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
-            <MenuItem id="menuSimulationFullExcelReport" fx:id="menuSimulationFullExcelReport" disable="true" mnemonicParsing="false" onAction="#onFullExcelReport" text="Full Excel Report">
+            <MenuItem id="menuSimulationFullExcelReport" fx:id="menuSimulationFullExcelReport" disable="true" mnemonicParsing="false" onAction="#onFullExcelReport" text="Full Excel Report" visible="false">
                      <accelerator>
                         <KeyCodeCombination alt="ANY" code="F10" control="UP" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
