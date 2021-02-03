@@ -1707,7 +1707,8 @@ public class LinkPerformanceController {
         Label[] valsUI = {lblCO, lblCO2, lblNOX, lblPM10, lblSOX, lblVOC, lblPM25};
         titleCalBC.setText(String.format("Emissions Parameters Computed Based on %d-%d Cal-BC Table", EmissionsCalBC.yearA, EmissionsCalBC.yearB));
         
-        double[] vals = EmissionsCalBC.computeParamAggregates(myLink, mySimData);
+        EmissionsCalBC.setListVT(listVT);
+        double[] vals = EmissionsCalBC.computeParamAggregates(myLink, mySimData, null);
         
         int sz = EmissionsCalBC.numParams / 2;
         Row vr = shE.createRow(1);

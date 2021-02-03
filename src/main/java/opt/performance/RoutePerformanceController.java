@@ -1597,6 +1597,7 @@ public class RoutePerformanceController {
             for (AbstractLink l : segment.get_links())
                 links.add(l);       
         
+        EmissionsCalBC.setListVT(listVT);
         double[] vals = EmissionsCalBC.computeParamAggregates(links, mySimData);
         
         int sz = EmissionsCalBC.numParams / 2;

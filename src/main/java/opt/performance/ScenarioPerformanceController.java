@@ -979,6 +979,7 @@ public class ScenarioPerformanceController {
         for (AbstractLink l : connectors)
             links.add(l);
         
+        EmissionsCalBC.setListVT(listVT);
         double[] vals = EmissionsCalBC.computeParamAggregates(links, mySimData);
         
         int sz = EmissionsCalBC.numParams / 2;

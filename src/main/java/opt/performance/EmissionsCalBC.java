@@ -41,10 +41,12 @@ import java.util.Map;
 import java.util.Set;
 import opt.UserSettings;
 import opt.data.AbstractLink;
+import opt.data.Commodity;
 import opt.data.Commodity.EmissionsClass;
 import opt.data.LaneGroupType;
 import opt.data.SimDataLink;
 import opt.data.SimDataScenario;
+import org.jfree.data.xy.XYDataItem;
 
 
 /**
@@ -71,6 +73,8 @@ public class EmissionsCalBC {
     private static int minV = 0;
     private static int maxV = 0;
     
+    private static List<Commodity> listVT = null;
+    private static int numVT;
     private static Set<LaneGroupType> lgset_gp = new HashSet<LaneGroupType>();
     private static Set<LaneGroupType> lgset_mng = new HashSet<LaneGroupType>();
     private static Set<LaneGroupType> lgset_aux = new HashSet<LaneGroupType>();
@@ -146,36 +150,30 @@ public class EmissionsCalBC {
     }
     
     
-    public static double[] getEmissionParams(EmissionsClass ec, double v_mph) {
-        int sz = numParams / 2;
-        int v = (int)Math.round(v_mph);
-        v = Math.min(Math.max(minV, v), maxV);
-        String key = ec + "," + v;
-        
-        double[] res = new double[sz];
-        for (int i = 0; i < sz; i++)
-            res[i] = 0d;
-        
-        if (cv2params.containsKey(key)) {
-            double[] vals = cv2params.get(key);
-            for (int i = 0; i < sz; i++)
-                res[i] = interpolate(vals[i], vals[i + sz]);
-        }
-        
-        return res;
+    
+    public static void setListVT(List<Commodity> lvt) {
+        listVT = lvt;
+        numVT = 0;
+        if (lvt != null)
+            numVT = listVT.size();
     }
     
     
-    
-    public static double[] computeParamAggregates(AbstractLink link, SimDataLink sdata) {
+    public static double[] computeParamAggregates(AbstractLink link, SimDataLink sdata, double[] cumVals) {
         int paramCount = numParams / 2;
-        double[] res = new double[paramCount];
-        for (var i = 0; i < paramCount; i++)
-            res[i] = i;
-        //double dt = sdata.get_dt_sec() / 3600d;
+        double[] res = cumVals;
+        if (res == null) {
+            res = new double[paramCount];
+            for (int i = 0; i < paramCount; i++)
+                res[i] = 0;
+        }
+        double dt = sdata.get_speed(lgset_gp).get_dt() / 3600d;
         
-        
-        
+        res = addArraysDouble(res, computeEmissionsParamsForLaneGroup(link, sdata, lgset_gp, dt));
+        if (link.has_mng())
+            res = addArraysDouble(res, computeEmissionsParamsForLaneGroup(link, sdata, lgset_mng, dt));
+        if (link.has_aux())
+            res = addArraysDouble(res, computeEmissionsParamsForLaneGroup(link, sdata, lgset_aux, dt));
         
         return res;
     }
@@ -184,12 +182,12 @@ public class EmissionsCalBC {
     public static double[] computeParamAggregates(List<AbstractLink> links, SimDataScenario sdata) {
         int paramCount = numParams / 2;
         double[] res = new double[paramCount];
-        for (var i = 0; i < paramCount; i++)
-            res[i] = i;
+        for (int i = 0; i < paramCount; i++)
+            res[i] = 0;
         double dt = sdata.get_dt_sec() / 3600d;
         
-        
-        
+        for (AbstractLink l : links)
+            res = addArraysDouble(res, computeParamAggregates(l, sdata.linkdata.get(l.id), res));
         
         return res;
     }
@@ -221,12 +219,82 @@ public class EmissionsCalBC {
 
 
     
+    
+    
+    /***************************************************************************
+     * 
+     * Utilities
+     *
+     ***************************************************************************/
 
+    private static double[] getEmissionParams(EmissionsClass ec, double v_mph) {
+        int sz = numParams / 2;
+        int v = (int)Math.round(v_mph);
+        v = Math.min(Math.max(minV, v), maxV);
+        String key = ec + "," + v;
+        
+        double[] res = new double[sz];
+        for (int i = 0; i < sz; i++)
+            res[i] = 0d;
+        
+        if (cv2params.containsKey(key)) {
+            double[] vals = cv2params.get(key);
+            for (int i = 0; i < sz; i++)
+                res[i] = interpolate(vals[i], vals[i + sz]);
+        }
+        
+        return res;
+    }
+    
+    
+    
+    private static double[] computeEmissionsParamsForLaneGroup(AbstractLink link, SimDataLink sdata, Set<LaneGroupType> lgt, double dt) {
+        int paramCount = numParams / 2;
+        double[] res = new double[paramCount];
+        for (int i = 0; i < paramCount; i++)
+            res[i] = 0;
+        
+        List<XYDataItem> speed = sdata.get_speed(lgt).get_XYSeries("lg").getItems();
+        int sz = speed.size();
+        for (Commodity c : listVT) {
+            List<XYDataItem> vehs = sdata.get_veh(lgset_gp, cset(c)).get_XYSeries(c.get_name()).getItems();
+            sz = Math.min(sz, vehs.size());
+            for  (int i = 0; i < sz; i++) {
+                double v_mph = speed.get(i).getYValue();
+                double[] ep = getEmissionParams(c.get_eclass(), v_mph);
+                //System.err.println("Speed: " + v_mph + ";\tdt: " + dt + ";\tvehs: " + vehs.get(i).getYValue());
+                for  (int j = 0; j < paramCount; j++)
+                    res[j] += vehs.get(i).getYValue() * v_mph * dt * ep[j];
+            }
+        }
+
+        return res;
+    }
+    
+    
     private static double interpolate(double a, double b) {
         double mult = (double)(currentYear - yearA) / (double)(yearB - yearA);
         double delta = b - a;
         return a + mult * delta;
     }
+    
+    
+    private static double[] addArraysDouble(double[] a, double[] b) {
+        int sz = Math.min(a.length, b.length);
+        for (int i = 0; i < sz; i++)
+            a[i] += b[i];
+        return a;
+    }
+    
+    
+    private static Set<Long> cset(Commodity c) {
+        Set<Long> s = new HashSet<Long>();
+        s.add(c.getId());
+        return s;
+    }
+    
+    
+    
     
 }
 
