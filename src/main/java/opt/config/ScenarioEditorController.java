@@ -1404,6 +1404,7 @@ public class ScenarioEditorController {
         if ((idx >= 0) && (idx < listEvents.getItems().size()))
             listEvents.getSelectionModel().select(idx);
         
+        listEvents.requestFocus();
     }
 
     

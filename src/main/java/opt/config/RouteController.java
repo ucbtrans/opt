@@ -360,6 +360,7 @@ public class RouteController {
         }
         myRoute.set_segments(routeSegments);
         updateSectionList();
+        appMainController.launchRouteInfoPanel(myRoute);
         appMainController.setProjectModified(true);
     }
     

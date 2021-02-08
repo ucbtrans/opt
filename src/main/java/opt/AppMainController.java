@@ -128,6 +128,10 @@ public class AppMainController {
     private LinkPerformanceController linkPerformanceController = null;
     private ScrollPane linkInfoPane = null;
     private LinkInfoController linkInfoController = null;
+    private ScrollPane routeInfoPane = null;
+    private RouteInfoController routeInfoController = null;
+    private ScrollPane scenarioInfoPane = null;
+    private ScenarioInfoController scenarioInfoController = null;
     private GridPane newLinkPane = null;
     private NewLinkController newLinkController = null;
     private GridPane newRampPane = null;
@@ -522,6 +526,16 @@ public class AppMainController {
             linkInfoPane = loader.load();
             linkInfoController = loader.getController();
             linkInfoController.setAppMainController(this);
+            
+            loader = new FXMLLoader(getClass().getResource("/route_info.fxml"));
+            routeInfoPane = loader.load();
+            routeInfoController = loader.getController();
+            routeInfoController.setAppMainController(this);
+            
+            loader = new FXMLLoader(getClass().getResource("/scenario_info.fxml"));
+            scenarioInfoPane = loader.load();
+            scenarioInfoController = loader.getController();
+            scenarioInfoController.setAppMainController(this);
             
             loader = new FXMLLoader(getClass().getResource("/new_link.fxml"));
             newLinkPane = loader.load();
@@ -1161,6 +1175,7 @@ public class AppMainController {
             reportAnchorPane.setRightAnchor(scenarioPerformancePane, 0.0);
             
             FreewayScenario fws = (FreewayScenario)obj;
+            launchScenarioInfoPanel(fws);
             if (fws != null)
                 scenarioEditorController.initWithScenarioData(fws);
             if (Misc.myMapGet(scenario2simData, selectedScenario) != null) {
@@ -1188,6 +1203,7 @@ public class AppMainController {
             reportAnchorPane.setRightAnchor(routePerformancePane, 0.0);
             
             Route route = (Route)obj;
+            launchRouteInfoPanel(route);
             if (route != null)
                 routeController.initWithRouteData(route);
             if (Misc.myMapGet(scenario2simData, selectedScenario) != null) {
@@ -1201,6 +1217,34 @@ public class AppMainController {
             }
         }
         
+    }
+    
+    
+    public void launchRouteInfoPanel(Route r) {
+        if (r == null)
+            return;
+        
+        infoAnchorPane.getChildren().clear();
+        infoAnchorPane.getChildren().setAll(routeInfoPane);
+        infoAnchorPane.setTopAnchor(routeInfoPane, 0.0);
+        infoAnchorPane.setBottomAnchor(routeInfoPane, 0.0);
+        infoAnchorPane.setLeftAnchor(routeInfoPane, 0.0);
+        infoAnchorPane.setRightAnchor(routeInfoPane, 0.0);
+        routeInfoController.initWithScenarioAndRouteData(r);
+    }
+    
+    
+    private void launchScenarioInfoPanel(FreewayScenario s) {
+        if (s == null)
+            return;
+        
+        infoAnchorPane.getChildren().clear();
+        infoAnchorPane.getChildren().setAll(scenarioInfoPane);
+        infoAnchorPane.setTopAnchor(scenarioInfoPane, 0.0);
+        infoAnchorPane.setBottomAnchor(scenarioInfoPane, 0.0);
+        infoAnchorPane.setLeftAnchor(scenarioInfoPane, 0.0);
+        infoAnchorPane.setRightAnchor(scenarioInfoPane, 0.0);
+        scenarioInfoController.initWithScenarioData(s);
     }
     
 
