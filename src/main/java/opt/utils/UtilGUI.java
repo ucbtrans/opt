@@ -41,6 +41,11 @@ import org.jfree.chart.ChartUtilities;
  */
 public class UtilGUI {
     
+    public static String labelInfoHeaderStyle = "-fx-font-size: 16; -fx-text-fill: black; -fx-font-weight: normal; -fx-spacing: 10;";
+    public static String labelInfoOrdinaryStyle = "-fx-font-size: 12; -fx-text-fill: black; -fx-spacing: 10;";
+    public static String labelInfoPointerStyle = "-fx-font-size: 12; -fx-text-fill: blue; -fx-underline: true; -fx-spacing: 10;";
+    public static String dividerInfoStyle = "-fx-padding: 10;";
+    
     public static int[] getWindowDims(int W, int H) {
         int sW = W;
         int sH = H;

@@ -1380,6 +1380,31 @@ public class ScenarioEditorController {
             onDeleteEvent(null);
         }
     }
+    
+    
+    
+    public void openLanePolicies(ControlSchedule cs) {
+        controllerPane.setExpanded(true);
+        
+        int idx = listLanePolicies.indexOf(cs);
+        if ((selectedPolicyIndex >= 0) && (selectedPolicyIndex < cbPolicies.getItems().size())) {
+            selectedPolicyIndex = idx;
+            selectedPolicy = listLanePolicies.get(selectedPolicyIndex);
+            cbPolicies.getSelectionModel().select(selectedPolicyIndex);
+        }
+    }
+    
+    
+    
+    public void openEvents(AbstractEvent e) {
+        eventPane.setExpanded(true);
+        List<AbstractEvent> events = myScenario.get_events();
+        
+        int idx = events.indexOf(e);
+        if ((idx >= 0) && (idx < listEvents.getItems().size()))
+            listEvents.getSelectionModel().select(idx);
+        
+    }
 
     
 }

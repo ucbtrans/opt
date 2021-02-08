@@ -48,6 +48,7 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -67,6 +68,8 @@ import javafx.stage.Modality;
 import javafx.util.Callback;
 import opt.config.*;
 import opt.data.*;
+import opt.data.control.ControlSchedule;
+import opt.data.event.AbstractEvent;
 import opt.performance.LinkPerformanceController;
 import opt.performance.RoutePerformanceController;
 import opt.performance.ScenarioPerformanceController;
@@ -123,7 +126,7 @@ public class AppMainController {
     private LinkEditorController linkEditorController = null;
     private TabPane linkPerformancePane = null;
     private LinkPerformanceController linkPerformanceController = null;
-    private GridPane linkInfoPane = null;
+    private ScrollPane linkInfoPane = null;
     private LinkInfoController linkInfoController = null;
     private GridPane newLinkPane = null;
     private NewLinkController newLinkController = null;
@@ -1126,7 +1129,7 @@ public class AppMainController {
 
             AbstractLink lnk = (AbstractLink)obj;
             linkEditorController.initWithLinkData(lnk);
-            linkInfoController.initWithLinkData(lnk);
+            linkInfoController.initWithScenarioAndLinkData(lnk);
             if (Misc.myMapGet(scenario2simData, selectedScenario) != null) { 
                 menuSimulationExportResultsToExcel.setDisable(false);
                 linkPerformanceController.initWithLinkData(lnk, (SimDataScenario)Misc.myMapGet(scenario2simData, selectedScenario));
@@ -1215,8 +1218,7 @@ public class AppMainController {
         
         if (projectTree.getRoot() != null)
             projectTree.getRoot().getChildren().clear();
-        
-        //setProjectModified(true);
+
         populateProjectTree();
         
         TreeItem item = object2tree.get(lnk);
@@ -1226,6 +1228,66 @@ public class AppMainController {
         
         projectTree.getSelectionModel().select(item);  
     }
+    
+    
+    /**
+     * This function is called when the user navigates to the given route not
+     * from projectTree, but using other pointers. Now we need to change the
+     * selected tree item appropriately and open the corresponding action
+     * and info panels.
+     * 
+     * @param r - route.
+     */
+    public void selectRoute(Route r) {
+        if (r == null) 
+            return;
+        
+        if (projectTree.getRoot() == null)
+            populateProjectTree();
+        
+        TreeItem item = object2tree.get(r);
+        if (item == null) { 
+            return;
+        }
+        
+        projectTree.getSelectionModel().select(item);  
+    }
+    
+    
+    public void openLanePolicies(ControlSchedule cs) {
+        if (cs == null) 
+            return;
+        
+        if (projectTree.getRoot() == null)
+            populateProjectTree();
+        
+        TreeItem item = object2tree.get(selectedScenario);
+        if (item == null) { 
+            return;
+        }
+        
+        projectTree.getSelectionModel().select(item);
+        scenarioEditorController.openLanePolicies(cs);
+    }
+    
+    
+    public void openEvents(AbstractEvent e) {
+        if (e == null) 
+            return;
+        
+        if (projectTree.getRoot() == null)
+            populateProjectTree();
+        
+        TreeItem item = object2tree.get(selectedScenario);
+        if (item == null) { 
+            return;
+        }
+        
+        projectTree.getSelectionModel().select(item);
+        scenarioEditorController.openEvents(e);
+    }
+    
+    
     
     
     
