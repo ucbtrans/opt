@@ -358,34 +358,34 @@ public class FreewayScenario {
                         event = new EventLinkToggle(id,type,timestamp,jname,links,isopen);
                         break;
 
-                    case "acttgl":
-
-                        if(!jev.getEventTarget().getType().equals("actuators"))
-                            throw new Exception("Bad event target type");
-
-                        // get the controllers
-                        List<ControlSchedule> controllers = new ArrayList<>();
-                        for(long cntrl_id : OTMUtils.csv2longlist(jev.getEventTarget().getIds())){
-                            Optional<ControlSchedule> ocntrl = scenario.links.values().stream()
-                                    .flatMap(lnk->lnk.schedules.values().stream())
-                                    .flatMap(m->m.values().stream())
-                                    .filter(c->c.getId()==cntrl_id)
-                                    .findFirst();
-
-                            if(!ocntrl.isPresent())
-                                throw new Exception("Bad controller id in event target.");
-
-                            controllers.add( ocntrl.get() );
-                        }
-
-                        boolean ison = true;
-                        if(jev.getParameters()!=null)
-                            for(jaxb.Parameter p : jev.getParameters().getParameter())
-                                if(p.getName().equals("ison"))
-                                    ison = Boolean.parseBoolean(p.getValue());
-
-                        event = new EventControlToggle(id,type,timestamp,jname,controllers,ison);
-                        break;
+//                    case "acttgl":
+//
+//                        if(!jev.getEventTarget().getType().equals("actuators"))
+//                            throw new Exception("Bad event target type");
+//
+//                        // get the controllers
+//                        List<ControlSchedule> controllers = new ArrayList<>();
+//                        for(long cntrl_id : OTMUtils.csv2longlist(jev.getEventTarget().getIds())){
+//                            Optional<ControlSchedule> ocntrl = scenario.links.values().stream()
+//                                    .flatMap(lnk->lnk.schedules.values().stream())
+//                                    .flatMap(m->m.values().stream())
+//                                    .filter(c->c.getId()==cntrl_id)
+//                                    .findFirst();
+//
+//                            if(!ocntrl.isPresent())
+//                                throw new Exception("Bad controller id in event target.");
+//
+//                            controllers.add( ocntrl.get() );
+//                        }
+//
+//                        boolean ison = true;
+//                        if(jev.getParameters()!=null)
+//                            for(jaxb.Parameter p : jev.getParameters().getParameter())
+//                                if(p.getName().equals("ison"))
+//                                    ison = Boolean.parseBoolean(p.getValue());
+//
+//                        event = new EventControlToggle(id,type,timestamp,jname,controllers,ison);
+//                        break;
 
                     case "lglanes":
 
@@ -1151,13 +1151,13 @@ public class FreewayScenario {
         return event;
     }
 
-    public EventControlToggle add_event_controltoggle(float timestamp, String name, List<ControlSchedule> controllers, boolean ison) throws Exception {
-        EventControlToggle event = new EventControlToggle(new_event_id(),"acttgl",timestamp,name,controllers,ison);
-        if(event_conflicts(event))
-            throw new Exception("Event conflicts.");
-        scenario.events.put(event.id,event);
-        return event;
-    }
+//    public EventControlToggle add_event_controltoggle(float timestamp, String name, List<ControlSchedule> controllers, boolean ison) throws Exception {
+//        EventControlToggle event = new EventControlToggle(new_event_id(),"acttgl",timestamp,name,controllers,ison);
+//        if(event_conflicts(event))
+//            throw new Exception("Event conflicts.");
+//        scenario.events.put(event.id,event);
+//        return event;
+//    }
 
     public EventLanegroupLanes add_event_lglanes(float timestamp, String name, List<AbstractLink> links, LaneGroupType lgtype, Integer delta_lanes) throws Exception {
         EventLanegroupLanes event = new EventLanegroupLanes(new_event_id(),"lglanes",timestamp,name,links,lgtype,delta_lanes);
@@ -1183,15 +1183,15 @@ public class FreewayScenario {
 
         Set<AbstractEvent> conflicts = new HashSet<>();
 
-        if(aevent instanceof EventControlToggle){
-            EventControlToggle event = (EventControlToggle) aevent;
-            conflicts = scenario.events.values().stream()
-                    .filter(x->x.timestamp==event.timestamp)
-                    .filter(x->x instanceof EventControlToggle)
-                    .map(x -> (EventControlToggle) x)
-                    .filter( x-> !Collections.disjoint(x.get_controller_ids(),event.get_controller_ids()))
-                    .collect(toSet());
-        }
+//        if(aevent instanceof EventControlToggle){
+//            EventControlToggle event = (EventControlToggle) aevent;
+//            conflicts = scenario.events.values().stream()
+//                    .filter(x->x.timestamp==event.timestamp)
+//                    .filter(x->x instanceof EventControlToggle)
+//                    .map(x -> (EventControlToggle) x)
+//                    .filter( x-> !Collections.disjoint(x.get_controller_ids(),event.get_controller_ids()))
+//                    .collect(toSet());
+//        }
 
         if(aevent instanceof EventLinkToggle){
             EventLinkToggle event = (EventLinkToggle) aevent;
@@ -1228,6 +1228,52 @@ public class FreewayScenario {
     public boolean is_valid_link_name(String name){
         return !scenario.links.values().stream()
                 .anyMatch(link->link.get_name()!=null && link.get_name().equals(name));
+    }
+
+    /**
+     * Gathers the items of the scenario that would be affected by deleting this link.
+     * Classifies these into "errors" and "non-errors"
+     * + Events: Any events that refer to this link. Error iff the event refers to *only*
+     * this link.
+     * + Routes: Any routes that contain this link. Error iff the link is internal to the
+     * route, meaning it is not the first or last link.
+     * + Policies: Any policies that affect this link. Error iff the policy applies *only*
+     * to this link.
+     */
+    public Set<CheckItem> check_delete_link(AbstractLink link){
+
+        Set<CheckItem> check_items = new HashSet<>();
+
+        // events ...........................
+        for(AbstractEvent event : scenario.events.values()){
+            List<AbstractLink> event_links = event.get_links();
+            if(event_links.contains(link))
+                check_items.add(new CheckItem(event_links.size()==1,event));
+        }
+
+        // routes ..........................
+        for( Route route : routes.values() ){
+            List<AbstractLink> links = route.get_link_sequence();
+            if(links.contains(link)){
+                int index = links.indexOf(link);
+                boolean is_internal = index>0 && index<links.size()-1;
+                check_items.add(new CheckItem(is_internal,route));
+            }
+        }
+
+        // policies ........................
+        link.schedules.values().stream()
+                .flatMap(s->s.values().stream())
+                .forEach(s->check_items.add(new CheckItem(s.links.size()==1,s)));
+
+        return check_items;
+    }
+
+    public Set<CheckItem> check_delete_segment(Segment segment){
+        Set<CheckItem> check_items = new HashSet<>();
+        for(AbstractLink link : segment.get_links())
+            check_items.addAll( check_delete_link(link) );
+        return check_items;
     }
 
     /////////////////////////////////////

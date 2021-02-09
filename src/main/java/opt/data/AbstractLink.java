@@ -330,8 +330,10 @@ public abstract class AbstractLink implements Comparable {
     public final void set_mng_lanes(int x) throws Exception {
         if(x<0)
             throw new Exception("Negative lanes");
-        if(x==0 && schedules.containsKey(LaneGroupType.mng))
-            schedules.remove(LaneGroupType.mng);
+        if(x==0){
+            if(schedules.containsKey(LaneGroupType.mng))
+                schedules.remove(LaneGroupType.mng);
+        }
         params.mng_lanes = x;
     }
 
@@ -505,23 +507,6 @@ public abstract class AbstractLink implements Comparable {
     public int compareTo(Object that) {
         return Long.compare(this.id,((AbstractLink) that).id);
     }
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        AbstractLink that = (AbstractLink) o;
-//        return id == that.id &&
-//                start_node_id == that.start_node_id &&
-//                end_node_id == that.end_node_id &&
-//                Objects.equals(params, that.params) &&
-//                demands.equals(that.demands);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(id, start_node_id, end_node_id, params, demands);
-//    }
 
     /////////////////////////////////////
     // protected and private

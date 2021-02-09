@@ -2,6 +2,9 @@ package opt.data;
 
 import opt.data.control.AbstractController;
 import opt.data.control.ControlSchedule;
+import opt.data.event.AbstractEvent;
+import opt.data.event.AbstractEventLaneGroup;
+import opt.data.event.EventLinkToggle;
 import utils.OTMUtils;
 
 import java.util.*;
@@ -187,13 +190,13 @@ public final class Segment implements Comparable {
     // insert / delete segments
     ////////////////////////////////////////
 
-    public Segment insert_up_segment(String seg_name, ParametersFreeway params){
-        return fwy.insert_up_segment(seg_name,params,null);
-    }
-
-    public Segment insert_dn_segment(String seg_name, ParametersFreeway params){
-        return fwy.insert_dn_segment(seg_name,params,null);
-    }
+//    public Segment insert_up_segment(String seg_name, ParametersFreeway params){
+//        return fwy.insert_up_segment(seg_name,params,null);
+//    }
+//
+//    public Segment insert_dn_segment(String seg_name, ParametersFreeway params){
+//        return fwy.insert_dn_segment(seg_name,params,null);
+//    }
 
     ////////////////////////////////////////
     // add / delete ramps
@@ -217,44 +220,56 @@ public final class Segment implements Comparable {
         return fr;
     }
 
-    public boolean delete_in_or(LinkOnramp or){
-        if( in_ors.contains(or) ){
-            delete_ramp(or);
-            in_ors.remove(or);
-            return true;
-        } else
-            return false;
+    public Set<CheckItem> delete_in_or(LinkOnramp link, boolean execute){
+        if(!in_ors.contains(link))
+            return null;
+
+        if(execute){
+            delete_ramp(link);
+            in_ors.remove(link);
+            return null;
+        }
+        else
+            return my_fwy_scenario.check_delete_link(link);
     }
 
-    public boolean delete_out_or(LinkOnramp or){
-        if( out_ors.contains(or) ){
-            delete_ramp(or);
-            out_ors.remove(or);
-            return true;
-        } else
-            return false;
+    public Set<CheckItem> delete_out_or(LinkOnramp link, boolean execute){
+        if(!out_ors.contains(link))
+            return null;
+
+        if(execute){
+            delete_ramp(link);
+            out_ors.remove(link);
+            return null;
+        }
+        else
+            return my_fwy_scenario.check_delete_link(link);
     }
 
-    public boolean delete_in_fr(LinkOfframp link){
-        if( in_frs.contains(link) ){
+    public Set<CheckItem> delete_in_fr(LinkOfframp link, boolean execute){
+        if(!in_frs.contains(link))
+            return null;
+
+        if(execute){
             delete_ramp(link);
             in_frs.remove(link);
-
-            // TODO UPDATE SPLITS
-            return true;
-        } else
-            return false;
+            return null;
+        }
+        else
+            return my_fwy_scenario.check_delete_link(link);
     }
 
-    public boolean delete_out_fr(LinkOfframp link){
-        if( out_frs.contains(link) ){
+    public Set<CheckItem> delete_out_fr(LinkOfframp link, boolean execute){
+        if(!out_frs.contains(link))
+            return null;
+
+        if(execute){
             delete_ramp(link);
             out_frs.remove(link);
-
-            // TODO UPDATE SPLITS
-            return true;
-        } else
-            return false;
+            return null;
+        }
+        else
+            return my_fwy_scenario.check_delete_link(link);
     }
 
     /////////////////////////////////////
@@ -429,24 +444,5 @@ public final class Segment implements Comparable {
     public int compareTo(Object that) {
         return this.name.compareTo(((Segment) that).name);
     }
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        Segment segment = (Segment) o;
-//        return id == segment.id &&
-//                name.equals(segment.name) &&
-//                fwy.equals(segment.fwy) &&
-//                in_ors.equals(segment.in_ors) &&
-//                out_ors.equals(segment.out_ors) &&
-//                in_frs.equals(segment.in_frs) &&
-//                out_frs.equals(segment.out_frs);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(id, name, fwy, in_ors, out_ors, in_frs, out_frs);
-//    }
 
 }

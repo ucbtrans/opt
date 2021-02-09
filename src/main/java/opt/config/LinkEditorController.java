@@ -1855,9 +1855,9 @@ public class LinkEditorController {
             return;
      
         if (idx < myLink.get_segment().num_out_ors())
-            myLink.get_segment().delete_out_or((LinkOnramp)onramps.get(idx));
+            myLink.get_segment().delete_out_or((LinkOnramp)onramps.get(idx),true);
         else
-            myLink.get_segment().delete_in_or((LinkOnramp)onramps.get(idx));
+            myLink.get_segment().delete_in_or((LinkOnramp)onramps.get(idx),true);
         
         appMainController.objectNameUpdate(myLink);
     }
@@ -1877,9 +1877,9 @@ public class LinkEditorController {
             return;
         
         if (idx < myLink.get_segment().num_out_frs())
-            myLink.get_segment().delete_out_fr((LinkOfframp)offramps.get(idx));
+            myLink.get_segment().delete_out_fr((LinkOfframp)offramps.get(idx),true);
         else
-            myLink.get_segment().delete_in_fr((LinkOfframp)offramps.get(idx));
+            myLink.get_segment().delete_in_fr((LinkOfframp)offramps.get(idx),true);
         
         appMainController.objectNameUpdate(myLink);
     }

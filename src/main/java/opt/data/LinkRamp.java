@@ -85,23 +85,18 @@ public abstract class LinkRamp extends AbstractLink {
 
     @Override
     public void set_aux_lanes(int value) throws Exception {
-//        throw new Exception("set_aux_lanes should not be called on ramps.");
     }
 
     @Override
     public void set_aux_capacity_vphpl(float value) throws Exception {
-//        throw new Exception("set_aux_capacity_vphpl should not be called on ramps.");
     }
 
     @Override
     public void set_aux_jam_density_vpkpl(float value) throws Exception {
-//        throw new Exception("set_aux_jam_density_vpkpl should not be called on ramps.");
     }
 
     @Override
     public void set_aux_ff_speed_kph(float value) throws Exception {
-//        throw new Exception("set_aux_ff_speed_kph should not be called on ramps.");
     }
-
 
 }

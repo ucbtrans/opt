@@ -42,5 +42,4 @@ public class LinkGhost extends LinkFreewayOrConnector {
         return Type.ghost;
     }
 
-
 }

@@ -17,11 +17,6 @@ public class LinkConnector extends LinkFreewayOrConnector {
         super(id, mysegment, up_link, dn_link, start_node_id, end_node_id, params);
     }
 
-    // used by clone
-//    public LinkConnector(long id, Long start_node_id, Long end_node_id, AbstractParameters params) throws Exception {
-//        super(id,start_node_id,end_node_id,params);
-//    }
-
     /////////////////////////////////////
     // insert
     /////////////////////////////////////
