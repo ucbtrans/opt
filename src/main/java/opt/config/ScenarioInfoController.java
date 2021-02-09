@@ -25,6 +25,7 @@
  **/
 package opt.config;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.fxml.FXML;
@@ -34,6 +35,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 import opt.AppMainController;
+import opt.UserSettings;
 import opt.data.AbstractLink;
 import opt.data.FreewayScenario;
 import opt.data.Route;
@@ -51,26 +53,7 @@ import opt.utils.UtilGUI;
  */
 public class ScenarioInfoController {
     private AppMainController appMainController = null;
-    private Route myRoute = null;
     private FreewayScenario myScenario = null;
-    
-    private AbstractLink shortest = null;
-    private AbstractLink longest = null;
-    
-    private int numOR = 0;
-    private int numFR = 0;
-    private int numLinks = 0;
-    
-    private double capGP = 0d;
-    private double capMng = 0d;
-    
-    
-    
-    private List<ControlSchedule> lanePolicies = new ArrayList<>();
-    private List<Label> pLabels = new ArrayList<>();
-    
-    private List<AbstractEvent> events = new ArrayList<>();
-    private List<Label> eLabels = new ArrayList<>();
     
     
     @FXML // fx:id="routeInfoMainPane"
@@ -109,16 +92,144 @@ public class ScenarioInfoController {
             return;
         
         myScenario = s;
-        
         vbScenarioInfo.getChildren().clear();
         
         
+        AbstractLink shortest = null;
+        AbstractLink longest = null;
+        double len = 0d;
+        double lmin = Double.MAX_VALUE;
+        double lmax = -1;
+        int numOR = 0;
+        int numFR = 0;
+        int numC = 0;
+        double capGP = 0d;
+        
+        for (AbstractLink l : myScenario.get_links()) {
+            double ll = l.get_length_meters();
+            len += ll;
+            
+            if (lmin > ll) {
+                shortest = l;
+                lmin = ll;
+            }
+            
+            if (lmax < ll) {
+                longest = l;
+                lmax = ll;
+            }
+            
+            if (l.get_type() == AbstractLink.Type.onramp)
+                numOR++;
+            
+            if (l.get_type() == AbstractLink.Type.offramp)
+                numFR++;
+            
+            if (l.get_type() == AbstractLink.Type.connector)
+                numC++;
+        }
         
         
+    
+        Label lbl = new Label(" ");
+        lbl.setStyle(UtilGUI.labelInfoHeaderStyle2);
+        vbScenarioInfo.getChildren().add(lbl);
+        
+        DecimalFormat df = new DecimalFormat("#.##");      
+        lbl = new Label("Total Length: " + df.format(UserSettings.lengthConversionMap.get("meters"+UserSettings.unitsLength)*len) + " " + UserSettings.unitsLength);
+        lbl.setStyle(UtilGUI.labelInfoHeaderStyle2);
+        vbScenarioInfo.getChildren().add(lbl);
+        
+        lbl = new Label("Sections: " + myScenario.get_links().size());
+        lbl.setStyle(UtilGUI.labelInfoHeaderStyle2);
+        vbScenarioInfo.getChildren().add(lbl);
+        
+        lbl = new Label("On-Ramps: " + numOR);
+        lbl.setStyle(UtilGUI.labelInfoHeaderStyle2);
+        vbScenarioInfo.getChildren().add(lbl);
+        
+        lbl = new Label("Off-Ramps: " + numFR);
+        lbl.setStyle(UtilGUI.labelInfoHeaderStyle2);
+        vbScenarioInfo.getChildren().add(lbl);
+        
+        lbl = new Label("Connectors: " + numC);
+        lbl.setStyle(UtilGUI.labelInfoHeaderStyle2);
+        vbScenarioInfo.getChildren().add(lbl);
+        
+        lbl = new Label("Subnetworks: " + myScenario.get_linear_freeway_segments().size());
+        lbl.setStyle(UtilGUI.labelInfoHeaderStyle2);
+        vbScenarioInfo.getChildren().add(lbl);
+    
+        Separator sep = new Separator();
+        sep.setStyle(UtilGUI.dividerInfoStyle);
+        vbScenarioInfo.getChildren().add(sep);
         
         
+        Label header = new Label("Shortest Section:");
+        header.setStyle(UtilGUI.labelInfoHeaderStyle);
+        vbScenarioInfo.getChildren().add(header);
         
+        if (shortest != null) {
+            lbl = new Label(shortest.get_name());
+            lbl.setStyle(UtilGUI.labelInfoPointerStyle);
+            final AbstractLink lnk = shortest;
+            final Label fl = lbl;
+            lbl.setOnMouseClicked((mouseEvent) -> {
+                openLink(lnk);
+            });
+            lbl.setOnMouseEntered((mouseEvent) -> {
+                fl.setCursor(Cursor.HAND);
+            });
+        } else {
+            lbl = new Label("None");
+            lbl.setStyle(UtilGUI.labelInfoOrdinaryStyle);
+        }
+        vbScenarioInfo.getChildren().add(lbl);
+        
+        sep = new Separator();
+        sep.setStyle(UtilGUI.dividerInfoStyle);
+        vbScenarioInfo.getChildren().add(sep);
+        
+        
+        header = new Label("Longest Section:");
+        header.setStyle(UtilGUI.labelInfoHeaderStyle);
+        vbScenarioInfo.getChildren().add(header);
+        
+        if (longest != null) {
+            lbl = new Label(longest.get_name());
+            lbl.setStyle(UtilGUI.labelInfoPointerStyle);
+            final AbstractLink lnk = longest;
+            final Label fl = lbl;
+            lbl.setOnMouseClicked((mouseEvent) -> {
+                openLink(lnk);
+            });
+            lbl.setOnMouseEntered((mouseEvent) -> {
+                fl.setCursor(Cursor.HAND);
+            });
+        } else {
+            lbl = new Label("None");
+            lbl.setStyle(UtilGUI.labelInfoOrdinaryStyle);
+        }
+        vbScenarioInfo.getChildren().add(lbl);
+
     }
+    
+    
+    
+    
+    
+     
+    /***************************************************************************
+     * CALBACKS
+     **************************************************************************/
+    
+    private void openLink(AbstractLink l) {
+        if (l == null)
+            return;
+
+        appMainController.selectLink(l);
+    }
+    
     
     
 }
