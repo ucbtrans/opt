@@ -26,17 +26,20 @@ public abstract class AbstractEventLaneGroup extends AbstractEvent {
     public Event to_jaxb() {
         jaxb.Event jevent = super.to_jaxb();
 
-        jaxb.EventTarget jtgt = new jaxb.EventTarget();
-        jevent.setEventTarget(jtgt);
+        if(!links.isEmpty()){
 
-        String str = "";
-        for(AbstractLink link : links){
-            int [] ln = link.lgtype2lanes(lgtype);
-            str += String.format("%d(%d#%d),",link.get_id(),ln[0],ln[1]);
+            jaxb.EventTarget jtgt = new jaxb.EventTarget();
+            jevent.setEventTarget(jtgt);
+            jtgt.setType("lanegroups");
+
+            String str = "";
+            for(AbstractLink link : links){
+                int [] ln = link.lgtype2lanes(lgtype);
+                str += String.format("%d(%d#%d),",link.get_id(),ln[0],ln[1]);
+            }
+            str = str.substring(0,str.length()-1);
+            jtgt.setLanegroups(str);
         }
-        str = str.substring(0,str.length()-1);
-        jtgt.setLanegroups(str);
-        jtgt.setType("lanegroups");
 
         return jevent;
     }

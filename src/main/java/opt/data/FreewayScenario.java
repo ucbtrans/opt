@@ -454,7 +454,9 @@ public class FreewayScenario {
                                     break;
                             }
                         }
-                        FDparams fd_mult = new FDparams(capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
+                        FDparams fd_mult = null;
+                        if(capacity_vphpl!=null && jam_density_vpkpl!=null && ff_speed_kph!=null)
+                            new FDparams(capacity_vphpl,jam_density_vpkpl,ff_speed_kph);
                         event = new EventLanegroupFD(id,type,timestamp,jname,links,lgtypes.iterator().next(),fd_mult);
                         break;
 

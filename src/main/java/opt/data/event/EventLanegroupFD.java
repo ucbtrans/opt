@@ -15,13 +15,13 @@ public class EventLanegroupFD extends AbstractEventLaneGroup {
         super(id, type, timestamp, name, links, lgtype);
         this.fd_mult = fd_mult;
 
-        if(fd_mult !=null){
-            if(fd_mult.capacity_vphpl==null || fd_mult.capacity_vphpl<0)
-                throw new Exception("delta_fd.capacity_vphpl==null || delta_fd.capacity_vphpl<0");
-            if(fd_mult.jam_density_vpkpl==null || fd_mult.jam_density_vpkpl<0)
-                throw new Exception("delta_fd.jam_density_vpkpl==null || delta_fd.jam_density_vpkpl<0");
-            if(fd_mult.ff_speed_kph==null || fd_mult.ff_speed_kph<0)
-                throw new Exception("delta_fd.ff_speed_kph==null || delta_fd.ff_speed_kph<0");
+        if(fd_mult!=null){
+            if(fd_mult.capacity_vphpl!=null && fd_mult.capacity_vphpl<0)
+                throw new Exception("delta_fd.capacity_vphpl<0");
+            if(fd_mult.jam_density_vpkpl!=null && fd_mult.jam_density_vpkpl<0)
+                throw new Exception("delta_fd.jam_density_vpkpl<0");
+            if(fd_mult.ff_speed_kph!=null && fd_mult.ff_speed_kph<0)
+                throw new Exception("delta_fd.ff_speed_kph<0");
         }
     }
 
@@ -51,7 +51,6 @@ public class EventLanegroupFD extends AbstractEventLaneGroup {
         }
         return jevent;
     }
-
 
     /////////////////////
     // API

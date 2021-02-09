@@ -617,8 +617,11 @@ public class Scenario {
         // events
         jaxb.Events jevent = new jaxb.Events();
         jScn.setEvents(jevent);
-        for(AbstractEvent event : events.values())
-            jevent.getEvent().add(event.to_jaxb());
+        for(AbstractEvent event : events.values()) {
+            jaxb.Event jev = event.to_jaxb();
+            if(jev!=null)
+                jevent.getEvent().add(jev);
+        }
 
         return jScn;
     }
