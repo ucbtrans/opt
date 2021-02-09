@@ -941,10 +941,13 @@ public class FreewayScenario {
      * Delete a segment
      * @param segment
      */
-    public void delete_segment(Segment segment, boolean connect_adjacent) throws Exception {
+    public Set<CheckItem> delete_segment(Segment segment, boolean connect_adjacent, boolean execute) throws Exception {
 
         if(segments.size()==1)
             throw new Exception("Removing the sole segment is not allowed.");
+
+        if(!execute)
+            return check_delete_segment(segment);
 
         // modify schedules that refer to this segment
         List<ControlSchedule> schedules = segment.get_links().stream()
@@ -1021,6 +1024,8 @@ public class FreewayScenario {
                     .forEach(route->route.segments.remove(segment));
         else
             routes.values().removeIf(route->route.segments.contains(segment));
+
+        return null;
 
     }
 

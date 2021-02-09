@@ -1377,7 +1377,7 @@ public class AppMainController {
 
         FreewayScenario scenario = lnk.get_segment().get_scenario();
         try {
-            scenario.delete_segment(lnk.get_segment(),reconnect);
+            scenario.delete_segment(lnk.get_segment(),reconnect, true);
         } catch (Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not delete road section...", e);
             return;
