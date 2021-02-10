@@ -38,13 +38,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -52,9 +48,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.embed.swing.SwingNode;
@@ -71,12 +64,7 @@ import opt.utils.Misc;
 import opt.UserSettings;
 import opt.data.Commodity;
 import opt.data.Route;
-import opt.data.SimCellData;
-import opt.data.SimDataLanegroup;
 import opt.utils.UtilGUI;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.block.BlockBorder;
@@ -116,6 +104,7 @@ public class RoutePerformanceController {
     private Route myRoute = null;
     private SimDataScenario mySimData = null;
     private float start = 0;
+    private float duration = 0;
     
     private double[][] speedDataGP = null;
     private double[][] speedDataManaged = null;
@@ -295,6 +284,7 @@ public class RoutePerformanceController {
         listVT = Misc.makeListVT(mySimData.fwyscenario.get_commodities());
         numVT = listVT.size();
         start = mySimData.fwyscenario.get_start_time();
+        duration = myRoute.get_scenario().get_sim_duration();
         
         timeLabel = "Time (hours)";
         timeDivider = 3600.0;
@@ -1094,7 +1084,7 @@ public class RoutePerformanceController {
         label_gp += per_buf;
         label_mng += per_buf;
 
-        NumberAxis xAxis = new NumberAxis();
+        NumberAxis xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("VMT");
@@ -1177,7 +1167,7 @@ public class RoutePerformanceController {
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vmtChart);
 
         if (hasManagedLanes) {
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("VMT");
@@ -1263,7 +1253,7 @@ public class RoutePerformanceController {
         label_gp += per_buf;
         label_mng += per_buf;
 
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("VHT");
@@ -1340,7 +1330,7 @@ public class RoutePerformanceController {
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart);
 
         if (hasManagedLanes) {
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("VHT");
@@ -1426,7 +1416,7 @@ public class RoutePerformanceController {
         label_gp += per_buf + " ";
         label_mng += per_buf + " ";
 
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("Delay (veh.-hr.)");
@@ -1507,7 +1497,7 @@ public class RoutePerformanceController {
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(delayChart);
 
         if (hasManagedLanes) {
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("Delay (veh.-hr.)");

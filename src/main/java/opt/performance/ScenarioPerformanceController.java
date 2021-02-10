@@ -99,6 +99,7 @@ public class ScenarioPerformanceController {
     private int numVT;
     
     private float start = 0;
+    private float duration = 0;
     private String timeLabel;
     private double timeDivider;
     
@@ -230,6 +231,7 @@ public class ScenarioPerformanceController {
         wbCol = 1;
         
         start = myScenario.get_start_time();
+        duration = myScenario.get_sim_duration();
         
         timeLabel = "Time (hours)";
         timeDivider = 3600.0;
@@ -539,7 +541,7 @@ public class ScenarioPerformanceController {
             
 
         label = "Network VMT" + per_buf;
-        NumberAxis xAxis = new NumberAxis();
+        NumberAxis xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("VMT");
@@ -628,7 +630,7 @@ public class ScenarioPerformanceController {
 
 
         label = "Network VHT" + per_buf;
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("VHT");
@@ -695,7 +697,7 @@ public class ScenarioPerformanceController {
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart1);
         
         
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("VHT");
@@ -804,7 +806,7 @@ public class ScenarioPerformanceController {
             label_thres = "(Speed Threshold: Free Flow Speed)";
             label_thres2 = "(veh.-hr.; Speed Threshold: Free Flow Speed)";
         }
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("Delay (veh.-hr.)");
@@ -871,7 +873,7 @@ public class ScenarioPerformanceController {
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(delayChart1);
 
         
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("Delay (veh.-hr.)");
