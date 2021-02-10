@@ -333,9 +333,12 @@ public class Scenario {
 
                 // VI) inner or -> fwy mng OR inner or ->fwy gp
                 if (up_link.get_is_inner())
-                    if (dn_link.has_mng())
-//                        jrcs.add( make_road_connection(my_fwy_scenario,rcs, up_link, null, dn_link, LaneGroupType.mng) );
-                        jrcs.add( make_road_connection(my_fwy_scenario,rcs, up_link, null, dn_link, null) );
+                    if (dn_link.has_mng()) {
+                        if(dn_link.get_mng_barrier())
+                            jrcs.add(make_road_connection(my_fwy_scenario, rcs, up_link, null, dn_link, LaneGroupType.mng));
+                        else
+                            jrcs.add(make_road_connection(my_fwy_scenario, rcs, up_link, null, dn_link, null));
+                    }
                     else
                         jrcs.add( make_road_connection(my_fwy_scenario,rcs, up_link, null, dn_link, LaneGroupType.gp) );
 
