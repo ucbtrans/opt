@@ -1478,11 +1478,11 @@ public class FreewayScenario {
             // create params
             ParametersFreeway newparams = new ParametersFreeway(
                     "",
-                    link.get_lanes(),
-                    0,
+                    link.get_gp_lanes(),
+                    link.get_mng_lanes(),
                     false,
                     false,
-                    0,
+                    link.get_aux_lanes(),
                     link.get_length_meters(),
                     link.get_gp_capacity_vphpl(),
                     link.get_gp_jam_density_vpkpl(),

@@ -358,7 +358,6 @@ public class SimDataLink {
         return extract_lgtypes(lgtypes).stream().map(x->  lgData.get(x)).collect(Collectors.toSet());
     }
 
-
     //////////////////////////
     // PROTECTED/PRIVATE
     //////////////////////////
