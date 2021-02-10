@@ -71,6 +71,7 @@ public class LinkPerformanceController {
     private AbstractLink myLink = null;
     private SimDataLink mySimData = null;
     private float start = 0;
+    private float duration = 0;
     
     private List<Commodity> listVT = null;
     private int numVT;
@@ -216,6 +217,7 @@ public class LinkPerformanceController {
         listVT = Misc.makeListVT(myLink.get_segment().get_scenario().get_commodities());
         numVT = listVT.size();
         start = myLink.get_segment().get_scenario().get_start_time();
+        duration = myLink.get_segment().get_scenario().get_sim_duration();
         
         timeLabel = "Time (hours)";
         timeDivider = 3600.0;
@@ -254,7 +256,7 @@ public class LinkPerformanceController {
         cc = UserSettings.speedConversionMap.get("mph"+label_units);
         
         //CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis xAxis = new NumberAxis();
+        NumberAxis xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Speed (" + label_units + ")");
@@ -383,7 +385,7 @@ public class LinkPerformanceController {
             label_units = UserSettings.unitsFlow;
             cc = UserSettings.flowConversionMap.get("vph"+label_units);
 
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("Demand (" + label_units + ")");
@@ -468,7 +470,7 @@ public class LinkPerformanceController {
         label_units = UserSettings.unitsFlow;
         cc = UserSettings.flowConversionMap.get("vph"+label_units);
 
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("Flow (" + label_units + ")");
@@ -547,7 +549,7 @@ public class LinkPerformanceController {
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(flowChart);
 
         if (mngD > 0) {
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("Flow (" + label_units + ")");
@@ -625,7 +627,7 @@ public class LinkPerformanceController {
         }
 
         if (auxD > 0) {
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("Flow (" + label_units + ")");
@@ -711,7 +713,7 @@ public class LinkPerformanceController {
             label_mng = "Managed Lane Vehicle Queue";
         }
 
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("Number of Vehicles");
@@ -788,7 +790,7 @@ public class LinkPerformanceController {
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vehChart);
 
         if (mngD > 0) {
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("Number of Vehicles");
@@ -866,7 +868,7 @@ public class LinkPerformanceController {
         }
 
         if (auxD > 0) {
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("Number of Vehicles");
@@ -966,7 +968,7 @@ public class LinkPerformanceController {
         label_mng = "VMT in Managed Lanes" + per_buf;
         label_aux = "VMT in Aux Lanes" + per_buf;
 
-        NumberAxis xAxis = new NumberAxis();
+        NumberAxis xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("VMT");
@@ -1045,7 +1047,7 @@ public class LinkPerformanceController {
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vmtChart);
 
         if (mngD > 0) {
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("VMT");
@@ -1123,7 +1125,7 @@ public class LinkPerformanceController {
         }
 
         if (auxD > 0) {
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("VMT");
@@ -1206,7 +1208,7 @@ public class LinkPerformanceController {
         label_mng = "VHT in Managed Lanes" + per_buf;
         label_aux = "VHT in Aux Lanes" + per_buf;
 
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("VHT");
@@ -1285,7 +1287,7 @@ public class LinkPerformanceController {
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart);
 
         if (mngD > 0) {
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("VHT");
@@ -1363,7 +1365,7 @@ public class LinkPerformanceController {
         }
 
         if (auxD > 0) {
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("VHT");
@@ -1453,7 +1455,7 @@ public class LinkPerformanceController {
         String label_thres = String.format("(Speed Threshold: %.0f %s)", cc*v_thres, label_units);
         String label_thres2 = String.format("(veh.-hr.; Speed Threshold: %.0f %s)", cc*v_thres, label_units);
 
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("Delay (veh.-hr.)");
@@ -1532,7 +1534,7 @@ public class LinkPerformanceController {
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(delayChart);
 
         if (mngD > 0) {
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("Delay (veh.-hr.)");
@@ -1615,7 +1617,7 @@ public class LinkPerformanceController {
         }
 
         if (auxD > 0) {
-            xAxis = new NumberAxis();
+            xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
             xAxis.setLabel(timeLabel);
             yAxis = new NumberAxis();
             yAxis.setLabel("Delay (veh.-hr.)");

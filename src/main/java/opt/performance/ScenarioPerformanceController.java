@@ -35,6 +35,7 @@ import java.util.Set;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -49,6 +50,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import opt.AppMainController;
 import opt.data.AbstractLink;
@@ -99,6 +101,7 @@ public class ScenarioPerformanceController {
     private int numVT;
     
     private float start = 0;
+    private float duration = 0;
     private String timeLabel;
     private double timeDivider;
     
@@ -230,6 +233,7 @@ public class ScenarioPerformanceController {
         wbCol = 1;
         
         start = myScenario.get_start_time();
+        duration = myScenario.get_sim_duration();
         
         timeLabel = "Time (hours)";
         timeDivider = 3600.0;
@@ -361,7 +365,7 @@ public class ScenarioPerformanceController {
             vmtPieData.add(new PieChart.Data(l, c_vmt[i]));
             l = listVT.get(i).get_name() + " = " + (int)Math.round(c_vht[i]) + " (" + p_vht + "%)";
             vhtPieData1.add(new PieChart.Data(l, c_vht[i]));
-            l = listVT.get(i).get_name() + " = " + (int)Math.round(c_vht[i]) + " (" + p_delay + "%)";
+            l = listVT.get(i).get_name() + " = " + (int)Math.round(c_delay[i]) + " (" + p_delay + "%)";
             delayPieData1.add(new PieChart.Data(l, c_delay[i]));
         }
 
@@ -467,7 +471,17 @@ public class ScenarioPerformanceController {
         //chart.setMaxWidth(prefWidth);
         chart.setMinHeight(prefHeight);
         //chart.setMaxHeight(prefHeight);
-        vbSummary.getChildren().add(chart);
+        if (total_delay >= 0.1)
+            vbSummary.getChildren().add(chart);
+        else {
+            Label title = new Label("Total Delay " + label_thres);
+            title.setStyle(opt.utils.UtilGUI.labelInfoHeaderStyle);
+            title.setTextAlignment(TextAlignment.CENTER);
+            title.setAlignment(Pos.CENTER);
+            title.setMaxWidth(Double.MAX_VALUE);
+            vbSummary.getChildren().add(title);
+            vbSummary.setFillWidth(true); 
+        }
         
         
         TimeSeries delay_no = mySimData.get_delay_for_network_nonsources(null, (float)v_thres);
@@ -511,7 +525,8 @@ public class ScenarioPerformanceController {
         //chart.setMaxWidth(prefWidth);
         chart.setMinHeight(prefHeight);
         //chart.setMaxHeight(prefHeight);
-        vbSummary.getChildren().add(chart);
+        if (total_delay >= 0.1)
+            vbSummary.getChildren().add(chart);
     }
     
     
@@ -539,7 +554,7 @@ public class ScenarioPerformanceController {
             
 
         label = "Network VMT" + per_buf;
-        NumberAxis xAxis = new NumberAxis();
+        NumberAxis xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("VMT");
@@ -628,7 +643,7 @@ public class ScenarioPerformanceController {
 
 
         label = "Network VHT" + per_buf;
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("VHT");
@@ -695,7 +710,7 @@ public class ScenarioPerformanceController {
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(vhtChart1);
         
         
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("VHT");
@@ -804,7 +819,7 @@ public class ScenarioPerformanceController {
             label_thres = "(Speed Threshold: Free Flow Speed)";
             label_thres2 = "(veh.-hr.; Speed Threshold: Free Flow Speed)";
         }
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("Delay (veh.-hr.)");
@@ -871,7 +886,7 @@ public class ScenarioPerformanceController {
         JFXChartUtil.addDoublePrimaryClickAutoRangeHandler(delayChart1);
 
         
-        xAxis = new NumberAxis();
+        xAxis = new NumberAxis(start/timeDivider, (start+duration) / timeDivider, 1);
         xAxis.setLabel(timeLabel);
         yAxis = new NumberAxis();
         yAxis.setLabel("Delay (veh.-hr.)");
