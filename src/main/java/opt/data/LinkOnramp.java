@@ -63,6 +63,8 @@ public class LinkOnramp extends LinkRamp {
             up_segment.fwy.dn_link = new_link;
         }
 
+        // add to routes
+        mysegment.my_fwy_scenario.add_segment_to_routes(new_segment);
 
         return new_segment;
     }

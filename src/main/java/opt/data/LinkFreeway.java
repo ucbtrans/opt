@@ -46,6 +46,9 @@ public class LinkFreeway extends LinkFreewayOrConnector {
             up_segment.fwy.dn_link = fwy_link;
         }
 
+        // add to routes
+        mysegment.my_fwy_scenario.add_segment_to_routes(new_segment);
+
         return new_segment;
     }
 
@@ -68,6 +71,9 @@ public class LinkFreeway extends LinkFreewayOrConnector {
             fwy_link.dn_link = dn_segment.fwy;
             dn_segment.fwy.up_link = fwy_link;
         }
+
+        // add to routes
+        mysegment.my_fwy_scenario.add_segment_to_routes(new_segment);
 
         return new_segment;
     }

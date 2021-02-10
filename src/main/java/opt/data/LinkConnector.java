@@ -51,10 +51,12 @@ public class LinkConnector extends LinkFreewayOrConnector {
         else
             segment.out_frs.add(fr);
 
-
         fr.up_link = fwy;
         fr.dn_link = this;
         this.up_link = fr;
+
+        // add to routes
+        mysegment.my_fwy_scenario.add_segment_to_routes(segment);
 
         return segment;
     }
@@ -93,6 +95,9 @@ public class LinkConnector extends LinkFreewayOrConnector {
         or.dn_link = fwy;
         or.up_link = this;
         this.dn_link = or;
+
+        // add to routes
+        mysegment.my_fwy_scenario.add_segment_to_routes(segment);
 
         return segment;
     }

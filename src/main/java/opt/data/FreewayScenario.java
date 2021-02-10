@@ -490,6 +490,11 @@ public class FreewayScenario {
             return false;
         }
 
+        // check routes are linear
+        for(Route route : routes.values())
+            if(!route.check_is_linear())
+                return false;
+
         return true;
 
     }
@@ -1349,6 +1354,11 @@ public class FreewayScenario {
     /////////////////////////////////////
     // protected and private
     /////////////////////////////////////
+
+    protected void add_segment_to_routes(Segment segment){
+        for(Route route : routes.values())
+            route.add_segment_if_connected(segment);
+    }
 
     protected AbstractLink get_link(Long id){
         return scenario.links.get(id);

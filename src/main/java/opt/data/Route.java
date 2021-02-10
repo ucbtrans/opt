@@ -2,9 +2,7 @@ package opt.data;
 
 import utils.OTMUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Route {
@@ -37,6 +35,7 @@ public class Route {
                 throw new Exception("Bad segment id in route");
             segments.add(my_fwy_scenario.segments.get(segid));
         }
+
     }
 
     @Override
@@ -86,28 +85,56 @@ public class Route {
         for(Long segid : segmentids){
             if(!my_fwy_scenario.segments.containsKey(segid))
                 continue;
-            add_segment(my_fwy_scenario.segments.get(segid));
+            add_segment_if_connected(my_fwy_scenario.segments.get(segid));
         }
     }
 
-    public void add_segment(Segment segment) {
+    public void add_segment_if_connected(Segment segment) {
+
         if(segments.isEmpty()){
             segments.add(segment);
             return;
         }
 
-        int numseg = segments.size();
+        Set<Segment> up_segments = segment.get_upstrm_segments();
+        Set<Segment> dn_segments = segment.get_dnstrm_segments();
+        Set<Segment> adjacent_segments = new HashSet<>();
+        adjacent_segments.addAll(up_segments);
+        adjacent_segments.addAll(dn_segments);
+        boolean is_disjoint = Collections.disjoint(segments, adjacent_segments);
 
-        // this segment goes upstream of the first segment
-        if(segments.get(0).get_upstrm_segments().contains(segment)){
-            segments.add(0,segment);
+        if(is_disjoint)
             return;
-        }
 
-        // or this segment goes downstream of the last segment
-        if(segments.get(numseg-1).get_dnstrm_segments().contains(segment)){
+        Segment first_segment = segments.get(0);
+        Segment last_segment = segments.get(segments.size()-1);
+
+        // add if this segment is upstream of first and first is a source
+        if(dn_segments.contains(first_segment) && first_segment.get_upstrm_segments().isEmpty())
+            segments.add(0, segment);
+
+        // add if this segment is downstream of last and last is a sink
+        else if(up_segments.contains(last_segment) && last_segment.get_dnstrm_segments().isEmpty())
             segments.add(segment);
-            return;
+
+        // this link is internal
+        else {
+            Optional<Segment> opt_dn_segment = segments.stream()
+                    .filter(dn_segments::contains)
+                    .findFirst();
+
+            Optional<Segment> opt_up_segment = segments.stream()
+                    .filter(up_segments::contains)
+                    .findFirst();
+
+            if (opt_dn_segment.isPresent() && opt_up_segment.isPresent()) {
+                Segment dn_segment = opt_dn_segment.get();
+                Segment up_segment = opt_up_segment.get();
+                int dn_index = segments.indexOf(dn_segment);
+                int up_index = segments.indexOf(up_segment);
+                assert(dn_index-up_index==1);
+                segments.add(dn_index,segment);
+            }
         }
     }
 
@@ -176,6 +203,18 @@ public class Route {
 
 
         return links;
+    }
+
+    public boolean check_is_linear(){
+        if(segments.isEmpty())
+            return true;
+        for(int i=1;i<segments.size();i++){
+            Segment curr_segment = segments.get(i-1);
+            Segment next_segment = segments.get(i);
+            if(!curr_segment.get_dnstrm_segments().contains(next_segment))
+                return false;
+        }
+        return true;
     }
 
 }
