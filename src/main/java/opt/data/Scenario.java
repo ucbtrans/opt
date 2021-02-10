@@ -303,7 +303,7 @@ public class Scenario {
             }
 
             // case freeway
-            if( (up_link instanceof LinkFreeway) || (up_link instanceof LinkGhost)){
+            if( (up_link instanceof LinkFreeway) || (up_link instanceof LinkGhost) ){
 
                 // III) aux->aux
                 if( ((dn_link instanceof LinkFreeway) || (dn_link instanceof LinkGhost)) && up_link.has_aux() && dn_link.has_aux())
@@ -334,7 +334,8 @@ public class Scenario {
                 // VI) inner or -> fwy mng OR inner or ->fwy gp
                 if (up_link.get_is_inner())
                     if (dn_link.has_mng())
-                        jrcs.add( make_road_connection(my_fwy_scenario,rcs, up_link, null, dn_link, LaneGroupType.mng) );
+//                        jrcs.add( make_road_connection(my_fwy_scenario,rcs, up_link, null, dn_link, LaneGroupType.mng) );
+                        jrcs.add( make_road_connection(my_fwy_scenario,rcs, up_link, null, dn_link, null) );
                     else
                         jrcs.add( make_road_connection(my_fwy_scenario,rcs, up_link, null, dn_link, LaneGroupType.gp) );
 
