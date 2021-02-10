@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TimeSeries {
-    public float [] time;
+    private static boolean shift_values = true;
+    protected float [] time;
     protected double [] values;
 
     public TimeSeries(float [] time){
@@ -27,8 +28,15 @@ public class TimeSeries {
 
     public double [] get_values(){
         double [] round_values = new double[values.length];
-        for(int i=0;i<values.length;i++)
-            round_values[i] = Math.floor(values[i]*10d)/10d;
+        if(shift_values && values.length>=2){
+            for(int i=0;i<values.length-1;i++)
+                round_values[i] = Math.floor(values[i+1]*10d)/10d;
+            round_values[values.length-1] = round_values[values.length-2];
+        }
+        else{
+            for(int i=0;i<values.length;i++)
+                round_values[i] = Math.floor(values[i]*10d)/10d;
+        }
         return round_values;
     }
 
@@ -64,7 +72,6 @@ public class TimeSeries {
         final int n = time.length;
 
         int newn = 1+(int)(n*this.get_dt()/newdt);
-
 
         float[] newtime = new float[newn];
         double[] newvalues = new double[newn];
@@ -106,8 +113,9 @@ public class TimeSeries {
         XYSeries series = new XYSeries(label);
         if(values==null)
             return series;
+        double [] round_values = get_values();
         for(int k=0;k<time.length;k++)
-            series.add(time[k],Math.floor(10d*values[k])/10d);
+            series.add(time[k],round_values[k]);
         return series;
     }
 
