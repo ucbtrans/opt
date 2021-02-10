@@ -601,10 +601,9 @@ public class Scenario {
 
                     // rcid
                     Set<Long> rcids = rcs.stream()
-                            .filter(r -> r.outlink == up_ml.id )
+                            .filter(r -> r.outlink==up_ml.id && !links.get(r.inlink).is_ramp())
                             .map(r->r.id)
                             .collect(toSet());
-
 
                     // actuator ............................
                     jacts.getActuator().add(create_linkflow_actuator(ctrlid, commid, up_ml.id, rcids));
