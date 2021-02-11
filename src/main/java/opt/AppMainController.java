@@ -1310,6 +1310,7 @@ public class AppMainController {
             return;
         }
         
+        actionPane.getSelectionModel().select(configTabPane);
         projectTree.getSelectionModel().select(item);
         scenarioEditorController.openLanePolicies(cs);
     }
@@ -1327,6 +1328,7 @@ public class AppMainController {
             return;
         }
         
+        actionPane.getSelectionModel().select(configTabPane);
         projectTree.getSelectionModel().select(item);
         scenarioEditorController.openEvents(e);
     }
