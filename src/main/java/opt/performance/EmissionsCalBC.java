@@ -187,7 +187,7 @@ public class EmissionsCalBC {
         double dt = sdata.get_dt_sec() / 3600d;
         
         for (AbstractLink l : links)
-            res = addArraysDouble(res, computeParamAggregates(l, sdata.linkdata.get(l.id), res));
+            res = computeParamAggregates(l, sdata.linkdata.get(l.id), res);
         
         return res;
     }
@@ -275,7 +275,7 @@ public class EmissionsCalBC {
     private static double interpolate(double a, double b) {
         double mult = (double)(currentYear - yearA) / (double)(yearB - yearA);
         double delta = b - a;
-        return a + mult * delta;
+        return 0.001 * (a + mult * delta);
     }
     
     
