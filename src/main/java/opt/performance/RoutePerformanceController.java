@@ -1580,7 +1580,7 @@ public class RoutePerformanceController {
     
     private void fillTabEmissions() {
         Label[] valsUI = {lblCO, lblCO2, lblNOX, lblPM10, lblSOX, lblVOC, lblPM25};
-        titleCalBC.setText(String.format("Emissions Parameters Computed Based on %d-%d Cal-BC Table", EmissionsCalBC.yearA, EmissionsCalBC.yearB));
+        titleCalBC.setText(String.format("Emissions Computed Based on %d-%d Cal-BC Table (Kg)", EmissionsCalBC.yearA, EmissionsCalBC.yearB));
         
         List<AbstractLink> links = new ArrayList<>();
         for(Segment segment : myRoute.get_segments())

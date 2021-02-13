@@ -60,7 +60,7 @@
                         <Font size="18.0" />
                      </font>
                   </Label>
-                  <Label text="CO:" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+                  <Label text="Carbon Monoxide (CO):" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -73,7 +73,7 @@
                         <Insets left="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label text="CO2:" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+                  <Label text="Carbon Dioxide (CO2):" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -86,7 +86,7 @@
                         <Insets left="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label text="NOX:" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+                  <Label text="Nitrogen Oxides (NOX):" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -99,7 +99,7 @@
                         <Insets left="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label text="PM10:" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+                  <Label text="10-Micron Particulate Matter (PM10):" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -112,7 +112,7 @@
                         <Insets left="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label text="SOX:" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
+                  <Label text="Sulfur Oxides (SOX):" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -125,7 +125,7 @@
                         <Insets left="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label text="VOC:" GridPane.halignment="RIGHT" GridPane.rowIndex="8">
+                  <Label text="Volatile Organic Compounds (VOC):" GridPane.halignment="RIGHT" GridPane.rowIndex="8">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -138,7 +138,7 @@
                         <Insets left="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label text="PM2.5:" GridPane.halignment="RIGHT" GridPane.rowIndex="9">
+                  <Label text="2.5-Micron Particulate Matter (PM2.5):" GridPane.halignment="RIGHT" GridPane.rowIndex="9">
                      <font>
                         <Font size="14.0" />
                      </font>
