@@ -327,17 +327,17 @@ public class PreferencesController {
         /// Lane Choice ////////////////////////////////////////////////////////
         
         step = 0.1;
-        svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(Double.MIN_VALUE, Double.MAX_VALUE, UserSettings.defaultLaneChoice_keep, step);
+        svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(0d, 1d, UserSettings.defaultLaneChoice_epsilon, step);
         svf.setConverter(new ModifiedDoubleStringConverter("#.####", 1));
         spA0.setValueFactory(svf);
         
         units = UserSettings.unitsDensity;
-        cc = 1.0 / UserSettings.densityConversionMap.get("vpm" + units);
-        svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(Double.MIN_VALUE, Double.MAX_VALUE, cc * UserSettings.defaultLaneChoice_rhovpmplane, step);
+        cc = 1.0 / UserSettings.densityConversionMap.get("vpmtr" + units);
+        svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(0d, Double.MAX_VALUE, cc * UserSettings.defaultLaneChoice_gamma, step);
         svf.setConverter(new ModifiedDoubleStringConverter("#.####", 1));
         spA1.setValueFactory(svf);
         
-        svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(Double.MIN_VALUE, Double.MAX_VALUE, UserSettings.defaultLaneChoice_tollcents, step);
+        svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(Double.MIN_VALUE, Double.MAX_VALUE, UserSettings.defaultLaneChoice_alpha, step);
         svf.setConverter(new ModifiedDoubleStringConverter("#.####", 1));
         spA2.setValueFactory(svf);
         
@@ -456,15 +456,15 @@ public class PreferencesController {
         
         /// Lane Choice ////////////////////////////////////////////////////////
         
-        spA0.getValueFactory().setValue(UserSettings.defaultLaneChoice_keep);
+        spA0.getValueFactory().setValue(UserSettings.defaultLaneChoice_epsilon);
         
         units = UserSettings.unitsDensity;
         labelA1.setText("Default Traffic Density Influencer (1/" + units + "):");
         
-        cc = 1.0 / UserSettings.densityConversionMap.get("vpm" + units);
-        spA1.getValueFactory().setValue(cc * UserSettings.defaultLaneChoice_rhovpmplane);
+        cc = 1.0 / UserSettings.densityConversionMap.get("vpmtr" + units);
+        spA1.getValueFactory().setValue(cc * UserSettings.defaultLaneChoice_gamma);
         
-        spA2.getValueFactory().setValue(UserSettings.defaultLaneChoice_tollcents);
+        spA2.getValueFactory().setValue(UserSettings.defaultLaneChoice_alpha);
         
         units = UserSettings.unitsSpeed;
         labelQosSpeed.setText("Default QoS Speed Threshold for Managed Lanes (" + units + "):");
@@ -558,13 +558,13 @@ public class PreferencesController {
 
         /// Lane Choice ////////////////////////////////////////////////////////
         
-        spA0.getValueFactory().setValue(1.8);
+        spA0.getValueFactory().setValue(0.5);
         
         units = UserSettings.unitsDensity;
-        cc = 1.0 / UserSettings.densityConversionMap.get("vpm" + units);
-        spA1.getValueFactory().setValue(cc * 0.0115);
+        cc = 1.0 / UserSettings.densityConversionMap.get("vpmtr" + units);
+        spA1.getValueFactory().setValue(cc * 30);
         
-        spA2.getValueFactory().setValue(0.0053);
+        spA2.getValueFactory().setValue(1.0);
         
         units = UserSettings.unitsSpeed;
         cc = UserSettings.speedConversionMap.get("kph" + units);
@@ -642,13 +642,13 @@ public class PreferencesController {
         
         /// Lane Choice ////////////////////////////////////////////////////////
         
-        UserSettings.defaultLaneChoice_keep = spA0.getValue();
+        UserSettings.defaultLaneChoice_epsilon = spA0.getValue();
         
         units = UserSettings.unitsDensity;
-        cc = 1.0 / UserSettings.densityConversionMap.get(units + "vpm");
-        UserSettings.defaultLaneChoice_rhovpmplane = cc * spA1.getValue();
+        cc = 1.0 / UserSettings.densityConversionMap.get(units + "vpmtr");
+        UserSettings.defaultLaneChoice_gamma = cc * spA1.getValue();
         
-        UserSettings.defaultLaneChoice_tollcents = spA2.getValue();
+        UserSettings.defaultLaneChoice_alpha = spA2.getValue();
         
         units = UserSettings.unitsSpeed;
         cc = UserSettings.speedConversionMap.get(units + "kph");

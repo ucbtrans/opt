@@ -721,11 +721,11 @@ public class FreewayScenario {
         return this.lcmodel.alpha;
     }
 
-    public void set_lc_epsilon_meterlane_over_vehicles(double x){
+    public void set_lc_epsilon(double x){
         this.lcmodel.epsilon = Math.min(1d,Math.max(0d,x));
     }
 
-    public void set_lc_gamma(double x){
+    public void set_lc_gamma_meterlane_over_vehicles(double x){
         this.lcmodel.gamma = Math.max(0d,x);
     }
 

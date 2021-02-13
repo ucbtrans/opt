@@ -62,7 +62,7 @@ public class ControllerLgRestrict extends AbstractController {
 
 //		this.a0 = a0==null ? UserSettings.defaultLaneChoice_keep : a0;
 //		this.a1 = a1==null ? UserSettings.defaultLaneChoice_rhovpmplane : a1;
-		this.toll_coef = toll_coef ==null ? UserSettings.defaultLaneChoice_tollcents : toll_coef;
+		this.toll_coef = toll_coef ==null ? UserSettings.defaultLaneChoice_alpha : toll_coef;
 
 		if(vphpl_to_cents_table==null){
 			this.vphpl_to_cents_table = new int[1][2];

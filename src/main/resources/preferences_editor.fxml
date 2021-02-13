@@ -315,17 +315,17 @@
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                            </rowConstraints>
                            <children>
-                              <Label text="Lane Keeping Parameter:" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                              <Label text="Default Willingness to Change Lanes (0-1):" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                                  <GridPane.margin>
                                     <Insets left="20.0" right="20.0" />
                                  </GridPane.margin>
                               </Label>
-                              <Label id="labelA1" fx:id="labelA1" text="Default Traffic Density Influencer:" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                              <Label id="labelA1" fx:id="labelA1" text="Default Lane Change Swiftness:" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
                                  <GridPane.margin>
                                     <Insets left="20.0" right="20.0" />
                                  </GridPane.margin>
                               </Label>
-                              <Label id="labelA2" fx:id="labelA2" text="Default Toll Price Influencer (1/cents):" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                              <Label id="labelA2" fx:id="labelA2" text="Default Toll Price Influencer:" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
                                  <GridPane.margin>
                                     <Insets left="20.0" right="20.0" />
                                  </GridPane.margin>

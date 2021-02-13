@@ -131,16 +131,16 @@
                                                             <Tooltip text="Enter the duration of scenario in the format 'hhmm'" wrapText="true" />
                                                          </tooltip>
                                                       </TextField>
-                                                      <Label text="Lane Keeping Parameter:" GridPane.rowIndex="8" />
+                                                      <Label text="Willingness to Change Lanes (0-1):" GridPane.rowIndex="8" />
                                                       <Spinner id="spA0" fx:id="spA0" editable="true" prefHeight="25.0" prefWidth="237.0" GridPane.rowIndex="9">
                                                          <tooltip>
-                                                            <Tooltip text="The larger the parameter the less traffic is changing lanes" wrapText="true" />
+                                                            <Tooltip text="0 means no lane change; 1 - change lanes as soon as conditions permit" wrapText="true" />
                                                          </tooltip>
                                                       </Spinner>
-                                                      <Label id="labelA1" fx:id="labelA1" text="Lane Choice Model Traffic Density Influencer:" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                                                      <Label id="labelA1" fx:id="labelA1" text="Lane Change Swiftness:" GridPane.columnIndex="1" GridPane.rowIndex="8" />
                                                       <Spinner id="spA1" fx:id="spA1" editable="true" prefHeight="25.0" prefWidth="237.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
                                                          <tooltip>
-                                                            <Tooltip text="Lane choice sensitivity coefficient for traffic density" wrapText="true" />
+                                                            <Tooltip text="Lane choice sensitivity: the larger the value the more vehicles change lanes" wrapText="true" />
                                                          </tooltip>
                                                       </Spinner>
                                                    </children>

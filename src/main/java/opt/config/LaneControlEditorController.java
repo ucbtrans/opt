@@ -382,7 +382,7 @@ public class LaneControlEditorController {
         
         Double a2 = myController.get_toll_coef();
         if (a2 == null)
-            a2 = UserSettings.defaultLaneChoice_tollcents;
+            a2 = UserSettings.defaultLaneChoice_alpha;
         spA2.getValueFactory().setValue(a2);
         
         String unitsSpeed = UserSettings.unitsSpeed;

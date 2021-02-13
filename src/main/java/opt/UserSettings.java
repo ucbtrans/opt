@@ -106,13 +106,13 @@ public class UserSettings {
     
     public static double defaultQosSpeedThresholdKph = 72.4205;
 
-    public static double defaultLaneChoice_keep = Double.NaN;       // no longer used
-    public static double defaultLaneChoice_rhovpmplane = Double.NaN;     // no longer used
-    public static double defaultLaneChoice_tollcents = Double.NaN;     // no longer used
+    //public static double defaultLaneChoice_keep = 0.5;       // obsolete
+    //public static double defaultLaneChoice_rhovpmplane = 30d;     // obsolete
+    //public static double defaultLaneChoice_tollcents = 0.0053;     // obsolete
 
-    public static double defaultLaneChoice_alpha = 1.0;
-    public static double defaultLaneChoice_epsilon = 0.8d;
-    public static double defaultLaneChoice_gamma = 30d;
+    public static double defaultLaneChoice_alpha = 1.0;  // lc toll
+    public static double defaultLaneChoice_epsilon = 0.5d; // lc epsilon 0-1: 0 - never change; 1 - whenever possible
+    public static double defaultLaneChoice_gamma = 30d; // lc gamma (positive) - aggressiveness
     
     public static double minGPRampMeteringRatePerLaneVph = 160;
     public static double minManagedRampMeteringRatePerLaneVph = 320;
@@ -502,13 +502,13 @@ public class UserSettings {
             defaultQosSpeedThresholdKph = Double.parseDouble(pv);
         pv = props.getProperty("defaultLaneChoice_A0");
         if (pv != null)
-            defaultLaneChoice_keep = Double.parseDouble(pv);
+            defaultLaneChoice_epsilon = Double.parseDouble(pv);
         pv = props.getProperty("defaultLaneChoice_A1");
         if (pv != null)
-            defaultLaneChoice_rhovpmplane = Double.parseDouble(pv);
+            defaultLaneChoice_gamma = Double.parseDouble(pv);
         pv = props.getProperty("defaultLaneChoice_A2");
         if (pv != null)
-            defaultLaneChoice_tollcents = Double.parseDouble(pv);
+            defaultLaneChoice_alpha = Double.parseDouble(pv);
         
         pv = props.getProperty("minGPRampMeteringRatePerLaneVph");
         if (pv != null)
@@ -580,9 +580,9 @@ public class UserSettings {
         props.setProperty("defaultControlDtSeconds", Double.toString(defaultControlDtSeconds));
         props.setProperty("queueOverrideTriggerThreshold", Double.toString(queueOverrideTriggerThreshold));
         props.setProperty("defaultQosSpeedThresholdKph", Double.toString(defaultQosSpeedThresholdKph));
-        props.setProperty("defaultLaneChoice_A0", Double.toString(defaultLaneChoice_keep));
-        props.setProperty("defaultLaneChoice_A1", Double.toString(defaultLaneChoice_rhovpmplane));
-        props.setProperty("defaultLaneChoice_A2", Double.toString(defaultLaneChoice_tollcents));
+        props.setProperty("defaultLaneChoice_A0", Double.toString(defaultLaneChoice_epsilon));
+        props.setProperty("defaultLaneChoice_A1", Double.toString(defaultLaneChoice_gamma));
+        props.setProperty("defaultLaneChoice_A2", Double.toString(defaultLaneChoice_alpha));
         
         props.setProperty("minGPRampMeteringRatePerLaneVph", Double.toString(minGPRampMeteringRatePerLaneVph));
         props.setProperty("minManagedRampMeteringRatePerLaneVph", Double.toString(minManagedRampMeteringRatePerLaneVph));
@@ -658,9 +658,9 @@ public class UserSettings {
     
         defaultQosSpeedThresholdKph = 72.4205;
     
-        defaultLaneChoice_keep = 1.8;   // positive utility of not changing lanes
-        defaultLaneChoice_rhovpmplane = 0.0115; // positive utility of choosing a lane with density in vpm
-        defaultLaneChoice_tollcents = 0.0053;     // positive utility of not paying a toll in cents
+        defaultLaneChoice_epsilon = 0.5;   // lc epsilon 0-1: 0 - never change; 1 - whenever possible
+        defaultLaneChoice_gamma = 30d; // lc gamma (positive) - aggressivenes
+        defaultLaneChoice_alpha = 1.0;     // positive utility of not paying a toll in cents
     
         minGPRampMeteringRatePerLaneVph = 160;
         minManagedRampMeteringRatePerLaneVph = 320;

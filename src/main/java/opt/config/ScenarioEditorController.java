@@ -432,8 +432,8 @@ public class ScenarioEditorController {
             onDurationChange(null);
         });
         
-        a0SpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(Double.MIN_VALUE, Double.MAX_VALUE, 1.0, 1);
-        a0SpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter("#.####", 1.0));
+        a0SpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0d, 1d, UserSettings.defaultLaneChoice_epsilon, 0.1);
+        a0SpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter("#.####", UserSettings.defaultLaneChoice_epsilon));
         spA0.setValueFactory(a0SpinnerValueFactory);
         spA0.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
@@ -442,14 +442,14 @@ public class ScenarioEditorController {
         spA0.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;
-            Double a0 = myScenario.get_lc_keep();
+            Double a0 = myScenario.get_lc_epsilon();
             if (a0 == null)
-                a0 = UserSettings.defaultLaneChoice_keep;
+                a0 = UserSettings.defaultLaneChoice_epsilon;
             opt.utils.WidgetFunctionality.commitEditorText(spA0, a0);
         });
         
-        a1SpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(Double.MIN_VALUE, Double.MAX_VALUE, 1.0, 1);
-        a1SpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter("#.####", 1.0));
+        a1SpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0d, Double.MAX_VALUE, UserSettings.defaultLaneChoice_gamma, 1);
+        a1SpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter("#.####", UserSettings.defaultLaneChoice_gamma));
         spA1.setValueFactory(a1SpinnerValueFactory);
         spA1.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!ignoreChange && (oldValue != newValue))
@@ -458,10 +458,10 @@ public class ScenarioEditorController {
         spA1.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
                 return;
-            double cc = 1.0 / UserSettings.densityConversionMap.get("vpm"+UserSettings.unitsDensity);
-            Double a1 = myScenario.get_lc_density_vpmilepl();
+            double cc = 1.0 / UserSettings.densityConversionMap.get("vpmtr"+UserSettings.unitsDensity);
+            Double a1 = myScenario.get_lc_gamma_meterlane_over_vehicles();
             if (a1 == null)
-                a1 = UserSettings.defaultLaneChoice_rhovpmplane;
+                a1 = UserSettings.defaultLaneChoice_gamma;
             opt.utils.WidgetFunctionality.commitEditorText(spA1, cc * a1);
         });
         
@@ -531,18 +531,18 @@ public class ScenarioEditorController {
         origScenarioDescription = myScenario.description;
         sDescription.setText(myScenario.description);
         
-        Double a0 = myScenario.get_lc_keep();
+        Double a0 = myScenario.get_lc_epsilon();
         if (a0 == null)
-            a0 = UserSettings.defaultLaneChoice_keep;
+            a0 = UserSettings.defaultLaneChoice_epsilon;
         spA0.getValueFactory().setValue(a0);
         
         String units = UserSettings.unitsDensity;
-        labelA1.setText("Lane Choice Model Traffic Density Influencer: (1/" + units + "):");
+        labelA1.setText("Lane Change Swiftness: (1/" + units + "):");
         
-        double cc = 1.0 / UserSettings.densityConversionMap.get("vpm"+UserSettings.unitsDensity);
-        Double a1 = myScenario.get_lc_density_vpmilepl();
+        double cc = 1.0 / UserSettings.densityConversionMap.get("vpmtr"+UserSettings.unitsDensity);
+        Double a1 = Math.max(1d, myScenario.get_lc_gamma_meterlane_over_vehicles());
         if (a1 == null)
-            a1 = UserSettings.defaultLaneChoice_rhovpmplane;
+            a1 = UserSettings.defaultLaneChoice_gamma;
         spA1.getValueFactory().setValue(cc * a1);
     }
     
@@ -910,13 +910,13 @@ public class ScenarioEditorController {
         if (ignoreChange)
             return;
         
-        double cc = 1.0 / UserSettings.densityConversionMap.get(UserSettings.unitsDensity+"vpm");
+        double cc = 1.0 / UserSettings.densityConversionMap.get(UserSettings.unitsDensity+"vpmtr");
         
         double a0 = a0SpinnerValueFactory.getValue();
         double a1 = cc * a1SpinnerValueFactory.getValue();
         
-        myScenario.set_lc_keep(a0);
-        myScenario.set_lc_density_vpmilepl(a1);
+        myScenario.set_lc_epsilon(Math.min(1, Math.max(0, a0)));
+        myScenario.set_lc_gamma_meterlane_over_vehicles(Math.max(1, a1));
          
         appMainController.setProjectModified(true);
     }
@@ -1079,9 +1079,7 @@ public class ScenarioEditorController {
         float start_time = selectedPolicy.num_entries() == 0 ? 0 :
                 Math.round(selectedPolicy.get_largest_start_time()) + 3600;
         
-//        double a0 = UserSettings.defaultLaneChoice_keep;      // removed by GG
-//        double a1 = UserSettings.defaultLaneChoice_rhovpmplane;      // removed by GG
-        double a2 = UserSettings.defaultLaneChoice_tollcents;
+        double a2 = UserSettings.defaultLaneChoice_alpha;
         float dt = (float) UserSettings.defaultControlDtSeconds;
         double v_thres = UserSettings.defaultQosSpeedThresholdKph;
         Set<Long> free_comms = new HashSet<Long>();
