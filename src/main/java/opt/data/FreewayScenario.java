@@ -709,22 +709,28 @@ public class FreewayScenario {
     // API lane change model
     /////////////////////////////////////
 
-    // TODO remove this
-    public double get_lc_keep(){
-        return Double.NaN;
+    public double get_lc_epsilon(){
+        return this.lcmodel.epsilon;
     }
 
-    // TODO remove this
-    public double get_lc_density_vpmilepl(){
-        return Double.NaN;
+    public double get_lc_gamma_meterlane_over_vehicles(){
+        return this.lcmodel.gamma;
     }
 
-    // TODO remove this
-    public void set_lc_keep(double x){
+    public double get_tolling_alpha(){
+        return this.lcmodel.alpha;
     }
 
-    // TODO remove this
-    public void set_lc_density_vpmilepl(double x){
+    public void set_lc_epsilon_meterlane_over_vehicles(double x){
+        this.lcmodel.epsilon = Math.min(1d,Math.max(0d,x));
+    }
+
+    public void set_lc_gamma(double x){
+        this.lcmodel.gamma = Math.max(0d,x);
+    }
+
+    public void set_tolling_alpha(double x){
+        this.lcmodel.alpha = Math.max(0d,x);
     }
 
     /////////////////////////////////////

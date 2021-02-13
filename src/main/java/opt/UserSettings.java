@@ -111,7 +111,7 @@ public class UserSettings {
     public static double defaultLaneChoice_tollcents = Double.NaN;     // no longer used
 
     public static double defaultLaneChoice_alpha = 1.0;
-    public static double defaultLaneChoice_epsilon = 1.3;
+    public static double defaultLaneChoice_epsilon = 0.8d;
     public static double defaultLaneChoice_gamma = 30d;
     
     public static double minGPRampMeteringRatePerLaneVph = 160;

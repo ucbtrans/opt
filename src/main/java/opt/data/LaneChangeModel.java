@@ -2,9 +2,9 @@ package opt.data;
 
 public class LaneChangeModel {
 
-    double alpha;
-    double epsilon;
-    double gamma;
+    double alpha;       // [] tolling parameter
+    double epsilon;     // [-] in [0,1] ... scaling parameter for supply in adjacent lanes
+    double gamma;   // [1/(veh/lane/meter)] ... linear proportionality between utility and probability
 
     public LaneChangeModel(double alpha, double epsilon, double gamma) {
         this.alpha = alpha;
