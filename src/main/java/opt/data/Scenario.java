@@ -300,7 +300,7 @@ public class Scenario {
 
                 // up_link -> ghost
                 else if(ghostlinks!=null && ghostlinks.contains(dn_link))
-                    jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.gp,dn_link,null) );
+                    jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.gp,dn_link,LaneGroupType.gp) );
 
                 // up_link -> dn_link
                 else
