@@ -293,10 +293,16 @@ public class Scenario {
                     jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.mng,dn_link,LaneGroupType.mng) );
 
                 // II) add gp-> gp
+
+                // ghost -> dn_link
                 if(ghostlinks!=null && ghostlinks.contains(up_link) )
-                    jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,null,dn_link,null) );
+                    jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.gp,dn_link,LaneGroupType.gp) );
+
+                // up_link -> ghost
                 else if(ghostlinks!=null && ghostlinks.contains(dn_link))
                     jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.gp,dn_link,null) );
+
+                // up_link -> dn_link
                 else
                     jrcs.add( make_road_connection(my_fwy_scenario,rcs,up_link,LaneGroupType.gp,dn_link,LaneGroupType.gp) );
 
@@ -586,7 +592,6 @@ public class Scenario {
                     }
                 }
             }
-
 
             // controllers for specified offramp flow
             Set<LinkOfframp> frs_useflow = frs.stream()
