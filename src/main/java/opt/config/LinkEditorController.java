@@ -621,7 +621,7 @@ public class LinkEditorController {
                 if (newValue == 0) {
                     List<AbstractLink> targets = new ArrayList<>();
                     targets.add(myLink);
-                    appMainController.removeFromPolicies(targets); //FIXME
+                    appMainController.removeFromPolicies(targets, true); 
                 }
                 onNumLanesChange();
             }

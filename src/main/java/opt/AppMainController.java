@@ -1376,7 +1376,7 @@ public class AppMainController {
     }
     
     
-    public void removeFromPolicies(List<AbstractLink> links) {
+    public void removeFromPolicies(List<AbstractLink> links, boolean lgOnlyCheck) {
         for (ControlSchedule cs : selectedScenario.get_schedules_for_controltype(AbstractController.Type.LgRestrict)) {
             Set<AbstractLink> ll = cs.get_links();
             for (AbstractLink l : links) {
@@ -1386,11 +1386,13 @@ public class AppMainController {
                     if (ll.size() == 1) {
                         header = String.format("Policy targets no sections");
                         content = String.format("Policy \"%s\" is removed", cs.get_name());
-                        //opt.utils.Dialogs.WarningDialog(header, content);
+                        if (!lgOnlyCheck)
+                            opt.utils.Dialogs.WarningDialog(header, content);
                         //selectedScenario.delete_schedule(cs);
                         cs.remove_link(l);
                     } else {
-                        //opt.utils.Dialogs.WarningDialog(header, content);
+                        if (!lgOnlyCheck)
+                            opt.utils.Dialogs.WarningDialog(header, content);
                         cs.remove_link(l);
                     }
                 }
@@ -1419,14 +1421,16 @@ public class AppMainController {
                 if (idx >= 0) {
                     String header = String.format("Event \"%s\" is modified", e.name);
                     String content = String.format("Section \"%s\" is removed", l.get_name());
-                    //opt.utils.Dialogs.WarningDialog(header, content);
+                    if (!lgOnlyCheck)
+                        opt.utils.Dialogs.WarningDialog(header, content);
                     e.remove_link(ll.get(idx));
                 }
             }
             if ((e.get_links() == null) || (e.get_links().size() == 0)) {
                 String header = String.format("Event targets no sections");
                 String content = String.format("Event \"%s\" is removed", e.name);
-                //opt.utils.Dialogs.WarningDialog(header, content);
+                if (!lgOnlyCheck)
+                    opt.utils.Dialogs.WarningDialog(header, content);
                 selectedScenario.delete_event_by_id(e.id);
             }
         }
@@ -1435,7 +1439,7 @@ public class AppMainController {
     
     
     public void removeFromPoliciesAndEvents(List<AbstractLink> links, boolean lgOnlyCheck) {
-        removeFromPolicies(links);
+        removeFromPolicies(links, lgOnlyCheck);
         removeFromEvents(links, lgOnlyCheck);
     }
     
