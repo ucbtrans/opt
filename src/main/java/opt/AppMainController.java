@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -68,8 +69,11 @@ import javafx.stage.Modality;
 import javafx.util.Callback;
 import opt.config.*;
 import opt.data.*;
+import opt.data.control.AbstractController;
 import opt.data.control.ControlSchedule;
 import opt.data.event.AbstractEvent;
+import opt.data.event.AbstractEventLaneGroup;
+import opt.data.event.EventLinkToggle;
 import opt.performance.LinkPerformanceController;
 import opt.performance.RoutePerformanceController;
 import opt.performance.ScenarioPerformanceController;
@@ -1372,6 +1376,69 @@ public class AppMainController {
     }
     
     
+    public void removeFromPolicies(List<AbstractLink> links) {
+        for (ControlSchedule cs : selectedScenario.get_schedules_for_controltype(AbstractController.Type.LgRestrict)) {
+            Set<AbstractLink> ll = cs.get_links();
+            for (AbstractLink l : links) {
+                if (ll.contains(l)) {
+                    String header = String.format("Policy \"%s\" is modified", cs.get_name());
+                        String content = String.format("Section \"%s\" is removed", l.get_name());
+                    if (ll.size() == 1) {
+                        header = String.format("Policy targets no sections");
+                        content = String.format("Policy \"%s\" is removed", cs.get_name());
+                        //opt.utils.Dialogs.WarningDialog(header, content);
+                        //selectedScenario.delete_schedule(cs);
+                        cs.remove_link(l);
+                    } else {
+                        //opt.utils.Dialogs.WarningDialog(header, content);
+                        cs.remove_link(l);
+                    }
+                }
+            }
+        }
+        
+    }
+    
+    
+    public void removeFromEvents(List<AbstractLink> links, boolean lgOnlyCheck) {
+        for (AbstractEvent e : selectedScenario.get_events()) {
+            List<AbstractLink> ll;
+            boolean lge = false;
+            if (e instanceof EventLinkToggle)
+                ll = ((EventLinkToggle)e).get_links();
+            else {
+                ll = ((AbstractEventLaneGroup)e).get_links();
+                lge = true;
+            }
+            for (AbstractLink l : links) {
+                if (lgOnlyCheck && lge)
+                    if (((((AbstractEventLaneGroup)e).get_lgtype() == LaneGroupType.mng) && l.has_mng()) ||
+                        ((((AbstractEventLaneGroup)e).get_lgtype() == LaneGroupType.aux) && l.has_aux()))
+                        continue;
+                int idx = ll.indexOf(l);
+                if (idx >= 0) {
+                    String header = String.format("Event \"%s\" is modified", e.name);
+                    String content = String.format("Section \"%s\" is removed", l.get_name());
+                    //opt.utils.Dialogs.WarningDialog(header, content);
+                    e.remove_link(ll.get(idx));
+                }
+            }
+            if ((e.get_links() == null) || (e.get_links().size() == 0)) {
+                String header = String.format("Event targets no sections");
+                String content = String.format("Event \"%s\" is removed", e.name);
+                //opt.utils.Dialogs.WarningDialog(header, content);
+                selectedScenario.delete_event_by_id(e.id);
+            }
+        }
+        clearSimData();
+    }
+    
+    
+    public void removeFromPoliciesAndEvents(List<AbstractLink> links, boolean lgOnlyCheck) {
+        removeFromPolicies(links);
+        removeFromEvents(links, lgOnlyCheck);
+    }
+    
     
     public void deleteLink(AbstractLink lnk, boolean reconnect) {
         if (lnk == null) 
@@ -1379,7 +1446,8 @@ public class AppMainController {
 
         FreewayScenario scenario = lnk.get_segment().get_scenario();
         try {
-            scenario.delete_segment(lnk.get_segment(),reconnect, true);
+            removeFromPoliciesAndEvents(lnk.get_segment().get_links(), false);
+            scenario.delete_segment(lnk.get_segment(), reconnect, true);
         } catch (Exception e) {
             opt.utils.Dialogs.ExceptionDialog("Could not delete road section...", e);
             return;

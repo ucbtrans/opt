@@ -339,6 +339,8 @@ public class FreewayScenario {
 
                     case "linktgl":
 
+                        if (jev.getEventTarget() == null)
+                            continue;
                         if(!jev.getEventTarget().getType().equals("links"))
                             throw new Exception("Bad event target type");
 
@@ -388,7 +390,9 @@ public class FreewayScenario {
 //                        break;
 
                     case "lglanes":
-
+                        
+                        if (jev.getEventTarget() == null)
+                            continue;
                         if(!jev.getEventTarget().getType().equals("lanegroups"))
                             throw new Exception("Bad event target type");
 
@@ -420,6 +424,8 @@ public class FreewayScenario {
 
                     case "lgfd":
 
+                        if (jev.getEventTarget() == null)
+                            continue;
                         if(!jev.getEventTarget().getType().equals("lanegroups"))
                             throw new Exception("Bad event target type");
 

@@ -617,8 +617,14 @@ public class LinkEditorController {
                 numManagedLanes.getValueFactory().setValue(myLink.get_mng_lanes());
                 return;
             }
-            if (!ignoreChange && (!Objects.equals(oldValue, newValue)))
+            if (!ignoreChange && (!Objects.equals(oldValue, newValue))) {
+                if (newValue == 0) {
+                    List<AbstractLink> targets = new ArrayList<>();
+                    targets.add(myLink);
+                    appMainController.removeFromPolicies(targets); //FIXME
+                }
                 onNumLanesChange();
+            }
         });
         numManagedLanes.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
@@ -1585,7 +1591,10 @@ public class LinkEditorController {
             return;
         }
         
+        List<AbstractLink> targets = new ArrayList<>();
+        targets.add(myLink);
         drawRoadSection();
+        appMainController.removeFromEvents(targets, true);
     }
     
     
@@ -1854,10 +1863,11 @@ public class LinkEditorController {
         if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
             return;
      
-        if (idx < myLink.get_segment().num_out_ors())
-            myLink.get_segment().delete_out_or((LinkOnramp)onramps.get(idx),true);
-        else
-            myLink.get_segment().delete_in_or((LinkOnramp)onramps.get(idx),true);
+        AbstractLink target = onramps.get(idx);
+        List<AbstractLink> targets = new ArrayList<>();
+        targets.add(target);
+        appMainController.removeFromPoliciesAndEvents(targets, false);
+        myLink.get_segment().delete_or((LinkOnramp)target, true);
         
         appMainController.objectNameUpdate(myLink);
     }
@@ -1876,10 +1886,11 @@ public class LinkEditorController {
         if (!opt.utils.Dialogs.ConfirmationYesNoDialog(header, "Are you sure?")) 
             return;
         
-        if (idx < myLink.get_segment().num_out_frs())
-            myLink.get_segment().delete_out_fr((LinkOfframp)offramps.get(idx),true);
-        else
-            myLink.get_segment().delete_in_fr((LinkOfframp)offramps.get(idx),true);
+        AbstractLink target = offramps.get(idx);
+        List<AbstractLink> targets = new ArrayList<>();
+        targets.add(target);
+        appMainController.removeFromPoliciesAndEvents(targets, false);
+        myLink.get_segment().delete_fr((LinkOfframp)target, true);
         
         appMainController.objectNameUpdate(myLink);
     }

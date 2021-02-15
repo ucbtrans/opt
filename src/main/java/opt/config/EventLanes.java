@@ -393,7 +393,8 @@ public class EventLanes {
         if ((linksOrderedUnderEvent == null) || (linksOrderedUnderEvent.isEmpty())) {
             String header = "No road sections are assigned to event";
             String content = "Without road sections assigned, event won't be saved.";
-            opt.utils.Dialogs.WarningDialog(header, content);
+            opt.utils.Dialogs.ErrorDialog(header, content);
+            return;
         }
         
         String name = txtName.getText();

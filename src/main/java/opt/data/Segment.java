@@ -142,10 +142,34 @@ public final class Segment implements Comparable {
         X.addAll(out_ors);
         return X;
     }
+    
+    public List<LinkOnramp> get_in_ors(){
+        List<LinkOnramp> X = new ArrayList<>();
+        X.addAll(in_ors);
+        return X;
+    }
+    
+    public List<LinkOnramp> get_out_ors(){
+        List<LinkOnramp> X = new ArrayList<>();
+        X.addAll(out_ors);
+        return X;
+    }
 
     public List<LinkOfframp> get_frs(){
         List<LinkOfframp> X = new ArrayList<>();
         X.addAll(in_frs);
+        X.addAll(out_frs);
+        return X;
+    }
+    
+    public List<LinkOfframp> get_in_frs(){
+        List<LinkOfframp> X = new ArrayList<>();
+        X.addAll(in_frs);
+        return X;
+    }
+    
+    public List<LinkOfframp> get_out_frs(){
+        List<LinkOfframp> X = new ArrayList<>();
         X.addAll(out_frs);
         return X;
     }
@@ -220,58 +244,50 @@ public final class Segment implements Comparable {
         return fr;
     }
 
-    public Set<CheckItem> delete_in_or(LinkOnramp link, boolean execute){
-        if(!in_ors.contains(link))
-            return null;
+
+    public Set<CheckItem> delete_or(LinkOnramp link, boolean execute){
+        boolean out = true;
+        if (!out_ors.contains(link)) {
+            out = false;
+            if (!in_ors.contains(link))
+                return null;
+        }
 
         if(execute){
             delete_ramp(link);
-            in_ors.remove(link);
+            if (out)
+                out_ors.remove(link);
+            else
+                in_ors.remove(link);
             return null;
         }
         else
             return my_fwy_scenario.check_delete_link(link);
     }
 
-    public Set<CheckItem> delete_out_or(LinkOnramp link, boolean execute){
-        if(!out_ors.contains(link))
-            return null;
+
+    public Set<CheckItem> delete_fr(LinkOfframp link, boolean execute){
+        boolean out = true;
+        if (!out_frs.contains(link)) {
+            out = false;
+            if (!in_frs.contains(link))
+                return null;
+        }
 
         if(execute){
             delete_ramp(link);
-            out_ors.remove(link);
+            if (out)
+                out_frs.remove(link);
+            else
+                in_frs.remove(link);
             return null;
         }
         else
             return my_fwy_scenario.check_delete_link(link);
     }
 
-    public Set<CheckItem> delete_in_fr(LinkOfframp link, boolean execute){
-        if(!in_frs.contains(link))
-            return null;
-
-        if(execute){
-            delete_ramp(link);
-            in_frs.remove(link);
-            return null;
-        }
-        else
-            return my_fwy_scenario.check_delete_link(link);
-    }
-
-    public Set<CheckItem> delete_out_fr(LinkOfframp link, boolean execute){
-        if(!out_frs.contains(link))
-            return null;
-
-        if(execute){
-            delete_ramp(link);
-            out_frs.remove(link);
-            return null;
-        }
-        else
-            return my_fwy_scenario.check_delete_link(link);
-    }
-
+    
+    
     /////////////////////////////////////
     // segment and link getters
     /////////////////////////////////////
