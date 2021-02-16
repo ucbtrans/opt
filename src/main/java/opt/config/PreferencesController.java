@@ -328,13 +328,14 @@ public class PreferencesController {
         
         step = 0.1;
         svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(0d, 1d, UserSettings.defaultLaneChoice_epsilon, step);
-        svf.setConverter(new ModifiedDoubleStringConverter("#.####", 1));
+        svf.setConverter(new ModifiedDoubleStringConverter("#.##", 1));
         spA0.setValueFactory(svf);
         
         units = UserSettings.unitsDensity;
+        step = 1.0;
         cc = 1.0 / UserSettings.densityConversionMap.get("vpmtr" + units);
-        svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(0d, Double.MAX_VALUE, cc * UserSettings.defaultLaneChoice_gamma, step);
-        svf.setConverter(new ModifiedDoubleStringConverter("#.####", 1));
+        svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(1d, Double.MAX_VALUE, UserSettings.defaultLaneChoice_gamma, step);
+        svf.setConverter(new ModifiedDoubleStringConverter("#.#", 1));
         spA1.setValueFactory(svf);
         
         svf = new SpinnerValueFactory.DoubleSpinnerValueFactory(Double.MIN_VALUE, Double.MAX_VALUE, UserSettings.defaultLaneChoice_alpha, step);
@@ -459,10 +460,10 @@ public class PreferencesController {
         spA0.getValueFactory().setValue(UserSettings.defaultLaneChoice_epsilon);
         
         units = UserSettings.unitsDensity;
-        labelA1.setText("Default Traffic Density Influencer (1/" + units + "):");
+        //labelA1.setText("Default Traffic Density Influencer (1/" + units + "):");
         
         cc = 1.0 / UserSettings.densityConversionMap.get("vpmtr" + units);
-        spA1.getValueFactory().setValue(cc * UserSettings.defaultLaneChoice_gamma);
+        spA1.getValueFactory().setValue(UserSettings.defaultLaneChoice_gamma);
         
         spA2.getValueFactory().setValue(UserSettings.defaultLaneChoice_alpha);
         
@@ -558,13 +559,13 @@ public class PreferencesController {
 
         /// Lane Choice ////////////////////////////////////////////////////////
         
-        spA0.getValueFactory().setValue(0.5);
+        spA0.getValueFactory().setValue(0.95);
         
         units = UserSettings.unitsDensity;
         cc = 1.0 / UserSettings.densityConversionMap.get("vpmtr" + units);
-        spA1.getValueFactory().setValue(cc * 30);
+        spA1.getValueFactory().setValue(30d);
         
-        spA2.getValueFactory().setValue(1.0);
+        spA2.getValueFactory().setValue(0.017);
         
         units = UserSettings.unitsSpeed;
         cc = UserSettings.speedConversionMap.get("kph" + units);
@@ -646,7 +647,7 @@ public class PreferencesController {
         
         units = UserSettings.unitsDensity;
         cc = 1.0 / UserSettings.densityConversionMap.get(units + "vpmtr");
-        UserSettings.defaultLaneChoice_gamma = cc * spA1.getValue();
+        UserSettings.defaultLaneChoice_gamma = spA1.getValue();
         
         UserSettings.defaultLaneChoice_alpha = spA2.getValue();
         

@@ -448,8 +448,8 @@ public class ScenarioEditorController {
             opt.utils.WidgetFunctionality.commitEditorText(spA0, a0);
         });
         
-        a1SpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0d, Double.MAX_VALUE, UserSettings.defaultLaneChoice_gamma, 1);
-        a1SpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter("#.####", UserSettings.defaultLaneChoice_gamma));
+        a1SpinnerValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(1d, Double.MAX_VALUE, UserSettings.defaultLaneChoice_gamma, 1);
+        a1SpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter("#.#", UserSettings.defaultLaneChoice_gamma));
         spA1.setValueFactory(a1SpinnerValueFactory);
         spA1.valueProperty().addListener((observable, oldValue, newValue) -> {
             //if (!ignoreChange && (oldValue != newValue))
@@ -462,7 +462,7 @@ public class ScenarioEditorController {
             Double a1 = myScenario.get_lc_gamma_meterlane_over_vehicles();
             if (a1 == null)
                 a1 = UserSettings.defaultLaneChoice_gamma;
-            opt.utils.WidgetFunctionality.commitEditorText(spA1, cc * a1);
+            opt.utils.WidgetFunctionality.commitEditorText(spA1, a1);
         });
         
         cbPolicies.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
@@ -537,13 +537,13 @@ public class ScenarioEditorController {
         spA0.getValueFactory().setValue(a0);
         
         String units = UserSettings.unitsDensity;
-        labelA1.setText("Lane Change Swiftness: (1/" + units + "):");
+        //labelA1.setText("Lane Change Swiftness: (1/" + units + "):");
         
         double cc = 1.0 / UserSettings.densityConversionMap.get("vpmtr"+UserSettings.unitsDensity);
         Double a1 = Math.max(1d, myScenario.get_lc_gamma_meterlane_over_vehicles());
         if (a1 == null)
             a1 = UserSettings.defaultLaneChoice_gamma;
-        spA1.getValueFactory().setValue(cc * a1);
+        spA1.getValueFactory().setValue(a1);
     }
     
     private void initLanePolicies() {
@@ -913,7 +913,7 @@ public class ScenarioEditorController {
         double cc = 1.0 / UserSettings.densityConversionMap.get(UserSettings.unitsDensity+"vpmtr");
         
         double a0 = a0SpinnerValueFactory.getValue();
-        double a1 = cc * a1SpinnerValueFactory.getValue();
+        double a1 = a1SpinnerValueFactory.getValue();
         
         myScenario.set_lc_epsilon(Math.min(1, Math.max(0, a0)));
         myScenario.set_lc_gamma_meterlane_over_vehicles(Math.max(1, a1));
