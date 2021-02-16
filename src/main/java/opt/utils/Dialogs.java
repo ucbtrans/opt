@@ -69,6 +69,7 @@ public class Dialogs {
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         stage.getIcons().add(new Image(Dialogs.class.getResourceAsStream("/OPT_icon.png")));
         alert.showAndWait();
+        //alert.show();
     }
     
     
@@ -97,7 +98,8 @@ public class Dialogs {
         ex.printStackTrace(pw);
         String exceptionText = sw.toString();
 
-        Label label = new Label("The exception stack trace:");
+        Label label = new Label("Please, send this stack trace to optsupport@berkeley.edu:");
+        label.setStyle(UtilGUI.labelInfoHeaderStyle2);
         TextArea textArea = new TextArea(exceptionText);
         textArea.setEditable(false);
         textArea.setWrapText(true);

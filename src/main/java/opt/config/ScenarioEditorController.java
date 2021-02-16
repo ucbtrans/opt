@@ -436,7 +436,7 @@ public class ScenarioEditorController {
         a0SpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter("#.####", UserSettings.defaultLaneChoice_epsilon));
         spA0.setValueFactory(a0SpinnerValueFactory);
         spA0.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (!ignoreChange && (oldValue != newValue))
+            //if (!ignoreChange && (oldValue != newValue))
                 onLCParamChange();
         });
         spA0.focusedProperty().addListener((observable, oldValue, newValue) -> {
@@ -452,7 +452,7 @@ public class ScenarioEditorController {
         a1SpinnerValueFactory.setConverter(new ModifiedDoubleStringConverter("#.####", UserSettings.defaultLaneChoice_gamma));
         spA1.setValueFactory(a1SpinnerValueFactory);
         spA1.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (!ignoreChange && (oldValue != newValue))
+            //if (!ignoreChange && (oldValue != newValue))
                 onLCParamChange();
         });
         spA1.focusedProperty().addListener((observable, oldValue, newValue) -> {

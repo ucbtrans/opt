@@ -110,7 +110,7 @@ public class UserSettings {
     //public static double defaultLaneChoice_rhovpmplane = 30d;     // obsolete
     //public static double defaultLaneChoice_tollcents = 0.0053;     // obsolete
 
-    public static double defaultLaneChoice_alpha = 1.0;  // lc toll
+    public static double defaultLaneChoice_alpha = 0.017;  // lc toll
     public static double defaultLaneChoice_epsilon = 0.5d; // lc epsilon 0-1: 0 - never change; 1 - whenever possible
     public static double defaultLaneChoice_gamma = 30d; // lc gamma (positive) - aggressiveness
     
@@ -660,7 +660,7 @@ public class UserSettings {
     
         defaultLaneChoice_epsilon = 0.5;   // lc epsilon 0-1: 0 - never change; 1 - whenever possible
         defaultLaneChoice_gamma = 30d; // lc gamma (positive) - aggressivenes
-        defaultLaneChoice_alpha = 1.0;     // positive utility of not paying a toll in cents
+        defaultLaneChoice_alpha = 0.017;     // positive utility of not paying a toll in cents
     
         minGPRampMeteringRatePerLaneVph = 160;
         minManagedRampMeteringRatePerLaneVph = 320;

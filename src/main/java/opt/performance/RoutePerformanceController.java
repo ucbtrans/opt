@@ -371,26 +371,26 @@ public class RoutePerformanceController {
         processRouteData();
         long endTime = System.nanoTime();
         double dur = (endTime - startTime) / 1000000000f;
-        System.err.println("processRouteData(): " + dur); //FIXME: remove
+        //System.err.println("processRouteData(): " + dur); //FIXME: remove
         
         startTime = System.nanoTime();
         fillTabContours();
         endTime = System.nanoTime();
         dur = (endTime - startTime) / 1000000000f;
-        System.err.println("fillTabContours(): " + dur); //FIXME: remove
+        //System.err.println("fillTabContours(): " + dur); //FIXME: remove
         
         startTime = System.nanoTime();
         fillTabAggregates();
         endTime = System.nanoTime();
         dur = (endTime - startTime) / 1000000000f;
-        System.err.println("fillTabAggregates(): " + dur); //FIXME: remove
+        //System.err.println("fillTabAggregates(): " + dur); //FIXME: remove
         
         fillTabEmissions();
         startTime = System.nanoTime();
-        fillTabEmissions();;
+        fillTabEmissions();
         endTime = System.nanoTime();
         dur = (endTime - startTime) / 1000000000f;
-        System.err.println("fillTabEmissions();: " + dur); //FIXME: remove
+        //System.err.println("fillTabEmissions(): " + dur); //FIXME: remove
 
              
     }
@@ -584,7 +584,7 @@ public class RoutePerformanceController {
                         maxSpeed = Math.max(maxSpeed, speedDataManaged[2][idx]);
                     }
                     if (!Double.isNaN(flowDataManaged[2][idx])) {
-                        minFlow = Math.min(minFlow, flowDataGP[2][idx]);
+                        minFlow = Math.min(minFlow, flowDataManaged[2][idx]);
                         maxFlow = Math.max(maxFlow, flowDataManaged[2][idx]);
                     }
                     if (!Double.isNaN(densityDataManaged[2][idx])) {
@@ -631,7 +631,7 @@ public class RoutePerformanceController {
         densityGPDS = new DefaultXYZDataset();
         densityGPDS.addSeries("Density " + lanes_buf, densityDataGP);
         densityManagedDS = new DefaultXYZDataset();
-        densityManagedDS.addSeries("Density in Managed Lanes", flowDataManaged);
+        densityManagedDS.addSeries("Density in Managed Lanes", densityDataManaged);
         
         XYPlot plot;
         XYBlockRenderer renderer;
