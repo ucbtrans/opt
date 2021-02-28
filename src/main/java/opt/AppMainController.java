@@ -1037,10 +1037,10 @@ public class AppMainController {
     
     @FXML
     void onClickMenuHelpAbout(ActionEvent event) {
-        String versionName = "OPT Alpha release";
+        String versionName = "OPT version 1";
         String optgit = Version.getOPTGitHash();
         String otmgit = Version.getOTMSimGitHash();
-        String date = "2021/01/31";
+        String date = "2021/02/28";
         String content = String.format("%s\nDate: %s\nOPT git hash: %s...\nOTM git hash: %s...",versionName,date,
                 optgit.substring(0,10),otmgit.substring(0,10));
         opt.utils.Dialogs.InformationDialog(null, content);

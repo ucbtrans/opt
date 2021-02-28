@@ -293,6 +293,8 @@ public class RoutePerformanceController {
             timeDivider = 60.0;
         }
         
+        hasManagedLanes = false;
+        hasAuxLanes = false;
         maxLinkLength = 0;
         double lcc = UserSettings.lengthConversionMap.get("meters"+UserSettings.unitsLength);
         List<AbstractLink> links = myRoute.get_link_sequence();

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>C:\Users\akurz\Dropbox\PATH\code\opt\target\opt-ui-1.0-SNAPSHOT-jar-with-dependencies.jar</jar>
+  <outfile>C:\Users\akurz\Dropbox\PATH\code\opt\opt.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>true</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>C:\Users\akurz\Dropbox\PATH\OPT\Website\OPT_dev_icon.ico</icon>
+  <jre>
+    <path>jdk11</path>
+    <bundledJre64Bit>true</bundledJre64Bit>
+    <minVersion></minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+  </jre>
+  <splash>
+    <file>C:\Users\akurz\Dropbox\PATH\OPT\Website\splash.bmp</file>
+    <waitForWindow>true</waitForWindow>
+    <timeout>60</timeout>
+    <timeoutErr>true</timeoutErr>
+  </splash>
+  <versionInfo>
+    <fileVersion>0.0.1.20190819</fileVersion>
+    <txtFileVersion>UC Berkeley</txtFileVersion>
+    <fileDescription>OPT development release</fileDescription>
+    <copyright>Regents of the University of California</copyright>
+    <productVersion>0.0.1.20190819</productVersion>
+    <txtProductVersion>UC Berkeley</txtProductVersion>
+    <productName>Operations Planning Toolbox</productName>
+    <companyName></companyName>
+    <internalName>OPT</internalName>
+    <originalFilename>opt_dev.exe</originalFilename>
+  </versionInfo>
+</launch4jConfig>
